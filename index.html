@@ -8,122 +8,148 @@
   <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <script>
     tailwind.config = {
       theme: {
         extend: {
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+          fontFamily: {
+            sans: ['Manrope', 'system-ui', 'sans-serif'],
+            display: ['"Playfair Display"', 'Georgia', 'serif'],
+          },
+          colors: {
+            ink: { DEFAULT: '#0B0B10', 900: '#101017', 800: '#16161F', 700: '#1F1F2A' },
+            gold: { DEFAULT: '#C9A227', light: '#E6C55C', pale: '#F1E4B8', dark: '#9A7B1C' },
+            ivory: '#F4EFE6',
+          },
+          letterSpacing: { luxe: '0.3em' },
         },
       },
     };
   </script>
   <style>
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; color-scheme: dark; }
+    body {
+      background-color: #0B0B10;
+      background-image:
+        radial-gradient(1200px 600px at 85% -100px, rgba(201, 162, 39, 0.09), transparent 60%),
+        radial-gradient(900px 500px at -10% 45%, rgba(201, 162, 39, 0.05), transparent 60%);
+      background-attachment: fixed;
+    }
     body.no-scroll { overflow: hidden; }
     .drawer { transition: transform 0.3s ease; }
+    .text-gold-gradient {
+      background: linear-gradient(135deg, #E6C55C 0%, #C9A227 45%, #9A7B1C 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    ::selection { background: rgba(201, 162, 39, 0.35); }
     ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    ::-webkit-scrollbar-track { background: #101017; }
+    ::-webkit-scrollbar-thumb { background: #2c2c3a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #C9A227; }
   </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased">
+<body class="font-sans text-ivory antialiased">
 
   <!-- ============================ HEADER ============================ -->
-  <header class="sticky top-0 z-40 bg-slate-900 text-white shadow-lg">
-    <div class="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3">
+  <header class="sticky top-0 z-40 border-b border-gold/20 bg-ink/90 shadow-2xl shadow-black/40 backdrop-blur-md">
+    <div class="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3.5">
       <a href="#" class="flex items-center gap-3">
-        <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-orange-500 text-xl font-black tracking-tighter">GC</div>
+        <div class="flex h-11 w-11 items-center justify-center rounded-lg border border-gold/60 bg-gradient-to-b from-gold-light/20 to-transparent font-display text-xl font-black text-gold">GC</div>
         <div class="leading-tight">
-          <div class="text-lg font-extrabold tracking-wide">GRAND COMPANY</div>
-          <div class="text-[11px] uppercase tracking-widest text-slate-400">Građevinski materijali · Banja Luka</div>
+          <div class="font-display text-xl font-extrabold tracking-wide text-ivory">GRAND COMPANY</div>
+          <div class="text-[10px] uppercase tracking-luxe text-gold/70">Građevinski materijali · Banja Luka</div>
         </div>
       </a>
 
-      <nav class="ml-8 hidden items-center gap-6 text-sm font-medium text-slate-300 lg:flex">
-        <a href="#katalog" class="hover:text-orange-400">Katalog</a>
-        <a href="#kalkulator" class="hover:text-orange-400">W111 Kalkulator</a>
-        <a href="#b2b" class="hover:text-orange-400">B2B uslovi</a>
-        <a href="#kontakt" class="hover:text-orange-400">Kontakt</a>
+      <nav class="ml-8 hidden items-center gap-7 text-sm font-semibold text-ivory/60 lg:flex">
+        <a href="#katalog" class="transition hover:text-gold">Katalog</a>
+        <a href="#kalkulator" class="transition hover:text-gold">W111 Kalkulator</a>
+        <a href="#b2b" class="transition hover:text-gold">B2B uslovi</a>
+        <a href="#kontakt" class="transition hover:text-gold">Kontakt</a>
       </nav>
 
       <div class="ml-auto flex items-center gap-3">
         <!-- B2C / B2B mode toggle -->
-        <div class="flex rounded-lg bg-slate-800 p-1 text-xs font-semibold sm:text-sm" role="group" aria-label="Režim kupovine">
+        <div class="flex rounded-lg border border-white/10 bg-ink-800 p-1 text-xs font-bold sm:text-sm" role="group" aria-label="Režim kupovine">
           <button id="mode-b2c" class="rounded-md px-3 py-1.5">🛒 Maloprodaja</button>
           <button id="mode-b2b" class="rounded-md px-3 py-1.5">💼 B2B Partner Portal</button>
         </div>
 
         <!-- Cart -->
-        <button id="btn-cart" class="relative flex items-center gap-2 rounded-lg bg-orange-500 px-3 py-2 text-sm font-bold text-white hover:bg-orange-600">
+        <button id="btn-cart" class="relative flex items-center gap-2 rounded-lg bg-gradient-to-b from-gold-light to-gold px-3.5 py-2 text-sm font-extrabold text-ink shadow-lg shadow-gold/20 transition hover:from-gold hover:to-gold-dark">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 4.6a1 1 0 00.9 1.4h12.4M16 21a1 1 0 100-2 1 1 0 000 2zm-8 0a1 1 0 100-2 1 1 0 000 2z" />
           </svg>
           <span class="hidden sm:inline">Korpa</span>
-          <span id="cart-count" class="absolute -right-2 -top-2 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold">0</span>
+          <span id="cart-count" class="absolute -right-2 -top-2 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-red-600 px-1 text-xs font-bold text-white">0</span>
         </button>
       </div>
     </div>
 
     <!-- B2B partner bar (rendered by JS when logged in) -->
-    <div id="partner-bar" class="hidden border-t border-slate-700 bg-slate-800"></div>
+    <div id="partner-bar" class="hidden border-t border-gold/20 bg-gradient-to-r from-gold/10 via-ink-800 to-ink-800"></div>
   </header>
 
   <!-- ============================ HERO ============================ -->
-  <section class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-    <div class="mx-auto max-w-7xl px-4 py-14 lg:py-20">
+  <section class="relative overflow-hidden">
+    <div class="mx-auto max-w-7xl px-4 py-16 lg:py-24">
       <div class="max-w-3xl">
-        <p class="mb-3 inline-block rounded-full border border-orange-500/40 bg-orange-500/10 px-4 py-1 text-sm font-semibold text-orange-400">
-          Knauf ovlašćeni distributer · Specijalista za suhu gradnju
+        <p class="mb-5 flex items-center gap-3 text-xs font-bold uppercase tracking-luxe text-gold">
+          <span class="h-px w-10 bg-gold/60"></span>
+          Knauf ovlašćeni distributer ✦ Suha gradnja
         </p>
-        <h1 class="text-4xl font-black leading-tight lg:text-5xl">
-          Građevinski materijal za <span class="text-orange-500">profesionalce</span> — od palete do sprata.
+        <h1 class="font-display text-5xl font-black leading-[1.1] text-ivory lg:text-6xl">
+          Građevinski materijal <span class="italic text-gold-gradient">vrhunske klase</span> — od palete do sprata.
         </h1>
-        <p class="mt-4 text-lg text-slate-300">
+        <p class="mt-6 max-w-2xl text-lg leading-relaxed text-ivory/60">
           Veleprodaja i maloprodaja u Banjoj Luci. Vlastiti kamioni sa hidrauličnom dizalicom istovaraju
           materijal direktno na vašu etažu, a zalihe i cijene su sinhronizovane sa Pantheon ERP-om u realnom vremenu.
         </p>
-        <div class="mt-7 flex flex-wrap gap-3">
-          <a href="#katalog" class="rounded-lg bg-orange-500 px-6 py-3 font-bold text-white hover:bg-orange-600">Pogledaj katalog</a>
-          <a href="#kalkulator" class="rounded-lg bg-white/10 px-6 py-3 font-bold text-white ring-1 ring-white/30 hover:bg-white/20">📐 W111 Kalkulator</a>
-          <button id="hero-b2b-login" class="rounded-lg bg-white px-6 py-3 font-bold text-slate-900 hover:bg-slate-200">💼 Prijava za B2B partnere</button>
+        <div class="mt-9 flex flex-wrap gap-4">
+          <a href="#katalog" class="rounded-lg bg-gradient-to-b from-gold-light to-gold px-7 py-3.5 text-sm font-extrabold uppercase tracking-wider text-ink shadow-lg shadow-gold/25 transition hover:from-gold hover:to-gold-dark">Pogledaj katalog</a>
+          <a href="#kalkulator" class="rounded-lg border border-gold/40 px-7 py-3.5 text-sm font-extrabold uppercase tracking-wider text-gold transition hover:bg-gold/10">📐 W111 Kalkulator</a>
+          <button id="hero-b2b-login" class="rounded-lg border border-white/15 bg-white/5 px-7 py-3.5 text-sm font-extrabold uppercase tracking-wider text-ivory transition hover:border-gold/40 hover:text-gold">💼 B2B Prijava</button>
         </div>
-        <div class="mt-8 flex flex-wrap gap-x-8 gap-y-2 text-sm text-slate-400">
-          <span><strong class="text-white">A+</strong> bonitetna ocjena</span>
-          <span><strong class="text-white">13,8 mil. KM</strong> godišnji promet</span>
-          <span><strong class="text-white">80%</strong> B2B veleprodaja</span>
-          <span><strong class="text-white">30/60/90</strong> dana valuta plaćanja</span>
+        <div class="mt-12 flex flex-wrap gap-x-12 gap-y-4">
+          <div><div class="font-display text-3xl font-black text-gold">A+</div><div class="mt-0.5 text-xs uppercase tracking-widest text-ivory/40">Bonitetna ocjena</div></div>
+          <div><div class="font-display text-3xl font-black text-gold">13,8M</div><div class="mt-0.5 text-xs uppercase tracking-widest text-ivory/40">KM godišnji promet</div></div>
+          <div><div class="font-display text-3xl font-black text-gold">80%</div><div class="mt-0.5 text-xs uppercase tracking-widest text-ivory/40">B2B veleprodaja</div></div>
+          <div><div class="font-display text-3xl font-black text-gold">90</div><div class="mt-0.5 text-xs uppercase tracking-widest text-ivory/40">Dana valuta plaćanja</div></div>
         </div>
       </div>
 
       <!-- USP cards -->
-      <div class="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div class="rounded-xl bg-white/5 p-5 ring-1 ring-white/10">
-          <div class="text-3xl">🚛</div>
-          <h3 class="mt-2 font-bold">Kamion sa kranom</h3>
-          <p class="mt-1 text-sm text-slate-400">Istovar paletiranog materijala direktno na spratove gradilišta — regija Banja Luke i šire.</p>
+      <div class="mt-16 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="group rounded-2xl border border-white/5 bg-white/[0.03] p-6 transition hover:border-gold/40 hover:bg-gold/[0.05]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gold/30 text-2xl">🚛</div>
+          <h3 class="mt-4 font-display text-lg font-bold text-ivory">Kamion sa kranom</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ivory/50">Istovar paletiranog materijala direktno na spratove gradilišta — regija Banja Luke i šire.</p>
         </div>
-        <div class="rounded-xl bg-white/5 p-5 ring-1 ring-white/10">
-          <div class="text-3xl">📊</div>
-          <h3 class="mt-2 font-bold">Pantheon ERP uživo</h3>
-          <p class="mt-1 text-sm text-slate-400">Stanje zaliha, rabati i kreditni limiti sinhronizovani sa skladištem Nenada Kostića 151.</p>
+        <div class="group rounded-2xl border border-white/5 bg-white/[0.03] p-6 transition hover:border-gold/40 hover:bg-gold/[0.05]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gold/30 text-2xl">📊</div>
+          <h3 class="mt-4 font-display text-lg font-bold text-ivory">Pantheon ERP uživo</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ivory/50">Stanje zaliha, rabati i kreditni limiti sinhronizovani sa skladištem Nenada Kostića 151.</p>
         </div>
-        <div class="rounded-xl bg-white/5 p-5 ring-1 ring-white/10">
-          <div class="text-3xl">🏗️</div>
-          <h3 class="mt-2 font-bold">Kompletan Knauf sistem</h3>
-          <p class="mt-1 text-sm text-slate-400">Ploče, profili, veziva, izolacija i trake — sistemska suha gradnja na jednom mjestu.</p>
+        <div class="group rounded-2xl border border-white/5 bg-white/[0.03] p-6 transition hover:border-gold/40 hover:bg-gold/[0.05]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gold/30 text-2xl">🏗️</div>
+          <h3 class="mt-4 font-display text-lg font-bold text-ivory">Kompletan Knauf sistem</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ivory/50">Ploče, profili, veziva, izolacija i trake — sistemska suha gradnja na jednom mjestu.</p>
         </div>
-        <div class="rounded-xl bg-white/5 p-5 ring-1 ring-white/10">
-          <div class="text-3xl">📄</div>
-          <h3 class="mt-2 font-bold">Atesti i deklaracije</h3>
-          <p class="mt-1 text-sm text-slate-400">Protivpožarni atesti, zvučna izolovanost i CE dokumentacija za tehnički prijem objekata.</p>
+        <div class="group rounded-2xl border border-white/5 bg-white/[0.03] p-6 transition hover:border-gold/40 hover:bg-gold/[0.05]">
+          <div class="flex h-12 w-12 items-center justify-center rounded-xl border border-gold/30 text-2xl">📄</div>
+          <h3 class="mt-4 font-display text-lg font-bold text-ivory">Atesti i deklaracije</h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-ivory/50">Protivpožarni atesti, zvučna izolovanost i CE dokumentacija za tehnički prijem objekata.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Info strip -->
-  <div class="border-b border-slate-200 bg-white">
-    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-10 gap-y-2 px-4 py-3 text-sm text-slate-600">
+  <div class="border-y border-gold/15 bg-ink-800/60">
+    <div class="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-12 gap-y-2 px-4 py-3.5 text-sm text-ivory/50">
       <span>📍 Nenada Kostića 151, Banja Luka</span>
       <span>📞 051 388-995 · 065 516-696 (Viber/WhatsApp)</span>
       <span>🕐 Pon–Pet 07–17h · Sub 07–14h</span>
@@ -131,42 +157,43 @@
   </div>
 
   <!-- ============================ W111 KALKULATOR ============================ -->
-  <section id="kalkulator" class="mx-auto max-w-7xl scroll-mt-24 px-4 py-14">
-    <div class="mb-8 max-w-3xl">
-      <h2 class="text-3xl font-black text-slate-900">📐 Kalkulator utroška — Knauf W111 pregradni zid</h2>
-      <p class="mt-2 text-slate-600">
-        Unesite dimenzije zida i sistem sam računa normativ materijala sa uračunatih <strong>5% otpada</strong>,
+  <section id="kalkulator" class="mx-auto max-w-7xl scroll-mt-24 px-4 py-16 lg:py-20">
+    <div class="mb-10 max-w-3xl">
+      <p class="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-luxe text-gold"><span class="h-px w-10 bg-gold/60"></span>Inženjerski alat</p>
+      <h2 class="font-display text-4xl font-black text-ivory">Kalkulator utroška — <span class="italic text-gold-gradient">Knauf W111</span></h2>
+      <p class="mt-3 leading-relaxed text-ivory/60">
+        Unesite dimenzije zida i sistem sam računa normativ materijala sa uračunatih <strong class="text-ivory">5% otpada</strong>,
         zaokružen na cijela pakovanja. Gotovu specifikaciju (BOM) dodajte u korpu jednim klikom.
       </p>
     </div>
 
     <div class="grid gap-6 lg:grid-cols-5">
       <!-- Calculator form -->
-      <form id="calc-form" class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 lg:col-span-2">
+      <form id="calc-form" class="rounded-2xl border border-white/5 bg-ink-800/80 p-6 shadow-xl shadow-black/30 lg:col-span-2">
         <div class="grid grid-cols-2 gap-4">
           <label class="block">
-            <span class="text-sm font-semibold text-slate-700">Dužina zida L (m)</span>
+            <span class="text-sm font-semibold text-ivory/80">Dužina zida L (m)</span>
             <input type="number" id="calc-l" value="5" min="0.5" max="50" step="0.1" required
-                   class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+                   class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold" />
           </label>
           <label class="block">
-            <span class="text-sm font-semibold text-slate-700">Visina zida H (m)</span>
+            <span class="text-sm font-semibold text-ivory/80">Visina zida H (m)</span>
             <input type="number" id="calc-h" value="2.8" min="1" max="6" step="0.05" required
-                   class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+                   class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold" />
           </label>
         </div>
 
         <label class="mt-4 block">
-          <span class="text-sm font-semibold text-slate-700">Obloga (broj slojeva ploča po strani)</span>
-          <select id="calc-cladding" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500">
+          <span class="text-sm font-semibold text-ivory/80">Obloga (broj slojeva ploča po strani)</span>
+          <select id="calc-cladding" class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold">
             <option value="single">Jednostruka obloga (1× ploča obostrano)</option>
             <option value="double">Dvostruka obloga (2× ploča obostrano)</option>
           </select>
         </label>
 
         <label class="mt-4 block">
-          <span class="text-sm font-semibold text-slate-700">Tip gips-kartonske ploče</span>
-          <select id="calc-plate" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500">
+          <span class="text-sm font-semibold text-ivory/80">Tip gips-kartonske ploče</span>
+          <select id="calc-plate" class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold">
             <option value="KNF-001">Standardna GKB (5,20 KM/m²)</option>
             <option value="KNF-002">Impregnirana GKBI — kupatila (7,40 KM/m²)</option>
             <option value="KNF-003">Vatrootporna GKF (8,80 KM/m²)</option>
@@ -175,8 +202,8 @@
         </label>
 
         <label class="mt-4 block">
-          <span class="text-sm font-semibold text-slate-700">Potkonstrukcija (CW profil)</span>
-          <select id="calc-cw" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500">
+          <span class="text-sm font-semibold text-ivory/80">Potkonstrukcija (CW profil)</span>
+          <select id="calc-cw" class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold">
             <option value="PRF-050">CW 50 — zid 7,5 cm</option>
             <option value="PRF-075" selected>CW 75 — zid 10 cm</option>
             <option value="PRF-100">CW 100 — zid 12,5 cm</option>
@@ -184,8 +211,8 @@
         </label>
 
         <label class="mt-4 block">
-          <span class="text-sm font-semibold text-slate-700">Ispuna — izolaciona vuna</span>
-          <select id="calc-wool" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500">
+          <span class="text-sm font-semibold text-ivory/80">Ispuna — izolaciona vuna</span>
+          <select id="calc-wool" class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold">
             <option value="ISO-001">Kamena vuna NaturBoard 50 mm (6,90 KM/m²)</option>
             <option value="ISO-002">Kamena vuna NaturBoard 100 mm (12,80 KM/m²)</option>
             <option value="">Bez vune</option>
@@ -193,82 +220,84 @@
         </label>
 
         <label class="mt-4 block">
-          <span class="text-sm font-semibold text-slate-700">Masa za ispunu spojeva</span>
-          <select id="calc-filler" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500">
+          <span class="text-sm font-semibold text-ivory/80">Masa za ispunu spojeva</span>
+          <select id="calc-filler" class="mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold">
             <option value="CHM-001">Knauf Uniflott 5 kg (14,50 KM)</option>
             <option value="CHM-002">Knauf Fugenfüller Leicht 25 kg (28,00 KM)</option>
           </select>
         </label>
 
-        <label class="mt-4 flex items-center gap-2 text-sm text-slate-700">
-          <input type="checkbox" id="calc-soundtape" checked class="rounded border-slate-300 text-orange-500 focus:ring-orange-500" />
-          Dodaj zvučno-izolacionu traku za UW profile <span class="text-slate-400">(preporuka montaže)</span>
+        <label class="mt-4 flex items-center gap-2.5 text-sm text-ivory/70">
+          <input type="checkbox" id="calc-soundtape" checked class="rounded border-white/20 bg-ink-700 text-gold focus:ring-gold" />
+          Dodaj zvučno-izolacionu traku za UW profile <span class="text-ivory/40">(preporuka montaže)</span>
         </label>
 
-        <button type="submit" class="mt-6 w-full rounded-lg bg-slate-900 py-3 font-bold text-white hover:bg-slate-700">
+        <button type="submit" class="mt-7 w-full rounded-lg bg-gradient-to-b from-gold-light to-gold py-3.5 text-sm font-extrabold uppercase tracking-wider text-ink shadow-lg shadow-gold/20 transition hover:from-gold hover:to-gold-dark">
           Izračunaj utrošak materijala
         </button>
       </form>
 
       <!-- BOM results -->
-      <div id="bom-results" class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 lg:col-span-3">
-        <div class="flex h-full flex-col items-center justify-center py-16 text-center text-slate-400">
+      <div id="bom-results" class="rounded-2xl border border-white/5 bg-ink-800/80 p-6 shadow-xl shadow-black/30 lg:col-span-3">
+        <div class="flex h-full flex-col items-center justify-center py-16 text-center text-ivory/40">
           <div class="text-5xl">🧮</div>
-          <p class="mt-4 max-w-sm">Unesite dimenzije zida i kliknite <strong>Izračunaj</strong> — ovdje će se pojaviti kompletna specifikacija materijala (BOM) sa cijenama.</p>
+          <p class="mt-4 max-w-sm">Unesite dimenzije zida i kliknite <strong class="text-ivory/70">Izračunaj</strong> — ovdje će se pojaviti kompletna specifikacija materijala (BOM) sa cijenama.</p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ============================ KATALOG ============================ -->
-  <section id="katalog" class="scroll-mt-24 border-t border-slate-200 bg-white py-14">
+  <section id="katalog" class="scroll-mt-24 border-t border-white/5 bg-white/[0.02] py-16 lg:py-20">
     <div class="mx-auto max-w-7xl px-4">
-      <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
+      <div class="mb-10 flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h2 class="text-3xl font-black text-slate-900">Katalog proizvoda</h2>
-          <p class="mt-2 text-slate-600">Zalihe sa centralnog stovarišta — <span class="font-semibold text-emerald-600">⟳ Pantheon ERP sinhronizacija</span></p>
+          <p class="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-luxe text-gold"><span class="h-px w-10 bg-gold/60"></span>Asortiman</p>
+          <h2 class="font-display text-4xl font-black text-ivory">Katalog proizvoda</h2>
+          <p class="mt-3 text-ivory/60">Zalihe sa centralnog stovarišta — <span class="font-semibold text-emerald-400">⟳ Pantheon ERP sinhronizacija</span></p>
         </div>
         <div class="w-full sm:w-80">
           <input type="search" id="search" placeholder="🔍 Pretraga: naziv, šifra, dimenzija..."
-                 class="w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+                 class="w-full rounded-lg border-white/10 bg-ink-700 text-ivory placeholder-ivory/30 focus:border-gold focus:ring-gold" />
         </div>
       </div>
 
-      <div id="category-filters" class="mb-8 flex flex-wrap gap-2"></div>
+      <div id="category-filters" class="mb-10 flex flex-wrap gap-2"></div>
       <div id="product-grid" class="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
     </div>
   </section>
 
   <!-- ============================ B2B USLOVI ============================ -->
-  <section id="b2b" class="scroll-mt-24 bg-slate-900 py-14 text-white">
+  <section id="b2b" class="scroll-mt-24 border-t border-gold/15 bg-gradient-to-b from-ink-800/60 to-transparent py-16 lg:py-20">
     <div class="mx-auto max-w-7xl px-4">
-      <h2 class="text-3xl font-black">💼 B2B Partner Program</h2>
-      <p class="mt-2 max-w-2xl text-slate-300">
+      <p class="mb-3 flex items-center gap-3 text-xs font-bold uppercase tracking-luxe text-gold"><span class="h-px w-10 bg-gold/60"></span>Partnerstvo</p>
+      <h2 class="font-display text-4xl font-black text-ivory">💼 B2B Partner Program</h2>
+      <p class="mt-3 max-w-2xl leading-relaxed text-ivory/60">
         Za građevinske firme, izvođače radova i subjekte visokogradnje — ugovorni rabati, kreditni limiti
         i odgođeno plaćanje, sve sinhronizovano sa Pantheon ERP-om.
       </p>
 
-      <div class="mt-8 grid gap-6 lg:grid-cols-2">
-        <div class="rounded-2xl bg-white/5 p-6 ring-1 ring-white/10">
-          <h3 class="text-lg font-bold text-orange-400">Rabatna skala</h3>
-          <table class="mt-4 w-full text-sm">
+      <div class="mt-10 grid gap-6 lg:grid-cols-2">
+        <div class="rounded-2xl border border-gold/20 bg-white/[0.03] p-7">
+          <h3 class="font-display text-xl font-bold text-gold">Rabatna skala</h3>
+          <table class="mt-5 w-full text-sm">
             <tbody class="divide-y divide-white/10">
-              <tr><td class="py-3 text-slate-300">Gost / Maloprodaja (B2C)</td><td class="py-3 text-right font-bold">0%</td></tr>
-              <tr><td class="py-3 text-slate-300">Nivo 1 — Manji izvođači i zanatlije</td><td class="py-3 text-right font-bold text-orange-400">10%</td></tr>
-              <tr><td class="py-3 text-slate-300">Nivo 2 — Srednje građevinske firme</td><td class="py-3 text-right font-bold text-orange-400">15%</td></tr>
-              <tr><td class="py-3 text-slate-300">Nivo 3 — Veliki ugovorni partneri</td><td class="py-3 text-right font-bold text-orange-400">18–22%</td></tr>
+              <tr><td class="py-3.5 text-ivory/60">Gost / Maloprodaja (B2C)</td><td class="py-3.5 text-right font-display text-lg font-bold text-ivory/50">0%</td></tr>
+              <tr><td class="py-3.5 text-ivory/60">Nivo 1 — Manji izvođači i zanatlije</td><td class="py-3.5 text-right font-display text-lg font-bold text-gold">10%</td></tr>
+              <tr><td class="py-3.5 text-ivory/60">Nivo 2 — Srednje građevinske firme</td><td class="py-3.5 text-right font-display text-lg font-bold text-gold">15%</td></tr>
+              <tr><td class="py-3.5 text-ivory/60">Nivo 3 — Veliki ugovorni partneri</td><td class="py-3.5 text-right font-display text-lg font-bold text-gold">18–22%</td></tr>
             </tbody>
           </table>
         </div>
-        <div class="rounded-2xl bg-white/5 p-6 ring-1 ring-white/10">
-          <h3 class="text-lg font-bold text-orange-400">Kreditni uslovi</h3>
-          <ul class="mt-4 space-y-3 text-sm text-slate-300">
-            <li>✅ Odobreni kreditni limiti (npr. 50.000 KM) uz ugovorenu menicu ili bankarsku garanciju</li>
-            <li>✅ Valuta plaćanja <strong class="text-white">30, 60 ili 90 dana</strong> prema ugovoru</li>
-            <li>✅ Mjerač iskorištenosti limita u realnom vremenu na portalu (Pantheon sync)</li>
-            <li>✅ Predračuni i fakture direktno iz Pantheon ERP-a</li>
+        <div class="rounded-2xl border border-gold/20 bg-white/[0.03] p-7">
+          <h3 class="font-display text-xl font-bold text-gold">Kreditni uslovi</h3>
+          <ul class="mt-5 space-y-3.5 text-sm leading-relaxed text-ivory/60">
+            <li><span class="text-gold">✦</span> Odobreni kreditni limiti (npr. 50.000 KM) uz ugovorenu menicu ili bankarsku garanciju</li>
+            <li><span class="text-gold">✦</span> Valuta plaćanja <strong class="text-ivory">30, 60 ili 90 dana</strong> prema ugovoru</li>
+            <li><span class="text-gold">✦</span> Mjerač iskorištenosti limita u realnom vremenu na portalu (Pantheon sync)</li>
+            <li><span class="text-gold">✦</span> Predračuni i fakture direktno iz Pantheon ERP-a</li>
           </ul>
-          <button id="b2b-section-login" class="mt-6 rounded-lg bg-orange-500 px-6 py-3 font-bold text-white hover:bg-orange-600">
+          <button id="b2b-section-login" class="mt-7 rounded-lg bg-gradient-to-b from-gold-light to-gold px-7 py-3.5 text-sm font-extrabold uppercase tracking-wider text-ink shadow-lg shadow-gold/20 transition hover:from-gold hover:to-gold-dark">
             Prijavi se na Partner Portal
           </button>
         </div>
@@ -277,46 +306,46 @@
   </section>
 
   <!-- ============================ FOOTER / KONTAKT ============================ -->
-  <footer id="kontakt" class="scroll-mt-24 bg-slate-950 py-12 text-sm text-slate-400">
-    <div class="mx-auto grid max-w-7xl gap-8 px-4 md:grid-cols-3">
+  <footer id="kontakt" class="scroll-mt-24 border-t border-gold/15 bg-black/50 py-14 text-sm text-ivory/50">
+    <div class="mx-auto grid max-w-7xl gap-10 px-4 md:grid-cols-3">
       <div>
-        <div class="mb-3 flex items-center gap-2">
-          <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-500 font-black text-white">GC</div>
-          <span class="text-lg font-extrabold text-white">GRAND COMPANY d.o.o.</span>
+        <div class="mb-4 flex items-center gap-2.5">
+          <div class="flex h-10 w-10 items-center justify-center rounded-lg border border-gold/60 font-display font-black text-gold">GC</div>
+          <span class="font-display text-lg font-extrabold text-ivory">GRAND COMPANY d.o.o.</span>
         </div>
         <p>Trgovina i usluge, Banja Luka</p>
         <p class="mt-2">📍 Ul. Nenada Kostića 151, 78000 Banja Luka<br />(naselje Zalužani / Lazarevo)</p>
         <p class="mt-2">🕐 Pon–Pet: 07–17h · Sub: 07–14h · Ned: neradna</p>
       </div>
       <div>
-        <h4 class="mb-3 font-bold uppercase tracking-wider text-white">Kontakt</h4>
-        <p>Veleprodaja / Stovarište: <a href="tel:+38751388995" class="text-orange-400">+387 (0)51 388-995</a></p>
-        <p class="mt-1">Mobilni / Viber / WhatsApp: <a href="tel:+38765516696" class="text-orange-400">+387 (0)65 516-696</a></p>
-        <p class="mt-1">E-mail: <a href="mailto:info@grandcompany.com" class="text-orange-400">info@grandcompany.com</a></p>
-        <p class="mt-1">Prodaja: <a href="mailto:prodaja@grandcompany.com" class="text-orange-400">prodaja@grandcompany.com</a></p>
+        <h4 class="mb-4 text-xs font-bold uppercase tracking-luxe text-gold">Kontakt</h4>
+        <p>Veleprodaja / Stovarište: <a href="tel:+38751388995" class="text-ivory hover:text-gold">+387 (0)51 388-995</a></p>
+        <p class="mt-1.5">Mobilni / Viber / WhatsApp: <a href="tel:+38765516696" class="text-ivory hover:text-gold">+387 (0)65 516-696</a></p>
+        <p class="mt-1.5">E-mail: <a href="mailto:info@grandcompany.com" class="text-ivory hover:text-gold">info@grandcompany.com</a></p>
+        <p class="mt-1.5">Prodaja: <a href="mailto:prodaja@grandcompany.com" class="text-ivory hover:text-gold">prodaja@grandcompany.com</a></p>
       </div>
       <div>
-        <h4 class="mb-3 font-bold uppercase tracking-wider text-white">Pravni podaci</h4>
+        <h4 class="mb-4 text-xs font-bold uppercase tracking-luxe text-gold">Pravni podaci</h4>
         <p>JIB: 4403433180005</p>
         <p>MBS: 57-01-0089-12</p>
         <p>PIB: 403433180005</p>
-        <p class="mt-1">Direktor: Predrag Uzelac</p>
-        <p class="mt-4 text-xs text-slate-600">© 2026 Grand Company d.o.o. Banja Luka · Demo web portal</p>
+        <p class="mt-1.5">Direktor: Predrag Uzelac</p>
+        <p class="mt-5 text-xs text-ivory/25">© 2026 Grand Company d.o.o. Banja Luka · Demo web portal</p>
       </div>
     </div>
   </footer>
 
   <!-- ============================ CART DRAWER ============================ -->
-  <div id="cart-overlay" class="fixed inset-0 z-40 hidden bg-black/50"></div>
-  <aside id="cart-drawer" class="drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-md translate-x-full flex-col bg-white shadow-2xl">
-    <div class="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-      <h3 class="text-lg font-black text-slate-900">🛒 Korpa</h3>
-      <button id="btn-close-cart" class="rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700" aria-label="Zatvori korpu">
+  <div id="cart-overlay" class="fixed inset-0 z-40 hidden bg-black/70 backdrop-blur-sm"></div>
+  <aside id="cart-drawer" class="drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-md translate-x-full flex-col border-l border-gold/20 bg-ink-900 shadow-2xl shadow-black/60">
+    <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+      <h3 class="font-display text-xl font-black text-ivory">🛒 Korpa</h3>
+      <button id="btn-close-cart" class="rounded-lg p-2 text-ivory/40 transition hover:bg-white/5 hover:text-gold" aria-label="Zatvori korpu">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
       </button>
     </div>
     <div id="cart-body" class="flex-1 overflow-y-auto px-5 py-4"></div>
-    <div id="cart-footer" class="border-t border-slate-200 px-5 py-4"></div>
+    <div id="cart-footer" class="border-t border-white/10 px-5 py-4"></div>
   </aside>
 
   <!-- ============================ MODALS (login / checkout / order) ============================ -->

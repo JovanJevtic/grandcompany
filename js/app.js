@@ -22,6 +22,10 @@ const bySku = Object.fromEntries(PRODUCTS.map((p) => [p.sku, p]));
 const esc = (s) =>
   String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+// Shared dark-theme form field classes
+const FIELD = 'mt-1 w-full rounded-lg border-white/10 bg-ink-700 text-ivory focus:border-gold focus:ring-gold';
+const BTN_GOLD = 'rounded-lg bg-gradient-to-b from-gold-light to-gold font-extrabold text-ink shadow-lg shadow-gold/20 transition hover:from-gold hover:to-gold-dark';
+
 // ---------------------------------------------------------------------
 // Application state (persisted to localStorage)
 // ---------------------------------------------------------------------
@@ -113,7 +117,7 @@ function setCartQty(sku, qty) {
 function toast(msg) {
   const el = document.createElement('div');
   el.className =
-    'pointer-events-auto mb-2 rounded-lg bg-slate-900 px-5 py-3 text-sm font-semibold text-white shadow-xl ring-1 ring-white/20 transition-opacity duration-500';
+    'pointer-events-auto mb-2 rounded-lg bg-ink-800 px-5 py-3 text-sm font-semibold text-ivory shadow-xl ring-1 ring-gold/40 transition-opacity duration-500';
   el.textContent = msg;
   $('toast').appendChild(el);
   setTimeout(() => (el.style.opacity = '0'), 2200);
@@ -124,8 +128,8 @@ function toast(msg) {
 // Header: mode toggle + partner bar (credit meter)
 // ---------------------------------------------------------------------
 function renderModeToggle() {
-  const active = 'rounded-md px-3 py-1.5 bg-orange-500 text-white';
-  const idle = 'rounded-md px-3 py-1.5 text-slate-300 hover:text-white';
+  const active = 'rounded-md px-3 py-1.5 bg-gradient-to-b from-gold-light to-gold font-extrabold text-ink';
+  const idle = 'rounded-md px-3 py-1.5 text-ivory/50 hover:text-ivory';
   $('mode-b2c').className = partner() ? idle : active;
   $('mode-b2b').className = partner() ? active : idle;
 }
@@ -147,19 +151,19 @@ function renderPartnerBar() {
 
   bar.innerHTML = `
     <div class="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2.5 text-sm">
-      <span class="font-bold text-white">💼 ${esc(p.name)}</span>
-      <span class="rounded-full bg-orange-500/20 px-2.5 py-0.5 text-xs font-bold text-orange-400">${esc(p.tier)}</span>
-      <span class="text-slate-300">Rabat: <strong class="text-orange-400">−${pct(p.discount)}</strong></span>
-      <span class="text-slate-300">Valuta: <strong class="text-white">${p.paymentDays} dana</strong></span>
+      <span class="font-bold text-ivory">💼 ${esc(p.name)}</span>
+      <span class="rounded-full bg-gold/15 px-2.5 py-0.5 text-xs font-bold text-gold">${esc(p.tier)}</span>
+      <span class="text-ivory/60">Rabat: <strong class="text-gold">−${pct(p.discount)}</strong></span>
+      <span class="text-ivory/60">Valuta: <strong class="text-ivory">${p.paymentDays} dana</strong></span>
       <div class="flex min-w-[240px] max-w-md flex-1 items-center gap-2">
-        <span class="whitespace-nowrap text-xs text-slate-400">Kreditni limit:</span>
-        <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-slate-700">
+        <span class="whitespace-nowrap text-xs text-ivory/40">Kreditni limit:</span>
+        <div class="h-2.5 flex-1 overflow-hidden rounded-full bg-white/10">
           <div class="h-full ${barColor} transition-all" style="width:${usedPct}%"></div>
         </div>
-        <span class="whitespace-nowrap text-xs text-slate-300">${KM(used)} / ${KM(p.creditLimit)} <span class="text-emerald-400">(${KM(free)} slobodno)</span></span>
+        <span class="whitespace-nowrap text-xs text-ivory/60">${KM(used)} / ${KM(p.creditLimit)} <span class="text-emerald-400">(${KM(free)} slobodno)</span></span>
       </div>
       <span class="text-xs font-semibold text-emerald-400">⟳ Pantheon ERP · ${syncTime}</span>
-      <button id="btn-logout" class="rounded-md bg-slate-700 px-3 py-1 text-xs font-semibold text-white hover:bg-slate-600">Odjava</button>
+      <button id="btn-logout" class="rounded-md bg-white/10 px-3 py-1 text-xs font-semibold text-ivory transition hover:bg-white/20">Odjava</button>
     </div>`;
   bar.classList.remove('hidden');
   $('btn-logout').addEventListener('click', logout);
@@ -178,13 +182,13 @@ function logout() {
 function openLoginModal() {
   const options = PARTNERS.map(
     (p, i) => `
-    <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 p-4 transition hover:border-orange-400 has-[:checked]:border-orange-500 has-[:checked]:bg-orange-50">
-      <input type="radio" name="login-partner" value="${p.id}" ${i === 2 ? 'checked' : ''} class="mt-1 text-orange-500 focus:ring-orange-500" />
+    <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-white/10 p-4 transition hover:border-gold/50 has-[:checked]:border-gold has-[:checked]:bg-gold/10">
+      <input type="radio" name="login-partner" value="${p.id}" ${i === 2 ? 'checked' : ''} class="mt-1 border-white/20 bg-ink-700 text-gold focus:ring-gold" />
       <span>
-        <span class="block font-bold text-slate-900">${esc(p.name)}</span>
-        <span class="block text-xs text-slate-500">${esc(p.tier)}</span>
-        <span class="mt-1 block text-xs">
-          <span class="font-bold text-orange-600">Rabat −${pct(p.discount)}</span> ·
+        <span class="block font-bold text-ivory">${esc(p.name)}</span>
+        <span class="block text-xs text-ivory/50">${esc(p.tier)}</span>
+        <span class="mt-1 block text-xs text-ivory/60">
+          <span class="font-bold text-gold">Rabat −${pct(p.discount)}</span> ·
           Limit ${KM(p.creditLimit)} · Valuta ${p.paymentDays} dana
         </span>
       </span>
@@ -193,18 +197,18 @@ function openLoginModal() {
 
   openModal(`
     <div class="p-6">
-      <h3 class="text-xl font-black text-slate-900">💼 B2B Partner Portal — Prijava</h3>
-      <p class="mt-1 text-sm text-slate-500">Demo prikaz: odaberite jedan od test naloga. U produkciji se prijava provjerava kroz Pantheon šifarnik kupaca.</p>
+      <h3 class="font-display text-2xl font-black text-ivory">💼 B2B Partner Portal — Prijava</h3>
+      <p class="mt-1 text-sm text-ivory/50">Demo prikaz: odaberite jedan od test naloga. U produkciji se prijava provjerava kroz Pantheon šifarnik kupaca.</p>
       <form id="login-form" class="mt-5 space-y-3">
         ${options}
         <label class="block pt-2">
-          <span class="text-sm font-semibold text-slate-700">Lozinka</span>
-          <input type="password" value="demo1234" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
-          <span class="mt-1 block text-xs text-slate-400">Demo režim — bilo koja lozinka je prihvaćena.</span>
+          <span class="text-sm font-semibold text-ivory/80">Lozinka</span>
+          <input type="password" value="demo1234" class="${FIELD}" />
+          <span class="mt-1 block text-xs text-ivory/40">Demo režim — bilo koja lozinka je prihvaćena.</span>
         </label>
         <div class="flex gap-3 pt-3">
-          <button type="submit" class="flex-1 rounded-lg bg-orange-500 py-3 font-bold text-white hover:bg-orange-600">Prijavi se</button>
-          <button type="button" data-close-modal class="rounded-lg bg-slate-100 px-6 py-3 font-bold text-slate-600 hover:bg-slate-200">Otkaži</button>
+          <button type="submit" class="${BTN_GOLD} flex-1 py-3 text-sm uppercase tracking-wider">Prijavi se</button>
+          <button type="button" data-close-modal class="rounded-lg bg-white/5 px-6 py-3 font-bold text-ivory/70 transition hover:bg-white/10">Otkaži</button>
         </div>
       </form>
     </div>`);
@@ -226,8 +230,8 @@ function openLoginModal() {
 // ---------------------------------------------------------------------
 function openModal(innerHtml, { wide = false } = {}) {
   $('modal-root').innerHTML = `
-    <div id="modal-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div class="max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} overflow-y-auto rounded-2xl bg-white shadow-2xl">
+    <div id="modal-overlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 backdrop-blur-sm">
+      <div class="max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} overflow-y-auto rounded-2xl border border-gold/25 bg-ink-900 text-ivory shadow-2xl shadow-black/60">
         ${innerHtml}
       </div>
     </div>`;
@@ -248,17 +252,19 @@ function closeModal() {
 // ---------------------------------------------------------------------
 function stockBadge(p) {
   if (p.stock > 1000)
-    return `<span class="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-700">✔ Na stanju · ${fmt0.format(p.stock)} ${p.unit}</span>`;
+    return `<span class="rounded-full bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-400">✔ Na stanju · ${fmt0.format(p.stock)} ${p.unit}</span>`;
   if (p.stock >= 300)
-    return `<span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">◐ Ograničeno · ${fmt0.format(p.stock)} ${p.unit}</span>`;
-  return `<span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">⚠ Niske zalihe · ${fmt0.format(p.stock)} ${p.unit}</span>`;
+    return `<span class="rounded-full bg-amber-500/10 px-2 py-0.5 text-xs font-semibold text-amber-400">◐ Ograničeno · ${fmt0.format(p.stock)} ${p.unit}</span>`;
+  return `<span class="rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-semibold text-red-400">⚠ Niske zalihe · ${fmt0.format(p.stock)} ${p.unit}</span>`;
 }
 
 function renderCategoryFilters() {
   $('category-filters').innerHTML = CATEGORIES.map((c) => {
     const active = state.category === c.id;
     return `<button data-category="${c.id}" class="rounded-full px-4 py-2 text-sm font-semibold transition ${
-      active ? 'bg-orange-500 text-white shadow' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+      active
+        ? 'bg-gradient-to-b from-gold-light to-gold text-ink shadow-lg shadow-gold/20'
+        : 'bg-white/5 text-ivory/60 hover:bg-white/10 hover:text-ivory'
     }">${c.label}</button>`;
   }).join('');
 }
@@ -279,34 +285,34 @@ function renderCatalog() {
 
   if (!products.length) {
     $('product-grid').innerHTML =
-      '<p class="col-span-full py-12 text-center text-slate-400">Nema artikala za zadatu pretragu. 🔍</p>';
+      '<p class="col-span-full py-12 text-center text-ivory/40">Nema artikala za zadatu pretragu. 🔍</p>';
     return;
   }
 
   $('product-grid').innerHTML = products.map((p) => {
     const priceHtml = b2b
       ? `<div>
-           <span class="text-xs text-slate-400 line-through">${KM(p.price)}</span>
-           <span class="ml-1 rounded bg-orange-100 px-1.5 py-0.5 text-xs font-bold text-orange-600">−${pct(discount())}</span>
-           <div class="text-xl font-black text-slate-900">${KM(priceOf(p))} <span class="text-xs font-medium text-slate-400">/${p.unit} sa PDV</span></div>
+           <span class="text-xs text-ivory/30 line-through">${KM(p.price)}</span>
+           <span class="ml-1 rounded bg-gold/15 px-1.5 py-0.5 text-xs font-bold text-gold">−${pct(discount())}</span>
+           <div class="font-display text-xl font-black text-gold">${KM(priceOf(p))} <span class="font-sans text-xs font-medium text-ivory/40">/${p.unit} sa PDV</span></div>
          </div>`
-      : `<div class="text-xl font-black text-slate-900">${KM(p.price)} <span class="text-xs font-medium text-slate-400">/${p.unit} sa PDV</span></div>`;
+      : `<div class="font-display text-xl font-black text-gold">${KM(p.price)} <span class="font-sans text-xs font-medium text-ivory/40">/${p.unit} sa PDV</span></div>`;
 
     return `
-    <article class="flex flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200 transition hover:shadow-md hover:ring-orange-300">
+    <article class="flex flex-col rounded-2xl border border-white/5 bg-ink-800/80 p-5 transition hover:border-gold/40 hover:shadow-lg hover:shadow-gold/5">
       <div class="flex items-start justify-between gap-2">
-        <span class="rounded bg-slate-100 px-2 py-0.5 font-mono text-xs font-semibold text-slate-500">${p.sku}</span>
+        <span class="rounded bg-white/5 px-2 py-0.5 font-mono text-xs font-semibold text-ivory/40">${p.sku}</span>
         ${stockBadge(p)}
       </div>
-      <h3 class="mt-3 font-bold leading-snug text-slate-900">${esc(p.name)}</h3>
-      <p class="mt-1 text-xs text-slate-500">${esc(p.spec)}</p>
-      <p class="mt-1 flex-1 text-sm text-slate-600">${esc(p.desc)}</p>
+      <h3 class="mt-3 font-bold leading-snug text-ivory">${esc(p.name)}</h3>
+      <p class="mt-1 text-xs text-ivory/40">${esc(p.spec)}</p>
+      <p class="mt-1 flex-1 text-sm text-ivory/60">${esc(p.desc)}</p>
       <div class="mt-4 flex items-end justify-between gap-3">
         ${priceHtml}
         <div class="flex items-center gap-1.5">
           <input type="number" value="1" min="0.5" step="any" data-qty-for="${p.sku}"
-                 class="w-16 rounded-lg border-slate-300 px-2 py-1.5 text-center text-sm focus:border-orange-500 focus:ring-orange-500" />
-          <button data-add="${p.sku}" class="rounded-lg bg-slate-900 px-3 py-2 text-sm font-bold text-white hover:bg-orange-500" title="Dodaj u korpu">+🛒</button>
+                 class="w-16 rounded-lg border-white/10 bg-ink-700 px-2 py-1.5 text-center text-sm text-ivory focus:border-gold focus:ring-gold" />
+          <button data-add="${p.sku}" class="rounded-lg border border-gold/40 px-3 py-2 text-sm font-bold text-gold transition hover:bg-gold hover:text-ink" title="Dodaj u korpu">+🛒</button>
         </div>
       </div>
     </article>`;
@@ -343,7 +349,7 @@ function renderCart() {
   // --- items ---
   if (!t.items.length) {
     $('cart-body').innerHTML = `
-      <div class="flex h-full flex-col items-center justify-center py-16 text-center text-slate-400">
+      <div class="flex h-full flex-col items-center justify-center py-16 text-center text-ivory/40">
         <div class="text-5xl">🛒</div>
         <p class="mt-4">Korpa je prazna.<br />Dodajte artikle iz kataloga ili preko W111 kalkulatora.</p>
       </div>`;
@@ -352,23 +358,23 @@ function renderCart() {
   }
 
   $('cart-body').innerHTML = t.items.map(({ product: p, qty }) => `
-    <div class="mb-3 rounded-xl border border-slate-200 p-3">
+    <div class="mb-3 rounded-xl border border-white/10 bg-white/[0.02] p-3">
       <div class="flex items-start justify-between gap-2">
         <div>
-          <div class="text-sm font-bold leading-snug text-slate-900">${esc(p.name)}</div>
-          <div class="mt-0.5 font-mono text-xs text-slate-400">${p.sku} · ${KM(priceOf(p))}/${p.unit}</div>
+          <div class="text-sm font-bold leading-snug text-ivory">${esc(p.name)}</div>
+          <div class="mt-0.5 font-mono text-xs text-ivory/40">${p.sku} · ${KM(priceOf(p))}/${p.unit}</div>
         </div>
-        <button data-remove="${p.sku}" class="text-slate-300 hover:text-red-500" title="Ukloni">✕</button>
+        <button data-remove="${p.sku}" class="text-ivory/30 transition hover:text-red-400" title="Ukloni">✕</button>
       </div>
       <div class="mt-2 flex items-center justify-between">
         <div class="flex items-center gap-1">
-          <button data-dec="${p.sku}" class="h-7 w-7 rounded-md bg-slate-100 font-bold hover:bg-slate-200">−</button>
+          <button data-dec="${p.sku}" class="h-7 w-7 rounded-md bg-white/5 font-bold text-ivory transition hover:bg-white/15">−</button>
           <input type="number" value="${qty}" min="0" step="any" data-cart-qty="${p.sku}"
-                 class="w-20 rounded-md border-slate-300 px-1 py-1 text-center text-sm" />
-          <button data-inc="${p.sku}" class="h-7 w-7 rounded-md bg-slate-100 font-bold hover:bg-slate-200">+</button>
-          <span class="ml-1 text-xs text-slate-400">${p.unit}</span>
+                 class="w-20 rounded-md border-white/10 bg-ink-700 px-1 py-1 text-center text-sm text-ivory focus:border-gold focus:ring-gold" />
+          <button data-inc="${p.sku}" class="h-7 w-7 rounded-md bg-white/5 font-bold text-ivory transition hover:bg-white/15">+</button>
+          <span class="ml-1 text-xs text-ivory/40">${p.unit}</span>
         </div>
-        <div class="font-bold text-slate-900">${KM(priceOf(p) * qty)}</div>
+        <div class="font-bold text-gold">${KM(priceOf(p) * qty)}</div>
       </div>
     </div>`).join('');
 
@@ -377,7 +383,7 @@ function renderCart() {
   const standardFree = t.subtotal >= FREE_STANDARD_DELIVERY_OVER;
   const craneHint =
     t.weightKg >= CRANE_RECOMMEND_OVER_KG && state.delivery !== 'kran'
-      ? `<p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-700">🏗️ Težina pošiljke je ${fmt0.format(t.weightKg)} kg — preporučujemo kamion sa kranom za istovar na gradilištu.</p>`
+      ? `<p class="mt-2 rounded-lg bg-amber-500/10 px-3 py-2 text-xs font-semibold text-amber-400">🏗️ Težina pošiljke je ${fmt0.format(t.weightKg)} kg — preporučujemo kamion sa kranom za istovar na gradilištu.</p>`
       : '';
 
   const deliveryOptions = [
@@ -386,40 +392,40 @@ function renderCart() {
     { id: 'kran', label: '🏗️ Kamion sa kranom — istovar na etažu', sub: `Transport ${KM(zone.kranTransport)} + rad krana ${KM(zone.kranWork)}`, cost: KM(zone.kranTransport + zone.kranWork) },
   ].map((o) => `
     <label class="flex cursor-pointer items-center justify-between gap-2 rounded-lg border p-2.5 text-sm transition ${
-      state.delivery === o.id ? 'border-orange-500 bg-orange-50' : 'border-slate-200 hover:border-slate-300'
+      state.delivery === o.id ? 'border-gold bg-gold/10' : 'border-white/10 hover:border-white/25'
     }">
       <span class="flex items-center gap-2">
-        <input type="radio" name="delivery" value="${o.id}" ${state.delivery === o.id ? 'checked' : ''} class="text-orange-500 focus:ring-orange-500" />
-        <span><span class="font-semibold">${o.label}</span><br /><span class="text-xs text-slate-400">${o.sub}</span></span>
+        <input type="radio" name="delivery" value="${o.id}" ${state.delivery === o.id ? 'checked' : ''} class="border-white/20 bg-ink-700 text-gold focus:ring-gold" />
+        <span><span class="font-semibold text-ivory">${o.label}</span><br /><span class="text-xs text-ivory/40">${o.sub}</span></span>
       </span>
-      <span class="whitespace-nowrap text-xs font-bold">${o.cost}</span>
+      <span class="whitespace-nowrap text-xs font-bold text-ivory">${o.cost}</span>
     </label>`).join('');
 
   const zoneSelect =
     state.delivery === 'pickup'
       ? ''
-      : `<select id="zone-select" class="mt-2 w-full rounded-lg border-slate-300 text-sm focus:border-orange-500 focus:ring-orange-500">
+      : `<select id="zone-select" class="mt-2 w-full rounded-lg border-white/10 bg-ink-700 text-sm text-ivory focus:border-gold focus:ring-gold">
           ${DELIVERY_ZONES.map((z) => `<option value="${z.id}" ${z.id === state.zone ? 'selected' : ''}>${z.label}</option>`).join('')}
         </select>`;
 
   const rebateRow = t.rebate > 0
-    ? `<div class="flex justify-between text-sm text-orange-600"><span>Vaš B2B rabat (−${pct(discount())})</span><span class="font-bold">−${KM(t.rebate)}</span></div>`
+    ? `<div class="flex justify-between text-sm text-gold"><span>Vaš B2B rabat (−${pct(discount())})</span><span class="font-bold">−${KM(t.rebate)}</span></div>`
     : '';
 
   $('cart-footer').innerHTML = `
     <div class="space-y-1.5">${deliveryOptions}</div>
     ${zoneSelect}
-    <p class="mt-2 text-xs text-slate-400">Procijenjena težina pošiljke: <strong>${fmt0.format(t.weightKg)} kg</strong></p>
+    <p class="mt-2 text-xs text-ivory/40">Procijenjena težina pošiljke: <strong class="text-ivory/70">${fmt0.format(t.weightKg)} kg</strong></p>
     ${craneHint}
-    <div class="mt-3 space-y-1 border-t border-slate-200 pt-3">
-      ${t.rebate > 0 ? `<div class="flex justify-between text-sm text-slate-400"><span>Vrijednost po cjenovniku</span><span class="line-through">${KM(t.grossB2C)}</span></div>` : ''}
+    <div class="mt-3 space-y-1 border-t border-white/10 pt-3">
+      ${t.rebate > 0 ? `<div class="flex justify-between text-sm text-ivory/40"><span>Vrijednost po cjenovniku</span><span class="line-through">${KM(t.grossB2C)}</span></div>` : ''}
       ${rebateRow}
       <div class="flex justify-between text-sm"><span>Roba (sa PDV)</span><span class="font-semibold">${KM(t.subtotal)}</span></div>
       <div class="flex justify-between text-sm"><span>Dostava</span><span class="font-semibold">${t.deliveryCost ? KM(t.deliveryCost) : 'Besplatno'}</span></div>
-      <div class="flex justify-between text-xs text-slate-400"><span>Osnovica / PDV 17%</span><span>${KM(t.net)} / ${KM(t.vat)}</span></div>
-      <div class="flex justify-between border-t border-slate-200 pt-2 text-lg font-black text-slate-900"><span>UKUPNO</span><span>${KM(t.total)}</span></div>
+      <div class="flex justify-between text-xs text-ivory/40"><span>Osnovica / PDV 17%</span><span>${KM(t.net)} / ${KM(t.vat)}</span></div>
+      <div class="flex justify-between border-t border-white/10 pt-2 font-display text-lg font-black text-gold"><span>UKUPNO</span><span>${KM(t.total)}</span></div>
     </div>
-    <button id="btn-checkout" class="mt-3 w-full rounded-lg bg-orange-500 py-3 font-bold text-white hover:bg-orange-600">Kreiraj narudžbu →</button>`;
+    <button id="btn-checkout" class="${BTN_GOLD} mt-3 w-full py-3 text-sm uppercase tracking-wider">Kreiraj narudžbu →</button>`;
 
   $('btn-checkout').addEventListener('click', openCheckoutModal);
   document.querySelectorAll('input[name="delivery"]').forEach((r) =>
@@ -461,52 +467,52 @@ function openCheckoutModal() {
 
   const creditWarning =
     p && !deferredOk
-      ? `<p class="rounded-lg bg-red-50 px-3 py-2 text-xs font-semibold text-red-600">⚠ Vrijednost narudžbe (${KM(t.total)}) prelazi slobodan kreditni limit (${KM(creditFree)}). Odgođeno plaćanje nije moguće — dostupan je avans, ili kontaktirajte komercijalistu za povećanje limita.</p>`
+      ? `<p class="rounded-lg bg-red-500/10 px-3 py-2 text-xs font-semibold text-red-400">⚠ Vrijednost narudžbe (${KM(t.total)}) prelazi slobodan kreditni limit (${KM(creditFree)}). Odgođeno plaćanje nije moguće — dostupan je avans, ili kontaktirajte komercijalistu za povećanje limita.</p>`
       : '';
 
   const needsAddress = state.delivery !== 'pickup';
 
   openModal(`
     <div class="p-6">
-      <h3 class="text-xl font-black text-slate-900">Kreiranje narudžbe</h3>
-      <p class="mt-1 text-sm text-slate-500">${t.items.length} artikala · ${KM(t.total)} sa PDV i dostavom</p>
+      <h3 class="font-display text-2xl font-black text-ivory">Kreiranje narudžbe</h3>
+      <p class="mt-1 text-sm text-ivory/50">${t.items.length} artikala · ${KM(t.total)} sa PDV i dostavom</p>
       <form id="checkout-form" class="mt-5 space-y-4">
         ${p ? `
-        <div class="rounded-lg bg-slate-50 px-3 py-2 text-sm">
-          <span class="text-slate-400">Kupac (Pantheon):</span> <strong>${esc(p.name)}</strong>
-          <span class="ml-2 rounded bg-orange-100 px-1.5 py-0.5 text-xs font-bold text-orange-600">rabat −${pct(p.discount)}</span>
+        <div class="rounded-lg bg-white/5 px-3 py-2 text-sm">
+          <span class="text-ivory/40">Kupac (Pantheon):</span> <strong class="text-ivory">${esc(p.name)}</strong>
+          <span class="ml-2 rounded bg-gold/15 px-1.5 py-0.5 text-xs font-bold text-gold">rabat −${pct(p.discount)}</span>
         </div>` : ''}
         <div class="grid gap-4 sm:grid-cols-2">
           <label class="block">
-            <span class="text-sm font-semibold text-slate-700">${p ? 'Kontakt osoba *' : 'Ime i prezime *'}</span>
-            <input type="text" id="co-name" required class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+            <span class="text-sm font-semibold text-ivory/80">${p ? 'Kontakt osoba *' : 'Ime i prezime *'}</span>
+            <input type="text" id="co-name" required class="${FIELD}" />
           </label>
           <label class="block">
-            <span class="text-sm font-semibold text-slate-700">Telefon *</span>
-            <input type="tel" id="co-phone" required placeholder="065 ..." class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+            <span class="text-sm font-semibold text-ivory/80">Telefon *</span>
+            <input type="tel" id="co-phone" required placeholder="065 ..." class="${FIELD}" />
           </label>
         </div>
         <label class="block">
-          <span class="text-sm font-semibold text-slate-700">E-mail</span>
-          <input type="email" id="co-email" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+          <span class="text-sm font-semibold text-ivory/80">E-mail</span>
+          <input type="email" id="co-email" class="${FIELD}" />
         </label>
         ${needsAddress ? `
         <label class="block">
-          <span class="text-sm font-semibold text-slate-700">Adresa gradilišta / istovara *</span>
-          <input type="text" id="co-address" required placeholder="Ulica i broj, mjesto — napomena za kran (sprat, pristup...)" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500" />
+          <span class="text-sm font-semibold text-ivory/80">Adresa gradilišta / istovara *</span>
+          <input type="text" id="co-address" required placeholder="Ulica i broj, mjesto — napomena za kran (sprat, pristup...)" class="${FIELD}" />
         </label>` : ''}
         <label class="block">
-          <span class="text-sm font-semibold text-slate-700">Način plaćanja</span>
-          <select id="co-payment" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500">${paymentOptions}</select>
+          <span class="text-sm font-semibold text-ivory/80">Način plaćanja</span>
+          <select id="co-payment" class="${FIELD}">${paymentOptions}</select>
         </label>
         ${creditWarning}
         <label class="block">
-          <span class="text-sm font-semibold text-slate-700">Napomena</span>
-          <textarea id="co-note" rows="2" class="mt-1 w-full rounded-lg border-slate-300 focus:border-orange-500 focus:ring-orange-500"></textarea>
+          <span class="text-sm font-semibold text-ivory/80">Napomena</span>
+          <textarea id="co-note" rows="2" class="${FIELD}"></textarea>
         </label>
         <div class="flex gap-3 pt-2">
-          <button type="submit" class="flex-1 rounded-lg bg-orange-500 py-3 font-bold text-white hover:bg-orange-600">Pošalji narudžbu ✓</button>
-          <button type="button" data-close-modal class="rounded-lg bg-slate-100 px-6 py-3 font-bold text-slate-600 hover:bg-slate-200">Nazad</button>
+          <button type="submit" class="${BTN_GOLD} flex-1 py-3 text-sm uppercase tracking-wider">Pošalji narudžbu ✓</button>
+          <button type="button" data-close-modal class="rounded-lg bg-white/5 px-6 py-3 font-bold text-ivory/70 transition hover:bg-white/10">Nazad</button>
         </div>
       </form>
     </div>`);
@@ -533,8 +539,8 @@ function submitOrder(form) {
   const deliveryLabels = { pickup: 'Preuzimanje na stovarištu', standard: 'Standardna dostava', kran: 'Kamion sa kranom — istovar na etažu' };
 
   const rows = t.items.map(({ product: pr, qty }) => `
-    <tr class="border-b border-slate-100">
-      <td class="py-1.5 pr-2 font-mono text-xs text-slate-400">${pr.sku}</td>
+    <tr class="border-b border-white/10">
+      <td class="py-1.5 pr-2 font-mono text-xs text-ivory/40">${pr.sku}</td>
       <td class="py-1.5 pr-2">${esc(pr.name)}</td>
       <td class="py-1.5 pr-2 text-right whitespace-nowrap">${qtyFmt(qty)} ${pr.unit}</td>
       <td class="py-1.5 text-right font-semibold whitespace-nowrap">${KM(priceOf(pr) * qty)}</td>
@@ -544,26 +550,26 @@ function submitOrder(form) {
   openModal(`
     <div class="p-6">
       <div class="flex items-center gap-3">
-        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100 text-2xl">✅</div>
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-2xl">✅</div>
         <div>
-          <h3 class="text-xl font-black text-slate-900">Narudžba ${orderNo} kreirana</h3>
-          <p class="text-sm text-slate-500">${now.toLocaleDateString('sr-Latn-BA')} · Poslato u Pantheon ERP <span class="text-slate-400">(simulacija)</span></p>
+          <h3 class="font-display text-2xl font-black text-ivory">Narudžba ${orderNo} kreirana</h3>
+          <p class="text-sm text-ivory/50">${now.toLocaleDateString('sr-Latn-BA')} · Poslato u Pantheon ERP <span class="text-ivory/30">(simulacija)</span></p>
         </div>
       </div>
-      <div class="mt-4 rounded-xl bg-slate-50 p-4 text-sm">
-        <p><span class="text-slate-400">Kupac:</span> <strong>${esc(p ? p.name : form.name)}</strong>${p ? ` — ${esc(form.name)}` : ''}</p>
-        <p class="mt-1"><span class="text-slate-400">Dostava:</span> ${deliveryLabels[state.delivery]} — ${esc(form.address)}</p>
-        <p class="mt-1"><span class="text-slate-400">Plaćanje:</span> ${esc(form.payment)}</p>
-        <p class="mt-1"><span class="text-slate-400">Težina:</span> ~${fmt0.format(t.weightKg)} kg</p>
+      <div class="mt-4 rounded-xl bg-white/5 p-4 text-sm">
+        <p><span class="text-ivory/40">Kupac:</span> <strong class="text-ivory">${esc(p ? p.name : form.name)}</strong>${p ? ` — ${esc(form.name)}` : ''}</p>
+        <p class="mt-1"><span class="text-ivory/40">Dostava:</span> ${deliveryLabels[state.delivery]} — ${esc(form.address)}</p>
+        <p class="mt-1"><span class="text-ivory/40">Plaćanje:</span> ${esc(form.payment)}</p>
+        <p class="mt-1"><span class="text-ivory/40">Težina:</span> ~${fmt0.format(t.weightKg)} kg</p>
       </div>
       <table class="mt-4 w-full text-sm"><tbody>${rows}</tbody></table>
       <div class="mt-3 space-y-1 text-sm">
-        ${t.rebate > 0 ? `<div class="flex justify-between text-orange-600"><span>B2B rabat</span><span>−${KM(t.rebate)}</span></div>` : ''}
+        ${t.rebate > 0 ? `<div class="flex justify-between text-gold"><span>B2B rabat</span><span>−${KM(t.rebate)}</span></div>` : ''}
         <div class="flex justify-between"><span>Dostava</span><span>${t.deliveryCost ? KM(t.deliveryCost) : 'Besplatno'}</span></div>
-        <div class="flex justify-between border-t border-slate-200 pt-2 text-lg font-black"><span>UKUPNO (sa PDV)</span><span>${KM(t.total)}</span></div>
+        <div class="flex justify-between border-t border-white/10 pt-2 font-display text-lg font-black text-gold"><span>UKUPNO (sa PDV)</span><span>${KM(t.total)}</span></div>
       </div>
-      <p class="mt-4 rounded-lg bg-emerald-50 px-3 py-2 text-xs text-emerald-700">📄 Komercijalista će potvrditi narudžbu i poslati zvaničan predračun iz Pantheon ERP-a na vaš kontakt. Atesti i deklaracije se isporučuju uz robu.</p>
-      <button data-close-modal class="mt-4 w-full rounded-lg bg-slate-900 py-3 font-bold text-white hover:bg-slate-700">U redu</button>
+      <p class="mt-4 rounded-lg bg-emerald-500/10 px-3 py-2 text-xs text-emerald-300">📄 Komercijalista će potvrditi narudžbu i poslati zvaničan predračun iz Pantheon ERP-a na vaš kontakt. Atesti i deklaracije se isporučuju uz robu.</p>
+      <button data-close-modal class="${BTN_GOLD} mt-4 w-full py-3 text-sm uppercase tracking-wider">U redu</button>
     </div>`, { wide: true });
 
   state.cart = {};
@@ -633,39 +639,39 @@ function renderBom(bom, L, H) {
     const p = bySku[it.sku];
     const amount = priceOf(p) * it.qty;
     return `
-      <tr class="border-b border-slate-100">
+      <tr class="border-b border-white/10">
         <td class="py-2 pr-3">
-          <div class="text-sm font-semibold text-slate-900">${esc(p.name)}</div>
-          <div class="font-mono text-xs text-slate-400">${p.sku}</div>
+          <div class="text-sm font-semibold text-ivory">${esc(p.name)}</div>
+          <div class="font-mono text-xs text-ivory/40">${p.sku}</div>
         </td>
-        <td class="py-2 pr-3 text-right text-sm text-slate-500 whitespace-nowrap">${it.need}</td>
-        <td class="py-2 pr-3 text-right text-sm whitespace-nowrap"><strong>${qtyFmt(it.qty)} ${p.unit}</strong><br /><span class="text-xs text-slate-400">${it.note}</span></td>
+        <td class="py-2 pr-3 text-right text-sm text-ivory/50 whitespace-nowrap">${it.need}</td>
+        <td class="py-2 pr-3 text-right text-sm whitespace-nowrap"><strong class="text-ivory">${qtyFmt(it.qty)} ${p.unit}</strong><br /><span class="text-xs text-ivory/40">${it.note}</span></td>
         <td class="py-2 text-right text-sm font-bold whitespace-nowrap">${KM(amount)}</td>
       </tr>`;
   }).join('');
 
   const total = bom.items.reduce((s, it) => s + priceOf(bySku[it.sku]) * it.qty, 0);
   const b2bNote = partner()
-    ? `<span class="ml-2 rounded bg-orange-100 px-2 py-0.5 text-xs font-bold text-orange-600">uključen rabat −${pct(discount())}</span>`
+    ? `<span class="ml-2 rounded bg-gold/15 px-2 py-0.5 text-xs font-bold text-gold">uključen rabat −${pct(discount())}</span>`
     : '';
 
   $('bom-results').innerHTML = `
     <div class="flex flex-wrap items-center justify-between gap-2">
-      <h3 class="text-lg font-black text-slate-900">Specifikacija materijala (BOM)</h3>
-      <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-600">Zid ${fmt2.format(L)} × ${fmt2.format(H)} m = ${fmt2.format(bom.P)} m²</span>
+      <h3 class="font-display text-xl font-black text-ivory">Specifikacija materijala (BOM)</h3>
+      <span class="rounded-full bg-white/5 px-3 py-1 text-sm font-semibold text-ivory/60">Zid ${fmt2.format(L)} × ${fmt2.format(H)} m = ${fmt2.format(bom.P)} m²</span>
     </div>
-    <p class="mt-1 text-xs text-slate-400">Normativ Knauf W111 · uračunato 5% otpada · količine zaokružene na cijela pakovanja. UW vodilica: UW 75 (lagerski artikal).</p>
+    <p class="mt-1 text-xs text-ivory/40">Normativ Knauf W111 · uračunato 5% otpada · količine zaokružene na cijela pakovanja. UW vodilica: UW 75 (lagerski artikal).</p>
     <table class="mt-4 w-full">
       <thead>
-        <tr class="border-b-2 border-slate-200 text-left text-xs uppercase tracking-wide text-slate-400">
+        <tr class="border-b-2 border-white/15 text-left text-xs uppercase tracking-wide text-ivory/40">
           <th class="pb-2">Artikal</th><th class="pb-2 text-right">Normativ</th><th class="pb-2 text-right">Za narudžbu</th><th class="pb-2 text-right">Iznos</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
-    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t-2 border-slate-200 pt-4">
-      <div class="text-xl font-black text-slate-900">Ukupno: ${KM(total)} <span class="text-xs font-medium text-slate-400">sa PDV</span>${b2bNote}</div>
-      <button id="btn-bom-to-cart" class="rounded-lg bg-orange-500 px-6 py-3 font-bold text-white hover:bg-orange-600">🛒 Dodaj sve u korpu</button>
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t-2 border-white/15 pt-4">
+      <div class="font-display text-2xl font-black text-gold">Ukupno: ${KM(total)} <span class="font-sans text-xs font-medium text-ivory/40">sa PDV</span>${b2bNote}</div>
+      <button id="btn-bom-to-cart" class="${BTN_GOLD} px-6 py-3 text-sm uppercase tracking-wider">🛒 Dodaj sve u korpu</button>
     </div>`;
 
   $('btn-bom-to-cart').addEventListener('click', () => {
