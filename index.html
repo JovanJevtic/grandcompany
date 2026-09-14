@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Grand Company d.o.o. Banja Luka — Građevinski materijali · B2B Partner Portal</title>
   <meta name="description" content="Veleprodaja i maloprodaja građevinskog materijala Banja Luka. Knauf ovlašćeni distributer, dostava kamionom s kranom, Pantheon ERP zalihe u realnom vremenu." />
-  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script src="vendor/tailwindcdn.forms.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -55,6 +55,12 @@
     ::-webkit-scrollbar-track { background: #F2F0EB; }
     ::-webkit-scrollbar-thumb { background: #c9c5bb; }
     ::-webkit-scrollbar-thumb:hover { background: #141412; }
+
+    /* Lenis smooth-scroll (recommended base styles) */
+    html.lenis, html.lenis body { height: auto; }
+    .lenis.lenis-smooth { scroll-behavior: auto !important; }
+    /* When the GSAP motion layer is active it takes over [data-reveal] */
+    .has-motion [data-reveal] { opacity: 1; transform: none; transition: none; }
   </style>
 </head>
 <body class="font-sans text-ink antialiased">
@@ -353,7 +359,7 @@
       </div>
 
       <div class="select-none overflow-hidden pb-4" aria-hidden="true">
-        <div class="whitespace-nowrap font-grotesk text-[clamp(3rem,9.2vw,11rem)] font-bold uppercase leading-[0.85] tracking-[-0.02em] text-paper">Grand Company<span class="text-accent">.</span></div>
+        <div class="footer-wordmark whitespace-nowrap font-grotesk text-[clamp(3rem,9.2vw,11rem)] font-bold uppercase leading-[0.85] tracking-[-0.02em] text-paper">Grand Company<span class="text-accent">.</span></div>
       </div>
     </div>
   </footer>
@@ -377,5 +383,10 @@
 
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+  <script src="vendor/SplitText.min.js"></script>
+  <script src="vendor/lenis.min.js"></script>
+  <script src="js/motion.js"></script>
 </body>
 </html>
