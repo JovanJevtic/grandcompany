@@ -1,0 +1,54 @@
+/* =====================================================================
+   GRAND COMPANY — shared base styles (Tailwind handles the rest)
+   ===================================================================== */
+
+@font-face { font-family: 'Instrument Serif'; src: url('../fonts/InstrumentSerif-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Instrument Serif'; src: url('../fonts/InstrumentSerif-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Regular.ttf') format('truetype'); font-weight: 400 600; font-style: normal; font-display: swap; }
+@font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Italic.ttf') format('truetype'); font-weight: 400 600; font-style: italic; font-display: swap; }
+@font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+
+html { scroll-behavior: smooth; }
+body { background-color: #EFE9DD; }
+body.no-scroll { overflow: hidden; }
+
+/* Grid items default to min-width:auto, so a wide table inside an overflow-x-auto
+   wrapper would stretch its column past the viewport on phones */
+.grid > * { min-width: 0; }
+
+:focus-visible { outline: 2px solid #7D2E1D; outline-offset: 2px; }
+::selection { background: #7D2E1D; color: #EFE9DD; }
+
+.drawer { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
+
+.link-line {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-size: 0% 1px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size 0.3s ease;
+  padding-bottom: 2px;
+}
+.link-line:hover { background-size: 100% 1px; }
+
+details > summary { list-style: none; cursor: pointer; }
+details > summary::-webkit-details-marker { display: none; }
+.faq-sign { transition: transform 0.25s ease; }
+details[open] .faq-sign { transform: rotate(45deg); }
+
+.no-scrollbar { scrollbar-width: none; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+
+/* Lenis smooth-scroll base styles */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #EFE9DD; }
+::-webkit-scrollbar-thumb { background: #cfc6b2; }
+::-webkit-scrollbar-thumb:hover { background: #221C14; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .drawer { transition: none; }
+}

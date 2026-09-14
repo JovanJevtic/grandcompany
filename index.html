@@ -3,381 +3,201 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grand Company d.o.o. Banja Luka — Građevinski materijali</title>
-  <meta name="description" content="Veleprodaja i maloprodaja građevinskog materijala u Banjoj Luci. Knauf ovlašćeni distributer, dostava kamionom s kranom, zalihe uživo iz Pantheon ERP-a." />
+  <title>Grand Company Banja Luka | Građevinski materijal i Knauf suha gradnja</title>
+  <meta name="description" content="Veleprodaja i maloprodaja građevinskog materijala u Banjoj Luci. Knauf ovlašćeni distributer, dostava kamionom sa kranom, zalihe uživo iz Pantheona." />
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
   <script src="vendor/tailwindcdn.forms.min.js"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            serif: ['"Instrument Serif"', 'Georgia', 'serif'],
-            sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
-          },
-          colors: {
-            cream: '#EFE9DD',
-            bone: '#E5DECE',
-            espresso: '#221C14',
-            umber: '#6B5D49',
-            oxide: '#7D2E1D',
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    @font-face { font-family: 'Instrument Serif'; src: url('fonts/InstrumentSerif-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
-    @font-face { font-family: 'Instrument Serif'; src: url('fonts/InstrumentSerif-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
-    @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
-    @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
-    @font-face { font-family: 'Instrument Sans'; src: url('fonts/InstrumentSans-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
-
-    html { scroll-behavior: smooth; }
-    body { background-color: #EFE9DD; }
-    body.no-scroll { overflow: hidden; }
-    .drawer { transition: transform 0.3s ease; }
-
-    /* Photographs sit inside the paper world */
-    .duo { filter: grayscale(1) sepia(0.22) contrast(1.02) brightness(1.03); }
-
-    /* Animated underline for nav links */
-    .link-line { background-image: linear-gradient(currentColor, currentColor); background-size: 0% 1px; background-repeat: no-repeat; background-position: 0 100%; transition: background-size 0.3s ease; padding-bottom: 2px; }
-    .link-line:hover { background-size: 100% 1px; }
-
-    /* Lenis smooth-scroll base styles */
-    html.lenis, html.lenis body { height: auto; }
-    .lenis.lenis-smooth { scroll-behavior: auto !important; }
-
-    ::selection { background: #7D2E1D; color: #EFE9DD; }
-    ::-webkit-scrollbar { width: 8px; height: 8px; }
-    ::-webkit-scrollbar-track { background: #EFE9DD; }
-    ::-webkit-scrollbar-thumb { background: #cfc6b2; }
-    ::-webkit-scrollbar-thumb:hover { background: #221C14; }
-  </style>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/site.css" />
 </head>
-<body class="font-sans text-espresso antialiased">
+<body class="bg-cream font-sans text-espresso antialiased" data-page="home">
+  <div id="site-header"></div>
 
-  <!-- ============================ HEADER ============================ -->
-  <header class="sticky top-0 z-40 border-b border-espresso/20 bg-cream/95 backdrop-blur-sm">
-    <div class="mx-auto flex max-w-[1440px] items-center gap-6 px-6 py-4 lg:px-12">
-      <a href="#" class="flex items-baseline gap-2">
-        <span class="font-serif text-2xl leading-none">Grand Company</span>
-        <span class="text-xs text-umber">d.o.o. Banja Luka</span>
-      </a>
-
-      <nav class="ml-10 hidden items-center gap-7 text-[14px] text-umber lg:flex">
-        <a href="#katalog" class="link-line hover:text-espresso">Katalog</a>
-        <a href="#kalkulator" class="link-line hover:text-espresso">Kalkulator</a>
-        <a href="#b2b" class="link-line hover:text-espresso">Uslovi za partnere</a>
-        <a href="#kontakt" class="link-line hover:text-espresso">Kontakt</a>
-      </nav>
-
-      <div class="ml-auto flex items-center gap-3">
-        <div class="flex border border-espresso/30 p-0.5 text-[13px]" role="group" aria-label="Režim kupovine">
-          <button id="mode-b2c" class="px-3 py-1.5">Maloprodaja</button>
-          <button id="mode-b2b" class="px-3 py-1.5">Partnerski portal</button>
-        </div>
-
-        <button id="btn-cart" class="relative flex items-center gap-2 bg-espresso px-4 py-2 text-[14px] font-medium text-cream transition-colors hover:bg-oxide">
-          Korpa
-          <span id="cart-count" class="hidden h-4 min-w-[16px] items-center justify-center bg-oxide px-1 text-[11px] font-bold text-cream">0</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- B2B partner bar (rendered by JS when logged in) -->
-    <div id="partner-bar" class="hidden border-t border-espresso/20 bg-bone"></div>
-  </header>
-
-  <!-- ============================ COVER ============================ -->
-  <section class="overflow-hidden">
-    <div class="mx-auto max-w-[1440px] px-6 pb-20 pt-12 lg:px-12 lg:pt-20">
-      <p class="mb-8 text-[14px] text-umber">Veleprodaja građevinskog materijala, Banja Luka</p>
-
-      <div class="relative">
-        <h1 class="cover-title relative z-10 max-w-[11em] font-serif italic text-[clamp(3rem,7.2vw,7.25rem)] leading-[0.98] tracking-[-0.01em]">
-          Materijal za one<br />koji grade<br />ozbiljno.
-        </h1>
-
-        <div class="mt-12 lg:absolute lg:-top-6 lg:right-0 lg:mt-0 lg:w-[38%]">
-          <div class="cover-photo overflow-hidden">
-            <div class="aspect-[3/4]">
-              <img src="img/cover.jpg" alt="Radnici na gradilištu među armaturom i čeličnim profilima" data-parallax class="duo h-full w-full scale-110 object-cover" />
-            </div>
-          </div>
-          <p class="mt-3 font-serif italic text-[15px] text-umber">Istovar kranom direktno na etažu gradilišta.</p>
-        </div>
-      </div>
-
-      <div class="cover-lede mt-12 max-w-xl lg:mt-16">
-        <p class="font-serif text-[19px] leading-relaxed">
-          Knauf ovlašćeni distributer sa vlastitim stovarištem, voznim parkom i
-          zalihama koje portal čita direktno iz Pantheon ERP-a. Ono što vidite
-          na stanju — stvarno je na stanju.
-        </p>
-        <p class="mt-4 font-serif italic text-[16px] text-umber">
-          13,8 miliona KM godišnjeg prometa, bonitet A+, valuta plaćanja do 90 dana.
-        </p>
-        <div class="mt-8 flex flex-wrap gap-3">
-          <a href="#katalog" class="bg-espresso px-6 py-3 text-[14px] font-medium text-cream transition-colors hover:bg-oxide">Pogledaj katalog</a>
-          <a href="#kalkulator" class="border border-espresso/40 px-6 py-3 text-[14px] font-medium transition-colors hover:bg-espresso hover:text-cream">Otvori kalkulator</a>
-          <button id="hero-b2b-login" class="px-2 py-3 text-[14px] font-medium text-oxide underline decoration-oxide/40 underline-offset-4 hover:decoration-oxide">Prijava za partnere</button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Info strip -->
-  <div class="border-y border-espresso/20">
-    <div class="mx-auto flex max-w-[1440px] flex-wrap items-baseline justify-between gap-x-10 gap-y-1 px-6 py-3 text-[13px] text-umber lg:px-12">
-      <span>Stovarište: Nenada Kostića 151, Zalužani</span>
-      <span>Telefon: 051 388-995, Viber 065 516-696</span>
-      <span>Radno vrijeme: pon–pet 7–17h, subota 7–14h</span>
-    </div>
-  </div>
-
-  <!-- ============================ USLUGE ============================ -->
-  <section class="mx-auto max-w-[1440px] px-6 py-20 lg:px-12 lg:py-28">
-    <div class="grid gap-12 lg:grid-cols-12">
-      <div class="lg:col-span-5">
-        <div class="photo-frame overflow-hidden">
-          <div class="aspect-[4/3]">
-            <img src="img/site.jpg" alt="Gradilište iz vazduha sa ekipom radnika" data-parallax class="duo h-full w-full scale-110 object-cover" />
-          </div>
-        </div>
-        <p class="mt-3 font-serif italic text-[15px] text-umber">Materijal stiže kada i ekipa — bez čekanja na gradilištu.</p>
-      </div>
-
-      <div class="lg:col-span-6 lg:col-start-7">
-        <h2 class="font-serif text-[clamp(2rem,3.4vw,3.25rem)] leading-tight">Od stovarišta do vaše etaže.</h2>
-
-        <div class="mt-8 divide-y divide-espresso/15">
-          <div class="py-6">
-            <h3 class="font-serif text-[22px]">Kamion sa hidrauličnom dizalicom</h3>
-            <p class="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-umber">Paletirane ploče, vunu i ciglu podižemo direktno na spratove i skele. Vozimo cijelu regiju Banje Luke i šire.</p>
-          </div>
-          <div class="py-6">
-            <h3 class="font-serif text-[22px]">Zalihe uživo iz Pantheona</h3>
-            <p class="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-umber">Portal čita stanje skladišta, vaše rabate i kreditni limit iz istog sistema u kojem naši komercijalisti izdaju predračune.</p>
-          </div>
-          <div class="py-6">
-            <h3 class="font-serif text-[22px]">Kompletan Knauf sistem</h3>
-            <p class="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-umber">Ploče, profili, veziva, izolacija i trake na jednom mjestu — sistemska suha gradnja bez improvizacije.</p>
-          </div>
-          <div class="py-6">
-            <h3 class="font-serif text-[22px]">Dokumentacija za tehnički prijem</h3>
-            <p class="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-umber">Protivpožarni atesti, zvučna izolovanost i CE deklaracije isporučuju se uz robu, spremni za predaju nadzoru.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ KALKULATOR ============================ -->
-  <section id="kalkulator" class="scroll-mt-24 border-y border-espresso/20 bg-bone">
-    <div class="mx-auto max-w-[1440px] px-6 py-20 lg:px-12 lg:py-28">
-      <div class="mb-12 grid items-end gap-8 lg:grid-cols-12">
-        <div class="lg:col-span-7">
-          <h2 class="font-serif text-[clamp(2rem,3.4vw,3.25rem)] leading-tight">Proračun materijala za pregradni zid.</h2>
-          <p class="mt-4 max-w-[58ch] font-serif italic text-[17px] text-umber">Knauf sistem W111 — unesite dimenzije zida, a normativ sa 5% otpada i zaokruživanjem na cijela pakovanja radi portal.</p>
-        </div>
-        <div class="hidden lg:col-span-4 lg:col-start-9 lg:block">
-          <div class="photo-frame overflow-hidden">
-            <div class="aspect-[16/9]">
-              <img src="img/plans.jpg" alt="Projektant crta građevinski nacrt" data-parallax class="duo h-full w-full scale-110 object-cover" />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="grid gap-12 lg:grid-cols-12">
-        <!-- Calculator form -->
-        <form id="calc-form" class="lg:col-span-4">
-          <div class="grid grid-cols-2 gap-6">
-            <label class="block">
-              <span class="text-[13px] text-umber">Dužina zida (m)</span>
-              <input type="number" id="calc-l" value="5" min="0.5" max="50" step="0.1" required
-                     class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-2 font-serif text-[22px] text-espresso focus:border-espresso focus:ring-0" />
-            </label>
-            <label class="block">
-              <span class="text-[13px] text-umber">Visina zida (m)</span>
-              <input type="number" id="calc-h" value="2.8" min="1" max="6" step="0.05" required
-                     class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-2 font-serif text-[22px] text-espresso focus:border-espresso focus:ring-0" />
-            </label>
-          </div>
-
-          <label class="mt-6 block">
-            <span class="text-[13px] text-umber">Obloga</span>
-            <select id="calc-cladding" class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-8 text-[15px] text-espresso focus:border-espresso focus:ring-0">
-              <option value="single">Jednostruka — jedna ploča obostrano</option>
-              <option value="double">Dvostruka — dvije ploče obostrano</option>
-            </select>
-          </label>
-
-          <label class="mt-5 block">
-            <span class="text-[13px] text-umber">Gips-kartonska ploča</span>
-            <select id="calc-plate" class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-8 text-[15px] text-espresso focus:border-espresso focus:ring-0">
-              <option value="KNF-001">Standardna GKB, 5,20 KM po m²</option>
-              <option value="KNF-002">Impregnirana GKBI, 7,40 KM po m²</option>
-              <option value="KNF-003">Vatrootporna GKF, 8,80 KM po m²</option>
-              <option value="KNF-004">Diamant DFH2IR, 14,50 KM po m²</option>
-            </select>
-          </label>
-
-          <label class="mt-5 block">
-            <span class="text-[13px] text-umber">Potkonstrukcija</span>
-            <select id="calc-cw" class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-8 text-[15px] text-espresso focus:border-espresso focus:ring-0">
-              <option value="PRF-050">CW 50 — gotov zid 7,5 cm</option>
-              <option value="PRF-075" selected>CW 75 — gotov zid 10 cm</option>
-              <option value="PRF-100">CW 100 — gotov zid 12,5 cm</option>
-            </select>
-          </label>
-
-          <label class="mt-5 block">
-            <span class="text-[13px] text-umber">Izolaciona vuna</span>
-            <select id="calc-wool" class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-8 text-[15px] text-espresso focus:border-espresso focus:ring-0">
-              <option value="ISO-001">Kamena vuna 50 mm, 6,90 KM po m²</option>
-              <option value="ISO-002">Kamena vuna 100 mm, 12,80 KM po m²</option>
-              <option value="">Bez vune</option>
-            </select>
-          </label>
-
-          <label class="mt-5 block">
-            <span class="text-[13px] text-umber">Masa za ispunu spojeva</span>
-            <select id="calc-filler" class="mt-1 w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-8 text-[15px] text-espresso focus:border-espresso focus:ring-0">
-              <option value="CHM-001">Knauf Uniflott, vreća 5 kg</option>
-              <option value="CHM-002">Knauf Fugenfüller, vreća 25 kg</option>
-            </select>
-          </label>
-
-          <label class="mt-6 flex items-center gap-3 text-[14px] text-umber">
-            <input type="checkbox" id="calc-soundtape" checked class="rounded-none border-espresso/40 bg-transparent text-espresso focus:ring-espresso" />
-            Dodaj zvučno-izolacionu traku za UW profile
-          </label>
-
-          <button type="submit" class="mt-8 w-full bg-espresso py-3.5 text-[14px] font-medium text-cream transition-colors hover:bg-oxide">
-            Izračunaj utrošak
-          </button>
-        </form>
-
-        <!-- BOM results -->
-        <div id="bom-results" class="lg:col-span-7 lg:col-start-6">
-          <div class="flex h-full flex-col justify-center border-l border-espresso/20 py-12 pl-8 lg:pl-12">
-            <p class="font-serif italic text-[19px] text-umber">Specifikacija se pojavljuje ovdje.</p>
-            <p class="mt-3 max-w-[44ch] text-[14px] leading-relaxed text-umber">Unesite dimenzije i pokrenite proračun — dobijate kompletnu listu materijala sa količinama, pakovanjima i cijenama, spremnu za korpu.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============================ KATALOG ============================ -->
-  <section id="katalog" class="scroll-mt-24">
-    <div class="mx-auto max-w-[1440px] px-6 py-20 lg:px-12 lg:py-28">
-      <div class="mb-10 flex flex-wrap items-end justify-between gap-6">
-        <div>
-          <h2 class="font-serif text-[clamp(2rem,3.4vw,3.25rem)] leading-tight">Katalog proizvoda.</h2>
-          <p class="mt-3 font-serif italic text-[16px] text-umber">Zalihe se osvježavaju iz Pantheona; partnerima se rabat obračunava automatski.</p>
-        </div>
-        <input type="search" id="search" placeholder="Pretraga po nazivu, šifri ili dimenziji"
-               class="w-full border-0 border-b border-espresso/30 bg-transparent pl-0 pr-2 text-[15px] text-espresso placeholder-umber/70 focus:border-espresso focus:ring-0 sm:w-80" />
-      </div>
-
-      <div id="category-filters" class="mb-12 flex flex-wrap gap-x-7 gap-y-2"></div>
-      <div id="product-grid" class="grid gap-x-10 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"></div>
-    </div>
-  </section>
-
-  <!-- ============================ B2B ============================ -->
-  <section id="b2b" class="scroll-mt-24 bg-espresso text-cream">
-    <div class="mx-auto max-w-[1440px] px-6 py-20 lg:px-12 lg:py-28">
-      <div class="grid gap-12 lg:grid-cols-12">
-        <div class="lg:col-span-6">
-          <h2 class="font-serif italic text-[clamp(2.2rem,3.8vw,3.75rem)] leading-tight">Uslovi za partnere.</h2>
-          <p class="mt-5 max-w-[56ch] text-[15px] leading-relaxed text-cream/70">
-            Građevinskim firmama i izvođačima ugovaramo rabatnu skalu, kreditni limit
-            i valutu plaćanja. Sve troje portal prikazuje uživo, iz istih Pantheon
-            podataka iz kojih se izdaju predračuni i fakture.
+  <main>
+    <!-- Cover -->
+    <section class="overflow-hidden">
+      <div class="mx-auto grid max-w-[1440px] items-center gap-12 px-5 pb-24 pt-10 lg:grid-cols-12 lg:px-12 lg:pb-32 lg:pt-16">
+        <div class="relative z-10 lg:col-span-6">
+          <p class="cover-lede text-[15px] text-umber">Stovarište u Zalužanima, dostava kranom u cijeloj regiji</p>
+          <h1 class="cover-title mt-5 font-serif text-[clamp(3rem,6.2vw,6.4rem)] italic leading-[0.98] tracking-[-0.01em]">Materijal za one koji grade ozbiljno.</h1>
+          <p class="cover-lede mt-7 max-w-xl font-serif text-[21px] leading-relaxed">
+            Ploče, profili, izolacija i ljepila sa stanjem zaliha uživo iz Pantheona. Naručite danas,
+            a kamion sa kranom istovara direktno na vašu etažu.
           </p>
-
-          <table class="mt-10 w-full text-[15px]">
-            <tbody class="divide-y divide-cream/20">
-              <tr><td class="py-4 pr-4 text-cream/70">Maloprodaja, bez ugovora</td><td class="py-4 text-right font-serif text-[26px]">0%</td></tr>
-              <tr><td class="py-4 pr-4 text-cream/70">Zanatlije i manji izvođači</td><td class="py-4 text-right font-serif text-[26px]">10%</td></tr>
-              <tr><td class="py-4 pr-4 text-cream/70">Srednje građevinske firme</td><td class="py-4 text-right font-serif text-[26px]">15%</td></tr>
-              <tr><td class="py-4 pr-4 text-cream/70">Veliki ugovorni partneri</td><td class="py-4 text-right font-serif text-[26px]">18–22%</td></tr>
-            </tbody>
-          </table>
+          <div class="cover-lede mt-8 flex flex-wrap gap-3">
+            <a href="katalog.html" class="inline-flex items-center bg-espresso px-7 py-4 text-[15px] font-medium text-cream transition-colors hover:bg-oxide">Kupujte iz kataloga</a>
+            <a href="kalkulator.html" class="inline-flex items-center border border-espresso/40 px-7 py-4 text-[15px] font-medium transition-colors hover:bg-espresso hover:text-cream">Izračunajte materijal za zid</a>
+          </div>
+          <div id="live-stock" class="cover-lede mt-10 max-w-xl border-t border-espresso/15 pt-5"></div>
         </div>
 
-        <div class="lg:col-span-5 lg:col-start-8">
-          <div class="photo-frame overflow-hidden">
-            <div class="aspect-[4/5]">
-              <img src="img/concrete.jpg" alt="Savremena betonska fasada" data-parallax class="duo h-full w-full scale-110 object-cover opacity-80" />
+        <div class="relative lg:col-span-6">
+          <div class="cover-photo ml-auto aspect-[4/5] w-[86%] overflow-hidden sm:aspect-[5/4] lg:aspect-[4/5]">
+            <img src="img/cover.jpg" alt="Radnici u narandžastim prslucima rade među armaturom na gradilištu" data-parallax class="h-full w-full scale-110 object-cover" />
+          </div>
+          <figure class="absolute -bottom-12 left-0 w-[40%] border-[6px] border-cream shadow-[0_30px_60px_-30px_rgba(34,28,20,0.6)]">
+            <div class="aspect-[3/4] overflow-hidden">
+              <img src="img/crane.jpg" alt="Kran podiže teret dok ga radnici prate sa tla" class="h-full w-full object-cover" />
             </div>
+          </figure>
+          <p class="absolute -bottom-12 right-0 w-[50%] font-serif text-[17px] italic leading-snug text-umber">Kran podiže palete direktno na skelu, bez nošenja stepeništem.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Categories -->
+    <section class="mx-auto max-w-[1440px] px-5 py-16 lg:px-12 lg:py-24">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <h2 class="font-serif text-[clamp(2.3rem,4.2vw,3.8rem)] leading-tight">Kupujte po kategoriji</h2>
+        <a href="katalog.html" class="link-line text-[15px]">Svih 30 artikala</a>
+      </div>
+      <div id="home-categories" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"></div>
+    </section>
+
+    <!-- Featured products -->
+    <section class="border-y border-espresso/15 bg-bone/60">
+      <div class="mx-auto max-w-[1440px] px-5 py-16 lg:px-12 lg:py-24">
+        <div class="flex flex-wrap items-end justify-between gap-6">
+          <div>
+            <h2 class="font-serif text-[clamp(2.3rem,4.2vw,3.8rem)] leading-tight">Izdvojeno iz ponude</h2>
+            <p class="mt-3 max-w-[56ch] text-[16px] text-umber">Osnovni artikli za pregradne zidove, fasade i plafone, spremni za utovar.</p>
           </div>
-          <div class="mt-8 space-y-4 text-[15px] leading-relaxed text-cream/70">
-            <p>Kreditni limiti do 50.000 KM uz mjenicu ili bankarsku garanciju, valuta plaćanja 30, 60 ili 90 dana prema ugovoru.</p>
-            <p>Mjerač iskorištenosti limita vidljiv je u zaglavlju portala nakon prijave.</p>
+          <a href="katalog.html" class="link-line text-[15px]">Cijeli katalog</a>
+        </div>
+        <div id="home-featured" class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"></div>
+      </div>
+    </section>
+
+    <!-- Crane delivery -->
+    <section class="mx-auto grid max-w-[1440px] items-center gap-12 px-5 py-16 lg:grid-cols-12 lg:px-12 lg:py-24">
+      <div class="lg:col-span-6">
+        <div class="aspect-[4/3] overflow-hidden">
+          <img src="img/renovation.jpg" alt="Zgrada u rekonstrukciji okružena skelom" data-parallax class="h-full w-full scale-110 object-cover" />
+        </div>
+      </div>
+      <div class="lg:col-span-5 lg:col-start-8">
+        <h2 class="font-serif text-[clamp(2.3rem,4vw,3.6rem)] leading-tight">Dostava kamionom sa kranom, do vaše etaže.</h2>
+        <p class="mt-5 text-[17px] leading-relaxed text-umber">
+          Palete ploča, vune i vreća podižemo direktno na sprat ili skelu. Ekipa ne nosi materijal
+          stepeništem, a ploče ne čekaju na kiši ispred objekta.
+        </p>
+        <div class="mt-8 overflow-x-auto">
+          <table id="home-zones" class="w-full min-w-[420px] text-[15px]"></table>
+        </div>
+        <a href="dostava.html" class="link-line mt-6 inline-flex items-center gap-2 text-[15px] text-oxide">
+          Sve o dostavi i istovaru
+          <svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </section>
+
+    <!-- Calculator teaser -->
+    <section class="bg-[#3F5A78] text-cream">
+      <div class="mx-auto grid max-w-[1440px] items-center gap-12 px-5 py-16 lg:grid-cols-12 lg:px-12 lg:py-24">
+        <div class="lg:col-span-5">
+          <h2 class="font-serif text-[clamp(2.3rem,4vw,3.6rem)] italic leading-tight">Koliko materijala ide u vaš zid?</h2>
+          <p class="mt-5 text-[17px] leading-relaxed text-cream/80">
+            Unesite dužinu i visinu, a kalkulator po Knauf normativu složi listu ploča, profila, vune,
+            vijaka i mase, sa otpadom i zaokruženu na pakovanja.
+          </p>
+          <a href="kalkulator.html" class="mt-8 inline-flex items-center bg-cream px-7 py-4 text-[15px] font-medium text-espresso transition-colors hover:bg-bone">Otvorite kalkulator</a>
+        </div>
+        <div id="home-calc" class="lg:col-span-6 lg:col-start-7"></div>
+      </div>
+    </section>
+
+    <!-- Partner program -->
+    <section class="bg-espresso text-cream">
+      <div class="mx-auto grid max-w-[1440px] gap-12 px-5 py-16 lg:grid-cols-12 lg:px-12 lg:py-24">
+        <div class="lg:col-span-5">
+          <h2 class="font-serif text-[clamp(2.3rem,4vw,3.6rem)] italic leading-tight">Partnerske cijene za firme i izvođače.</h2>
+          <p class="mt-5 text-[17px] leading-relaxed text-cream/70">
+            Nakon prijave svaka cijena na sajtu uključuje vaš ugovoreni rabat, a u zaglavlju vidite
+            koliko vam je kreditnog limita ostalo, zajedno sa robom u korpi.
+          </p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <button data-login class="inline-flex items-center bg-cream px-7 py-4 text-[15px] font-medium text-espresso transition-colors hover:bg-bone">Prijava za partnere</button>
+            <a href="partneri.html" class="inline-flex items-center border border-cream/40 px-7 py-4 text-[15px] font-medium transition-colors hover:bg-cream hover:text-espresso">Kako postati partner</a>
           </div>
-          <button id="b2b-section-login" class="mt-8 bg-cream px-7 py-3.5 text-[14px] font-medium text-espresso transition-colors hover:bg-oxide hover:text-cream">
-            Prijava na partnerski portal
-          </button>
+        </div>
+        <div id="home-tiers" class="grid gap-px self-start bg-cream/15 sm:grid-cols-2 lg:col-span-6 lg:col-start-7"></div>
+      </div>
+    </section>
+
+    <!-- Audiences -->
+    <section class="mx-auto max-w-[1440px] px-5 py-16 lg:px-12 lg:py-24">
+      <h2 class="max-w-3xl font-serif text-[clamp(2.3rem,4.2vw,3.8rem)] leading-tight">Radimo sa izvođačima, zanatlijama i investitorima.</h2>
+      <div class="mt-12 grid gap-10 md:grid-cols-3">
+        <article>
+          <div class="aspect-[4/3] overflow-hidden"><img src="img/site.jpg" alt="Ekipa izvođača na betonskoj ploči gradilišta" class="h-full w-full object-cover" /></div>
+          <h3 class="mt-5 font-serif text-[28px] leading-tight">Građevinske firme</h3>
+          <p class="mt-2 text-[16px] leading-relaxed text-umber">Rabat do 22%, kreditni limit i valuta do 90 dana. Predračuni i fakture stižu iz Pantheona, a narudžbe šaljete sa portala.</p>
+          <a href="partneri.html" class="link-line mt-4 inline-block text-[15px] text-oxide">Partnerski program</a>
+        </article>
+        <article class="md:mt-16">
+          <div class="aspect-[4/3] overflow-hidden"><img src="img/drill.jpg" alt="Akumulatorska bušilica na podu tokom radova" class="h-full w-full object-cover" /></div>
+          <h3 class="mt-5 font-serif text-[28px] leading-tight">Zanatlije i montažeri</h3>
+          <p class="mt-2 text-[16px] leading-relaxed text-umber">Kompletan Knauf sistem na jednom mjestu i kalkulator koji listu materijala šalje pravo u korpu. Uz ugovor rabat kreće od 10%.</p>
+          <a href="kalkulator.html" class="link-line mt-4 inline-block text-[15px] text-oxide">Kalkulator utroška</a>
+        </article>
+        <article class="md:mt-32">
+          <div class="aspect-[4/3] overflow-hidden"><img src="img/living.jpg" alt="Svijetla dnevna soba sa glatkim zidovima" class="h-full w-full object-cover" /></div>
+          <h3 class="mt-5 font-serif text-[28px] leading-tight">Investitori i domaćinstva</h3>
+          <p class="mt-2 text-[16px] leading-relaxed text-umber">Maloprodajne cijene sa PDV-om, savjet u prodaji i dostava na adresu, sa kranom kada gradite na spratu.</p>
+          <a href="katalog.html" class="link-line mt-4 inline-block text-[15px] text-oxide">Katalog proizvoda</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- Brands -->
+    <section class="border-y border-espresso/15">
+      <div class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-12 gap-y-5 px-5 py-10 lg:px-12">
+        <p class="text-[14px] text-umber">Sistemi i proizvođači u ponudi</p>
+        <a href="katalog.html?brend=Knauf" class="font-serif text-[36px] leading-none hover:text-oxide">Knauf</a>
+        <a href="katalog.html?brend=Knauf%20Insulation" class="font-serif text-[36px] leading-none hover:text-oxide">Knauf Insulation</a>
+        <a href="katalog.html?brend=Ceresit" class="font-serif text-[36px] leading-none hover:text-oxide">Ceresit</a>
+        <a href="katalog.html?brend=Cement%20Lukavac" class="font-serif text-[36px] leading-none hover:text-oxide">Cement Lukavac</a>
+      </div>
+    </section>
+
+    <!-- Guides -->
+    <section class="mx-auto max-w-[1440px] px-5 py-16 lg:px-12 lg:py-24">
+      <h2 class="font-serif text-[clamp(2.3rem,4.2vw,3.8rem)] leading-tight">Savjeti iz prodaje</h2>
+      <div id="home-guides" class="mt-10 grid gap-6 md:grid-cols-3"></div>
+    </section>
+
+    <!-- Visit -->
+    <section class="border-t border-espresso/15 bg-bone/60">
+      <div class="mx-auto grid max-w-[1440px] lg:grid-cols-12">
+        <div class="lg:col-span-7">
+          <div class="h-full min-h-[340px] overflow-hidden">
+            <img src="img/warehouse.jpg" alt="Viljuškar u skladištu između regala sa paletama" class="h-full w-full object-cover" />
+          </div>
+        </div>
+        <div class="px-5 py-12 lg:col-span-5 lg:px-12 lg:py-20">
+          <h2 class="font-serif text-[clamp(2.3rem,4vw,3.6rem)] leading-tight">Posjetite stovarište.</h2>
+          <p class="mt-4 text-[17px] leading-relaxed text-umber">Robu naručenu preko portala pripremamo za utovar, a savjet o sistemu dobijate na licu mjesta.</p>
+          <dl class="mt-8 space-y-4 border-t border-espresso/15 pt-6 text-[16px]">
+            <div><dt class="text-[13px] text-umber">Adresa</dt><dd class="mt-1">Ul. Nenada Kostića 151, 78000 Banja Luka, Zalužani</dd></div>
+            <div><dt class="text-[13px] text-umber">Radno vrijeme</dt><dd class="mt-1">Ponedjeljak–petak 7–17h, subota 7–14h, nedjelja neradna</dd></div>
+            <div><dt class="text-[13px] text-umber">Veleprodaja</dt><dd class="mt-1"><a href="tel:+38751388995" class="link-line">051 388-995</a>, Viber i WhatsApp <a href="tel:+38765516696" class="link-line">065 516-696</a></dd></div>
+          </dl>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <a href="https://www.google.com/maps/search/?api=1&amp;query=Nenada+Kosti%C4%87a+151+Banja+Luka" target="_blank" rel="noopener" class="inline-flex items-center bg-espresso px-6 py-3.5 text-[15px] font-medium text-cream transition-colors hover:bg-oxide">Otvori u mapama</a>
+            <a href="kontakt.html" class="inline-flex items-center border border-espresso/40 px-6 py-3.5 text-[15px] font-medium transition-colors hover:bg-espresso hover:text-cream">Kontakt</a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- ============================ FOOTER ============================ -->
-  <footer id="kontakt" class="scroll-mt-24 border-t border-cream/15 bg-espresso text-cream">
-    <div class="mx-auto max-w-[1440px] px-6 pt-16 lg:px-12">
-      <div class="grid gap-10 border-b border-cream/15 pb-12 md:grid-cols-3">
-        <div class="text-[14px] leading-relaxed text-cream/70">
-          <h4 class="mb-3 font-serif italic text-[19px] text-cream">Stovarište</h4>
-          <p>Ul. Nenada Kostića 151<br />78000 Banja Luka, Zalužani</p>
-          <p class="mt-3">Ponedjeljak–petak 7–17h<br />Subota 7–14h, nedjelja neradna</p>
-        </div>
-        <div class="text-[14px] leading-relaxed text-cream/70">
-          <h4 class="mb-3 font-serif italic text-[19px] text-cream">Kontakt</h4>
-          <p>Veleprodaja: <a href="tel:+38751388995" class="link-line text-cream">051 388-995</a></p>
-          <p class="mt-1">Viber i WhatsApp: <a href="tel:+38765516696" class="link-line text-cream">065 516-696</a></p>
-          <p class="mt-1">Pošta: <a href="mailto:info@grandcompany.com" class="link-line text-cream">info@grandcompany.com</a></p>
-          <p class="mt-1">Prodaja: <a href="mailto:prodaja@grandcompany.com" class="link-line text-cream">prodaja@grandcompany.com</a></p>
-        </div>
-        <div class="text-[14px] leading-relaxed text-cream/70">
-          <h4 class="mb-3 font-serif italic text-[19px] text-cream">Podaci o firmi</h4>
-          <p>JIB 4403433180005<br />MBS 57-01-0089-12<br />PIB 403433180005</p>
-          <p class="mt-3">Direktor: Predrag Uzelac</p>
-        </div>
-      </div>
-
-      <p class="py-5 text-[12px] text-cream/40">© 2026 Grand Company d.o.o. Banja Luka, demonstracioni portal</p>
-
-      <div class="select-none overflow-hidden pb-2" aria-hidden="true">
-        <div class="footer-wordmark whitespace-nowrap font-serif italic text-[clamp(3.5rem,10.5vw,12rem)] leading-[0.9] text-cream/95">Grand Company</div>
-      </div>
-    </div>
-  </footer>
-
-  <!-- ============================ CART DRAWER ============================ -->
-  <div id="cart-overlay" class="fixed inset-0 z-40 hidden bg-espresso/40 backdrop-blur-[2px]"></div>
-  <aside id="cart-drawer" class="drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-md translate-x-full flex-col border-l border-espresso/30 bg-cream">
-    <div class="flex items-center justify-between border-b border-espresso/20 px-6 py-4">
-      <h3 class="font-serif text-[26px]">Korpa</h3>
-      <button id="btn-close-cart" class="flex h-9 w-9 items-center justify-center border border-espresso/20 transition-colors hover:bg-espresso hover:text-cream" aria-label="Zatvori korpu">✕</button>
-    </div>
-    <div id="cart-body" class="flex-1 overflow-y-auto px-6 py-4"></div>
-    <div id="cart-footer" class="border-t border-espresso/20 px-6 py-4"></div>
-  </aside>
-
-  <!-- ============================ MODALS ============================ -->
-  <div id="modal-root"></div>
-
-  <!-- Toast notifications -->
-  <div id="toast" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2"></div>
+  <div id="site-footer"></div>
 
   <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/home.js"></script>
   <script src="vendor/gsap.min.js"></script>
   <script src="vendor/ScrollTrigger.min.js"></script>
   <script src="vendor/SplitText.min.js"></script>

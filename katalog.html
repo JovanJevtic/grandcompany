@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="sr-Latn-BA">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Katalog proizvoda | Grand Company Banja Luka</title>
+  <meta name="description" content="Gips-kartonske ploče, profili, izolacija, ljepila i oprema za suhu gradnju. Stanje zaliha uživo iz Pantheona, partnerske cijene za izvođače." />
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+  <script src="vendor/tailwindcdn.forms.min.js"></script>
+  <script src="js/tw-config.js"></script>
+  <link rel="stylesheet" href="css/site.css" />
+</head>
+<body class="bg-cream font-sans text-espresso antialiased" data-page="katalog">
+  <div id="site-header"></div>
+
+  <main>
+    <section id="catalog-head" class="border-b border-espresso/15"></section>
+
+    <div class="mx-auto grid max-w-[1440px] gap-10 px-5 pb-20 pt-8 lg:grid-cols-12 lg:px-12">
+      <aside id="filters" aria-label="Filteri" class="hidden lg:col-span-3 lg:block"></aside>
+
+      <div class="lg:col-span-9">
+        <div class="flex flex-wrap items-center gap-3 border-b border-espresso/15 pb-4">
+          <button id="btn-filters" class="border border-espresso/30 px-4 py-2 text-[14px] lg:hidden" aria-controls="filters" aria-expanded="false">Filteri</button>
+          <p id="result-count" class="text-[15px] text-umber" aria-live="polite"></p>
+          <label class="ml-auto flex items-center gap-2 text-[14px] text-umber">
+            Sortiraj
+            <select id="sort" class="border-espresso/25 bg-paper py-1.5 pl-3 pr-9 text-[14px] text-espresso focus:border-espresso focus:ring-0">
+              <option value="preporuceno">Preporučeno</option>
+              <option value="cijena-rastuce">Cijena: od najniže</option>
+              <option value="cijena-opadajuce">Cijena: od najviše</option>
+              <option value="naziv">Naziv</option>
+              <option value="zalihe">Najviše na stanju</option>
+            </select>
+          </label>
+        </div>
+        <div id="active-chips" class="mt-4 flex flex-wrap gap-2"></div>
+        <div id="catalog-grid" class="mt-6 grid gap-5 sm:grid-cols-2 xl:grid-cols-3"></div>
+      </div>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+
+  <script src="js/data.js"></script>
+  <script src="js/core.js"></script>
+  <script src="js/art.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages/catalog.js"></script>
+  <script src="vendor/gsap.min.js"></script>
+  <script src="vendor/ScrollTrigger.min.js"></script>
+  <script src="vendor/SplitText.min.js"></script>
+  <script src="vendor/lenis.min.js"></script>
+  <script src="js/motion.js"></script>
+</body>
+</html>

@@ -27,7 +27,7 @@ window.addEventListener('load', () => {
       const target = document.querySelector(href);
       if (!target) return;
       e.preventDefault();
-      lenis.scrollTo(target, { offset: -76, duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 4) });
+      lenis.scrollTo(target, { offset: -150, duration: 1.1, easing: (t) => 1 - Math.pow(1 - t, 4) });
     });
   });
 
@@ -50,7 +50,7 @@ window.addEventListener('load', () => {
     );
   }
 
-  const lede = document.querySelectorAll('.cover-lede > *');
+  const lede = document.querySelectorAll('.cover-lede');
   if (lede.length) tl.from(lede, { y: 20, autoAlpha: 0, duration: 0.7, stagger: 0.08 }, 0.6);
 
   // --- Photographs drift slowly against their frames while scrolling ---
