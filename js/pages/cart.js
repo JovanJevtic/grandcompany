@@ -10,8 +10,6 @@
 initPage(() => {
   let mode = null; // 'empty' | 'filled' | 'done'
 
-  const DELIVERY_LABELS = { pickup: 'Preuzimanje na stovarištu', standard: 'Standardna dostava', kran: 'Kamion sa kranom, istovar na etažu' };
-
   function setSteps(active) {
     $('steps').innerHTML = ['Korpa', 'Dostava i podaci', 'Potvrda'].map((label, i) => {
       const done = i < active;
@@ -29,20 +27,20 @@ initPage(() => {
     setSteps(0);
     $('cart-root').innerHTML = `
       <div class="border border-dashed border-espresso/30 px-6 py-16 text-center">
-        <p class="font-serif text-[42px] italic leading-tight">Korpa je prazna.</p>
+        <p class="font-serif text-[36px] leading-tight">Korpa je prazna.</p>
         <p class="mt-3 text-[16px] text-umber">Dodajte artikle iz kataloga ili prenesite gotovu specifikaciju iz kalkulatora.</p>
         <div class="mt-8 flex flex-wrap justify-center gap-3">
           <a href="katalog.html" class="${BTN_PRIMARY} px-7 py-3.5">Otvori katalog</a>
           <a href="kalkulator.html" class="${BTN_GHOST} px-7 py-3.5">Otvori kalkulator</a>
         </div>
       </div>
-      <h2 class="mt-16 font-serif text-[36px] leading-tight">Izdvojeno iz ponude</h2>
+      <h2 class="mt-16 font-serif text-[31px] leading-tight">Izdvojeno iz ponude</h2>
       <div id="empty-featured" class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-4"></div>`;
   }
 
   function layoutFilled() {
     setSteps(1);
-    const heading = (id, text) => `<h2 id="${id}" class="font-serif text-[32px] leading-tight">${text}</h2>`;
+    const heading = (id, text) => `<h2 id="${id}" class="font-serif text-[28px] leading-tight">${text}</h2>`;
     $('cart-root').innerHTML = `
       <div class="grid gap-12 lg:grid-cols-12">
         <div class="lg:col-span-8">
@@ -99,7 +97,7 @@ initPage(() => {
       <div class="grid grid-cols-[88px_1fr] gap-x-5 gap-y-3 border-b border-espresso/10 py-5 sm:grid-cols-[124px_1fr_auto]">
         <a href="${productUrl(p)}" class="block aspect-[4/3] self-start bg-bone p-1" tabindex="-1" aria-hidden="true">${productArt(p)}</a>
         <div class="min-w-0">
-          <a href="${productUrl(p)}" class="font-serif text-[22px] leading-snug hover:text-oxide">${esc(p.name)}</a>
+          <a href="${productUrl(p)}" class="font-serif text-[19px] leading-snug hover:text-oxide">${esc(p.name)}</a>
           <p class="mt-0.5 text-[13px] text-umber">${p.sku}, ${esc(p.spec)}</p>
           <p class="mt-1 text-[14px]">${KM(priceOf(p))} po ${p.unit}${b2b ? ` <span class="ml-1 text-umber line-through">${KM(p.price)}</span>` : ''}</p>
           <div class="mt-3 flex flex-wrap items-center gap-4">
@@ -107,7 +105,7 @@ initPage(() => {
             <button data-remove="${p.sku}" class="text-[14px] text-umber underline underline-offset-4 hover:text-oxide">Ukloni</button>
           </div>
         </div>
-        <p class="col-start-2 font-serif text-[28px] leading-none sm:col-start-3 sm:text-right">${KM(priceOf(p) * qty)}</p>
+        <p class="col-start-2 font-serif text-[24px] leading-none sm:col-start-3 sm:text-right">${KM(priceOf(p) * qty)}</p>
       </div>`).join('');
   }
 
@@ -129,7 +127,7 @@ initPage(() => {
               <input type="radio" name="delivery" value="${o.id}" ${state.delivery === o.id ? 'checked' : ''} class="border-espresso/40 text-oxide focus:ring-oxide" />
               <span class="text-[14px] font-medium">${o.cost}</span>
             </span>
-            <span class="mt-3 font-serif text-[22px] leading-tight">${o.title}</span>
+            <span class="mt-3 font-serif text-[19px] leading-tight">${o.title}</span>
             <span class="mt-1 text-[14px] leading-snug text-umber">${o.text}</span>
           </label>`).join('')}
       </div>
@@ -162,7 +160,7 @@ initPage(() => {
     let options;
     let warning = '';
     if (p) {
-      const free = Math.max(0, p.creditLimit - p.creditUsed);
+      const free = Math.max(0, p.creditLimit - creditUsed(p));
       const fits = t.total <= free;
       options = [
         ['odgodjeno', `Odgođeno plaćanje, valuta ${p.paymentDays} dana`, !fits],
@@ -193,17 +191,17 @@ initPage(() => {
 
     let credit = '';
     if (p) {
-      const usedPct = Math.min(100, ((p.creditUsed + t.total) / p.creditLimit) * 100);
+      const usedPct = Math.min(100, ((creditUsed(p) + t.total) / p.creditLimit) * 100);
       credit = `
         <div class="mt-5 border-t border-espresso/15 pt-4 text-[14px] text-umber">
           <p>Kreditni limit nakon ove narudžbe</p>
           <div class="mt-2 h-1.5 overflow-hidden bg-espresso/15"><div class="h-full ${usedPct < 85 ? 'bg-sage' : 'bg-oxide'}" style="width:${usedPct}%"></div></div>
-          <p class="mt-2">Slobodno još <strong class="font-medium text-espresso">${KM(Math.max(0, p.creditLimit - p.creditUsed - t.total))}</strong> od ${KM(p.creditLimit)}</p>
+          <p class="mt-2">Slobodno još <strong class="font-medium text-espresso">${KM(Math.max(0, p.creditLimit - creditUsed(p) - t.total))}</strong> od ${KM(p.creditLimit)}</p>
         </div>`;
     }
 
     $('cart-summary').innerHTML = `
-      <h2 class="font-serif text-[30px] leading-tight">Pregled narudžbe</h2>
+      <h2 class="font-serif text-[26px] leading-tight">Pregled narudžbe</h2>
       <div class="mt-4 border-t border-espresso/15 pt-3">
         ${t.rebate > 0 ? row('Vrijednost po cjenovniku', `<span class="line-through">${KM(t.grossB2C)}</span>`, 'text-[15px] text-umber') : ''}
         ${t.rebate > 0 ? row(`Partnerski rabat −${pct(discount())}`, `−${KM(t.rebate)}`, 'text-[15px] text-oxide') : ''}
@@ -214,7 +212,7 @@ initPage(() => {
       </div>
       <div class="mt-3 flex items-baseline justify-between border-t border-espresso pt-4">
         <span class="text-[15px]">Ukupno</span>
-        <span class="font-serif text-[42px] leading-none">${KM(t.total)}</span>
+        <span class="font-serif text-[36px] leading-none">${KM(t.total)}</span>
       </div>
       ${credit}
       <button type="submit" form="checkout-form" class="${BTN_PRIMARY} mt-6 w-full py-4 text-[16px]">Pošalji narudžbu</button>
@@ -245,7 +243,7 @@ initPage(() => {
       <div class="grid gap-12 lg:grid-cols-12">
         <div class="lg:col-span-7">
           <p class="text-[15px] text-sage">Narudžba je poslata u Pantheon (simulacija)</p>
-          <h2 class="mt-2 font-serif text-[clamp(2.4rem,4.4vw,4rem)] italic leading-tight">Hvala, narudžba ${orderNo} je primljena.</h2>
+          <h2 class="mt-2 font-serif text-[clamp(1.97rem,3.61vw,3.28rem)] leading-tight">Hvala, narudžba ${orderNo} je primljena.</h2>
           <p class="mt-4 max-w-[58ch] text-[17px] leading-relaxed text-umber">Komercijalista provjerava stanje i ${next}, zove vas na ${esc(phone)} i šalje predračun. Atesti i deklaracije stižu uz robu.</p>
           <dl class="mt-8 grid gap-5 border-t border-espresso/15 pt-6 sm:grid-cols-2">
             ${detail('Kupac', customer)}
@@ -262,7 +260,7 @@ initPage(() => {
         </div>
         <aside class="lg:col-span-5">
           <div class="border border-espresso/15 bg-paper p-6">
-            <h3 class="font-serif text-[26px]">Naručeni artikli</h3>
+            <h3 class="font-serif text-[22px]">Naručeni artikli</h3>
             <ul class="mt-3 divide-y divide-espresso/10 border-t border-espresso/15">
               ${t.items.map(({ product: pr, qty }) => `
                 <li class="flex items-center gap-3 py-3">
@@ -276,7 +274,7 @@ initPage(() => {
               <div class="flex justify-between"><span>Dostava</span><span>${t.deliveryCost ? KM(t.deliveryCost) : 'besplatno'}</span></div>
             </div>
             <div class="mt-3 flex items-baseline justify-between border-t border-espresso pt-3">
-              <span>Ukupno sa PDV-om</span><span class="font-serif text-[34px] leading-none">${KM(t.total)}</span>
+              <span>Ukupno sa PDV-om</span><span class="font-serif text-[29px] leading-none">${KM(t.total)}</span>
             </div>
           </div>
         </aside>

@@ -17,8 +17,8 @@ initPage(() => {
 
   $('delivery-methods').innerHTML = methods.map((m) => `
     <div class="flex flex-col border border-espresso/15 bg-paper p-7" style="border-top:4px solid ${m.color}">
-      <h3 class="font-serif text-[28px] leading-tight">${m.title}</h3>
-      <p class="mt-2 font-serif text-[40px] leading-none" style="color:${m.color}">${m.price}</p>
+      <h3 class="font-serif text-[24px] leading-tight">${m.title}</h3>
+      <p class="mt-2 font-serif text-[34px] leading-none" style="color:${m.color}">${m.price}</p>
       <p class="mt-4 text-[15px] leading-relaxed text-umber">${m.text}</p>
     </div>`).join('');
 
@@ -37,7 +37,7 @@ initPage(() => {
     <tbody>
       ${DELIVERY_ZONES.map((z) => `
         <tr class="border-b border-espresso/10">
-          <td class="py-4 pr-4 font-serif text-[20px]">${z.label}</td>
+          <td class="py-4 pr-4 font-serif text-[17px]">${z.label}</td>
           <td class="py-4 pr-4 text-right">${KM(z.standard)}</td>
           <td class="py-4 pr-4 text-right">${KM(z.kranTransport)}</td>
           <td class="py-4 pr-4 text-right">${KM(z.kranWork)}</td>
@@ -63,7 +63,7 @@ initPage(() => {
             <td class="py-3 pr-4">
               <a href="${productUrl(p)}" class="flex items-center gap-3 hover:text-oxide">
                 <span class="block h-11 w-14 shrink-0 bg-bone p-0.5">${productArt(p)}</span>
-                <span class="font-serif text-[18px] leading-snug">${esc(p.name)}</span>
+                <span class="font-serif text-[15px] leading-snug">${esc(p.name)}</span>
               </a>
             </td>
             <td class="py-3 pr-4 text-umber">${esc(packLabel)}</td>
@@ -77,14 +77,14 @@ initPage(() => {
     if (!t.items.length) {
       $('cart-weight').innerHTML = `
         <p class="text-[13px] text-umber">Vaša korpa</p>
-        <p class="mt-1 font-serif text-[26px] italic leading-tight">Korpa je prazna.</p>
+        <p class="mt-1 font-serif text-[22px] leading-tight">Korpa je prazna.</p>
         <a href="katalog.html" class="link-line mt-3 inline-block text-[15px] text-oxide">Otvori katalog</a>`;
       return;
     }
     const heavy = t.weightKg >= CRANE_RECOMMEND_OVER_KG;
     $('cart-weight').innerHTML = `
       <p class="text-[13px] text-umber">Vaša korpa trenutno teži</p>
-      <p class="mt-1 font-serif text-[48px] leading-none ${heavy ? 'text-oxide' : ''}">${fmt0.format(t.weightKg)} kg</p>
+      <p class="mt-1 font-serif text-[41px] leading-none ${heavy ? 'text-oxide' : ''}">${fmt0.format(t.weightKg)} kg</p>
       <p class="mt-3 text-[15px] leading-relaxed text-umber">${heavy ? 'Preporučujemo kamion sa kranom za istovar.' : 'Standardna dostava ili preuzimanje su dovoljni.'}</p>
       <a href="korpa.html" class="link-line mt-3 inline-block text-[15px] text-oxide">Izaberite dostavu u korpi</a>`;
   }

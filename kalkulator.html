@@ -24,7 +24,7 @@
               <li aria-current="page" class="text-espresso">Kalkulator</li>
             </ol>
           </nav>
-          <h1 class="mt-4 font-serif text-[clamp(2.6rem,5.4vw,5rem)] leading-[1.02]">Kalkulator utroška materijala</h1>
+          <h1 class="mt-4 font-serif text-[clamp(2.13rem,4.43vw,4.1rem)] leading-[1.02]">Kalkulator utroška materijala</h1>
           <p class="mt-5 max-w-[60ch] text-[17px] leading-relaxed text-umber">
             Unesite dužinu i visinu pregradnog zida. Kalkulator primjenjuje Knauf normativ za sistem W111,
             dodaje 5% na otpad i zaokružuje količine na cijela pakovanja, a listu jednim klikom prebacujete u korpu.
@@ -41,18 +41,18 @@
     <section class="mx-auto max-w-[1440px] px-5 py-12 lg:px-12 lg:py-16">
       <div class="grid gap-10 lg:grid-cols-12">
         <form id="calc-form" class="self-start border border-espresso/15 bg-paper p-6 lg:col-span-4 lg:p-7">
-          <h2 class="font-serif text-[28px] leading-tight">Zid i sistem</h2>
+          <h2 class="font-serif text-[24px] leading-tight">Zid i sistem</h2>
 
           <div class="mt-5 grid grid-cols-2 gap-4">
             <label class="block">
               <span class="text-[13px] text-umber">Dužina zida (m)</span>
               <input type="number" id="calc-l" value="5" min="0.5" max="50" step="0.1" required
-                     class="mt-1 w-full border border-espresso/25 bg-cream px-3 py-2 font-serif text-[26px] focus:border-espresso focus:ring-0" />
+                     class="mt-1 w-full border border-espresso/25 bg-cream px-3 py-2 font-serif text-[22px] focus:border-espresso focus:ring-0" />
             </label>
             <label class="block">
               <span class="text-[13px] text-umber">Visina zida (m)</span>
               <input type="number" id="calc-h" value="2.8" min="1" max="6" step="0.05" required
-                     class="mt-1 w-full border border-espresso/25 bg-cream px-3 py-2 font-serif text-[26px] focus:border-espresso focus:ring-0" />
+                     class="mt-1 w-full border border-espresso/25 bg-cream px-3 py-2 font-serif text-[22px] focus:border-espresso focus:ring-0" />
             </label>
           </div>
 
@@ -115,7 +115,7 @@
     <section class="border-y border-espresso/15 bg-bone/60">
       <div class="mx-auto grid max-w-[1440px] items-center gap-10 px-5 py-14 lg:grid-cols-12 lg:px-12 lg:py-20">
         <div class="lg:col-span-5">
-          <h2 class="font-serif text-[clamp(2rem,3.4vw,3.2rem)] leading-tight">Šta je sistem W111?</h2>
+          <h2 class="font-serif text-[clamp(1.64rem,2.79vw,2.62rem)] leading-tight">Šta je sistem W111?</h2>
           <p class="mt-5 text-[16px] leading-relaxed text-umber">
             W111 je Knaufov osnovni pregradni zid: metalna potkonstrukcija od CW i UW profila, po jedna
             gips-kartonska ploča sa svake strane i mineralna vuna u šupljini. Debljina gotovog zida zavisi od
@@ -175,7 +175,7 @@
     <section class="mx-auto max-w-[1440px] px-5 py-14 lg:px-12 lg:py-20">
       <div class="grid gap-10 lg:grid-cols-12">
         <div class="lg:col-span-4">
-          <h2 class="font-serif text-[clamp(2rem,3.4vw,3.2rem)] leading-tight">Kako računamo</h2>
+          <h2 class="font-serif text-[clamp(1.64rem,2.79vw,2.62rem)] leading-tight">Kako računamo</h2>
           <p class="mt-5 text-[16px] leading-relaxed text-umber">
             Normativi važe po kvadratnom metru zida, gdje je P dužina puta visina, i već uključuju 5% otpada.
             Količine zaokružujemo naviše na cijela pakovanja, pa je lista spremna za utovar.
@@ -191,13 +191,13 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-espresso/10">
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">Gips-kartonske ploče</td><td class="py-3 pr-4">P × 2,05 m² jednostruko, P × 4,10 m² dvostruko</td><td class="py-3 text-umber">ploča 2,5 m²</td></tr>
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">CW profili</td><td class="py-3 pr-4">(L ÷ 0,6) × H × 1,05 m</td><td class="py-3 text-umber">profil 3 m</td></tr>
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">UW profili</td><td class="py-3 pr-4">L × 2 × 1,05 m</td><td class="py-3 text-umber">profil 4 m</td></tr>
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">Mineralna vuna</td><td class="py-3 pr-4">P × 1,05 m²</td><td class="py-3 text-umber">ploča 0,6 m²</td></tr>
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">Masa za spojeve</td><td class="py-3 pr-4">P × 0,6 kg</td><td class="py-3 text-umber">vreća 5 ili 25 kg</td></tr>
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">Vijci TN 25</td><td class="py-3 pr-4">P × 25 komada</td><td class="py-3 text-umber">kutija 1000 komada</td></tr>
-              <tr><td class="py-3 pr-4 font-serif text-[19px]">Bandaž traka</td><td class="py-3 pr-4">L × 1,5 m</td><td class="py-3 text-umber">rolna 25 m</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">Gips-kartonske ploče</td><td class="py-3 pr-4">P × 2,05 m² jednostruko, P × 4,10 m² dvostruko</td><td class="py-3 text-umber">ploča 2,5 m²</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">CW profili</td><td class="py-3 pr-4">(L ÷ 0,6) × H × 1,05 m</td><td class="py-3 text-umber">profil 3 m</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">UW profili</td><td class="py-3 pr-4">L × 2 × 1,05 m</td><td class="py-3 text-umber">profil 4 m</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">Mineralna vuna</td><td class="py-3 pr-4">P × 1,05 m²</td><td class="py-3 text-umber">ploča 0,6 m²</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">Masa za spojeve</td><td class="py-3 pr-4">P × 0,6 kg</td><td class="py-3 text-umber">vreća 5 ili 25 kg</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">Vijci TN 25</td><td class="py-3 pr-4">P × 25 komada</td><td class="py-3 text-umber">kutija 1000 komada</td></tr>
+              <tr><td class="py-3 pr-4 font-serif text-[16px]">Bandaž traka</td><td class="py-3 pr-4">L × 1,5 m</td><td class="py-3 text-umber">rolna 25 m</td></tr>
             </tbody>
           </table>
         </div>
@@ -207,7 +207,7 @@
     <section class="bg-espresso text-cream">
       <div class="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-8 px-5 py-14 lg:px-12">
         <div class="max-w-2xl">
-          <h2 class="font-serif text-[clamp(2rem,3.4vw,3rem)] italic leading-tight">Više zidova, plafoni ili fasada?</h2>
+          <h2 class="font-serif text-[clamp(1.64rem,2.79vw,2.46rem)] leading-tight">Više zidova, plafoni ili fasada?</h2>
           <p class="mt-3 text-[16px] leading-relaxed text-cream/70">Pošaljite nam projekat ili listu prostorija, a komercijalista priprema predračun iz Pantheona sa vašim rabatom.</p>
         </div>
         <div class="flex flex-wrap gap-3">
@@ -222,6 +222,7 @@
 
   <script src="js/data.js"></script>
   <script src="js/core.js"></script>
+  <script src="js/pantheon.js"></script>
   <script src="js/art.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/pages/calculator.js"></script>

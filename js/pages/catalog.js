@@ -73,14 +73,14 @@ initPage(() => {
     const quick = CATEGORIES.map((c) => {
       const count = PRODUCTS.filter((p) => p.category === c.id).length;
       return `<button data-quick-cat="${c.id}" class="inline-flex items-center gap-2 border border-espresso/20 bg-paper px-3 py-2 text-[14px] transition-colors hover:border-espresso">
-        <span class="h-2.5 w-2.5" style="background:${c.color}" aria-hidden="true"></span>${c.label}<span class="text-umber">${count}</span></button>`;
+        ${c.label}<span class="text-umber">${count}</span></button>`;
     }).join('');
 
     $('catalog-head').innerHTML = `
       <div class="mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-8 lg:grid-cols-12 lg:px-12 lg:py-10">
         <div class="${single ? 'lg:col-span-7' : 'lg:col-span-10'}">
           ${breadcrumb([{ label: 'Početna', href: 'index.html' }, { label: 'Katalog', href: single ? 'katalog.html' : null }, ...(single ? [{ label: single.label }] : [])])}
-          <h1 class="mt-4 font-serif text-[clamp(2.6rem,5vw,4.5rem)] leading-[1.02]">${esc(title)}</h1>
+          <h1 class="mt-4 font-serif text-[clamp(2.13rem,4.1vw,3.69rem)] leading-[1.02]">${esc(title)}</h1>
           <p class="mt-4 max-w-[64ch] text-[16px] leading-relaxed text-umber">${esc(lead)}</p>
           ${single ? '' : `<div class="mt-6 flex flex-wrap gap-2">${quick}</div>`}
         </div>
@@ -88,7 +88,6 @@ initPage(() => {
         <div class="hidden lg:col-span-4 lg:col-start-9 lg:block">
           <div class="relative aspect-[16/10] overflow-hidden">
             <img src="${single.image}" alt="" class="h-full w-full object-cover" />
-            <span class="absolute bottom-0 left-0 h-1.5 w-full" style="background:${single.color}"></span>
           </div>
         </div>` : ''}
       </div>`;
@@ -97,7 +96,7 @@ initPage(() => {
   function renderFilters() {
     const group = (title, body) => `
       <fieldset class="border-t border-espresso/15 py-5">
-        <legend class="float-left mb-3 w-full font-serif text-[21px]">${title}</legend>
+        <legend class="float-left mb-3 w-full font-serif text-[18px]">${title}</legend>
         <div class="clear-both space-y-2.5">${body}</div>
       </fieldset>`;
     const check = (name, value, label, swatch = '') => `
@@ -111,10 +110,10 @@ initPage(() => {
     $('filters').innerHTML = `
       <div class="lg:sticky lg:top-40">
         <label class="block pb-5">
-          <span class="font-serif text-[21px]">Pretraga</span>
+          <span class="font-serif text-[18px]">Pretraga</span>
           <input id="f-q" type="search" placeholder="Naziv, šifra ili dimenzija" class="${FIELD}" />
         </label>
-        ${group('Kategorija', CATEGORIES.map((c) => check('kat', c.id, c.label, `<span class="h-2.5 w-2.5" style="background:${c.color}" aria-hidden="true"></span>`)).join(''))}
+        ${group('Kategorija', CATEGORIES.map((c) => check('kat', c.id, c.label)).join(''))}
         ${group('Proizvođač', BRANDS.map((b) => check('brend', b, b)).join(''))}
         ${group('Zalihe', LEVELS.map(([v, l]) => check('zalihe', v, l)).join(''))}
         ${group('Cijena po jedinici', `
@@ -172,7 +171,7 @@ initPage(() => {
     $('catalog-grid').innerHTML = results.length
       ? results.map(productCard).join('')
       : `<div class="col-span-full border border-dashed border-espresso/30 px-6 py-16 text-center">
-          <p class="font-serif text-[30px] italic">Nijedan artikal ne odgovara filterima.</p>
+          <p class="font-serif text-[26px]">Nijedan artikal ne odgovara filterima.</p>
           <p class="mt-2 text-umber">Uklonite neki od filtera ili pretražite po šifri artikla.</p>
           <button data-reset class="${BTN_PRIMARY} mt-6 px-6 py-3">Poništi filtere</button>
         </div>`;

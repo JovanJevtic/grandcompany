@@ -24,7 +24,7 @@ initPage(() => {
       last = null;
       $('bom-results').innerHTML = `
         <div class="border border-dashed border-espresso/30 px-6 py-16 text-center">
-          <p class="font-serif text-[28px] italic">Unesite dužinu i visinu zida.</p>
+          <p class="font-serif text-[24px]">Unesite dužinu i visinu zida.</p>
           <p class="mt-2 text-umber">Obje vrijednosti moraju biti veće od nule, u metrima.</p>
         </div>`;
       return;
@@ -46,7 +46,7 @@ initPage(() => {
             <div class="flex items-center gap-3">
               <a href="${productUrl(p)}" class="block h-14 w-[4.7rem] shrink-0 bg-bone p-0.5" tabindex="-1" aria-hidden="true">${productArt(p)}</a>
               <div>
-                <a href="${productUrl(p)}" class="font-serif text-[18px] leading-snug hover:text-oxide">${esc(p.name)}</a>
+                <a href="${productUrl(p)}" class="font-serif text-[15px] leading-snug hover:text-oxide">${esc(p.name)}</a>
                 <p class="text-[12px] text-umber">${p.sku}</p>
               </div>
             </div>
@@ -59,7 +59,7 @@ initPage(() => {
 
     $('bom-results').innerHTML = `
       <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-espresso pb-4">
-        <h2 class="font-serif text-[32px] leading-tight">Specifikacija materijala</h2>
+        <h2 class="font-serif text-[28px] leading-tight">Specifikacija materijala</h2>
         <p class="text-[15px] text-umber">Zid ${fmt2.format(input.L)} × ${fmt2.format(input.H)} m, ${fmt2.format(bom.P)} m², oko ${fmt0.format(weight)} kg</p>
       </div>
       <div class="overflow-x-auto">
@@ -78,7 +78,7 @@ initPage(() => {
       <div class="mt-6 flex flex-wrap items-end justify-between gap-5">
         <div>
           <p class="text-[14px] text-umber">Ukupno sa PDV-om${b2b ? `, uključen rabat −${pct(discount())}` : ''}</p>
-          <p class="mt-1 font-serif text-[48px] leading-none ${b2b ? 'text-oxide' : ''}">${KM(bomTotal(bom))}</p>
+          <p class="mt-1 font-serif text-[41px] leading-none ${b2b ? 'text-oxide' : ''}">${KM(bomTotal(bom))}</p>
         </div>
         <button data-bom-add class="${BTN_PRIMARY} px-8 py-4 text-[16px]">Dodaj sve u korpu</button>
       </div>

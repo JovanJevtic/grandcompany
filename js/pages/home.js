@@ -1,6 +1,6 @@
 // =====================================================================
-// Home page — live stock, categories, featured products, delivery
-// zones, calculator example, partner tiers and buying guides
+// Home page — cover, live stock, category index, featured plates,
+// delivery data table, calculator example, partner ledger and guides
 // =====================================================================
 
 'use strict';
@@ -8,7 +8,7 @@
 initPage(() => {
   const LIVE_STOCK = ['KNF-001', 'PRF-075', 'ISO-001', 'CHM-004'];
   const EXAMPLE_WALL = { L: 5, H: 2.8, cladding: 'single', plateSku: 'KNF-001', cwSku: 'PRF-075', woolSku: 'ISO-001', fillerSku: 'CHM-001', soundTape: true };
-  const TIER_OF = { gipsmont: 1, gradnjamont: 2, integral: 3 };
+  const TIER_OF = { gipsmont: 1, gradnjamont: 2, lazarevo: 3 };
   const GUIDES = [
     {
       sku: 'KNF-002',
@@ -35,17 +35,17 @@ initPage(() => {
 
   function renderLiveStock() {
     $('live-stock').innerHTML = `
-      <p class="flex items-center gap-2 text-[13px] text-umber">
+      <p class="flex items-center gap-3 text-[14px] text-umber">
         <span class="relative flex h-2 w-2" aria-hidden="true">
           <span class="absolute inline-flex h-full w-full rounded-full bg-sage opacity-60 motion-safe:animate-ping"></span>
           <span class="relative inline-flex h-2 w-2 rounded-full bg-sage"></span>
         </span>
-        Stanje na stovarištu, Pantheon u ${syncTime()}
+        Stanje na stovarištu, Pantheon u <span class="tnum">${syncTime()}</span>
       </p>
-      <ul class="mt-2 divide-y divide-espresso/10">
+      <ul class="mt-3 divide-y divide-espresso/10">
         ${LIVE_STOCK.map((sku) => {
           const p = bySku[sku];
-          return `<li><a href="${productUrl(p)}" class="flex items-baseline justify-between gap-4 py-2 text-[15px] hover:text-oxide"><span>${esc(p.name)}</span><span class="whitespace-nowrap text-umber">${fmt0.format(p.stock)} ${p.unit}</span></a></li>`;
+          return `<li><a href="${productUrl(p)}" class="flex items-baseline justify-between gap-4 py-2.5 text-[15px] hover:text-oxide"><span>${esc(p.name)}</span><span class="tnum whitespace-nowrap text-umber">${fmt0.format(p.stock)} ${p.unit}</span></a></li>`;
         }).join('')}
       </ul>`;
   }
@@ -54,19 +54,13 @@ initPage(() => {
     $('home-categories').innerHTML = CATEGORIES.map((c) => {
       const count = PRODUCTS.filter((p) => p.category === c.id).length;
       return `
-        <a href="katalog.html?kat=${c.id}" class="group relative block overflow-hidden bg-espresso">
-          <div class="aspect-[4/5] overflow-hidden">
-            <img src="${c.image}" alt="" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-espresso/90 via-espresso/20 to-transparent"></div>
-          <div class="absolute inset-x-0 bottom-0 p-5 pb-6 text-cream">
-            <p class="font-serif text-[34px] leading-none">${c.label}</p>
-            <p class="mt-2 text-[14px] text-cream/80">${c.lead}</p>
-            <p class="mt-4 flex items-center justify-between gap-3 text-[14px]">
-              <span>${count} ${plural(count, 'artikal', 'artikla', 'artikala')}, od ${KM(minPrice(c.id))}</span>${ICON.arrow}
-            </p>
-          </div>
-          <span class="absolute inset-x-0 bottom-0 h-1.5" style="background:${c.color}" aria-hidden="true"></span>
+        <a href="katalog.html?kat=${c.id}" class="group grid items-center gap-x-6 gap-y-2 border-b border-espresso/15 py-6 transition-colors hover:bg-paper/60 lg:grid-cols-12 lg:py-8">
+          <span class="flex items-baseline lg:col-span-5">
+            <span class="font-serif text-[clamp(1.6rem,3.1vw,2.6rem)] leading-none tracking-[-0.01em] group-hover:text-oxide">${c.label}</span>
+          </span>
+          <span class="text-[15px] leading-snug text-umber lg:col-span-4">${c.lead}</span>
+          <span class="tnum text-[14px] text-umber lg:col-span-2">${count} ${plural(count, 'artikal', 'artikla', 'artikala')}, od ${KM(minPrice(c.id))}</span>
+          <span class="hidden justify-end text-[14px] text-oxide lg:col-span-1 lg:flex"><span class="link-line">Pogledajte</span></span>
         </a>`;
     }).join('');
   }
@@ -79,17 +73,17 @@ initPage(() => {
     $('home-zones').innerHTML = `
       <thead>
         <tr class="border-b border-espresso text-left text-[13px] text-umber">
-          <th class="py-2 pr-4 font-normal">Zona</th>
-          <th class="py-2 pr-4 text-right font-normal">Standardna</th>
-          <th class="py-2 text-right font-normal">Kamion sa kranom</th>
+          <th class="pb-2 pr-4 font-normal">Zona dostave</th>
+          <th class="pb-2 pr-4 text-right font-normal">Standardna</th>
+          <th class="pb-2 text-right font-normal">Kamion sa kranom</th>
         </tr>
       </thead>
       <tbody>
         ${DELIVERY_ZONES.map((z) => `
           <tr class="border-b border-espresso/10">
             <td class="py-3 pr-4">${z.label}</td>
-            <td class="py-3 pr-4 text-right">${KM(z.standard)}</td>
-            <td class="py-3 text-right font-medium">${KM(z.kranTransport + z.kranWork)}</td>
+            <td class="tnum py-3 pr-4 text-right">${KM(z.standard)}</td>
+            <td class="tnum py-3 text-right font-medium">${KM(z.kranTransport + z.kranWork)}</td>
           </tr>`).join('')}
       </tbody>`;
   }
@@ -101,36 +95,43 @@ initPage(() => {
     $('home-calc').innerHTML = `
       <div class="bg-paper p-6 text-espresso shadow-[0_40px_80px_-40px_rgba(0,0,0,0.55)] lg:p-8">
         <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-espresso pb-3">
-          <p class="font-serif text-[28px] leading-none">Zid 5 × 2,8 m</p>
-          <p class="text-[14px] text-umber">${fmt0.format(bom.P)} m², jednostruka obloga, CW 75</p>
+          <p class="font-serif text-[24px] leading-none tnum">Zid 5 × 2,8 m</p>
+          <p class="text-[14px] text-umber tnum">${fmt0.format(bom.P)} m², jednostruka obloga, CW 75</p>
         </div>
         <ul class="divide-y divide-espresso/10">
           ${shown.map((it) => {
             const p = bySku[it.sku];
             return `<li class="flex items-center gap-4 py-3">
-              <span class="block h-12 w-16 shrink-0 bg-bone p-0.5">${productArt(p)}</span>
+              <span class="plate block h-12 w-16 shrink-0 bg-bone p-0.5">${productArt(p)}</span>
               <span class="flex-1 text-[15px] leading-snug">${esc(p.name)}</span>
-              <span class="whitespace-nowrap text-[14px] text-umber">${it.note}</span>
+              <span class="tnum whitespace-nowrap text-[14px] text-umber">${it.note}</span>
             </li>`;
           }).join('')}
         </ul>
         <p class="mt-1 text-[14px] text-umber">i još ${rest} ${plural(rest, 'stavka', 'stavke', 'stavki')}: vijci, bandaž traka i zvučna traka</p>
         <div class="mt-5 flex items-baseline justify-between border-t border-espresso pt-4">
           <span class="text-[15px]">Ukupno sa PDV-om</span>
-          <span class="font-serif text-[40px] leading-none ${partner() ? 'text-oxide' : ''}">${KM(bomTotal(bom))}</span>
+          <span class="font-serif text-[34px] leading-none tnum ${partner() ? 'text-oxide' : ''}">${KM(bomTotal(bom))}</span>
         </div>
       </div>`;
   }
 
   function renderTiers() {
     const mine = TIER_OF[state.partnerId];
-    $('home-tiers').innerHTML = PARTNER_TIERS.map((t, i) => `
-      <div class="bg-espresso p-6 ${i === mine ? 'outline outline-1 -outline-offset-1 outline-cream/70' : ''}">
-        <p class="text-[14px] text-cream/60">${t.name}${i === mine ? ', vaš nivo' : ''}</p>
-        <p class="mt-2 font-serif text-[52px] leading-none">${t.rebate}</p>
-        <p class="mt-3 text-[15px]">${t.who}</p>
-        <p class="mt-1 text-[14px] text-cream/60">${t.days}</p>
-      </div>`).join('');
+    $('home-tiers').innerHTML = `
+      <div class="border-t border-cream/20">
+        ${PARTNER_TIERS.map((t, i) => `
+          <div class="relative grid grid-cols-12 items-baseline gap-x-4 gap-y-1 border-b border-cream/20 py-5 pl-4">
+            ${i === mine ? '<span class="absolute left-0 top-4 h-[calc(100%-2rem)] w-0.5 bg-oxide" aria-hidden="true"></span>' : ''}
+            <div class="col-span-12 sm:col-span-4">
+              <p class="font-serif text-[20px] leading-tight">${t.name}</p>
+              <p class="mt-0.5 text-[13px] text-cream/60">${t.who}</p>
+            </div>
+            <p class="tnum col-span-4 font-serif text-[30px] leading-none sm:col-span-3">${t.rebate}</p>
+            <p class="col-span-8 text-[13px] text-cream/70 sm:col-span-3">${t.limit}</p>
+            <p class="col-span-12 text-[13px] text-cream/70 sm:col-span-2">${t.days}</p>
+          </div>`).join('')}
+      </div>`;
   }
 
   function renderGuides() {
@@ -138,9 +139,9 @@ initPage(() => {
       const p = bySku[g.sku];
       return `
         <article class="flex flex-col border border-espresso/15 bg-paper">
-          <div class="aspect-[16/10] bg-bone p-4">${productArt(p)}</div>
+          <div class="aspect-[16/10] border-b border-espresso/15 bg-bone p-4">${productArt(p)}</div>
           <div class="flex flex-1 flex-col p-6">
-            <h3 class="font-serif text-[26px] leading-tight">${g.title}</h3>
+            <h3 class="font-serif text-[22px] leading-tight">${g.title}</h3>
             <p class="mt-3 flex-1 text-[15px] leading-relaxed text-umber">${g.text}</p>
             <a href="${g.href}" class="link-line mt-5 self-start text-[15px] text-oxide">${g.cta}</a>
           </div>

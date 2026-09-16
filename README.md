@@ -31,7 +31,8 @@ python3 -m http.server 8642
 | Fajl | Uloga |
 |---|---|
 | `js/data.js` | **Podaci** — 30 artikala, kategorije, partneri, zone dostave. U produkciji ovo daje Pantheon API. |
-| `js/core.js` | **Logika** — stanje (localStorage), cijene i rabat, korpa, težina, W111 normativ. Bez HTML-a. |
+| `js/core.js` | **Logika** — stanje (localStorage), cijene i rabat, korpa, težina, kreditni limit, fakture/nalozi/gradilišta, W111 normativ. Bez HTML-a. |
+| `js/pantheon.js` | **Pantheon gateway (demo)** — prijava, nalog, slanje narudžbe i čuvanje gradilišta. Sve funkcije su `async`; u produkciji tijelo postaje `fetch()` na backend koji priča sa Datalab PANTHEON-om. |
 | `js/art.js` | SVG ilustracije proizvoda iz recepta `product.art` u `data.js` |
 | `js/ui.js` | Zajednički **izgled** — header, footer, korpa, modali, prijava, kartica proizvoda, `initPage()` |
 | `js/pages/*.js` | Logika pojedinačne stranice |
@@ -40,11 +41,15 @@ python3 -m http.server 8642
 
 ## Demo partnerski nalozi
 
-Bilo koja lozinka prolazi:
+Prijava ide preko `Pantheon.login(email, lozinka)` sa podacima ispod:
 
-1. ZR „GipsMont" — Nivo 1, rabat 10%, limit 15.000 KM, valuta 30 dana
-2. Gradnja-Mont d.o.o. — Nivo 2, rabat 15%, limit 30.000 KM, valuta 60 dana
-3. Integral Inženjering a.d. — Nivo 3, rabat 18%, limit 50.000 KM, valuta 90 dana
+| Nalog | E-pošta | Lozinka | Nivo | Rabat | Limit | Valuta |
+|---|---|---|---|---|---|---|
+| ZR „GipsMont" | `nabavka@gipsmont.demo` | `gipsmont2026` | Nivo 1 | 10% | 15.000 KM | 30 dana |
+| Gradnja-Mont d.o.o. | `nabavka@gradnjamont.demo` | `gradnjamont2026` | Nivo 2 | 15% | 30.000 KM | 60 dana |
+| Lazarevo Inženjering a.d. | `nabavka@lazarevo.demo` | `lazarevo2026` | Nivo 3 | 18% | 50.000 KM | 90 dana |
+
+Svaki nalog ima i demo fakture (otvorene i plaćene), istoriju naloga i gradilišta — vidljive u pregledu naloga na `partneri.html`.
 
 ## Fotografije
 

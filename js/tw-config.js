@@ -2,7 +2,7 @@ tailwind.config = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Instrument Serif"', 'Georgia', 'serif'],
+        serif: ['"Fraunces"', 'Georgia', 'serif'],
         sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {

@@ -263,6 +263,10 @@ const ART_DRAWERS = { board: drawBoard, profile: drawProfile, slab: drawSlabs, r
 const artCache = new Map();
 
 function productArt(p, className = 'h-full w-full') {
+  const photo = typeof PRODUCT_PHOTOS !== 'undefined' && PRODUCT_PHOTOS[p.sku];
+  if (photo) {
+    return `<img src="${photo}" alt="${esc(p.name)}" loading="lazy" class="${className} object-cover" />`;
+  }
   if (!artCache.has(p.sku)) {
     const draw = ART_DRAWERS[p.art.kind];
     artCache.set(p.sku, draw ? draw(p.art, p.sku) : '');

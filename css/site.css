@@ -2,14 +2,21 @@
    GRAND COMPANY — shared base styles (Tailwind handles the rest)
    ===================================================================== */
 
-@font-face { font-family: 'Instrument Serif'; src: url('../fonts/InstrumentSerif-Regular.ttf') format('truetype'); font-weight: 400; font-style: normal; font-display: swap; }
-@font-face { font-family: 'Instrument Serif'; src: url('../fonts/InstrumentSerif-Italic.ttf') format('truetype'); font-weight: 400; font-style: italic; font-display: swap; }
+/* Fraunces (Undercase Type, OFL) — variable weight + optical size, latin + latin-ext for č ć đ š ž */
+@font-face { font-family: 'Fraunces'; src: url('../fonts/Fraunces-normal-latin-ext.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Fraunces'; src: url('../fonts/Fraunces-normal-latin.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Fraunces'; src: url('../fonts/Fraunces-italic-latin-ext.woff2') format('woff2'); font-weight: 100 900; font-style: italic; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Fraunces'; src: url('../fonts/Fraunces-italic-latin.woff2') format('woff2'); font-weight: 100 900; font-style: italic; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 @font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Regular.ttf') format('truetype'); font-weight: 400 600; font-style: normal; font-display: swap; }
 @font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Italic.ttf') format('truetype'); font-weight: 400 600; font-style: italic; font-display: swap; }
 @font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
 
 html { scroll-behavior: smooth; }
 body { background-color: #EFE9DD; }
+
+.font-serif { font-optical-sizing: auto; font-variant-numeric: lining-nums; }
+h1.font-serif, h2.font-serif { font-weight: 500; letter-spacing: -0.02em; }
+h3.font-serif, legend.font-serif, summary.font-serif { font-weight: 550; letter-spacing: -0.01em; }
 body.no-scroll { overflow: hidden; }
 
 /* Grid items default to min-width:auto, so a wide table inside an overflow-x-auto
@@ -35,6 +42,25 @@ details > summary { list-style: none; cursor: pointer; }
 details > summary::-webkit-details-marker { display: none; }
 .faq-sign { transition: transform 0.25s ease; }
 details[open] .faq-sign { transform: rotate(45deg); }
+
+/* Technical-editorial helpers */
+.tnum { font-variant-numeric: tabular-nums; }
+/* Blueprint grid — faint construction lines behind a dark section */
+.bp-grid {
+  background-image:
+    linear-gradient(to right, rgba(239, 233, 221, 0.07) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(239, 233, 221, 0.07) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+/* Light-section variant */
+.bp-grid-ink {
+  background-image:
+    linear-gradient(to right, rgba(34, 28, 20, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(34, 28, 20, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+/* Thin frame used for product drawings, so they read as plates, not photos */
+.plate { border: 1px solid rgba(34, 28, 20, 0.16); }
 
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }

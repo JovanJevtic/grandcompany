@@ -40,6 +40,8 @@ const state = {
   cart: {},           // sku -> quantity in the product's sales unit
   delivery: 'pickup', // pickup | standard | kran
   zone: 'bl',
+  orders: {},         // partnerId -> orders placed on the portal (not yet in the seed data)
+  sites: {},          // partnerId -> construction sites added on the portal
 };
 
 const listeners = [];
@@ -57,6 +59,8 @@ function saveState() {
 function loadState() {
   state.partnerId = null;
   state.cart = {};
+  state.orders = {};
+  state.sites = {};
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
     if (!saved) return;
@@ -68,6 +72,8 @@ function loadState() {
     }
     if (['pickup', 'standard', 'kran'].includes(saved.delivery)) state.delivery = saved.delivery;
     if (DELIVERY_ZONES.some((z) => z.id === saved.zone)) state.zone = saved.zone;
+    if (saved.orders && typeof saved.orders === 'object') state.orders = saved.orders;
+    if (saved.sites && typeof saved.sites === 'object') state.sites = saved.sites;
   } catch {
     /* corrupted storage — start fresh */
   }
@@ -85,6 +91,15 @@ const partner = () => PARTNERS.find((p) => p.id === state.partnerId) || null;
 const discount = () => (partner() ? partner().discount : 0);
 const priceOf = (p) => p.price * (1 - discount());
 const currentZone = () => DELIVERY_ZONES.find((z) => z.id === state.zone) || DELIVERY_ZONES[0];
+
+const DELIVERY_LABELS = {
+  pickup: 'Preuzimanje na stovarištu',
+  standard: 'Standardna dostava',
+  kran: 'Kamion sa kranom, istovar na etažu',
+};
+
+// Short forms for dense lists (order history, summaries)
+const DELIVERY_SHORT = { pickup: 'Preuzimanje', standard: 'Dostava', kran: 'Istovar kranom' };
 
 const stockLevel = (p) => (p.stock > 1000 ? 'high' : p.stock >= 300 ? 'mid' : 'low');
 const minPrice = (categoryId) => Math.min(...PRODUCTS.filter((p) => p.category === categoryId).map(priceOf));
@@ -142,6 +157,55 @@ function clearCart() {
 
 function setPartner(id) {
   state.partnerId = PARTNERS.some((p) => p.id === id) ? id : null;
+  commit();
+}
+
+// ---------------------------------------------------------------------
+// Partner account — invoices, orders, sites and credit exposure
+// ---------------------------------------------------------------------
+const DAY_MS = 86400000;
+const daysAgo = (days) => new Date(Date.now() - days * DAY_MS);
+const fmtDate = (d) => d.toLocaleDateString('sr-Latn-BA', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+function partnerInvoices(p) {
+  return p.invoices
+    .map((inv) => {
+      const issued = daysAgo(inv.issuedDaysAgo);
+      const due = new Date(issued.getTime() + p.paymentDays * DAY_MS);
+      const daysToDue = Math.ceil((due.getTime() - Date.now()) / DAY_MS);
+      const status = inv.paid ? 'paid' : daysToDue < 0 ? 'overdue' : 'open';
+      return { ...inv, issued, due, daysToDue, status };
+    })
+    .sort((a, b) => b.issued - a.issued);
+}
+
+function partnerOrders(p) {
+  const seeded = p.orders.map((o) => {
+    const items = o.items.map(([sku, qty]) => ({ sku, qty, price: bySku[sku].price * (1 - p.discount) }));
+    const subtotal = items.reduce((s, i) => s + i.price * i.qty, 0);
+    return { ...o, date: daysAgo(o.daysAgo), items, subtotal, total: subtotal + o.deliveryCost, source: 'pantheon' };
+  });
+  const placed = (state.orders[p.id] || []).map((o) => ({ ...o, date: new Date(o.date) }));
+  return [...placed, ...seeded].sort((a, b) => b.date - a.date);
+}
+
+const partnerSites = (p) => [...p.sites, ...(state.sites[p.id] || [])];
+
+const openInvoicesTotal = (p) => partnerInvoices(p).filter((i) => !i.paid).reduce((s, i) => s + i.amount, 0);
+
+// Deferred orders placed on the portal reserve credit until Pantheon invoices them
+const reservedCredit = (p) => (state.orders[p.id] || []).filter((o) => o.payment === 'odgodjeno').reduce((s, o) => s + o.total, 0);
+
+const creditUsed = (p) => openInvoicesTotal(p) + reservedCredit(p);
+const creditFree = (p) => Math.max(0, p.creditLimit - creditUsed(p));
+
+function recordOrder(order) {
+  (state.orders[order.customerId] ||= []).push(order);
+  commit();
+}
+
+function recordSite(partnerId, site) {
+  (state.sites[partnerId] ||= []).push(site);
   commit();
 }
 

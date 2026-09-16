@@ -30,7 +30,7 @@ const CATEGORIES = [
     label: 'Suha gradnja',
     lead: 'Gips-kartonske ploče i pocinčani profili',
     image: 'img/interior.jpg',
-    gallery: ['img/interior.jpg', 'img/living.jpg'],
+    gallery: ['img/interior.jpg', 'img/hall.jpg'],
     color: '#4F6D8F',
     usage:
       'Knauf sistemi suhe gradnje za pregradne zidove, obloge i spuštene plafone. Ploče se razlikuju po boji kartona: bijela je standardna, zelena vlagootporna, crvena vatrootporna, a plava ojačana Diamant ploča. Profili se biraju prema debljini zida i sistemu.',
@@ -40,7 +40,7 @@ const CATEGORIES = [
     label: 'Izolacija i fasade',
     lead: 'Kamena i staklena vuna, stiropor i stirodur',
     image: 'img/facade.jpg',
-    gallery: ['img/facade.jpg', 'img/bales.jpg'],
+    gallery: ['img/facade.jpg', 'img/office.jpg'],
     color: '#C08A2E',
     usage:
       'Toplotna i zvučna izolacija za pregradne zidove, potkrovlja, podove i kontaktne fasade. Kamena vuna je negoriva i dobro prigušuje zvuk, staklena vuna u rolni je lakša za kose krovove, a grafitni stiropor daje istu izolaciju sa tanjom pločom.',
@@ -49,8 +49,8 @@ const CATEGORIES = [
     id: 'veziva',
     label: 'Veziva i ljepila',
     lead: 'Mase za spojeve, ljepila, glet i cement',
-    image: 'img/plaster.jpg',
-    gallery: ['img/plaster.jpg', 'img/renovation.jpg'],
+    image: 'img/concrete-curves.jpg',
+    gallery: ['img/concrete-curves.jpg', 'img/site-aerial.jpg'],
     color: '#5E7F5B',
     usage:
       'Gipsane mase za fugovanje, ljepila za fasadne sisteme i keramiku, glet mase i cement. Vreće čuvajte na paleti, na suhom i zaštićene od vlage, i koristite ih unutar roka trajanja otisnutog na pakovanju.',
@@ -59,8 +59,8 @@ const CATEGORIES = [
     id: 'oprema',
     label: 'Vijci i oprema',
     lead: 'Samourezni vijci, trake i ovjesi',
-    image: 'img/tools.jpg',
-    gallery: ['img/tools.jpg', 'img/drill.jpg'],
+    image: 'img/steel-frame.jpg',
+    gallery: ['img/steel-frame.jpg', 'img/cranes.jpg'],
     color: '#B5472F',
     usage:
       'Pribor za montažu sistema suhe gradnje: vijci za jednostruku i dvostruku oblogu, trake za ojačanje spojeva, akustične trake ispod vodećih profila i direktni ovjesi za plafone.',
@@ -112,13 +112,122 @@ const PRODUCTS = [
 ];
 
 // ---------------------------------------------------------------------
-// B2B demo partners — in production the login goes against PANTHEON
-// customer records. creditUsed = open (unpaid) invoices from the ERP.
+// Real product photography
+// Map SKU -> path to a real packshot. Any SKU missing here keeps the SVG
+// drawing as a fallback, so the catalogue works while photos are added.
+// ---------------------------------------------------------------------
+const PRODUCT_PHOTOS = {
+  'KNF-001': 'img/products/plasterboard.jpg',
+  'KNF-002': 'img/products/plasterboard.jpg',
+  'KNF-003': 'img/products/plasterboard.jpg',
+  'KNF-004': 'img/products/plasterboard.jpg',
+  'PRF-050': 'img/products/metal-profile.jpg',
+  'PRF-075': 'img/products/metal-profile.jpg',
+  'PRF-100': 'img/products/metal-profile.jpg',
+  'PRF-UW75': 'img/products/metal-profile.jpg',
+  'PRF-CD60': 'img/products/metal-profile.jpg',
+  'PRF-UD28': 'img/products/metal-profile.jpg',
+  'ISO-001': 'img/products/insulation-wall.jpg',
+  'ISO-002': 'img/products/insulation-wall.jpg',
+  'ISO-003': 'img/products/insulation-wall.jpg',
+  'ISO-004': 'img/products/insulation-wall.jpg',
+  'ISO-005': 'img/products/insulation-wall.jpg',
+  'ISO-006': 'img/products/insulation-wall.jpg',
+  'ISO-007': 'img/products/insulation-wall.jpg',
+  'CHM-001': 'img/products/cement.jpg',
+  'CHM-002': 'img/products/cement.jpg',
+  'CHM-003': 'img/products/cement.jpg',
+  'CHM-004': 'img/products/cement.jpg',
+  'CHM-005': 'img/products/cement.jpg',
+  'CHM-006': 'img/products/cement.jpg',
+  'CHM-007': 'img/products/cement.jpg',
+  'ACC-001': 'img/products/screws.jpg',
+  'ACC-002': 'img/products/screws.jpg',
+  'ACC-003': 'img/products/tape.jpg',
+  'ACC-004': 'img/products/tape.jpg',
+  'ACC-005': 'img/products/tape.jpg',
+  'ACC-006': 'img/products/screws.jpg',
+};
+
+// ---------------------------------------------------------------------
+// B2B demo partners — in production the login, invoices, order history
+// and construction sites all come from PANTHEON customer records.
+// Dates are stored as "days ago", so the demo never goes stale.
+//
+// DEMO ONLY: real passwords never live in frontend code. A production
+// login posts to a backend that checks a hashed password and returns a
+// session cookie.
 // ---------------------------------------------------------------------
 const PARTNERS = [
-  { id: 'gipsmont', name: 'Zanatska radnja „GipsMont" Banja Luka', tier: 'Nivo 1, zanatlije i manji izvođači', discount: 0.10, creditLimit: 15000, creditUsed: 4230, paymentDays: 30 },
-  { id: 'gradnjamont', name: 'Gradnja-Mont d.o.o. Laktaši', tier: 'Nivo 2, srednje građevinske firme', discount: 0.15, creditLimit: 30000, creditUsed: 11350, paymentDays: 60 },
-  { id: 'integral', name: 'Integral Inženjering a.d.', tier: 'Nivo 3, veliki ugovorni partneri', discount: 0.18, creditLimit: 50000, creditUsed: 18750, paymentDays: 90 },
+  {
+    id: 'gipsmont',
+    name: 'Zanatska radnja „GipsMont" Banja Luka',
+    tier: 'Nivo 1, zanatlije i manji izvođači',
+    discount: 0.10,
+    creditLimit: 15000,
+    paymentDays: 30,
+    email: 'nabavka@gipsmont.demo',
+    password: 'gipsmont2026',
+    sites: [
+      { id: 'gm-1', name: 'Stan, Borik', address: 'Ul. Slavka Rodića 12, Banja Luka', note: 'Treći sprat, lift za teret' },
+    ],
+    invoices: [
+      { no: 'IF-26-00714', issuedDaysAgo: 72, amount: 3120.0, paid: true },
+      { no: 'IF-26-00871', issuedDaysAgo: 41, amount: 2610.4, paid: false },
+      { no: 'IF-26-00932', issuedDaysAgo: 18, amount: 1619.6, paid: false },
+    ],
+    orders: [
+      { no: 'GC-2026-04418', daysAgo: 19, siteId: 'gm-1', status: 'Isporučena', payment: 'odgodjeno', delivery: 'kran', deliveryCost: 90, items: [['KNF-001', 150], ['PRF-075', 36], ['PRF-UW75', 12], ['CHM-001', 8], ['ACC-001', 3]] },
+    ],
+  },
+  {
+    id: 'gradnjamont',
+    name: 'Gradnja-Mont d.o.o. Laktaši',
+    tier: 'Nivo 2, srednje građevinske firme',
+    discount: 0.15,
+    creditLimit: 30000,
+    paymentDays: 60,
+    email: 'nabavka@gradnjamont.demo',
+    password: 'gradnjamont2026',
+    sites: [
+      { id: 'gd-1', name: 'Stambeni objekat, Laktaši', address: 'Ul. Karađorđeva 45, Laktaši', note: 'Kran sa ulične strane' },
+      { id: 'gd-2', name: 'Poslovni prostor, Gradiška', address: 'Vidovdanska 8, Gradiška', note: 'Prizemlje, istovar pored objekta' },
+    ],
+    invoices: [
+      { no: 'IF-26-00655', issuedDaysAgo: 95, amount: 6400.0, paid: true },
+      { no: 'IF-26-00802', issuedDaysAgo: 52, amount: 7240.5, paid: false },
+      { no: 'IF-26-00901', issuedDaysAgo: 24, amount: 4109.5, paid: false },
+    ],
+    orders: [
+      { no: 'GC-2026-04302', daysAgo: 26, siteId: 'gd-1', status: 'Isporučena', payment: 'odgodjeno', delivery: 'kran', deliveryCost: 130, items: [['KNF-002', 250], ['KNF-001', 400], ['PRF-100', 80], ['PRF-UW75', 30], ['ISO-002', 120], ['CHM-002', 12]] },
+      { no: 'GC-2026-04477', daysAgo: 6, siteId: 'gd-2', status: 'U pripremi', payment: 'odgodjeno', delivery: 'standard', deliveryCost: 80, items: [['CHM-003', 40], ['CHM-004', 60], ['ISO-004', 180]] },
+    ],
+  },
+  {
+    id: 'lazarevo',
+    name: 'Lazarevo Inženjering a.d.',
+    tier: 'Nivo 3, veliki ugovorni partneri',
+    discount: 0.18,
+    creditLimit: 50000,
+    paymentDays: 90,
+    email: 'nabavka@lazarevo.demo',
+    password: 'lazarevo2026',
+    sites: [
+      { id: 'lz-1', name: 'Lamela B, Starčevica', address: 'Ul. Vojvode Stepe Stepanovića 110, Banja Luka', note: 'Ulaz iz dvorišta, kran sa sjeverne strane' },
+      { id: 'lz-2', name: 'Poslovni objekat, Prijedor', address: 'Ul. Nikole Pašića 21, Prijedor', note: 'Najava vozača 30 minuta ranije' },
+    ],
+    invoices: [
+      { no: 'IF-26-00588', issuedDaysAgo: 110, amount: 12480.0, paid: true },
+      { no: 'IF-26-00731', issuedDaysAgo: 64, amount: 9870.3, paid: false },
+      { no: 'IF-26-00845', issuedDaysAgo: 38, amount: 5412.7, paid: false },
+      { no: 'IF-26-00955', issuedDaysAgo: 9, amount: 3467.0, paid: false },
+    ],
+    orders: [
+      { no: 'GC-2026-04211', daysAgo: 34, siteId: 'lz-1', status: 'Isporučena', payment: 'odgodjeno', delivery: 'kran', deliveryCost: 90, items: [['KNF-001', 600], ['KNF-003', 200], ['PRF-075', 140], ['PRF-UW75', 45], ['ISO-001', 480], ['ACC-001', 12], ['ACC-003', 20]] },
+      { no: 'GC-2026-04390', daysAgo: 21, siteId: 'lz-2', status: 'Isporučena', payment: 'odgodjeno', delivery: 'kran', deliveryCost: 180, items: [['ISO-006', 320], ['CHM-003', 30], ['CHM-004', 45]] },
+      { no: 'GC-2026-04502', daysAgo: 2, siteId: 'lz-1', status: 'Potvrđena', payment: 'odgodjeno', delivery: 'kran', deliveryCost: 90, items: [['KNF-004', 150], ['PRF-100', 60], ['ACC-002', 6], ['ACC-005', 8]] },
+    ],
+  },
 ];
 
 const PARTNER_TIERS = [
