@@ -12,11 +12,11 @@
 @font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
 
 html { scroll-behavior: smooth; }
-body { background-color: #EFE9DD; }
+body { background-color: #EFE9DD; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
 
 .font-serif { font-optical-sizing: auto; font-variant-numeric: lining-nums; }
 h1.font-serif, h2.font-serif { font-weight: 500; letter-spacing: -0.02em; }
-h3.font-serif, legend.font-serif, summary.font-serif { font-weight: 550; letter-spacing: -0.01em; }
+h3.font-serif, legend.font-serif, summary.font-serif { font-weight: 540; letter-spacing: -0.015em; }
 body.no-scroll { overflow: hidden; }
 
 /* Grid items default to min-width:auto, so a wide table inside an overflow-x-auto
