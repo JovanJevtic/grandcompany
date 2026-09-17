@@ -13,7 +13,7 @@ initPage(() => {
     $('product-root').innerHTML = `
       <div class="py-24 text-center">
         <p class="font-serif text-[40px] leading-tight">Artikal nije pronađen.</p>
-        <p class="mt-3 text-umber">Šifra „${esc(sku || '')}" ne postoji u katalogu ili je artikal povučen iz prodaje.</p>
+        <p class="mt-3 text-muted">Šifra „${esc(sku || '')}" ne postoji u katalogu ili je artikal povučen iz prodaje.</p>
         <a href="katalog.html" class="${BTN_PRIMARY} mt-8 px-7 py-3.5">Nazad na katalog</a>
       </div>`;
     $('related').remove();
@@ -32,15 +32,8 @@ initPage(() => {
   const CALCULATOR_SKUS = ['ISO-001', 'ISO-002', 'CHM-001', 'CHM-002', 'ACC-001', 'ACC-003', 'ACC-005'];
   const TABS = [['opis', 'Opis'], ['podaci', 'Tehnički podaci'], ['dokumentacija', 'Dokumentacija'], ['dostava', 'Dostava i istovar']];
 
-  const views = [{ type: 'art' }, ...cat.gallery.map((src) => ({ type: 'photo', src }))];
-  let view = 0;
   let tab = 'opis';
   let qty = defaultQty(p);
-
-  const viewMarkup = (v, compact) =>
-    v.type === 'art'
-      ? `<div class="h-full w-full ${compact ? 'p-2' : 'p-6 lg:p-12'}">${productArt(p)}</div>`
-      : `<img src="${v.src}" alt="${compact ? '' : `${esc(cat.label)} u primjeni`}" class="h-full w-full object-cover" />`;
 
   function docsFor() {
     const docs = [['Tehnički list proizvoda', 'Svojstva, potrošnja i uputstvo za ugradnju']];
@@ -59,7 +52,7 @@ initPage(() => {
       return `
         <div class="grid gap-8 lg:grid-cols-12">
           <p class="font-serif text-[24px] leading-snug lg:col-span-6">${esc(p.desc)}</p>
-          <div class="space-y-4 text-[16px] leading-relaxed text-umber lg:col-span-5 lg:col-start-8">
+          <div class="space-y-4 text-[16px] leading-relaxed text-muted lg:col-span-5 lg:col-start-8">
             <p>${esc(cat.usage)}</p>
             <p>${brandNote}</p>
           </div>
@@ -78,32 +71,32 @@ initPage(() => {
       ];
       return `
         <table class="w-full max-w-3xl text-[15px]">
-          <tbody>${rows.map(([k, v]) => `<tr class="border-b border-espresso/10"><th scope="row" class="w-1/2 py-3 pr-6 text-left font-normal text-umber">${k}</th><td class="py-3">${esc(v)}</td></tr>`).join('')}</tbody>
+          <tbody>${rows.map(([k, v]) => `<tr class="border-b border-ink/10"><th scope="row" class="w-1/2 py-3 pr-6 text-left font-normal text-muted">${k}</th><td class="py-3">${esc(v)}</td></tr>`).join('')}</tbody>
         </table>`;
     }
     if (tab === 'dokumentacija') {
       return `
-        <ul class="max-w-3xl divide-y divide-espresso/10 border-y border-espresso/15">
+        <ul class="max-w-3xl divide-y divide-ink/10 border-y border-ink/15">
           ${docsFor().map(([name, note]) => `
             <li class="flex flex-wrap items-center justify-between gap-4 py-4">
-              <div class="flex items-start gap-3"><span class="text-oxide">${ICON.doc}</span><div><p class="font-serif text-[17px] leading-snug">${name}</p><p class="text-[14px] text-umber">${note}</p></div></div>
+              <div class="flex items-start gap-3"><span class="text-steel">${ICON.doc}</span><div><p class="text-[15px] font-semibold leading-snug">${name}</p><p class="text-[14px] text-muted">${note}</p></div></div>
               <button data-doc="${esc(name)}" class="${BTN_GHOST} px-4 py-2 text-[14px]">Zatraži dokument</button>
             </li>`).join('')}
         </ul>
-        <p class="mt-4 max-w-3xl text-[14px] text-umber">Dokumentacija se isporučuje i u papirnom obliku uz robu, spremna za predaju nadzornom organu.</p>`;
+        <p class="mt-4 max-w-3xl text-[14px] text-muted">Dokumentacija se isporučuje i u papirnom obliku uz robu, spremna za predaju nadzornom organu.</p>`;
     }
     const zone = DELIVERY_ZONES[0];
     const packWeight = p.pack ? p.weight * p.pack.size : p.weight;
     return `
       <div class="grid gap-8 lg:grid-cols-12">
-        <div class="space-y-4 text-[16px] leading-relaxed text-umber lg:col-span-6">
-          <p>Jedno pakovanje (${p.pack ? `${p.pack.name} od ${qtyFmt(p.pack.size)} ${p.unit}` : `1 ${p.unit}`}) teži oko <strong class="font-medium text-espresso">${qtyFmt(Math.round(packWeight * 10) / 10)} kg</strong>. Kada narudžba pređe ${fmt0.format(CRANE_RECOMMEND_OVER_KG)} kg, preporučujemo kamion sa kranom koji paletu podiže direktno na etažu.</p>
+        <div class="space-y-4 text-[16px] leading-relaxed text-muted lg:col-span-6">
+          <p>Jedno pakovanje (${p.pack ? `${p.pack.name} od ${qtyFmt(p.pack.size)} ${p.unit}` : `1 ${p.unit}`}) teži oko <strong class="font-medium text-ink">${qtyFmt(Math.round(packWeight * 10) / 10)} kg</strong>. Kada narudžba pređe ${fmt0.format(CRANE_RECOMMEND_OVER_KG)} kg, preporučujemo kamion sa kranom koji paletu podiže direktno na etažu.</p>
           <p>Dostavu i zonu birate u korpi, a tačan termin istovara dogovaramo pri potvrdi narudžbe.</p>
-          <a href="dostava.html" class="inline-flex items-center gap-2 text-oxide link-line">Cjenovnik dostave po zonama ${ICON.arrow}</a>
+          <a href="dostava.html" class="inline-flex items-center gap-2 text-steel link-line">Cjenovnik dostave po zonama ${ICON.arrow}</a>
         </div>
         <div class="lg:col-span-5 lg:col-start-8">
           <div class="aspect-[4/3] overflow-hidden"><img src="img/crane-lift.jpg" alt="Kran podiže betonski panel na gradilištu" class="h-full w-full object-cover" /></div>
-          <p class="mt-2 text-[14px] text-umber">Kamion sa kranom u Banjoj Luci: ${KM(zone.kranTransport + zone.kranWork)}</p>
+          <p class="mt-2 text-[14px] text-muted">Kamion sa kranom u Banjoj Luci: ${KM(zone.kranTransport + zone.kranWork)}</p>
         </div>
       </div>`;
   }
@@ -118,64 +111,56 @@ initPage(() => {
 
       <div class="mt-6 grid gap-10 lg:grid-cols-12 lg:gap-12">
         <div class="lg:col-span-7">
-          <div id="main-view" class="relative aspect-[4/3] overflow-hidden bg-bone">
-            ${viewMarkup(views[view], false)}
-          </div>
-          <div class="mt-3 grid grid-cols-3 gap-3" role="group" aria-label="Prikazi artikla">
-            ${views.map((v, i) => `
-              <button data-view="${i}" aria-pressed="${i === view}" aria-label="Prikaz ${i + 1}" class="aspect-[4/3] overflow-hidden border-2 bg-bone ${i === view ? 'border-espresso' : 'border-transparent hover:border-espresso/30'}">
-                ${viewMarkup(v, true)}
-              </button>`).join('')}
-          </div>
+          <div class="aspect-[4/3] border border-ink/10 bg-well p-8 lg:p-14">${productArt(p)}</div>
         </div>
 
         <div class="lg:col-span-5">
-          <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px] text-umber">
+          <div class="flex flex-wrap items-center gap-x-5 gap-y-1 text-[13px] text-muted">
             <span>${esc(p.brand)}</span>
             <span>Šifra ${p.sku}</span>
-            <a href="katalog.html?kat=${cat.id}" class="hover:text-espresso">${cat.label}</a>
+            <a href="katalog.html?kat=${cat.id}" class="hover:text-ink">${cat.label}</a>
           </div>
           <h1 class="mt-3 font-serif text-[clamp(1.89rem,2.95vw,2.87rem)] leading-[1.04]">${esc(p.name)}</h1>
-          <p class="mt-3 text-[16px] text-umber">${esc(p.spec)}</p>
+          <p class="mt-3 text-[16px] text-muted">${esc(p.spec)}</p>
 
-          <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-y border-espresso/15 py-3 text-[14px]">
+          <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-y border-ink/15 py-3 text-[14px]">
             ${stockBadge(p)}
-            <span class="text-umber">${fmt0.format(p.stock)} ${p.unit} na stovarištu, stanje iz Pantheona u ${syncTime()}</span>
+            <span class="text-muted">${fmt0.format(p.stock)} ${p.unit} na stovarištu, stanje iz Pantheona u ${syncTime()}</span>
           </div>
 
           <div class="mt-6">
-            ${b2b ? `<p class="text-[14px] text-umber"><span class="line-through">${KM(p.price)}</span><span class="ml-2 text-oxide">rabat −${pct(discount())} za ${esc(b2b.name)}</span></p>` : ''}
-            <p class="mt-1 font-serif text-[46px] leading-none ${b2b ? 'text-oxide' : ''}">${KM(priceOf(p))}<span class="ml-2 font-sans text-[16px] text-umber">po ${p.unit}, sa PDV-om</span></p>
-            ${p.pack ? `<p class="mt-2 text-[15px] text-umber">Jedna ${p.pack.name} od ${qtyFmt(p.pack.size)} ${p.unit} košta ${KM(priceOf(p) * p.pack.size)}.</p>` : ''}
-            ${b2b ? '' : `<button data-login class="mt-3 text-left text-[15px] text-umber"><span class="text-oxide underline underline-offset-4">Prijavite se kao partner</span> i platite od ${KM(p.price * 0.9)} do ${KM(p.price * 0.78)} po ${p.unit}.</button>`}
+            ${b2b ? `<p class="text-[14px] text-muted"><span class="line-through">${KM(p.price)}</span><span class="ml-2 text-steel">rabat −${pct(discount())} za ${esc(b2b.name)}</span></p>` : ''}
+            <p class="tnum mt-1 text-[38px] font-semibold leading-none ${b2b ? 'text-steel' : ''}">${KM(priceOf(p))}<span class="ml-2 text-[15px] font-normal text-muted">po ${p.unit}, sa PDV-om</span></p>
+            ${p.pack ? `<p class="mt-2 text-[15px] text-muted">Jedna ${p.pack.name} od ${qtyFmt(p.pack.size)} ${p.unit} košta ${KM(priceOf(p) * p.pack.size)}.</p>` : ''}
+            ${b2b ? '' : `<button data-login class="mt-3 text-left text-[15px] text-muted"><span class="text-steel underline underline-offset-4">Prijavite se kao partner</span> i platite od ${KM(p.price * 0.9)} do ${KM(p.price * 0.78)} po ${p.unit}.</button>`}
           </div>
 
           <div data-product="${p.sku}" class="mt-7 flex flex-wrap items-stretch gap-3">
             <div class="flex">
-              <button id="qty-dec" class="w-11 border border-espresso/30 text-[20px] transition-colors hover:bg-espresso hover:text-cream" aria-label="Smanji količinu">−</button>
+              <button id="qty-dec" class="w-11 border border-ink/30 text-[20px] transition-colors hover:bg-ink hover:text-canvas" aria-label="Smanji količinu">−</button>
               <input id="qty" data-qty type="number" min="0" step="any" value="${qty}" aria-label="Količina u ${p.unit}"
-                     class="w-20 border-x-0 border-y border-espresso/30 bg-paper text-center text-[17px] focus:border-espresso focus:ring-0" />
-              <button id="qty-inc" class="w-11 border border-espresso/30 text-[20px] transition-colors hover:bg-espresso hover:text-cream" aria-label="Povećaj količinu">+</button>
+                     class="w-20 border-x-0 border-y border-ink/30 bg-surface text-center text-[17px] focus:border-ink focus:ring-0" />
+              <button id="qty-inc" class="w-11 border border-ink/30 text-[20px] transition-colors hover:bg-ink hover:text-canvas" aria-label="Povećaj količinu">+</button>
             </div>
-            <span class="self-center text-[15px] text-umber">${p.unit}</span>
+            <span class="self-center text-[15px] text-muted">${p.unit}</span>
             <button data-add="${p.sku}" class="${BTN_PRIMARY} min-w-[200px] flex-1 px-8 py-4 text-[16px]">Dodaj u korpu</button>
           </div>
-          <p id="line-total" class="mt-3 text-[15px] text-umber"></p>
+          <p id="line-total" class="mt-3 text-[15px] text-muted"></p>
 
-          ${showCalc ? `<a href="kalkulator.html" class="mt-5 inline-flex items-center gap-2 text-[15px] text-oxide link-line">Izračunajte količinu za pregradni zid ${ICON.arrow}</a>` : ''}
+          ${showCalc ? `<a href="kalkulator.html" class="mt-5 inline-flex items-center gap-2 text-[15px] text-steel link-line">Izračunajte količinu za pregradni zid ${ICON.arrow}</a>` : ''}
 
-          <ul class="mt-7 divide-y divide-espresso/10 border-y border-espresso/15 text-[15px]">
-            <li class="flex flex-wrap justify-between gap-x-4 py-3"><span>Preuzimanje na stovarištu</span><span class="text-umber">besplatno</span></li>
-            <li class="flex flex-wrap justify-between gap-x-4 py-3"><span>Standardna dostava, Banja Luka</span><span class="text-umber">${KM(zone.standard)}, besplatna preko ${fmt0.format(FREE_STANDARD_DELIVERY_OVER)} KM</span></li>
-            <li class="flex flex-wrap justify-between gap-x-4 py-3"><span>Kamion sa kranom, istovar na etažu</span><span class="text-umber">od ${KM(zone.kranTransport + zone.kranWork)}</span></li>
+          <ul class="mt-7 divide-y divide-ink/10 border-y border-ink/15 text-[15px]">
+            <li class="flex flex-wrap justify-between gap-x-4 py-3"><span>Preuzimanje na stovarištu</span><span class="text-muted">besplatno</span></li>
+            <li class="flex flex-wrap justify-between gap-x-4 py-3"><span>Standardna dostava, Banja Luka</span><span class="text-muted">${KM(zone.standard)}, besplatna preko ${fmt0.format(FREE_STANDARD_DELIVERY_OVER)} KM</span></li>
+            <li class="flex flex-wrap justify-between gap-x-4 py-3"><span>Kamion sa kranom, istovar na etažu</span><span class="text-muted">od ${KM(zone.kranTransport + zone.kranWork)}</span></li>
           </ul>
         </div>
       </div>
 
       <div class="mt-16">
-        <div role="tablist" aria-label="Detalji artikla" class="no-scrollbar flex gap-8 overflow-x-auto border-b border-espresso/20">
+        <div role="tablist" aria-label="Detalji artikla" class="no-scrollbar flex gap-8 overflow-x-auto border-b border-ink/20">
           ${TABS.map(([id, label]) => `
-            <button role="tab" data-tab="${id}" aria-selected="${tab === id}" class="whitespace-nowrap pb-3 text-[16px] ${tab === id ? 'text-espresso shadow-[inset_0_-2px_0_#7D2E1D]' : 'text-umber hover:text-espresso'}">${label}</button>`).join('')}
+            <button role="tab" data-tab="${id}" aria-selected="${tab === id}" class="whitespace-nowrap pb-3 text-[16px] ${tab === id ? 'text-ink shadow-[inset_0_-2px_0_#274C77]' : 'text-muted hover:text-ink'}">${label}</button>`).join('')}
         </div>
         <div role="tabpanel" class="pt-8">${tabPanel()}</div>
       </div>`;
@@ -193,7 +178,7 @@ initPage(() => {
       .slice(0, 4)
       .map((s) => bySku[s]);
     $('related').innerHTML = `
-      <div class="mx-auto max-w-[1440px] px-5 py-14 lg:px-12 lg:py-20">
+      <div class="mx-auto max-w-page px-5 py-14 lg:px-10 lg:py-20">
         <div class="flex flex-wrap items-end justify-between gap-4">
           <h2 class="font-serif text-[clamp(1.64rem,2.79vw,2.46rem)] leading-tight">Uz ovaj artikal najčešće idu</h2>
           <a href="katalog.html?kat=${cat.id}" class="link-line text-[15px]">Sve iz kategorije ${esc(cat.label.toLowerCase())}</a>

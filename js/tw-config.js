@@ -2,21 +2,25 @@ tailwind.config = {
   theme: {
     extend: {
       fontFamily: {
-        serif: ['"Fraunces"', 'Georgia', 'serif'],
+        serif: ['"Source Serif 4"', 'Georgia', 'serif'],
         sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {
-        cream: '#EFE9DD',
-        bone: '#E5DECE',
-        paper: '#F8F4EC',
-        espresso: '#221C14',
-        umber: '#6B5D49',
-        oxide: '#7D2E1D',
-        // Material colours — each one belongs to a product family
+        canvas: '#F5F5F2',  // page background, a cool gypsum grey
+        surface: '#FFFFFF', // cards, header, panels
+        well: '#ECEDE9',    // wells behind product drawings
+        ink: '#1B1E22',     // text and primary buttons
+        muted: '#5A6069',   // secondary text
+        steel: '#274C77',   // the one accent: galvanised-steel blue
+        tint: '#E4EAF1',    // steel wash for the partner portal
+        // Status and material colours
         dusk: '#4F6D8F',
-        ochre: '#C08A2E',
-        sage: '#5E7F5B',
-        brick: '#B5472F',
+        ochre: '#B7862C',
+        sage: '#4E7A55',
+        brick: '#A8432F',
+      },
+      maxWidth: {
+        page: '1360px',
       },
     },
   },

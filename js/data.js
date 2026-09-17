@@ -41,7 +41,7 @@ const CATEGORIES = [
     lead: 'Kamena i staklena vuna, stiropor i stirodur',
     image: 'img/facade.jpg',
     gallery: ['img/facade.jpg', 'img/office.jpg'],
-    color: '#C08A2E',
+    color: '#B7862C',
     usage:
       'Toplotna i zvučna izolacija za pregradne zidove, potkrovlja, podove i kontaktne fasade. Kamena vuna je negoriva i dobro prigušuje zvuk, staklena vuna u rolni je lakša za kose krovove, a grafitni stiropor daje istu izolaciju sa tanjom pločom.',
   },
@@ -51,7 +51,7 @@ const CATEGORIES = [
     lead: 'Mase za spojeve, ljepila, glet i cement',
     image: 'img/concrete-curves.jpg',
     gallery: ['img/concrete-curves.jpg', 'img/site-aerial.jpg'],
-    color: '#5E7F5B',
+    color: '#4E7A55',
     usage:
       'Gipsane mase za fugovanje, ljepila za fasadne sisteme i keramiku, glet mase i cement. Vreće čuvajte na paleti, na suhom i zaštićene od vlage, i koristite ih unutar roka trajanja otisnutog na pakovanju.',
   },
@@ -61,7 +61,7 @@ const CATEGORIES = [
     lead: 'Samourezni vijci, trake i ovjesi',
     image: 'img/steel-frame.jpg',
     gallery: ['img/steel-frame.jpg', 'img/cranes.jpg'],
-    color: '#B5472F',
+    color: '#A8432F',
     usage:
       'Pribor za montažu sistema suhe gradnje: vijci za jednostruku i dvostruku oblogu, trake za ojačanje spojeva, akustične trake ispod vodećih profila i direktni ovjesi za plafone.',
   },
@@ -99,7 +99,7 @@ const PRODUCTS = [
   { sku: 'CHM-003', name: 'Ceresit CT 83 ljepilo za stiropor', brand: 'Ceresit', spec: 'Vreća 25 kg', desc: 'Ljepilo za lijepljenje polistirenskih ploča na fasadu.', price: 11.50, unit: 'kom', category: 'veziva', stock: 520, weight: 25, art: { kind: 'bag', body: '#F4F1EA', band: '#C0392B', label: 'CT 83', weight: '25 kg' } },
   { sku: 'CHM-004', name: 'Ceresit CT 85 ljepilo i masa za armiranje', brand: 'Ceresit', spec: 'Vreća 25 kg', desc: 'Za lijepljenje ploča i armiranje fasadne mrežice, sa vlaknima.', price: 16.20, unit: 'kom', category: 'veziva', stock: 470, weight: 25, featured: true, art: { kind: 'bag', body: '#F4F1EA', band: '#C0392B', label: 'CT 85', weight: '25 kg' } },
   { sku: 'CHM-005', name: 'Ceresit CM 16 fleksibilno ljepilo za keramiku', brand: 'Ceresit', spec: 'Vreća 25 kg', desc: 'Za unutrašnju i vanjsku keramiku i gres pločice.', price: 22.50, unit: 'kom', category: 'veziva', stock: 350, weight: 25, art: { kind: 'bag', body: '#F4F1EA', band: '#C0392B', label: 'CM 16', weight: '25 kg' } },
-  { sku: 'CHM-006', name: 'Cement Lukavac CEM II 42,5N', brand: 'Cement Lukavac', spec: 'Vreća 50 kg', desc: 'Za klasičnu gradnju, betoniranje i malterisanje.', price: 13.80, unit: 'kom', category: 'veziva', stock: 1200, weight: 50, art: { kind: 'bag', body: '#BDB7AA', band: '#D9A62E', bandText: '#221C14', label: 'CEM II 42,5N', weight: '50 kg' } },
+  { sku: 'CHM-006', name: 'Cement Lukavac CEM II 42,5N', brand: 'Cement Lukavac', spec: 'Vreća 50 kg', desc: 'Za klasičnu gradnju, betoniranje i malterisanje.', price: 13.80, unit: 'kom', category: 'veziva', stock: 1200, weight: 50, art: { kind: 'bag', body: '#BDB7AA', band: '#D9A62E', bandText: '#1B1E22', label: 'CEM II 42,5N', weight: '50 kg' } },
   { sku: 'CHM-007', name: 'Ceresit IN 52 glet masa', brand: 'Ceresit', spec: 'Vreća 20 kg', desc: 'Fina unutrašnja glet masa za zidove i plafone.', price: 18.00, unit: 'kom', category: 'veziva', stock: 290, weight: 20, art: { kind: 'bag', body: '#F4F1EA', band: '#C0392B', label: 'IN 52', weight: '20 kg' } },
 
   // ------------------- VIJCI I OPREMA -------------------
@@ -116,43 +116,9 @@ const PRODUCTS = [
 // Map SKU -> path to a real packshot. Any SKU missing here keeps the SVG
 // drawing as a fallback, so the catalogue works while photos are added.
 // ---------------------------------------------------------------------
-const PRODUCT_PHOTOS = {
-  // Suha gradnja — ploče (drywall)
-  'KNF-001': 'img/interior.jpg',
-  'KNF-002': 'img/interior.jpg',
-  'KNF-003': 'img/interior.jpg',
-  'KNF-004': 'img/interior.jpg',
-  // Suha gradnja — profili (steel framing)
-  'PRF-050': 'img/steel-frame.jpg',
-  'PRF-075': 'img/steel-frame.jpg',
-  'PRF-100': 'img/steel-frame.jpg',
-  'PRF-UW75': 'img/steel-frame.jpg',
-  'PRF-CD60': 'img/steel-frame.jpg',
-  'PRF-UD28': 'img/steel-frame.jpg',
-  // Izolacija — vune i stiropor (facade insulation)
-  'ISO-001': 'img/facade.jpg',
-  'ISO-002': 'img/facade.jpg',
-  'ISO-003': 'img/facade.jpg',
-  'ISO-004': 'img/facade.jpg',
-  'ISO-005': 'img/facade.jpg',
-  'ISO-006': 'img/facade.jpg',
-  'ISO-007': 'img/facade.jpg',
-  // Veziva — mase, ljepila, cement (concrete)
-  'CHM-001': 'img/concrete-curves.jpg',
-  'CHM-002': 'img/concrete-curves.jpg',
-  'CHM-003': 'img/concrete-curves.jpg',
-  'CHM-004': 'img/concrete-curves.jpg',
-  'CHM-005': 'img/concrete-curves.jpg',
-  'CHM-006': 'img/concrete-curves.jpg',
-  'CHM-007': 'img/concrete-curves.jpg',
-  // Oprema — vijci, trake, ovjesi (steel detail)
-  'ACC-001': 'img/steel-frame.jpg',
-  'ACC-002': 'img/steel-frame.jpg',
-  'ACC-003': 'img/interior.jpg',
-  'ACC-004': 'img/interior.jpg',
-  'ACC-005': 'img/interior.jpg',
-  'ACC-006': 'img/steel-frame.jpg',
-};
+// Empty until real packshots exist: a generic site photo on every drywall board
+// misleads buyers, so each SKU keeps its own illustration from js/art.js.
+const PRODUCT_PHOTOS = {};
 
 // ---------------------------------------------------------------------
 // B2B demo partners — in production the login, invoices, order history

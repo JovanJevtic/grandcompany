@@ -72,16 +72,16 @@ initPage(() => {
 
     const quick = CATEGORIES.map((c) => {
       const count = PRODUCTS.filter((p) => p.category === c.id).length;
-      return `<button data-quick-cat="${c.id}" class="inline-flex items-center gap-2 border border-espresso/20 bg-paper px-3 py-2 text-[14px] transition-colors hover:border-espresso">
-        ${c.label}<span class="text-umber">${count}</span></button>`;
+      return `<button data-quick-cat="${c.id}" class="inline-flex items-center gap-2 border border-ink/20 bg-surface px-3 py-2 text-[14px] transition-colors hover:border-ink">
+        ${c.label}<span class="text-muted">${count}</span></button>`;
     }).join('');
 
     $('catalog-head').innerHTML = `
-      <div class="mx-auto grid max-w-[1440px] items-center gap-8 px-5 py-8 lg:grid-cols-12 lg:px-12 lg:py-10">
+      <div class="mx-auto grid max-w-page items-center gap-8 px-5 py-8 lg:grid-cols-12 lg:px-10 lg:py-10">
         <div class="${single ? 'lg:col-span-7' : 'lg:col-span-10'}">
           ${breadcrumb([{ label: 'Početna', href: 'index.html' }, { label: 'Katalog', href: single ? 'katalog.html' : null }, ...(single ? [{ label: single.label }] : [])])}
           <h1 class="mt-4 font-serif text-[clamp(2.13rem,4.1vw,3.69rem)] leading-[1.02]">${esc(title)}</h1>
-          <p class="mt-4 max-w-[64ch] text-[16px] leading-relaxed text-umber">${esc(lead)}</p>
+          <p class="mt-4 max-w-[64ch] text-[16px] leading-relaxed text-muted">${esc(lead)}</p>
           ${single ? '' : `<div class="mt-6 flex flex-wrap gap-2">${quick}</div>`}
         </div>
         ${single ? `
@@ -95,22 +95,22 @@ initPage(() => {
 
   function renderFilters() {
     const group = (title, body) => `
-      <fieldset class="border-t border-espresso/15 py-5">
-        <legend class="float-left mb-3 w-full font-serif text-[18px]">${title}</legend>
+      <fieldset class="border-t border-ink/15 py-5">
+        <legend class="float-left mb-3 w-full text-[15px] font-semibold">${title}</legend>
         <div class="clear-both space-y-2.5">${body}</div>
       </fieldset>`;
     const check = (name, value, label, swatch = '') => `
       <label class="flex cursor-pointer items-center gap-3 text-[15px]">
-        <input type="checkbox" name="${name}" value="${esc(value)}" class="h-4 w-4 rounded-none border-espresso/40 text-oxide focus:ring-oxide" />
+        <input type="checkbox" name="${name}" value="${esc(value)}" class="h-4 w-4 rounded-none border-ink/40 text-steel focus:ring-steel" />
         ${swatch}<span class="flex-1">${esc(label)}</span>
-        <span class="text-[13px] text-umber" data-count="${name}|${esc(value)}"></span>
+        <span class="text-[13px] text-muted" data-count="${name}|${esc(value)}"></span>
       </label>`;
-    const priceField = 'w-full min-w-0 border border-espresso/25 bg-paper px-2 py-2 text-[15px] focus:border-espresso focus:ring-0';
+    const priceField = 'w-full min-w-0 border border-ink/25 bg-surface px-2 py-2 text-[15px] focus:border-ink focus:ring-0';
 
     $('filters').innerHTML = `
       <div class="lg:sticky lg:top-40">
         <label class="block pb-5">
-          <span class="font-serif text-[18px]">Pretraga</span>
+          <span class="text-[15px] font-semibold">Pretraga</span>
           <input id="f-q" type="search" placeholder="Naziv, šifra ili dimenzija" class="${FIELD}" />
         </label>
         ${group('Kategorija', CATEGORIES.map((c) => check('kat', c.id, c.label)).join(''))}
@@ -119,11 +119,11 @@ initPage(() => {
         ${group('Cijena po jedinici', `
           <div class="flex items-center gap-2">
             <label class="flex-1"><span class="sr-only">Cijena od</span><input id="f-min" type="number" min="0" step="0.5" placeholder="od" class="${priceField}" /></label>
-            <span class="text-umber" aria-hidden="true">–</span>
+            <span class="text-muted" aria-hidden="true">–</span>
             <label class="flex-1"><span class="sr-only">Cijena do</span><input id="f-max" type="number" min="0" step="0.5" placeholder="do" class="${priceField}" /></label>
-            <span class="text-[13px] text-umber">KM</span>
+            <span class="text-[13px] text-muted">KM</span>
           </div>`)}
-        <button id="f-reset" class="mt-1 text-[14px] text-oxide underline underline-offset-4">Poništi sve filtere</button>
+        <button id="f-reset" class="mt-1 text-[14px] text-steel underline underline-offset-4">Poništi sve filtere</button>
       </div>`;
     syncInputs();
   }
@@ -160,7 +160,7 @@ initPage(() => {
     ];
     $('active-chips').classList.toggle('hidden', !chips.length);
     $('active-chips').innerHTML = chips.map(([name, value, label]) => `
-      <button data-chip="${name}" data-value="${esc(value)}" class="inline-flex items-center gap-2 bg-espresso px-3 py-1.5 text-[13px] text-cream transition-colors hover:bg-oxide">
+      <button data-chip="${name}" data-value="${esc(value)}" class="inline-flex items-center gap-2 bg-ink px-3 py-1.5 text-[13px] text-canvas transition-colors hover:bg-steel">
         ${esc(label)}<span aria-hidden="true">×</span><span class="sr-only">Ukloni filter</span>
       </button>`).join('');
   }
@@ -170,9 +170,9 @@ initPage(() => {
     $('result-count').textContent = `${results.length} ${plural(results.length, 'artikal', 'artikla', 'artikala')}`;
     $('catalog-grid').innerHTML = results.length
       ? results.map(productCard).join('')
-      : `<div class="col-span-full border border-dashed border-espresso/30 px-6 py-16 text-center">
+      : `<div class="col-span-full border border-dashed border-ink/30 px-6 py-16 text-center">
           <p class="font-serif text-[26px]">Nijedan artikal ne odgovara filterima.</p>
-          <p class="mt-2 text-umber">Uklonite neki od filtera ili pretražite po šifri artikla.</p>
+          <p class="mt-2 text-muted">Uklonite neki od filtera ili pretražite po šifri artikla.</p>
           <button data-reset class="${BTN_PRIMARY} mt-6 px-6 py-3">Poništi filtere</button>
         </div>`;
     renderHead();

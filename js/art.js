@@ -35,7 +35,7 @@ const pts = (list) => list.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).jo
 const poly = (list, fill, extra = '') => `<polygon points="${pts(list)}" fill="${fill}" ${extra}/>`;
 const add = (p, q) => [p[0] + q[0], p[1] + q[1]];
 const shadow = (cx, cy, rx, ry, rot = 0) =>
-  `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#221C14" opacity="0.1" transform="rotate(${rot} ${cx} ${cy})"/>`;
+  `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#1B1E22" opacity="0.1" transform="rotate(${rot} ${cx} ${cy})"/>`;
 
 // A flat box in oblique projection: side, front and top faces
 function slab(x, y, w, h, ox, oy, c) {
@@ -57,8 +57,8 @@ function topLabel(x, y, ox, oy, text, color, size) {
 function sticker(x, y, text, rot = 0) {
   const w = Math.max(54, text.length * 7.6 + 18);
   return `<g transform="translate(${x} ${y}) rotate(${rot})">
-    <rect x="${-w / 2}" y="-12" width="${w}" height="22" fill="#F8F4EC" stroke="#221C14" stroke-opacity="0.12"/>
-    <text y="4" text-anchor="middle" font-family="${ART_FONT}" font-size="12" font-weight="700" fill="#221C14">${esc(text)}</text>
+    <rect x="${-w / 2}" y="-12" width="${w}" height="22" fill="#F8F4EC" stroke="#1B1E22" stroke-opacity="0.12"/>
+    <text y="4" text-anchor="middle" font-family="${ART_FONT}" font-size="12" font-weight="700" fill="#1B1E22">${esc(text)}</text>
   </g>`;
 }
 
@@ -148,7 +148,7 @@ function drawSlabs(a, sku) {
 
 function drawRoll(a) {
   const R = 76, cx = 142, cy = 176, axis = [128, -64], steps = 28;
-  const colors = { side: '#D9AE36', face: '#E8C24E', band: '#221C14' };
+  const colors = { side: '#D9AE36', face: '#E8C24E', band: '#1B1E22' };
   let s = shadow(212, 252, 170, 18);
 
   for (let i = steps; i >= 0; i--) {
@@ -217,8 +217,8 @@ function drawBox(a) {
   s += poly([[172, 132], [192, 132], add([192, 132], depth), add([172, 132], depth)], '#EAD5B2', 'opacity="0.85"');
   s += `<rect x="122" y="158" width="116" height="56" fill="#F8F4EC"/>`;
   s += `<rect x="122" y="158" width="6" height="56" fill="#2F5FA7"/>`;
-  s += `<text x="184" y="184" text-anchor="middle" font-family="${ART_FONT}" font-size="15" font-weight="700" fill="#221C14">${esc(a.label)}</text>`;
-  s += `<text x="184" y="202" text-anchor="middle" font-family="${ART_FONT}" font-size="12" fill="#6B5D49">${esc(a.sub)}</text>`;
+  s += `<text x="184" y="184" text-anchor="middle" font-family="${ART_FONT}" font-size="15" font-weight="700" fill="#1B1E22">${esc(a.label)}</text>`;
+  s += `<text x="184" y="202" text-anchor="middle" font-family="${ART_FONT}" font-size="12" fill="#5A6069">${esc(a.sub)}</text>`;
 
   const screw = (x, y, rot) => {
     let g = `<g transform="translate(${x} ${y}) rotate(${rot})"><rect x="0" y="-2.5" width="42" height="5" fill="#59606A"/>`;
@@ -242,7 +242,7 @@ function drawBag(a) {
   body += poly([[xl(118), 118], [xr(118), 118], [xr(124), 124], [xl(124), 124]], a.band);
   body += poly([[xl(146), 146], [xr(146), 146], [xr(200), 200], [xl(200), 200]], a.band);
   body += `<text x="200" y="180" text-anchor="middle" font-family="${ART_FONT}" font-size="${a.label.length > 10 ? 18 : 22}" font-weight="700" fill="${a.bandText || '#F8F4EC'}">${esc(a.label)}</text>`;
-  body += `<text x="200" y="232" text-anchor="middle" font-family="${ART_FONT}" font-size="17" font-weight="700" fill="${a.band === '#D9A62E' ? '#221C14' : a.band}">${esc(a.weight)}</text>`;
+  body += `<text x="200" y="232" text-anchor="middle" font-family="${ART_FONT}" font-size="17" font-weight="700" fill="${a.band === '#D9A62E' ? '#1B1E22' : a.band}">${esc(a.weight)}</text>`;
 
   return shadow(200, 262, 110 * scale, 12) + `<g transform="translate(200 258) scale(${scale}) translate(-200 -258)">${body}</g>`;
 }

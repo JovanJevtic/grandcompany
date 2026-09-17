@@ -10,22 +10,22 @@
   <script src="js/tw-config.js"></script>
   <link rel="stylesheet" href="css/site.css" />
 </head>
-<body class="bg-cream font-sans text-espresso antialiased" data-page="katalog">
+<body class="bg-canvas font-sans text-ink antialiased" data-page="katalog">
   <div id="site-header"></div>
 
   <main>
-    <section id="catalog-head" class="border-b border-espresso/15"></section>
+    <section id="catalog-head" class="border-b border-ink/15"></section>
 
-    <div class="mx-auto grid max-w-[1440px] gap-10 px-5 pb-20 pt-8 lg:grid-cols-12 lg:px-12">
+    <div class="mx-auto grid max-w-page gap-10 px-5 pb-20 pt-8 lg:grid-cols-12 lg:px-10">
       <aside id="filters" aria-label="Filteri" class="hidden lg:col-span-3 lg:block"></aside>
 
       <div class="lg:col-span-9">
-        <div class="flex flex-wrap items-center gap-3 border-b border-espresso/15 pb-4">
-          <button id="btn-filters" class="border border-espresso/30 px-4 py-2 text-[14px] lg:hidden" aria-controls="filters" aria-expanded="false">Filteri</button>
-          <p id="result-count" class="text-[15px] text-umber" aria-live="polite"></p>
-          <label class="ml-auto flex items-center gap-2 text-[14px] text-umber">
+        <div class="flex flex-wrap items-center gap-3 border-b border-ink/15 pb-4">
+          <button id="btn-filters" class="border border-ink/30 px-4 py-2 text-[14px] lg:hidden" aria-controls="filters" aria-expanded="false">Filteri</button>
+          <p id="result-count" class="text-[15px] text-muted" aria-live="polite"></p>
+          <label class="ml-auto flex items-center gap-2 text-[14px] text-muted">
             Sortiraj
-            <select id="sort" class="border-espresso/25 bg-paper py-1.5 pl-3 pr-9 text-[14px] text-espresso focus:border-espresso focus:ring-0">
+            <select id="sort" class="border-ink/25 bg-surface py-1.5 pl-3 pr-9 text-[14px] text-ink focus:border-ink focus:ring-0">
               <option value="preporuceno">Preporučeno</option>
               <option value="cijena-rastuce">Cijena: od najniže</option>
               <option value="cijena-opadajuce">Cijena: od najviše</option>

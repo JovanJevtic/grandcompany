@@ -6,21 +6,22 @@
 
 'use strict';
 
-const FIELD = 'mt-1 w-full border border-espresso/25 bg-paper px-3 py-2.5 text-[15px] text-espresso placeholder-umber/60 focus:border-espresso focus:ring-0';
-const LABEL = 'text-[13px] text-umber';
-const BTN_PRIMARY = 'inline-flex items-center justify-center gap-2 bg-espresso text-[15px] font-medium text-cream transition-colors hover:bg-oxide';
-const BTN_GHOST = 'inline-flex items-center justify-center gap-2 border border-espresso/40 text-[15px] font-medium text-espresso transition-colors hover:bg-espresso hover:text-cream';
+const FIELD = 'mt-1 w-full border border-ink/20 bg-surface px-3 py-2.5 text-[15px] text-ink placeholder-muted/60 focus:border-steel focus:ring-1 focus:ring-steel';
+const LABEL = 'text-[13px] font-medium text-muted';
+const BTN_PRIMARY = 'inline-flex items-center justify-center gap-2 bg-ink text-[15px] font-semibold text-surface transition-colors hover:bg-steel';
+const BTN_GHOST = 'inline-flex items-center justify-center gap-2 border border-ink/25 bg-surface text-[15px] font-semibold text-ink transition-colors hover:border-ink';
 
 const ICON = {
-  search: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
-  cart: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>',
-  user: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
-  menu: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
-  close: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
-  crane: '<svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M5 21V4l13 2M5 4h15M17 6v5"/><path d="M15 11h4v3h-4zM2 21h7"/></svg>',
-  stock: '<svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>',
-  doc: '<svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>',
-  card: '<svg viewBox="0 0 24 24" class="h-7 w-7" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M7 15h4"/></svg>',
+  search: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+  cart: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h9.2a1 1 0 0 0 1-.8L20 8H6"/><circle cx="9" cy="20" r="1.3"/><circle cx="17" cy="20" r="1.3"/></svg>',
+  user: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg>',
+  menu: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>',
+  close: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  crane: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 21V4l13 2M5 4h15M17 6v5"/><path d="M15 11h4v3h-4zM2 21h7"/></svg>',
+  stock: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/><path d="M3 7l9 4 9-4M12 11v10"/></svg>',
+  doc: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>',
+  card: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M7 15h4"/></svg>',
+  check: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
   arrow: '<svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
 };
 
@@ -39,13 +40,13 @@ const currentPage = () => document.body.dataset.page || '';
 function breadcrumb(items) {
   const parts = items.map((it, i) => {
     const last = i === items.length - 1;
-    const sep = i ? '<span aria-hidden="true" class="text-umber/50">/</span>' : '';
+    const sep = i ? '<span aria-hidden="true" class="text-muted/50">/</span>' : '';
     const node = last || !it.href
-      ? `<span${last ? ' aria-current="page" class="text-espresso"' : ''}>${esc(it.label)}</span>`
-      : `<a href="${it.href}" class="link-line hover:text-espresso">${esc(it.label)}</a>`;
+      ? `<span${last ? ' aria-current="page" class="text-ink"' : ''}>${esc(it.label)}</span>`
+      : `<a href="${it.href}" class="link-line hover:text-ink">${esc(it.label)}</a>`;
     return `<li class="flex items-center gap-2">${sep}${node}</li>`;
   });
-  return `<nav aria-label="Putanja" class="text-[13px] text-umber"><ol class="flex flex-wrap items-center gap-x-2 gap-y-1">${parts.join('')}</ol></nav>`;
+  return `<nav aria-label="Putanja" class="text-[13px] text-muted"><ol class="flex flex-wrap items-center gap-x-2 gap-y-1">${parts.join('')}</ol></nav>`;
 }
 
 // ---------------------------------------------------------------------
@@ -56,78 +57,82 @@ function headerHTML() {
   const params = new URLSearchParams(location.search);
   const activeCat = page === 'katalog' ? params.get('kat') : page === 'proizvod' ? bySku[params.get('sku')]?.category : null;
   const q = page === 'katalog' ? params.get('q') || '' : '';
-  const activeCls = 'text-oxide shadow-[inset_0_-2px_0_#7D2E1D]';
+  const activeCls = 'text-ink shadow-[inset_0_-2px_0_#274C77]';
 
   const catLinks = CATEGORIES.map(
-    (c) => `<a href="katalog.html?kat=${c.id}" class="whitespace-nowrap py-3 text-[14px] hover:text-oxide ${activeCat === c.id ? activeCls : ''}">${c.label}</a>`
+    (c) => `<a href="katalog.html?kat=${c.id}" class="whitespace-nowrap py-3.5 text-[14px] font-medium text-ink/80 hover:text-ink ${activeCat === c.id ? activeCls : ''}">${c.label}</a>`
   ).join('');
   const serviceLinks = SERVICE_LINKS.map(
-    (l) => `<a href="${l.href}" class="whitespace-nowrap py-3 text-[14px] text-umber hover:text-espresso ${page === l.page ? activeCls : ''}">${l.label}</a>`
+    (l) => `<a href="${l.href}" class="whitespace-nowrap py-3.5 text-[14px] text-muted hover:text-ink ${page === l.page ? activeCls : ''}">${l.label}</a>`
   ).join('');
 
   const searchForm = (id, extra) => `
     <form action="katalog.html" role="search" class="flex ${extra}">
       <label for="${id}" class="sr-only">Pretraga kataloga</label>
-      <input id="${id}" name="q" type="search" value="${esc(q)}" placeholder="Pretražite ploče, profile, vunu, ljepila…"
-             class="w-full min-w-0 border border-r-0 border-espresso/25 bg-paper px-4 py-2.5 text-[15px] placeholder-umber/70 focus:border-espresso focus:ring-0" />
-      <button class="flex items-center gap-2 bg-espresso px-4 text-[14px] font-medium text-cream hover:bg-oxide">${ICON.search}<span class="hidden xl:inline">Traži</span></button>
+      <input id="${id}" name="q" type="search" value="${esc(q)}" placeholder="Pretražite po nazivu, šifri ili dimenziji"
+             class="h-11 w-full min-w-0 border border-r-0 border-ink/20 bg-canvas px-4 text-[15px] placeholder-muted/70 focus:border-steel focus:bg-surface focus:ring-0" />
+      <button class="flex h-11 items-center gap-2 bg-ink px-4 text-[14px] font-semibold text-surface transition-colors hover:bg-steel">${ICON.search}<span class="hidden xl:inline">Traži</span></button>
     </form>`;
 
   return `
-  <div class="bg-espresso text-[13px] text-cream/75">
-    <div class="mx-auto flex max-w-[1440px] items-center gap-6 px-5 py-2 lg:px-12">
-      <span class="hidden md:inline">Stovarište: Nenada Kostića 151, Zalužani</span>
+  <div class="border-b border-ink/10 bg-canvas text-[13px] text-muted">
+    <div class="mx-auto flex max-w-page items-center gap-6 px-5 py-2 lg:px-10">
+      <span class="hidden md:inline">Stovarište Zalužani, Nenada Kostića 151</span>
       <span class="hidden lg:inline">Pon–pet 7–17h, subota 7–14h</span>
-      <a href="${COMPANY.phoneLandlineHref}" class="hover:text-cream">${COMPANY.phoneLandline}</a>
-      <a href="${COMPANY.phoneMobileHref}" class="hidden hover:text-cream sm:inline">Viber ${COMPANY.phoneMobile}</a>
-      <div class="ml-auto flex border border-cream/25 p-0.5" role="group" aria-label="Cijene">
-        <button id="mode-b2c" class="px-2.5 py-1">Maloprodaja</button>
-        <button id="mode-b2b" class="px-2.5 py-1">Partnerske cijene</button>
+      <a href="${COMPANY.phoneLandlineHref}" class="tnum hover:text-ink">${COMPANY.phoneLandline}</a>
+      <a href="${COMPANY.phoneMobileHref}" class="tnum hidden hover:text-ink sm:inline">Viber ${COMPANY.phoneMobile}</a>
+      <div class="ml-auto flex items-center gap-1" role="group" aria-label="Prikaz cijena">
+        <span class="mr-1 hidden sm:inline">Cijene</span>
+        <button id="mode-b2c">Maloprodajne</button>
+        <button id="mode-b2b">Partnerske</button>
       </div>
     </div>
   </div>
 
-  <header class="sticky top-0 z-40 border-b border-espresso/15 bg-cream/95 backdrop-blur">
-    <div class="mx-auto flex max-w-[1440px] items-center gap-4 px-5 py-3.5 lg:gap-8 lg:px-12">
+  <header class="sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur">
+    <div class="mx-auto flex max-w-page items-center gap-4 px-5 py-3 lg:gap-10 lg:px-10">
       <button id="btn-menu" class="-ml-1 p-1.5 lg:hidden" aria-label="Meni" aria-expanded="false" aria-controls="mobile-menu">${ICON.menu}</button>
-      <a href="index.html" class="shrink-0 leading-none">
-        <span class="block font-serif text-[22px] lg:text-[26px]">Grand Company</span>
-        <span class="mt-1 hidden text-[12px] text-umber sm:block">građevinski materijali, Banja Luka</span>
+      <a href="index.html" class="flex shrink-0 items-center gap-3" aria-label="Grand Company, početna">
+        <span class="flex h-9 w-9 items-center justify-center bg-ink font-serif text-[20px] font-semibold text-surface" aria-hidden="true">G</span>
+        <span class="leading-tight">
+          <span class="block font-serif text-[20px] font-semibold tracking-[-0.01em]">Grand Company</span>
+          <span class="hidden text-[12px] text-muted sm:block">Građevinski materijali, Banja Luka</span>
+        </span>
       </a>
       ${searchForm('hdr-q', 'mx-auto hidden max-w-2xl flex-1 md:flex')}
-      <div class="ml-auto flex items-center gap-1 md:ml-0">
-        <button id="btn-account" class="flex items-center gap-2 px-3 py-2 text-[14px] hover:text-oxide">${ICON.user}<span id="account-label" class="hidden max-w-[170px] truncate sm:inline">Prijava za partnere</span></button>
-        <button id="btn-cart" class="relative flex items-center gap-2 bg-espresso px-4 py-2.5 text-[14px] font-medium text-cream transition-colors hover:bg-oxide">
-          ${ICON.cart}<span id="cart-total" class="hidden sm:inline">Korpa</span>
-          <span id="cart-count" class="absolute -right-2 -top-2 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-oxide px-1 text-[11px] font-bold text-cream">0</span>
+      <div class="ml-auto flex items-center gap-2 md:ml-0">
+        <button id="btn-account" class="flex h-11 items-center gap-2 px-2 text-[14px] font-medium transition-colors hover:text-steel">${ICON.user}<span id="account-label" class="hidden max-w-[180px] truncate sm:inline">Prijava za partnere</span></button>
+        <button id="btn-cart" class="relative flex h-11 items-center gap-2 border border-ink/20 px-4 text-[14px] font-semibold transition-colors hover:border-ink">
+          ${ICON.cart}<span id="cart-total" class="tnum hidden sm:inline">Korpa</span>
+          <span id="cart-count" class="absolute -right-2 -top-2 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-steel px-1 text-[11px] font-bold text-surface">0</span>
         </button>
       </div>
     </div>
 
-    <nav aria-label="Glavna navigacija" class="hidden border-t border-espresso/10 bg-bone/60 lg:block">
-      <div class="mx-auto flex max-w-[1440px] items-center gap-7 px-12">
-        <a href="katalog.html" class="whitespace-nowrap py-3 text-[14px] font-medium hover:text-oxide ${page === 'katalog' && !activeCat ? activeCls : ''}">Svi proizvodi</a>
+    <nav aria-label="Glavna navigacija" class="hidden border-t border-ink/10 lg:block">
+      <div class="mx-auto flex max-w-page items-center gap-8 px-10">
+        <a href="katalog.html" class="whitespace-nowrap py-3.5 text-[14px] font-semibold hover:text-steel ${page === 'katalog' && !activeCat ? activeCls : ''}">Svi proizvodi</a>
         ${catLinks}
         <span class="ml-auto flex items-center gap-6">${serviceLinks}</span>
       </div>
     </nav>
 
-    <div id="mobile-menu" class="hidden max-h-[75vh] overflow-y-auto border-t border-espresso/10 bg-cream lg:hidden">
+    <div id="mobile-menu" class="hidden max-h-[75vh] overflow-y-auto border-t border-ink/10 bg-surface lg:hidden">
       <div class="px-5 py-5">
         ${searchForm('mob-q', '')}
-        <p class="mt-6 text-[13px] text-umber">Kategorije</p>
+        <p class="mt-6 text-[13px] font-medium text-muted">Kategorije</p>
         <div class="mt-2 grid grid-cols-2 gap-x-4">
-          <a href="katalog.html" class="py-2 text-[16px]">Svi proizvodi</a>
+          <a href="katalog.html" class="py-2 text-[16px] font-medium">Svi proizvodi</a>
           ${CATEGORIES.map((c) => `<a href="katalog.html?kat=${c.id}" class="py-2 text-[16px]">${c.label}</a>`).join('')}
         </div>
-        <p class="mt-5 text-[13px] text-umber">Usluge i firma</p>
+        <p class="mt-5 text-[13px] font-medium text-muted">Usluge i firma</p>
         <div class="mt-2 grid grid-cols-2 gap-x-4">
           ${SERVICE_LINKS.map((l) => `<a href="${l.href}" class="py-2 text-[16px]">${l.label}</a>`).join('')}
         </div>
       </div>
     </div>
 
-    <div id="partner-bar" class="hidden border-t border-espresso/10 bg-bone"></div>
+    <div id="partner-bar" class="hidden border-t border-ink/10 bg-tint"></div>
   </header>`;
 }
 
@@ -140,48 +145,45 @@ function footerHTML() {
   ];
   const col = (title, links) => `
     <div class="lg:col-span-2">
-      <p class="font-serif text-[17px]">${title}</p>
-      <ul class="mt-3 space-y-2 text-[14px] text-cream/70">${links.map(([href, label]) => `<li><a href="${href}" class="link-line hover:text-cream">${label}</a></li>`).join('')}</ul>
+      <p class="text-[14px] font-semibold text-surface">${title}</p>
+      <ul class="mt-4 space-y-2.5 text-[14px] text-surface/65">${links.map(([href, label]) => `<li><a href="${href}" class="link-line hover:text-surface">${label}</a></li>`).join('')}</ul>
     </div>`;
 
   return `
-  <section class="border-t border-espresso/15 bg-bone">
-    <div class="mx-auto grid max-w-[1440px] gap-8 px-5 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-12">
+  <section class="border-t border-ink/10 bg-surface">
+    <div class="mx-auto grid max-w-page gap-8 px-5 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
       ${promises.map(([icon, title, text]) => `
         <div class="flex gap-4">
-          <span class="mt-0.5 shrink-0 text-oxide">${icon}</span>
-          <div><p class="font-serif text-[18px] leading-tight">${title}</p><p class="mt-1 text-[14px] leading-relaxed text-umber">${text}</p></div>
+          <span class="mt-0.5 shrink-0 text-steel">${icon}</span>
+          <div><p class="text-[15px] font-semibold">${title}</p><p class="mt-1 text-[14px] leading-relaxed text-muted">${text}</p></div>
         </div>`).join('')}
     </div>
   </section>
 
-  <footer class="bg-espresso text-cream">
-    <div class="mx-auto max-w-[1440px] px-5 pt-14 lg:px-12">
-      <div class="grid gap-10 border-b border-cream/15 pb-12 sm:grid-cols-2 lg:grid-cols-12">
-        <div class="lg:col-span-4">
-          <p class="font-serif text-[28px] leading-none">Grand Company</p>
-          <p class="mt-4 max-w-sm text-[14px] leading-relaxed text-cream/70">Veleprodaja i maloprodaja građevinskog materijala u Banjoj Luci od ${COMPANY.founded}. godine. Ovlašćeni distributer Knauf sistema suhe gradnje.</p>
-          <p class="mt-5 text-[14px] leading-relaxed text-cream/70">Ul. Nenada Kostića 151<br />78000 Banja Luka, Zalužani</p>
+  <footer class="bg-ink text-surface">
+    <div class="mx-auto max-w-page px-5 pt-14 lg:px-10">
+      <div class="grid gap-10 border-b border-surface/10 pb-12 sm:grid-cols-2 lg:grid-cols-12">
+        <div class="lg:col-span-3">
+          <p class="font-serif text-[24px] font-semibold tracking-[-0.01em]">Grand Company</p>
+          <p class="mt-3 max-w-sm text-[14px] leading-relaxed text-surface/65">Veleprodaja i maloprodaja građevinskog materijala u Banjoj Luci od ${COMPANY.founded}. godine. Ovlašćeni distributer Knauf sistema suhe gradnje.</p>
+          <address class="mt-5 text-[14px] not-italic leading-relaxed text-surface/65">Ul. Nenada Kostića 151<br />78000 Banja Luka, Zalužani</address>
         </div>
         ${col('Katalog', [['katalog.html', 'Svi proizvodi'], ...CATEGORIES.map((c) => [`katalog.html?kat=${c.id}`, c.label])])}
         ${col('Usluge', [['kalkulator.html', 'Kalkulator utroška'], ['dostava.html', 'Dostava i kran'], ['partneri.html', 'Partnerski program'], ['korpa.html', 'Korpa i narudžba']])}
         ${col('Firma', [['o-nama.html', 'O nama'], ['kontakt.html', 'Kontakt'], ['kontakt.html#poruka', 'Pošaljite upit']])}
-        <div class="lg:col-span-2">
-          <p class="font-serif text-[17px]">Pozovite nas</p>
-          <ul class="mt-3 space-y-2 text-[14px] text-cream/70">
-            <li>Veleprodaja <a href="${COMPANY.phoneLandlineHref}" class="link-line whitespace-nowrap text-cream">${COMPANY.phoneLandline}</a></li>
-            <li>Viber i WhatsApp <a href="${COMPANY.phoneMobileHref}" class="link-line whitespace-nowrap text-cream">${COMPANY.phoneMobile}</a></li>
-            <li><a href="mailto:${COMPANY.emailSales}" class="link-line text-cream">${COMPANY.emailSales}</a></li>
+        <div class="lg:col-span-3">
+          <p class="text-[14px] font-semibold text-surface">Pozovite nas</p>
+          <ul class="mt-4 space-y-2.5 text-[14px] text-surface/65">
+            <li>Veleprodaja<br /><a href="${COMPANY.phoneLandlineHref}" class="link-line tnum text-surface">${COMPANY.phoneLandline}</a></li>
+            <li>Viber i WhatsApp<br /><a href="${COMPANY.phoneMobileHref}" class="link-line tnum text-surface">${COMPANY.phoneMobile}</a></li>
+            <li><a href="mailto:${COMPANY.emailSales}" class="link-line text-surface">${COMPANY.emailSales}</a></li>
           </ul>
         </div>
       </div>
-      <div class="flex flex-wrap justify-between gap-x-8 gap-y-2 py-5 text-[12px] text-cream/45">
+      <div class="flex flex-wrap justify-between gap-x-8 gap-y-2 py-6 text-[12px] text-surface/45">
         <span>© 2026 ${COMPANY.name}</span>
-        <span>JIB ${COMPANY.jib}, PIB ${COMPANY.pib}, MBS ${COMPANY.mbs}</span>
+        <span class="tnum">JIB ${COMPANY.jib}, PIB ${COMPANY.pib}, MBS ${COMPANY.mbs}</span>
         <span>Demonstracioni portal</span>
-      </div>
-      <div aria-hidden="true" class="select-none overflow-hidden">
-        <div class="footer-wordmark whitespace-nowrap font-serif text-[clamp(2.87rem,9.02vw,10.25rem)] leading-[1.15] text-cream/95">Grand Company</div>
       </div>
     </div>
   </footer>`;
@@ -189,14 +191,14 @@ function footerHTML() {
 
 function shellHTML() {
   return `
-  <div id="cart-overlay" class="fixed inset-0 z-40 hidden bg-espresso/40 backdrop-blur-[2px]"></div>
-  <aside id="cart-drawer" aria-label="Korpa" class="drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-md translate-x-full flex-col border-l border-espresso/25 bg-cream">
-    <div class="flex items-center justify-between border-b border-espresso/15 px-6 py-4">
-      <p class="font-serif text-[26px] leading-none">Korpa</p>
-      <button id="btn-close-cart" class="flex h-9 w-9 items-center justify-center border border-espresso/20 transition-colors hover:bg-espresso hover:text-cream" aria-label="Zatvori korpu">${ICON.close}</button>
+  <div id="cart-overlay" class="fixed inset-0 z-40 hidden bg-ink/40"></div>
+  <aside id="cart-drawer" aria-label="Korpa" class="drawer fixed right-0 top-0 z-50 flex h-full w-full max-w-md translate-x-full flex-col border-l border-ink/10 bg-surface shadow-2xl">
+    <div class="flex items-center justify-between border-b border-ink/10 px-6 py-4">
+      <p class="font-serif text-[24px] font-semibold leading-none">Korpa</p>
+      <button id="btn-close-cart" class="flex h-9 w-9 items-center justify-center border border-ink/15 transition-colors hover:border-ink" aria-label="Zatvori korpu">${ICON.close}</button>
     </div>
     <div id="drawer-body" class="flex-1 overflow-y-auto px-6"></div>
-    <div id="drawer-footer" class="border-t border-espresso/15 px-6 py-5"></div>
+    <div id="drawer-footer" class="border-t border-ink/10 bg-canvas px-6 py-5"></div>
   </aside>
   <div id="modal-root"></div>
   <div id="toast" aria-live="polite" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] w-max max-w-[92vw] -translate-x-1/2"></div>`;
@@ -214,8 +216,8 @@ function replacePlaceholder(id, html) {
 // ---------------------------------------------------------------------
 function renderChrome() {
   const p = partner();
-  const on = 'px-2.5 py-1 bg-cream text-espresso';
-  const off = 'px-2.5 py-1 text-cream/70 hover:text-cream';
+  const on = 'px-2.5 py-1 text-[12px] font-semibold bg-ink text-surface';
+  const off = 'px-2.5 py-1 text-[12px] font-medium text-muted hover:text-ink';
   $('mode-b2c').className = p ? off : on;
   $('mode-b2b').className = p ? on : off;
   $('account-label').textContent = p ? p.name : 'Prijava za partnere';
@@ -244,30 +246,30 @@ function renderPartnerBar(t) {
   const free = Math.max(0, p.creditLimit - used);
 
   bar.innerHTML = `
-    <div class="mx-auto flex max-w-[1440px] flex-wrap items-center gap-x-8 gap-y-2 px-5 py-2.5 text-[13px] lg:px-12">
-      <a href="partneri.html#nalog" class="font-medium hover:text-oxide">${esc(p.name)}</a>
-      <span class="text-umber">Rabat <strong class="font-medium text-oxide">−${pct(p.discount)}</strong></span>
-      <span class="text-umber">Valuta ${p.paymentDays} dana</span>
+    <div class="mx-auto flex max-w-page flex-wrap items-center gap-x-8 gap-y-2 px-5 py-2.5 text-[13px] lg:px-10">
+      <a href="partneri.html#nalog" class="font-semibold hover:text-steel">${esc(p.name)}</a>
+      <span class="text-muted">Rabat <strong class="font-semibold text-steel">−${pct(p.discount)}</strong></span>
+      <span class="text-muted">Valuta ${p.paymentDays} dana</span>
       <div class="flex min-w-[260px] max-w-md flex-1 items-center gap-3">
-        <span class="text-umber">Kreditni limit</span>
-        <div class="h-1.5 flex-1 overflow-hidden bg-espresso/15" role="meter" aria-valuemin="0" aria-valuemax="${p.creditLimit}" aria-valuenow="${Math.round(used)}" aria-label="Iskorišten kreditni limit">
-          <div class="h-full ${usedPct < 85 ? 'bg-sage' : 'bg-oxide'}" style="width:${usedPct}%"></div>
+        <span class="text-muted">Kreditni limit</span>
+        <div class="h-1.5 flex-1 overflow-hidden bg-ink/10" role="meter" aria-valuemin="0" aria-valuemax="${p.creditLimit}" aria-valuenow="${Math.round(used)}" aria-label="Iskorišten kreditni limit">
+          <div class="h-full ${usedPct < 85 ? 'bg-steel' : 'bg-brick'}" style="width:${usedPct}%"></div>
         </div>
-        <span class="whitespace-nowrap text-umber">slobodno <strong class="font-medium text-espresso">${KM(free)}</strong></span>
+        <span class="tnum whitespace-nowrap text-muted">slobodno <strong class="font-semibold text-ink">${KM(free)}</strong></span>
       </div>
-      <span class="text-umber">Pantheon, ${syncTime()}</span>
+      <span class="tnum text-muted">Pantheon, ${syncTime()}</span>
     </div>`;
 }
 
 function cartStepper(p, qty) {
-  const btn = 'flex h-8 w-8 items-center justify-center border border-espresso/25 transition-colors hover:bg-espresso hover:text-cream';
+  const btn = 'flex h-8 w-8 items-center justify-center border border-ink/20 transition-colors hover:border-ink';
   return `
     <div class="flex items-center">
       <button data-dec="${p.sku}" class="${btn}" aria-label="Smanji količinu">−</button>
       <input data-cart-qty="${p.sku}" type="number" min="0" step="any" value="${qty}" aria-label="Količina za ${esc(p.name)}"
-             class="h-8 w-16 border-x-0 border-y border-espresso/25 bg-paper px-1 text-center text-[14px] focus:border-espresso focus:ring-0" />
+             class="tnum h-8 w-16 border-x-0 border-y border-ink/20 bg-surface px-1 text-center text-[14px] focus:border-steel focus:ring-0" />
       <button data-inc="${p.sku}" class="${btn}" aria-label="Povećaj količinu">+</button>
-      <span class="ml-2 text-[13px] text-umber">${p.unit}</span>
+      <span class="ml-2 text-[13px] text-muted">${p.unit}</span>
     </div>`;
 }
 
@@ -275,35 +277,37 @@ function renderDrawer(t) {
   if (!t.items.length) {
     $('drawer-body').innerHTML = `
       <div class="py-16 text-center">
-        <p class="font-serif text-[22px]">Korpa je prazna.</p>
-        <p class="mt-3 text-[14px] text-umber">Dodajte artikle iz kataloga ili prenesite specifikaciju iz kalkulatora.</p>
+        <p class="text-[18px] font-semibold">Korpa je prazna</p>
+        <p class="mt-2 text-[14px] text-muted">Dodajte artikle iz kataloga ili prenesite specifikaciju iz kalkulatora.</p>
         <a href="katalog.html" class="${BTN_PRIMARY} mt-6 px-6 py-3">Otvori katalog</a>
       </div>`;
     $('drawer-footer').innerHTML = '';
+    $('drawer-footer').classList.add('hidden');
     return;
   }
+  $('drawer-footer').classList.remove('hidden');
 
   $('drawer-body').innerHTML = t.items.map(({ product: p, qty }) => `
-    <div class="flex gap-4 border-b border-espresso/10 py-4">
-      <a href="${productUrl(p)}" class="block h-20 w-24 shrink-0 bg-bone p-1" tabindex="-1" aria-hidden="true">${productArt(p)}</a>
+    <div class="flex gap-4 border-b border-ink/10 py-4">
+      <a href="${productUrl(p)}" class="block h-20 w-24 shrink-0 bg-well p-1" tabindex="-1" aria-hidden="true">${productArt(p)}</a>
       <div class="min-w-0 flex-1">
         <div class="flex items-start justify-between gap-2">
-          <a href="${productUrl(p)}" class="font-serif text-[15px] leading-snug hover:text-oxide">${esc(p.name)}</a>
-          <button data-remove="${p.sku}" class="shrink-0 text-umber/70 hover:text-oxide" aria-label="Ukloni ${esc(p.name)}">${ICON.close}</button>
+          <a href="${productUrl(p)}" class="text-[14px] font-medium leading-snug hover:text-steel">${esc(p.name)}</a>
+          <button data-remove="${p.sku}" class="shrink-0 text-muted/70 hover:text-brick" aria-label="Ukloni ${esc(p.name)}">${ICON.close}</button>
         </div>
         <div class="mt-2 flex flex-wrap items-center justify-between gap-2">
           ${cartStepper(p, qty)}
-          <span class="font-medium">${KM(priceOf(p) * qty)}</span>
+          <span class="tnum text-[15px] font-semibold">${KM(priceOf(p) * qty)}</span>
         </div>
       </div>
     </div>`).join('');
 
   $('drawer-footer').innerHTML = `
-    ${t.rebate > 0 ? `<div class="flex justify-between text-[14px] text-oxide"><span>Partnerski rabat</span><span>−${KM(t.rebate)}</span></div>` : ''}
-    <div class="mt-1 flex items-baseline justify-between"><span class="text-[15px]">Roba sa PDV-om</span><span class="font-serif text-[26px]">${KM(t.subtotal)}</span></div>
-    <p class="mt-1 text-[13px] text-umber">Težina oko ${fmt0.format(t.weightKg)} kg. Dostavu i istovar kranom birate u korpi.</p>
+    ${t.rebate > 0 ? `<div class="flex justify-between text-[14px] text-steel"><span>Partnerski rabat</span><span class="tnum">−${KM(t.rebate)}</span></div>` : ''}
+    <div class="mt-1 flex items-baseline justify-between"><span class="text-[15px]">Roba sa PDV-om</span><span class="tnum text-[22px] font-semibold">${KM(t.subtotal)}</span></div>
+    <p class="mt-1 text-[13px] text-muted">Težina oko <span class="tnum">${fmt0.format(t.weightKg)}</span> kg. Dostavu i istovar kranom birate u korpi.</p>
     <a href="korpa.html" class="${BTN_PRIMARY} mt-4 w-full py-3.5">Korpa i narudžba</a>
-    <button data-close-drawer class="mt-2 w-full py-2 text-[14px] text-umber hover:text-espresso">Nastavi kupovinu</button>`;
+    <button data-close-drawer class="mt-2 w-full py-2 text-[14px] text-muted hover:text-ink">Nastavi kupovinu</button>`;
 }
 
 // ---------------------------------------------------------------------
@@ -326,8 +330,8 @@ function closeCart() {
 
 function openModal(innerHtml, { wide = false } = {}) {
   $('modal-root').innerHTML = `
-    <div id="modal-overlay" class="fixed inset-0 z-[55] flex items-center justify-center bg-espresso/45 p-4 backdrop-blur-[2px]">
-      <div role="dialog" aria-modal="true" class="max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} overflow-y-auto border border-espresso/30 bg-cream text-espresso shadow-2xl">
+    <div id="modal-overlay" class="fixed inset-0 z-[55] flex items-center justify-center bg-ink/50 p-4">
+      <div role="dialog" aria-modal="true" class="max-h-[90vh] w-full ${wide ? 'max-w-2xl' : 'max-w-lg'} overflow-y-auto bg-surface text-ink shadow-2xl">
         ${innerHtml}
       </div>
     </div>`;
@@ -346,13 +350,13 @@ function closeModal() {
 
 function toast(message, action) {
   const el = document.createElement('div');
-  el.className = 'pointer-events-auto mb-2 flex items-center gap-5 bg-espresso px-5 py-3 text-[14px] text-cream shadow-lg transition-opacity duration-500';
+  el.className = 'pointer-events-auto mb-2 flex items-center gap-5 bg-ink px-5 py-3 text-[14px] text-surface shadow-lg transition-opacity duration-500';
   const text = document.createElement('span');
   text.textContent = message;
   el.append(text);
   if (action) {
     const btn = document.createElement('button');
-    btn.className = 'whitespace-nowrap font-medium underline underline-offset-4 hover:text-bone';
+    btn.className = 'whitespace-nowrap font-semibold underline underline-offset-4 hover:text-tint';
     btn.textContent = action.label;
     btn.addEventListener('click', () => {
       action.onClick();
@@ -377,8 +381,8 @@ function toggleMenu() {
 function openLoginModal() {
   openModal(`
     <div class="p-7">
-      <h2 class="font-serif text-[28px] leading-tight">Prijava za partnere</h2>
-      <p class="mt-2 text-[14px] text-umber">Unesite adresu e-pošte i lozinku iz ugovora o partnerstvu.</p>
+      <h2 class="font-serif text-[26px] leading-tight">Prijava za partnere</h2>
+      <p class="mt-2 text-[14px] text-muted">Unesite adresu e-pošte i lozinku iz ugovora o partnerstvu.</p>
       <form id="login-form" class="mt-6 space-y-4">
         <label class="block">
           <span class="${LABEL}">Adresa e-pošte</span>
@@ -388,18 +392,19 @@ function openLoginModal() {
           <span class="${LABEL}">Lozinka</span>
           <input id="login-password" type="password" required autocomplete="current-password" value="lazarevo2026" class="${FIELD}" />
         </label>
-        <p id="login-error" class="hidden border-l-2 border-oxide pl-3 text-[14px] text-oxide" role="alert"></p>
+        <p id="login-error" class="hidden border-l-2 border-brick pl-3 text-[14px] text-brick" role="alert"></p>
         <div class="flex gap-3 pt-2">
           <button type="submit" id="login-submit" class="${BTN_PRIMARY} flex-1 py-3">Prijavi se</button>
           <button type="button" data-close-modal class="${BTN_GHOST} px-6 py-3">Otkaži</button>
         </div>
       </form>
-      <div class="mt-6 border-t border-espresso/15 pt-4">
-        <p class="text-[13px] text-umber">Demo nalozi — kliknite red da popunite podatke:</p>
-        <ul class="mt-2 space-y-1.5">
+      <div class="mt-6 border-t border-ink/10 pt-4">
+        <p class="text-[13px] text-muted">Demo nalozi, kliknite red da popunite podatke</p>
+        <ul class="mt-2 divide-y divide-ink/10">
           ${PARTNERS.map((p) => `
-            <li><button type="button" data-demo="${p.id}" class="text-left text-[13px] text-umber hover:text-oxide">
-              <span class="text-espresso underline underline-offset-4">${esc(p.email)}</span> · ${esc(p.tier)}
+            <li><button type="button" data-demo="${p.id}" class="flex w-full flex-wrap items-baseline justify-between gap-x-3 py-2 text-left text-[13px] hover:text-steel">
+              <span class="font-medium underline decoration-ink/25 underline-offset-4">${esc(p.email)}</span>
+              <span class="text-muted">${esc(p.tier)}</span>
             </button></li>`).join('')}
         </ul>
       </div>
@@ -445,11 +450,11 @@ async function submitLogin(email, password) {
 function openAccountModal() {
   const p = partner();
   const t = cartTotals();
-  const row = (label, value) => `<div class="border-t border-espresso/15 pt-3"><dt class="text-[13px] text-umber">${label}</dt><dd class="mt-1 font-serif text-[21px] leading-none">${value}</dd></div>`;
+  const row = (label, value) => `<div class="border-t border-ink/10 pt-3"><dt class="text-[13px] text-muted">${label}</dt><dd class="tnum mt-1 text-[20px] font-semibold leading-none">${value}</dd></div>`;
   openModal(`
     <div class="p-7">
-      <p class="text-[13px] text-umber">${esc(p.tier)}</p>
-      <h2 class="mt-1 font-serif text-[28px] leading-tight">${esc(p.name)}</h2>
+      <p class="text-[13px] text-muted">${esc(p.tier)}</p>
+      <h2 class="mt-1 font-serif text-[26px] leading-tight">${esc(p.name)}</h2>
       <dl class="mt-6 grid grid-cols-2 gap-5">
         ${row('Ugovoreni rabat', `−${pct(p.discount)}`)}
         ${row('Valuta plaćanja', `${p.paymentDays} dana`)}
@@ -476,37 +481,40 @@ function logout() {
 // Product card (catalogue, home, related products)
 // ---------------------------------------------------------------------
 function stockBadge(p) {
-  const [color, label] = { high: ['#5E7F5B', 'Na stanju'], mid: ['#C08A2E', 'Ograničene zalihe'], low: ['#7D2E1D', 'Niske zalihe'] }[stockLevel(p)];
-  return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap text-[12px] text-umber"><span class="h-2 w-2 rounded-full" style="background:${color}" aria-hidden="true"></span>${label}</span>`;
+  const [color, label] = { high: ['#4E7A55', 'Na stanju'], mid: ['#B7862C', 'Ograničeno'], low: ['#A8432F', 'Malo na stanju'] }[stockLevel(p)];
+  return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted"><span class="h-2 w-2 rounded-full" style="background:${color}" aria-hidden="true"></span>${label}</span>`;
 }
 
 function productCard(p) {
   const url = productUrl(p);
-  const cat = categoryById[p.category];
   const b2b = !!partner();
   return `
-  <article data-product="${p.sku}" class="group flex flex-col border border-espresso/15 bg-paper transition-colors hover:border-espresso/45">
-    <a href="${url}" class="relative block overflow-hidden bg-bone" tabindex="-1" aria-hidden="true">
-      <div class="aspect-[4/3] p-3 transition-transform duration-500 group-hover:scale-[1.04]">${productArt(p)}</div>
-      <span class="absolute left-3 top-3 bg-paper/90 px-2 py-0.5 text-[12px]">${esc(p.brand)}</span>
-      ${b2b ? `<span class="absolute right-3 top-3 bg-oxide px-2 py-0.5 text-[12px] font-medium text-cream">−${pct(discount())}</span>` : ''}
+  <article data-product="${p.sku}" class="group flex flex-col border border-ink/10 bg-surface transition-shadow hover:shadow-[0_16px_40px_-28px_rgba(27,30,34,0.45)]">
+    <a href="${url}" class="relative block bg-well" tabindex="-1" aria-hidden="true">
+      <div class="aspect-[4/3] p-5">${productArt(p)}</div>
+      ${b2b ? `<span class="absolute left-3 top-3 bg-steel px-2 py-0.5 text-[12px] font-semibold text-surface">−${pct(discount())}</span>` : ''}
     </a>
-    <div class="flex flex-1 flex-col p-4">
-      <div class="flex items-center justify-between gap-2 text-[12px] text-umber">
-        <span>${cat.label}</span>
-        ${stockBadge(p)}
+    <div class="flex flex-1 flex-col border-t border-ink/10 p-4">
+      <div class="flex items-center justify-between gap-2 text-[12px] text-muted">
+        <span class="font-medium text-ink/70">${esc(p.brand)}</span>
+        <span class="tnum">${p.sku}</span>
       </div>
-      <h3 class="mt-2 font-serif text-[17px] leading-snug"><a href="${url}" class="hover:text-oxide">${esc(p.name)}</a></h3>
-      <p class="mt-1 text-[13px] text-umber">${esc(p.spec)}</p>
+      <h3 class="mt-1.5 text-[15px] font-semibold leading-snug"><a href="${url}" class="hover:text-steel">${esc(p.name)}</a></h3>
+      <p class="mt-1 text-[13px] leading-snug text-muted">${esc(p.spec)}</p>
       <div class="mt-auto pt-4">
-        ${b2b ? `<p class="text-[12px] text-umber line-through">${KM(p.price)}</p>` : ''}
-        <p class="font-serif text-[24px] leading-none ${b2b ? 'text-oxide' : ''}">${KM(priceOf(p))}<span class="ml-1 font-sans text-[13px] text-umber">po ${p.unit}</span></p>
+        <div class="flex items-end justify-between gap-3">
+          <div>
+            ${b2b ? `<p class="tnum text-[12px] text-muted line-through">${KM(p.price)}</p>` : ''}
+            <p class="tnum text-[20px] font-semibold leading-none ${b2b ? 'text-steel' : ''}">${KM(priceOf(p))}<span class="ml-1 text-[12px] font-normal text-muted">/ ${p.unit}</span></p>
+          </div>
+          ${stockBadge(p)}
+        </div>
         <div class="mt-3 flex">
           <label class="shrink-0"><span class="sr-only">Količina u ${p.unit}</span>
             <input data-qty type="number" min="0" step="any" value="${defaultQty(p)}"
-                   class="h-10 w-16 border border-r-0 border-espresso/25 bg-cream px-1 text-center text-[14px] focus:border-espresso focus:ring-0" />
+                   class="tnum h-10 w-16 border border-r-0 border-ink/20 bg-surface px-1 text-center text-[14px] focus:border-steel focus:ring-0" />
           </label>
-          <button data-add="${p.sku}" class="h-10 flex-1 bg-espresso px-3 text-[14px] font-medium text-cream transition-colors hover:bg-oxide">U korpu</button>
+          <button data-add="${p.sku}" class="h-10 flex-1 bg-ink px-3 text-[14px] font-semibold text-surface transition-colors hover:bg-steel">U korpu</button>
         </div>
       </div>
     </div>
