@@ -170,7 +170,7 @@ function footerHTML() {
         </div>
         ${col('Katalog', [['katalog.html', 'Svi proizvodi'], ...CATEGORIES.map((c) => [`katalog.html?kat=${c.id}`, c.label])])}
         ${col('Usluge', [['kalkulator.html', 'Kalkulator utroška'], ['dostava.html', 'Dostava i kran'], ['partneri.html', 'Partnerski program'], ['korpa.html', 'Korpa i narudžba']])}
-        ${col('Firma', [['o-nama.html', 'O nama'], ['kontakt.html', 'Kontakt'], ['kontakt.html#poruka', 'Pošaljite upit']])}
+        ${col('Firma', [['o-nama.html', 'O nama'], ['kontakt.html', 'Kontakt'], ['kontakt.html#poruka', 'Pošaljite upit'], ['zasluge.html', 'Zasluge za fotografije']])}
         <div class="lg:col-span-3">
           <p class="text-[14px] font-semibold text-surface">Pozovite nas</p>
           <ul class="mt-4 space-y-2.5 text-[14px] text-surface/65">
@@ -488,10 +488,11 @@ function stockBadge(p) {
 function productCard(p) {
   const url = productUrl(p);
   const b2b = !!partner();
+  const photo = PRODUCT_PHOTOS[p.sku];
   return `
   <article data-product="${p.sku}" class="group flex flex-col border border-ink/10 bg-surface transition-shadow hover:shadow-[0_16px_40px_-28px_rgba(27,30,34,0.45)]">
     <a href="${url}" class="relative block bg-well" tabindex="-1" aria-hidden="true">
-      <div class="aspect-[4/3] p-5">${productArt(p)}</div>
+      <div class="aspect-[4/3] ${photo ? '' : 'p-5'}">${productArt(p)}</div>
       ${b2b ? `<span class="absolute left-3 top-3 bg-steel px-2 py-0.5 text-[12px] font-semibold text-surface">−${pct(discount())}</span>` : ''}
     </a>
     <div class="flex flex-1 flex-col border-t border-ink/10 p-4">

@@ -103,6 +103,7 @@ initPage(() => {
 
   function render() {
     const b2b = partner();
+    const photo = PRODUCT_PHOTOS[p.sku];
     const zone = DELIVERY_ZONES[0];
     const showCalc = p.category === 'suha-gradnja' || CALCULATOR_SKUS.includes(p.sku);
 
@@ -111,7 +112,12 @@ initPage(() => {
 
       <div class="mt-6 grid gap-10 lg:grid-cols-12 lg:gap-12">
         <div class="lg:col-span-7">
-          <div class="aspect-[4/3] border border-ink/10 bg-well p-8 lg:p-14">${productArt(p)}</div>
+          <div class="aspect-[4/3] overflow-hidden border border-ink/10 bg-well ${photo ? '' : 'p-8 lg:p-14'}">${productArt(p, 'h-full w-full', photo ? 'contain' : 'cover')}</div>
+          ${cat.app ? `
+          <figure class="mt-3">
+            <div class="aspect-[16/9] overflow-hidden bg-well"><img src="${cat.app}" alt="Ugradnja iz kategorije ${esc(cat.label.toLowerCase())}" loading="lazy" class="h-full w-full object-cover" /></div>
+            <figcaption class="mt-2 text-[13px] text-muted">Fotografija prikazuje ugradnju iz iste kategorije, ne sam artikal. <a href="zasluge.html" class="link-line">Zasluge za fotografije</a></figcaption>
+          </figure>` : ''}
         </div>
 
         <div class="lg:col-span-5">

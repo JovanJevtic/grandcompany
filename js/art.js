@@ -262,10 +262,12 @@ function drawHanger(a) {
 const ART_DRAWERS = { board: drawBoard, profile: drawProfile, slab: drawSlabs, roll: drawRoll, tape: drawTape, box: drawBox, bag: drawBag, hanger: drawHanger };
 const artCache = new Map();
 
-function productArt(p, className = 'h-full w-full') {
+// A real photograph wins over the drawing; `fit` is cover for cards and
+// contain on the product page, where the whole package should be visible.
+function productArt(p, className = 'h-full w-full', fit = 'cover') {
   const photo = typeof PRODUCT_PHOTOS !== 'undefined' && PRODUCT_PHOTOS[p.sku];
   if (photo) {
-    return `<img src="${photo}" alt="${esc(p.name)}" loading="lazy" class="${className} object-cover" />`;
+    return `<img src="${photo}" alt="${esc(p.name)}" loading="lazy" class="${className} object-${fit}" />`;
   }
   if (!artCache.has(p.sku)) {
     const draw = ART_DRAWERS[p.art.kind];

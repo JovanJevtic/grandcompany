@@ -72,8 +72,13 @@ initPage(() => {
 
     const quick = CATEGORIES.map((c) => {
       const count = PRODUCTS.filter((p) => p.category === c.id).length;
-      return `<button data-quick-cat="${c.id}" class="inline-flex items-center gap-2 border border-ink/20 bg-surface px-3 py-2 text-[14px] transition-colors hover:border-ink">
-        ${c.label}<span class="text-muted">${count}</span></button>`;
+      return `<button data-quick-cat="${c.id}" class="group block border border-ink/10 bg-surface text-left transition-colors hover:border-ink/30">
+        <span class="block aspect-[16/9] overflow-hidden bg-well"><img src="${c.image}" alt="" loading="lazy" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]" /></span>
+        <span class="flex items-baseline justify-between gap-3 px-4 py-3">
+          <span class="text-[15px] font-semibold group-hover:text-steel">${c.label}</span>
+          <span class="tnum text-[13px] text-muted">${count}</span>
+        </span>
+      </button>`;
     }).join('');
 
     $('catalog-head').innerHTML = `
@@ -82,7 +87,7 @@ initPage(() => {
           ${breadcrumb([{ label: 'Početna', href: 'index.html' }, { label: 'Katalog', href: single ? 'katalog.html' : null }, ...(single ? [{ label: single.label }] : [])])}
           <h1 class="mt-4 font-serif text-[clamp(2.13rem,4.1vw,3.69rem)] leading-[1.02]">${esc(title)}</h1>
           <p class="mt-4 max-w-[64ch] text-[16px] leading-relaxed text-muted">${esc(lead)}</p>
-          ${single ? '' : `<div class="mt-6 flex flex-wrap gap-2">${quick}</div>`}
+          ${single ? '' : `<div class="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">${quick}</div>`}
         </div>
         ${single ? `
         <div class="hidden lg:col-span-4 lg:col-start-9 lg:block">

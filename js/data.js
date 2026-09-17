@@ -31,6 +31,7 @@ const CATEGORIES = [
     lead: 'Gips-kartonske ploče i pocinčani profili',
     image: 'img/interior.jpg',
     gallery: ['img/interior.jpg', 'img/hall.jpg'],
+    app: 'img/app/drywall-frame.jpg',
     color: '#4F6D8F',
     usage:
       'Knauf sistemi suhe gradnje za pregradne zidove, obloge i spuštene plafone. Ploče se razlikuju po boji kartona: bijela je standardna, zelena vlagootporna, crvena vatrootporna, a plava ojačana Diamant ploča. Profili se biraju prema debljini zida i sistemu.',
@@ -51,6 +52,7 @@ const CATEGORIES = [
     lead: 'Mase za spojeve, ljepila, glet i cement',
     image: 'img/concrete-curves.jpg',
     gallery: ['img/concrete-curves.jpg', 'img/site-aerial.jpg'],
+    app: 'img/app/jointing.jpg',
     color: '#4E7A55',
     usage:
       'Gipsane mase za fugovanje, ljepila za fasadne sisteme i keramiku, glet mase i cement. Vreće čuvajte na paleti, na suhom i zaštićene od vlage, i koristite ih unutar roka trajanja otisnutog na pakovanju.',
@@ -61,6 +63,7 @@ const CATEGORIES = [
     lead: 'Samourezni vijci, trake i ovjesi',
     image: 'img/steel-frame.jpg',
     gallery: ['img/steel-frame.jpg', 'img/cranes.jpg'],
+    app: 'img/app/taping.jpg',
     color: '#A8432F',
     usage:
       'Pribor za montažu sistema suhe gradnje: vijci za jednostruku i dvostruku oblogu, trake za ojačanje spojeva, akustične trake ispod vodećih profila i direktni ovjesi za plafone.',
@@ -116,9 +119,17 @@ const PRODUCTS = [
 // Map SKU -> path to a real packshot. Any SKU missing here keeps the SVG
 // drawing as a fallback, so the catalogue works while photos are added.
 // ---------------------------------------------------------------------
-// Empty until real packshots exist: a generic site photo on every drywall board
-// misleads buyers, so each SKU keeps its own illustration from js/art.js.
-const PRODUCT_PHOTOS = {};
+// Real product photography, keyed by SKU. Drop a file into img/products/
+// named after the article code (KNF-001.jpg) and run tools/sync-photos.py;
+// any SKU missing here keeps its drawing from js/art.js.
+// ---------------------------------------------------------------------
+const PRODUCT_PHOTOS = {
+  'ACC-003': 'img/products/ACC-003.jpg',
+  'CHM-006': 'img/products/CHM-006.jpg',
+  'ISO-003': 'img/products/ISO-003.jpg',
+  'ISO-004': 'img/products/ISO-004.jpg',
+  'ISO-007': 'img/products/ISO-007.jpg',
+};
 
 // ---------------------------------------------------------------------
 // B2B demo partners — in production the login, invoices, order history
