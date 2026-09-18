@@ -34,16 +34,78 @@ function shade(hex, amount) {
 const pts = (list) => list.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(' ');
 const poly = (list, fill, extra = '') => `<polygon points="${pts(list)}" fill="${fill}" ${extra}/>`;
 const add = (p, q) => [p[0] + q[0], p[1] + q[1]];
+
+// ---------------------------------------------------------------------
+// Gradients
+// Every gradient lives once in a hidden <svg> at the end of the document
+// and is referenced by id, so a catalogue page with 30 packshots ships one
+// copy of each definition instead of thirty.
+// ---------------------------------------------------------------------
+const GRADIENTS = new Map();
+let defsNode = null;
+
+function defineGradient(id, markup) {
+  if (!GRADIENTS.has(id)) GRADIENTS.set(id, markup);
+  return `url(#${id})`;
+}
+
+function flushDefs() {
+  if (!document.body) return;
+  if (!defsNode) {
+    defsNode = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    defsNode.setAttribute('width', '0');
+    defsNode.setAttribute('height', '0');
+    defsNode.setAttribute('aria-hidden', 'true');
+    defsNode.style.position = 'absolute';
+    document.body.appendChild(defsNode);
+  }
+  defsNode.innerHTML = `<defs>${[...GRADIENTS.values()].join('')}</defs>`;
+}
+
+const key = (hex, tag) => `gc-${tag}-${hex.slice(1)}`;
+
+// Light falls from the upper left: top faces catch it, sides fall away
+const FACE_LIGHT = {
+  top: [0.18, -0.02, [0, 0, 1, 1]],
+  front: [0.05, -0.16, [0, 0, 0, 1]],
+  side: [-0.05, -0.24, [0, 0, 1, 1]],
+  flat: [0.10, -0.10, [0, 0, 0, 1]],
+};
+
+function face(hex, kind = 'front') {
+  const [lo, hi, [x1, y1, x2, y2]] = FACE_LIGHT[kind];
+  const id = key(hex, kind);
+  return defineGradient(
+    id,
+    `<linearGradient id="${id}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}">
+       <stop offset="0" stop-color="${shade(hex, lo)}"/>
+       <stop offset="1" stop-color="${shade(hex, hi)}"/>
+     </linearGradient>`
+  );
+}
+
+// A soft contact shadow instead of a flat grey ellipse
+const SHADOW_FILL = defineGradient(
+  'gc-shadow',
+  `<radialGradient id="gc-shadow">
+     <stop offset="0" stop-color="#1B1E22" stop-opacity="0.30"/>
+     <stop offset="0.55" stop-color="#1B1E22" stop-opacity="0.13"/>
+     <stop offset="1" stop-color="#1B1E22" stop-opacity="0"/>
+   </radialGradient>`
+);
+
 const shadow = (cx, cy, rx, ry, rot = 0) =>
-  `<ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="#1B1E22" opacity="0.1" transform="rotate(${rot} ${cx} ${cy})"/>`;
+  `<ellipse cx="${cx}" cy="${cy}" rx="${rx * 1.12}" ry="${ry * 1.5}" fill="${SHADOW_FILL}" transform="rotate(${rot} ${cx} ${cy})"/>`;
 
 // A flat box in oblique projection: side, front and top faces
 function slab(x, y, w, h, ox, oy, c) {
   const A = [x, y], B = [x + w, y], C = [x + w + ox, y - oy], D = [x + ox, y - oy];
   return (
-    poly([B, C, add(C, [0, h]), add(B, [0, h])], c.side) +
-    poly([A, B, add(B, [0, h]), add(A, [0, h])], c.front) +
-    poly([A, B, C, D], c.top)
+    poly([B, C, add(C, [0, h]), add(B, [0, h])], face(c.side, 'side')) +
+    poly([A, B, add(B, [0, h]), add(A, [0, h])], face(c.front, 'front')) +
+    poly([A, B, C, D], face(c.top, 'top')) +
+    // thin lit edge where the top face meets the front
+    `<line x1="${A[0]}" y1="${A[1]}" x2="${B[0]}" y2="${B[1]}" stroke="${shade(c.top, 0.35)}" stroke-width="0.8" opacity="0.7"/>`
   );
 }
 
@@ -81,6 +143,21 @@ function drawBoard(a) {
   return `<g transform="translate(200 190) scale(1.18) translate(-200 -190)">${s}</g>`;
 }
 
+// Galvanised steel: a bright band sweeps across the sheet
+function sheen(hex) {
+  const id = key(hex, 'sheen');
+  return defineGradient(
+    id,
+    `<linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0.35">
+       <stop offset="0" stop-color="${shade(hex, -0.10)}"/>
+       <stop offset="0.28" stop-color="${shade(hex, 0.32)}"/>
+       <stop offset="0.5" stop-color="${hex}"/>
+       <stop offset="0.72" stop-color="${shade(hex, 0.18)}"/>
+       <stop offset="1" stop-color="${shade(hex, -0.16)}"/>
+     </linearGradient>`
+  );
+}
+
 function drawProfile(a) {
   const b = a.web, f = a.flange, L = [236, -122];
   const metal = { outer: '#CDD2D7', web: '#AEB5BC', inner: '#8C949C', edge: '#F1F3F5' };
@@ -91,10 +168,10 @@ function drawProfile(a) {
     const P1 = O, P2 = add(O, [b, 0]), P3 = add(O, [0, -f]), P4 = add(O, [b, -f]);
     const lip = a.lips ? 7 : 0;
     return (
-      poly([P2, P4, add(P4, L), add(P2, L)], metal.inner) +
-      poly([P1, P2, add(P2, L), add(P1, L)], metal.web) +
+      poly([P2, P4, add(P4, L), add(P2, L)], face(metal.inner, 'side')) +
+      poly([P1, P2, add(P2, L), add(P1, L)], sheen(metal.web)) +
       `<line x1="${P1[0] + b / 2}" y1="${P1[1]}" x2="${P1[0] + b / 2 + L[0]}" y2="${P1[1] + L[1]}" stroke="${metal.inner}" stroke-width="2" stroke-dasharray="2 12" opacity="0.7"/>` +
-      poly([P1, P3, add(P3, L), add(P1, L)], metal.outer) +
+      poly([P1, P3, add(P3, L), add(P1, L)], sheen(metal.outer)) +
       `<polyline points="${pts([add(P3, [lip, 0]), P3, P1, P2, P4, add(P4, [-lip, 0])])}" fill="none" stroke="${metal.edge}" stroke-width="3" stroke-linejoin="round"/>`
     );
   };
@@ -146,6 +223,19 @@ function drawSlabs(a, sku) {
   return s;
 }
 
+// A round face lit from the upper left (roll and tape ends)
+function dome(hex) {
+  const id = key(hex, 'dome');
+  return defineGradient(
+    id,
+    `<radialGradient id="${id}" cx="0.36" cy="0.3" r="0.82">
+       <stop offset="0" stop-color="${shade(hex, 0.28)}"/>
+       <stop offset="0.55" stop-color="${hex}"/>
+       <stop offset="1" stop-color="${shade(hex, -0.22)}"/>
+     </radialGradient>`
+  );
+}
+
 function drawRoll(a) {
   const R = 76, cx = 142, cy = 176, axis = [128, -64], steps = 28;
   const colors = { side: '#D9AE36', face: '#E8C24E', band: '#1B1E22' };
@@ -154,10 +244,10 @@ function drawRoll(a) {
   for (let i = steps; i >= 0; i--) {
     const t = i / steps;
     const inBand = t > 0.42 && t < 0.62;
-    s += `<circle cx="${(cx + axis[0] * t).toFixed(1)}" cy="${(cy + axis[1] * t).toFixed(1)}" r="${R}" fill="${inBand ? colors.band : colors.side}"/>`;
+    s += `<circle cx="${(cx + axis[0] * t).toFixed(1)}" cy="${(cy + axis[1] * t).toFixed(1)}" r="${R}" fill="${inBand ? colors.band : face(colors.side, 'front')}"/>`;
   }
 
-  s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${colors.face}"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${dome(colors.face)}"/>`;
   for (let r = R - 9, k = 0; r > 12; r -= 9, k++) {
     s += `<circle cx="${cx + k * 0.8}" cy="${cy - k * 0.4}" r="${r}" fill="none" stroke="${shade(colors.face, -0.22)}" stroke-width="1.4"/>`;
   }
@@ -184,9 +274,9 @@ function drawTape(a) {
 
   for (let i = steps; i >= 1; i--) {
     const t = i / steps;
-    s += `<circle cx="${cx + depth[0] * t}" cy="${cy + depth[1] * t}" r="${R}" fill="${m.side}"/>`;
+    s += `<circle cx="${cx + depth[0] * t}" cy="${cy + depth[1] * t}" r="${R}" fill="${face(m.side, 'front')}"/>`;
   }
-  s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${m.face}"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="${dome(m.face)}"/>`;
 
   if (a.material === 'mesh') {
     for (let k = -R + 10; k < R; k += 11) {
@@ -200,8 +290,8 @@ function drawTape(a) {
     }
   }
 
-  s += `<circle cx="${cx}" cy="${cy}" r="42" fill="#B8946A"/>`;
-  s += `<circle cx="${cx}" cy="${cy}" r="33" fill="#8C6C48"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="42" fill="${dome('#B8946A')}"/>`;
+  s += `<circle cx="${cx}" cy="${cy}" r="33" fill="${face('#8C6C48', 'side')}"/>`;
   s += `<circle cx="${cx + 5}" cy="${cy - 3}" r="30" fill="#6E5236" opacity="0.55"/>`;
   s += sticker(cx + 62, cy + 84, a.label);
   return s;
@@ -211,9 +301,9 @@ function drawBox(a) {
   const A = [104, 132], B = [256, 132], depth = [62, -40], h = 106;
   const c = { top: '#DDBB90', front: '#C99F72', side: '#B08658' };
   let s = shadow(212, 250, 150, 16);
-  s += poly([B, add(B, depth), add(add(B, depth), [0, h]), add(B, [0, h])], c.side);
-  s += poly([A, B, add(B, [0, h]), add(A, [0, h])], c.front);
-  s += poly([A, B, add(B, depth), add(A, depth)], c.top);
+  s += poly([B, add(B, depth), add(add(B, depth), [0, h]), add(B, [0, h])], face(c.side, 'side'));
+  s += poly([A, B, add(B, [0, h]), add(A, [0, h])], face(c.front, 'front'));
+  s += poly([A, B, add(B, depth), add(A, depth)], face(c.top, 'top'));
   s += poly([[172, 132], [192, 132], add([192, 132], depth), add([172, 132], depth)], '#EAD5B2', 'opacity="0.85"');
   s += `<rect x="122" y="158" width="116" height="56" fill="#F8F4EC"/>`;
   s += `<rect x="122" y="158" width="6" height="56" fill="#2F5FA7"/>`;
@@ -236,8 +326,10 @@ function drawBag(a) {
   const xr = (y) => 268 + (16 * (y - 76)) / 160;
   const scale = a.small ? 0.8 : 1;
 
-  let body = `<path d="M132,76 C152,62 248,62 268,76 L284,236 C285,249 277,256 264,256 L136,256 C123,256 115,249 116,236 Z" fill="${a.body}"/>`;
-  body += `<path d="M238,68 C252,68 262,72 268,76 L284,236 C285,249 277,256 264,256 L244,256 Z" fill="${dark}" opacity="0.55"/>`;
+  let body = `<path d="M132,76 C152,62 248,62 268,76 L284,236 C285,249 277,256 264,256 L136,256 C123,256 115,249 116,236 Z" fill="${sheen(a.body)}"/>`;
+  body += `<path d="M238,68 C252,68 262,72 268,76 L284,236 C285,249 277,256 264,256 L244,256 Z" fill="${dark}" opacity="0.32"/>`;
+  // paper catches the light along the folded top edge
+  body += `<path d="M140,80 C162,68 238,68 260,80 L262,96 C238,84 162,84 138,96 Z" fill="#FFFFFF" opacity="0.18"/>`;
   body += `<path d="M140,86 C162,74 238,74 260,86" fill="none" stroke="${shade(a.body, -0.25)}" stroke-width="2" stroke-dasharray="4 5"/>`;
   body += poly([[xl(118), 118], [xr(118), 118], [xr(124), 124], [xl(124), 124]], a.band);
   body += poly([[xl(146), 146], [xr(146), 146], [xr(200), 200], [xl(200), 200]], a.band);
@@ -250,8 +342,8 @@ function drawBag(a) {
 function drawHanger(a) {
   const strip = (x, y) => {
     let g = `<g transform="translate(${x} ${y}) rotate(-24)">`;
-    g += `<rect x="-15" y="-92" width="30" height="176" fill="#C3C9CF"/>`;
-    g += `<rect x="-15" y="-92" width="9" height="176" fill="#DCE0E4"/>`;
+    g += `<rect x="-15" y="-92" width="30" height="176" fill="${sheen('#C3C9CF')}"/>`;
+    g += `<rect x="-15" y="-92" width="9" height="176" fill="${face('#DCE0E4', 'front')}"/>`;
     for (let k = -74; k <= 58; k += 26) g += `<rect x="-4" y="${k}" width="8" height="13" rx="4" fill="#7F8891"/>`;
     g += `<polygon points="-15,84 15,84 30,100 0,100" fill="#A5ACB3"/></g>`;
     return g;
@@ -273,6 +365,7 @@ function productArt(p, className = 'h-full w-full', fit = 'cover') {
     const draw = ART_DRAWERS[p.art.kind];
     artCache.set(p.sku, draw ? draw(p.art, p.sku) : '');
   }
+  flushDefs(); // drawing may have registered new gradients
   return `<svg viewBox="0 0 400 300" class="${className}" role="img" aria-label="${esc(p.name)}" xmlns="http://www.w3.org/2000/svg">${artCache.get(p.sku)}</svg>`;
 }
 

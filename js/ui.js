@@ -492,30 +492,30 @@ function productCard(p) {
   return `
   <article data-product="${p.sku}" class="group flex flex-col border border-ink/10 bg-surface transition-shadow hover:shadow-[0_16px_40px_-28px_rgba(27,30,34,0.45)]">
     <a href="${url}" class="relative block bg-well" tabindex="-1" aria-hidden="true">
-      <div class="aspect-[4/3] ${photo ? '' : 'p-5'}">${productArt(p)}</div>
+      <div class="aspect-square ${photo ? '' : 'p-3'}">${productArt(p)}</div>
       ${b2b ? `<span class="absolute left-3 top-3 bg-steel px-2 py-0.5 text-[12px] font-semibold text-surface">−${pct(discount())}</span>` : ''}
     </a>
-    <div class="flex flex-1 flex-col border-t border-ink/10 p-4">
+    <div class="flex flex-1 flex-col border-t border-ink/10 p-4 sm:p-5">
       <div class="flex items-center justify-between gap-2 text-[12px] text-muted">
-        <span class="font-medium text-ink/70">${esc(p.brand)}</span>
-        <span class="tnum">${p.sku}</span>
+        <span class="truncate font-medium text-ink/70">${esc(p.brand)}</span>
+        <span class="tnum shrink-0">${p.sku}</span>
       </div>
-      <h3 class="mt-1.5 text-[15px] font-semibold leading-snug"><a href="${url}" class="hover:text-steel">${esc(p.name)}</a></h3>
-      <p class="mt-1 text-[13px] leading-snug text-muted">${esc(p.spec)}</p>
-      <div class="mt-auto pt-4">
-        <div class="flex items-end justify-between gap-3">
+      <h3 class="mt-2 text-[15px] font-semibold leading-snug sm:text-[16px]"><a href="${url}" class="hover:text-steel">${esc(p.name)}</a></h3>
+      <p class="mt-1.5 text-[13px] leading-snug text-muted">${esc(p.spec)}</p>
+      <div class="mt-auto pt-4 sm:pt-5">
+        <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
           <div>
             ${b2b ? `<p class="tnum text-[12px] text-muted line-through">${KM(p.price)}</p>` : ''}
-            <p class="tnum text-[20px] font-semibold leading-none ${b2b ? 'text-steel' : ''}">${KM(priceOf(p))}<span class="ml-1 text-[12px] font-normal text-muted">/ ${p.unit}</span></p>
+            <p class="tnum whitespace-nowrap text-[19px] font-semibold leading-none sm:text-[22px] ${b2b ? 'text-steel' : ''}">${KM(priceOf(p))}<span class="ml-1 text-[12px] font-normal text-muted">/ ${p.unit}</span></p>
           </div>
           ${stockBadge(p)}
         </div>
         <div class="mt-3 flex">
           <label class="shrink-0"><span class="sr-only">Količina u ${p.unit}</span>
             <input data-qty type="number" min="0" step="any" value="${defaultQty(p)}"
-                   class="tnum h-10 w-16 border border-r-0 border-ink/20 bg-surface px-1 text-center text-[14px] focus:border-steel focus:ring-0" />
+                   class="tnum h-10 w-12 border border-r-0 border-ink/20 bg-surface px-1 text-center text-[14px] focus:border-steel focus:ring-0 sm:w-16" />
           </label>
-          <button data-add="${p.sku}" class="h-10 flex-1 bg-ink px-3 text-[14px] font-semibold text-surface transition-colors hover:bg-steel">U korpu</button>
+          <button data-add="${p.sku}" class="h-10 flex-1 whitespace-nowrap bg-ink px-2 text-[13px] font-semibold text-surface transition-colors hover:bg-steel sm:px-3 sm:text-[14px]">U korpu</button>
         </div>
       </div>
     </div>
