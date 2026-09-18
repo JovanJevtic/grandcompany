@@ -2,6 +2,12 @@
    GRAND COMPANY — shared base styles (Tailwind handles the rest)
    ===================================================================== */
 
+/* Montserrat (OFL) — heavy grotesk for cover-sized lines; one variable file per subset */
+@font-face { font-family: 'Montserrat'; src: url('../fonts/Montserrat-latin-ext.woff2') format('woff2'); font-weight: 400 900; font-style: normal; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Montserrat'; src: url('../fonts/Montserrat-latin.woff2') format('woff2'); font-weight: 400 900; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+/* Pinyon Script (OFL) — the one handwritten word inside a cover line */
+@font-face { font-family: 'Pinyon Script'; src: url('../fonts/PinyonScript-latin-ext.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'Pinyon Script'; src: url('../fonts/PinyonScript-latin.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 /* Newsreader (Production Type, OFL) — display serif for headlines; latin-ext covers č ć đ š ž */
 @font-face { font-family: 'Newsreader'; src: url('../fonts/Newsreader-latin-ext.woff2') format('woff2'); font-weight: 300 700; font-style: normal; font-display: swap; unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: 'Newsreader'; src: url('../fonts/Newsreader-latin.woff2') format('woff2'); font-weight: 300 700; font-style: normal; font-display: swap; unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
@@ -13,21 +19,79 @@
 @font-face { font-family: 'Instrument Sans'; src: url('../fonts/InstrumentSans-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
 
 html { scroll-behavior: smooth; }
-body { background-color: #F5F5F2; color: #1B1E22; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
+body { background-color: #F1ECE4; color: #191817; text-rendering: optimizeLegibility; -webkit-font-smoothing: antialiased; }
 body.no-scroll { overflow: hidden; }
 
-.font-serif { font-optical-sizing: auto; font-variant-numeric: lining-nums; }
-h1.font-serif, h2.font-serif { font-weight: 400; letter-spacing: -0.015em; }
-h3.font-serif, legend.font-serif, summary.font-serif { font-weight: 500; letter-spacing: -0.01em; }
-.font-serif em, .font-serif i { font-style: italic; }
+/* --- Type system ---------------------------------------------------
+   Headings are grotesk in caps at weight 500, not bold: the size does
+   the shouting. The display face is only for cover-sized lines. */
+.font-display { font-weight: 900; text-transform: uppercase; letter-spacing: -0.035em; line-height: 0.86; }
+h1, h2, h3, legend, summary { font-weight: 500; letter-spacing: -0.01em; }
+.u-head { text-transform: uppercase; letter-spacing: -0.005em; line-height: 1.04; }
+
+/* Small caps label that sits above a heading */
+.eyebrow {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-weight: 500;
+  color: #6B655D;
+}
+
+.font-script { font-weight: 400; text-transform: none; letter-spacing: 0; }
 .tnum { font-variant-numeric: tabular-nums; }
+
+/* --- Outline button, square corners, optional arrow ---------------- */
+.btn-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid currentColor;
+  padding: 1rem 1.75rem;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+.btn-line:hover { background-color: #191817; color: #F1ECE4; }
+.btn-line.on-dark:hover { background-color: #F1ECE4; color: #191817; }
+.btn-line .arrow { transition: transform 0.25s ease; }
+.btn-line:hover .arrow { transform: translateX(4px); }
+
+.btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background-color: #191817;
+  color: #F1ECE4;
+  padding: 1rem 1.75rem;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  transition: background-color 0.25s ease;
+}
+.btn-solid:hover { background-color: #274C77; }
+
+/* Brand list set vertically alongside a photograph */
+.vertical-rule {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  letter-spacing: 0.22em;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: #6B655D;
+}
 
 /* Grid items default to min-width:auto, so a wide table inside an overflow-x-auto
    wrapper would stretch its column past the viewport on phones */
 .grid > * { min-width: 0; }
 
 :focus-visible { outline: 2px solid #274C77; outline-offset: 2px; }
-::selection { background: #274C77; color: #FFFFFF; }
+::selection { background: #191817; color: #F1ECE4; }
 
 .drawer { transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1); }
 
@@ -54,9 +118,9 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
-::-webkit-scrollbar-track { background: #F5F5F2; }
-::-webkit-scrollbar-thumb { background: #C9CBC7; }
-::-webkit-scrollbar-thumb:hover { background: #1B1E22; }
+::-webkit-scrollbar-track { background: #F1ECE4; }
+::-webkit-scrollbar-thumb { background: #CFC7B9; }
+::-webkit-scrollbar-thumb:hover { background: #191817; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

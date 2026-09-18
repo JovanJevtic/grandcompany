@@ -57,13 +57,14 @@ function headerHTML() {
   const params = new URLSearchParams(location.search);
   const activeCat = page === 'katalog' ? params.get('kat') : page === 'proizvod' ? bySku[params.get('sku')]?.category : null;
   const q = page === 'katalog' ? params.get('q') || '' : '';
-  const activeCls = 'text-ink shadow-[inset_0_-2px_0_#274C77]';
+  const activeCls = 'text-ink shadow-[inset_0_-2px_0_#191817]';
+  const navCls = 'whitespace-nowrap py-4 text-[12px] uppercase tracking-label transition-colors';
 
   const catLinks = CATEGORIES.map(
-    (c) => `<a href="katalog.html?kat=${c.id}" class="whitespace-nowrap py-3.5 text-[14px] font-medium text-ink/80 hover:text-ink ${activeCat === c.id ? activeCls : ''}">${c.label}</a>`
+    (c) => `<a href="katalog.html?kat=${c.id}" class="${navCls} text-ink/70 hover:text-ink ${activeCat === c.id ? activeCls : ''}">${c.label}</a>`
   ).join('');
   const serviceLinks = SERVICE_LINKS.map(
-    (l) => `<a href="${l.href}" class="whitespace-nowrap py-3.5 text-[14px] text-muted hover:text-ink ${page === l.page ? activeCls : ''}">${l.label}</a>`
+    (l) => `<a href="${l.href}" class="${navCls} text-muted hover:text-ink ${page === l.page ? activeCls : ''}">${l.label}</a>`
   ).join('');
 
   const searchForm = (id, extra) => `
@@ -75,8 +76,8 @@ function headerHTML() {
     </form>`;
 
   return `
-  <div class="border-b border-ink/10 bg-canvas text-[13px] text-muted">
-    <div class="mx-auto flex max-w-page items-center gap-6 px-5 py-2 lg:px-10">
+  <div class="border-b border-ink/10 bg-canvas text-[11px] uppercase tracking-label text-muted">
+    <div class="mx-auto flex max-w-page items-center gap-6 px-5 py-2.5 lg:px-10">
       <span class="hidden md:inline">Stovarište Zalužani, Nenada Kostića 151</span>
       <span class="hidden lg:inline">Pon–pet 7–17h, subota 7–14h</span>
       <a href="${COMPANY.phoneLandlineHref}" class="tnum hover:text-ink">${COMPANY.phoneLandline}</a>
@@ -93,16 +94,16 @@ function headerHTML() {
     <div class="mx-auto flex max-w-page items-center gap-4 px-5 py-3 lg:gap-10 lg:px-10">
       <button id="btn-menu" class="-ml-1 p-1.5 lg:hidden" aria-label="Meni" aria-expanded="false" aria-controls="mobile-menu">${ICON.menu}</button>
       <a href="index.html" class="flex shrink-0 items-center gap-3" aria-label="Grand Company, početna">
-        <span class="flex h-9 w-9 items-center justify-center bg-ink font-serif text-[20px] font-semibold text-surface" aria-hidden="true">G</span>
+        <span class="font-display flex h-10 w-10 items-center justify-center bg-ink text-[20px] text-canvas" aria-hidden="true">G</span>
         <span class="leading-tight">
-          <span class="block font-serif text-[20px] font-semibold tracking-[-0.01em]">Grand Company</span>
-          <span class="hidden text-[12px] text-muted sm:block">Građevinski materijali, Banja Luka</span>
+          <span class="font-display block text-[15px] tracking-[-0.02em] sm:text-[19px]">Grand Company</span>
+          <span class="hidden text-[10px] uppercase tracking-label text-muted sm:block">Građevinski materijali, Banja Luka</span>
         </span>
       </a>
       ${searchForm('hdr-q', 'mx-auto hidden max-w-2xl flex-1 md:flex')}
       <div class="ml-auto flex items-center gap-2 md:ml-0">
-        <button id="btn-account" class="flex h-11 items-center gap-2 px-2 text-[14px] font-medium transition-colors hover:text-steel">${ICON.user}<span id="account-label" class="hidden max-w-[180px] truncate sm:inline">Prijava za partnere</span></button>
-        <button id="btn-cart" class="relative flex h-11 items-center gap-2 border border-ink/20 px-4 text-[14px] font-semibold transition-colors hover:border-ink">
+        <button id="btn-account" class="flex h-11 items-center gap-2 px-1.5 text-[12px] uppercase tracking-label transition-colors hover:text-steel sm:px-2">${ICON.user}<span id="account-label" class="hidden max-w-[180px] truncate sm:inline">Prijava za partnere</span></button>
+        <button id="btn-cart" class="relative flex h-11 items-center gap-2 border border-ink px-3 text-[12px] uppercase tracking-label transition-colors hover:bg-ink hover:text-canvas sm:px-5">
           ${ICON.cart}<span id="cart-total" class="tnum hidden sm:inline">Korpa</span>
           <span id="cart-count" class="absolute -right-2 -top-2 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-steel px-1 text-[11px] font-bold text-surface">0</span>
         </button>
@@ -111,7 +112,7 @@ function headerHTML() {
 
     <nav aria-label="Glavna navigacija" class="hidden border-t border-ink/10 lg:block">
       <div class="mx-auto flex max-w-page items-center gap-8 px-10">
-        <a href="katalog.html" class="whitespace-nowrap py-3.5 text-[14px] font-semibold hover:text-steel ${page === 'katalog' && !activeCat ? activeCls : ''}">Svi proizvodi</a>
+        <a href="katalog.html" class="${navCls} font-medium hover:text-steel ${page === 'katalog' && !activeCat ? activeCls : ''}">Svi proizvodi</a>
         ${catLinks}
         <span class="ml-auto flex items-center gap-6">${serviceLinks}</span>
       </div>
@@ -145,8 +146,8 @@ function footerHTML() {
   ];
   const col = (title, links) => `
     <div class="lg:col-span-2">
-      <p class="text-[14px] font-semibold text-surface">${title}</p>
-      <ul class="mt-4 space-y-2.5 text-[14px] text-surface/65">${links.map(([href, label]) => `<li><a href="${href}" class="link-line hover:text-surface">${label}</a></li>`).join('')}</ul>
+      <p class="eyebrow text-canvas/50">${title}</p>
+      <ul class="mt-5 space-y-3 text-[14px] text-canvas/60">${links.map(([href, label]) => `<li><a href="${href}" class="link-line hover:text-canvas">${label}</a></li>`).join('')}</ul>
     </div>`;
 
   return `
@@ -155,32 +156,32 @@ function footerHTML() {
       ${promises.map(([icon, title, text]) => `
         <div class="flex gap-4">
           <span class="mt-0.5 shrink-0 text-steel">${icon}</span>
-          <div><p class="text-[15px] font-semibold">${title}</p><p class="mt-1 text-[14px] leading-relaxed text-muted">${text}</p></div>
+          <div><p class="text-[13px] uppercase tracking-label">${title}</p><p class="mt-1 text-[14px] leading-relaxed text-muted">${text}</p></div>
         </div>`).join('')}
     </div>
   </section>
 
-  <footer class="bg-ink text-surface">
+  <footer class="bg-deeper text-canvas">
     <div class="mx-auto max-w-page px-5 pt-14 lg:px-10">
-      <div class="grid gap-10 border-b border-surface/10 pb-12 sm:grid-cols-2 lg:grid-cols-12">
+      <div class="grid gap-10 border-b border-canvas/15 pb-12 sm:grid-cols-2 lg:grid-cols-12">
         <div class="lg:col-span-3">
-          <p class="font-serif text-[24px] font-semibold tracking-[-0.01em]">Grand Company</p>
-          <p class="mt-3 max-w-sm text-[14px] leading-relaxed text-surface/65">Veleprodaja i maloprodaja građevinskog materijala u Banjoj Luci od ${COMPANY.founded}. godine. Ovlašćeni distributer Knauf sistema suhe gradnje.</p>
-          <address class="mt-5 text-[14px] not-italic leading-relaxed text-surface/65">Ul. Nenada Kostića 151<br />78000 Banja Luka, Zalužani</address>
+          <p class="font-display text-[26px] tracking-[-0.02em]">Grand Company</p>
+          <p class="mt-3 max-w-sm text-[14px] leading-relaxed text-canvas/60">Veleprodaja i maloprodaja građevinskog materijala u Banjoj Luci od ${COMPANY.founded}. godine. Ovlašćeni distributer Knauf sistema suhe gradnje.</p>
+          <address class="mt-5 text-[14px] not-italic leading-relaxed text-canvas/60">Ul. Nenada Kostića 151<br />78000 Banja Luka, Zalužani</address>
         </div>
         ${col('Katalog', [['katalog.html', 'Svi proizvodi'], ...CATEGORIES.map((c) => [`katalog.html?kat=${c.id}`, c.label])])}
         ${col('Usluge', [['kalkulator.html', 'Kalkulator utroška'], ['dostava.html', 'Dostava i kran'], ['partneri.html', 'Partnerski program'], ['korpa.html', 'Korpa i narudžba']])}
         ${col('Firma', [['o-nama.html', 'O nama'], ['kontakt.html', 'Kontakt'], ['kontakt.html#poruka', 'Pošaljite upit'], ['zasluge.html', 'Zasluge za fotografije']])}
         <div class="lg:col-span-3">
-          <p class="text-[14px] font-semibold text-surface">Pozovite nas</p>
-          <ul class="mt-4 space-y-2.5 text-[14px] text-surface/65">
-            <li>Veleprodaja<br /><a href="${COMPANY.phoneLandlineHref}" class="link-line tnum text-surface">${COMPANY.phoneLandline}</a></li>
-            <li>Viber i WhatsApp<br /><a href="${COMPANY.phoneMobileHref}" class="link-line tnum text-surface">${COMPANY.phoneMobile}</a></li>
-            <li><a href="mailto:${COMPANY.emailSales}" class="link-line text-surface">${COMPANY.emailSales}</a></li>
+          <p class="eyebrow text-canvas/50">Pozovite nas</p>
+          <ul class="mt-5 space-y-3 text-[14px] text-canvas/60">
+            <li>Veleprodaja<br /><a href="${COMPANY.phoneLandlineHref}" class="link-line tnum text-canvas">${COMPANY.phoneLandline}</a></li>
+            <li>Viber i WhatsApp<br /><a href="${COMPANY.phoneMobileHref}" class="link-line tnum text-canvas">${COMPANY.phoneMobile}</a></li>
+            <li><a href="mailto:${COMPANY.emailSales}" class="link-line text-canvas">${COMPANY.emailSales}</a></li>
           </ul>
         </div>
       </div>
-      <div class="flex flex-wrap justify-between gap-x-8 gap-y-2 py-6 text-[12px] text-surface/45">
+      <div class="flex flex-wrap justify-between gap-x-8 gap-y-2 py-6 text-[12px] text-canvas/40">
         <span>© 2026 ${COMPANY.name}</span>
         <span class="tnum">JIB ${COMPANY.jib}, PIB ${COMPANY.pib}, MBS ${COMPANY.mbs}</span>
         <span>Demonstracioni portal</span>
@@ -481,8 +482,8 @@ function logout() {
 // Product card (catalogue, home, related products)
 // ---------------------------------------------------------------------
 function stockBadge(p) {
-  const [color, label] = { high: ['#4E7A55', 'Na stanju'], mid: ['#B7862C', 'Ograničeno'], low: ['#A8432F', 'Malo na stanju'] }[stockLevel(p)];
-  return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap text-[12px] text-muted"><span class="h-2 w-2 rounded-full" style="background:${color}" aria-hidden="true"></span>${label}</span>`;
+  const [color, label] = { high: ['#4E7A55', 'Na stanju'], mid: ['#A8792A', 'Ograničeno'], low: ['#A8432F', 'Malo na stanju'] }[stockLevel(p)];
+  return `<span class="inline-flex items-center gap-1.5 whitespace-nowrap text-[11px] uppercase tracking-label text-muted"><span class="h-1.5 w-1.5 rounded-full" style="background:${color}" aria-hidden="true"></span>${label}</span>`;
 }
 
 function productCard(p) {
@@ -490,32 +491,28 @@ function productCard(p) {
   const b2b = !!partner();
   const photo = PRODUCT_PHOTOS[p.sku];
   return `
-  <article data-product="${p.sku}" class="group flex flex-col border border-ink/10 bg-surface transition-shadow hover:shadow-[0_16px_40px_-28px_rgba(27,30,34,0.45)]">
-    <a href="${url}" class="relative block bg-well" tabindex="-1" aria-hidden="true">
-      <div class="aspect-square ${photo ? '' : 'p-3'}">${productArt(p)}</div>
-      ${b2b ? `<span class="absolute left-3 top-3 bg-steel px-2 py-0.5 text-[12px] font-semibold text-surface">−${pct(discount())}</span>` : ''}
+  <article data-product="${p.sku}" class="group flex flex-col">
+    <a href="${url}" class="relative block overflow-hidden bg-well" tabindex="-1" aria-hidden="true">
+      <div class="aspect-square ${photo ? '' : 'p-3'} transition-transform duration-[900ms] group-hover:scale-[1.04]">${productArt(p)}</div>
+      ${b2b ? `<span class="absolute left-0 top-0 bg-ink px-3 py-1.5 text-[11px] uppercase tracking-label text-canvas">Rabat −${pct(discount())}</span>` : ''}
     </a>
-    <div class="flex flex-1 flex-col border-t border-ink/10 p-4 sm:p-5">
-      <div class="flex items-center justify-between gap-2 text-[12px] text-muted">
-        <span class="truncate font-medium text-ink/70">${esc(p.brand)}</span>
-        <span class="tnum shrink-0">${p.sku}</span>
-      </div>
-      <h3 class="mt-2 text-[15px] font-semibold leading-snug sm:text-[16px]"><a href="${url}" class="hover:text-steel">${esc(p.name)}</a></h3>
-      <p class="mt-1.5 text-[13px] leading-snug text-muted">${esc(p.spec)}</p>
-      <div class="mt-auto pt-4 sm:pt-5">
+    <div class="flex flex-1 flex-col pt-5">
+      <h3 class="text-[16px] font-medium leading-snug"><a href="${url}" class="link-line">${esc(p.name)}</a></h3>
+      <p class="mt-2 text-[11px] uppercase leading-relaxed tracking-label text-muted">${esc(p.brand)} &middot; ${esc(p.spec)}</p>
+      <div class="mt-auto pt-5">
         <div class="flex flex-wrap items-end justify-between gap-x-3 gap-y-1">
           <div>
             ${b2b ? `<p class="tnum text-[12px] text-muted line-through">${KM(p.price)}</p>` : ''}
-            <p class="tnum whitespace-nowrap text-[19px] font-semibold leading-none sm:text-[22px] ${b2b ? 'text-steel' : ''}">${KM(priceOf(p))}<span class="ml-1 text-[12px] font-normal text-muted">/ ${p.unit}</span></p>
+            <p class="tnum whitespace-nowrap text-[19px] font-medium leading-none sm:text-[21px] ${b2b ? 'text-steel' : ''}">${KM(priceOf(p))}<span class="ml-1.5 text-[12px] text-muted">/ ${p.unit}</span></p>
           </div>
           ${stockBadge(p)}
         </div>
-        <div class="mt-3 flex">
+        <div class="mt-4 flex">
           <label class="shrink-0"><span class="sr-only">Količina u ${p.unit}</span>
             <input data-qty type="number" min="0" step="any" value="${defaultQty(p)}"
-                   class="tnum h-10 w-12 border border-r-0 border-ink/20 bg-surface px-1 text-center text-[14px] focus:border-steel focus:ring-0 sm:w-16" />
+                   class="tnum h-11 w-12 border border-r-0 border-ink/25 bg-transparent px-1 text-center text-[14px] focus:border-ink focus:ring-0 sm:w-16" />
           </label>
-          <button data-add="${p.sku}" class="h-10 flex-1 whitespace-nowrap bg-ink px-2 text-[13px] font-semibold text-surface transition-colors hover:bg-steel sm:px-3 sm:text-[14px]">U korpu</button>
+          <button data-add="${p.sku}" class="h-11 flex-1 whitespace-nowrap bg-ink px-2 text-[11px] uppercase tracking-label text-canvas transition-colors hover:bg-steel sm:px-3">U korpu</button>
         </div>
       </div>
     </div>
