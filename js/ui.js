@@ -63,9 +63,13 @@ function headerHTML() {
   const catLinks = CATEGORIES.map(
     (c) => `<a href="katalog.html?kat=${c.id}" class="${navCls} text-ink/70 hover:text-ink ${activeCat === c.id ? activeCls : ''}">${c.label}</a>`
   ).join('');
-  const serviceLinks = SERVICE_LINKS.map(
-    (l) => `<a href="${l.href}" class="${navCls} text-muted hover:text-ink ${page === l.page ? activeCls : ''}">${l.label}</a>`
-  ).join('');
+  // Kalkulator and Za partnere are tools, not footer links: the references
+  // (Dinesen's Floor Planner, Bert & May's Trade) keep them beside the shop.
+  const TOOLS = ['kalkulator', 'partneri'];
+  const serviceLinks = SERVICE_LINKS.map((l) => {
+    const tool = TOOLS.includes(l.page);
+    return `<a href="${l.href}" class="${navCls} ${tool ? 'font-medium text-ink hover:text-steel' : 'text-muted hover:text-ink'} ${page === l.page ? activeCls : ''}">${l.label}</a>`;
+  }).join('');
 
   const searchForm = (id, extra) => `
     <form action="katalog.html" role="search" class="flex ${extra}">
@@ -90,8 +94,8 @@ function headerHTML() {
     </div>
   </div>
 
-  <header class="sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur">
-    <div class="mx-auto flex max-w-page items-center gap-4 px-5 py-3 lg:gap-10 lg:px-10">
+  <header id="site-shell-header" class="sticky top-0 z-40 border-b border-ink/10 bg-surface/95 backdrop-blur">
+    <div data-hdr-main class="mx-auto flex max-w-page items-center gap-4 px-5 py-3 lg:gap-10 lg:px-10">
       <button id="btn-menu" class="-ml-1 p-1.5 lg:hidden" aria-label="Meni" aria-expanded="false" aria-controls="mobile-menu">${ICON.menu}</button>
       <a href="index.html" class="flex shrink-0 items-center gap-3" aria-label="Grand Company, početna">
         <span class="font-display flex h-10 w-10 items-center justify-center bg-ink text-[20px] text-canvas" aria-hidden="true">G</span>
@@ -100,8 +104,8 @@ function headerHTML() {
           <span class="hidden text-[10px] uppercase tracking-label text-muted sm:block">Građevinski materijali, Banja Luka</span>
         </span>
       </a>
-      ${searchForm('hdr-q', 'mx-auto hidden max-w-2xl flex-1 md:flex')}
-      <div class="ml-auto flex items-center gap-2 md:ml-0">
+      ${searchForm('hdr-q', 'mx-auto hidden max-w-2xl flex-1 lg:flex')}
+      <div class="ml-auto flex items-center gap-2 lg:ml-0">
         <button id="btn-account" class="flex h-11 items-center gap-2 px-1.5 text-[12px] uppercase tracking-label transition-colors hover:text-steel sm:px-2">${ICON.user}<span id="account-label" class="hidden max-w-[180px] truncate sm:inline">Prijava za partnere</span></button>
         <button id="btn-cart" class="relative flex h-11 items-center gap-2 border border-ink px-3 text-[12px] uppercase tracking-label transition-colors hover:bg-ink hover:text-canvas sm:px-5">
           ${ICON.cart}<span id="cart-total" class="tnum hidden sm:inline">Korpa</span>
@@ -110,11 +114,11 @@ function headerHTML() {
       </div>
     </div>
 
-    <nav aria-label="Glavna navigacija" class="hidden border-t border-ink/10 lg:block">
-      <div class="mx-auto flex max-w-page items-center gap-8 px-10">
+    <nav data-hdr-nav aria-label="Glavna navigacija" class="hidden border-t border-ink/10 lg:block">
+      <div class="no-scrollbar mx-auto flex max-w-page items-center gap-5 overflow-x-auto px-10 xl:gap-8">
         <a href="katalog.html" class="${navCls} font-medium hover:text-steel ${page === 'katalog' && !activeCat ? activeCls : ''}">Svi proizvodi</a>
         ${catLinks}
-        <span class="ml-auto flex items-center gap-6">${serviceLinks}</span>
+        <span class="ml-auto flex items-center gap-4 xl:gap-6">${serviceLinks}</span>
       </div>
     </nav>
 
@@ -137,21 +141,18 @@ function headerHTML() {
   </header>`;
 }
 
-function footerHTML() {
+// The four reasons to buy here are the most concrete copy on the site, so
+// they are their own block: the home page places them above the articles
+// rather than leaving them stranded at the bottom.
+function promisesHTML() {
   const promises = [
     [ICON.crane, 'Istovar kranom na etažu', 'Vlastiti kamioni sa dizalicom za cijelu regiju Banje Luke.'],
     [ICON.stock, 'Zalihe uživo', 'Stanje skladišta čitamo iz Pantheona, ne iz cjenovnika.'],
     [ICON.doc, 'Atesti uz robu', 'CE deklaracije i protivpožarni atesti za tehnički prijem.'],
     [ICON.card, 'Plaćanje do 90 dana', 'Za ugovorne partnere, uz mjenicu ili bankarsku garanciju.'],
   ];
-  const col = (title, links) => `
-    <div class="lg:col-span-2">
-      <p class="eyebrow text-canvas/50">${title}</p>
-      <ul class="mt-5 space-y-3 text-[14px] text-canvas/60">${links.map(([href, label]) => `<li><a href="${href}" class="link-line hover:text-canvas">${label}</a></li>`).join('')}</ul>
-    </div>`;
-
   return `
-  <section class="border-t border-ink/10 bg-surface">
+  <section class="border-y border-ink/10 bg-surface">
     <div class="mx-auto grid max-w-page gap-8 px-5 py-10 sm:grid-cols-2 lg:grid-cols-4 lg:px-10">
       ${promises.map(([icon, title, text]) => `
         <div class="flex gap-4">
@@ -159,7 +160,18 @@ function footerHTML() {
           <div><p class="text-[13px] uppercase tracking-label">${title}</p><p class="mt-1 text-[14px] leading-relaxed text-muted">${text}</p></div>
         </div>`).join('')}
     </div>
-  </section>
+  </section>`;
+}
+
+function footerHTML() {
+  const col = (title, links) => `
+    <div class="lg:col-span-2">
+      <p class="eyebrow text-canvas/50">${title}</p>
+      <ul class="mt-5 space-y-3 text-[14px] text-canvas/60">${links.map(([href, label]) => `<li><a href="${href}" class="link-line hover:text-canvas">${label}</a></li>`).join('')}</ul>
+    </div>`;
+
+  return `
+  ${currentPage() === 'home' ? '' : promisesHTML()}
 
   <footer class="bg-deeper text-canvas">
     <div class="mx-auto max-w-page px-5 pt-14 lg:px-10">
@@ -575,13 +587,30 @@ function bindGlobalEvents() {
   });
 }
 
+// Past the cover the header sheds its category row. A 60px hysteresis gap
+// keeps it from flickering when the user rests right on the threshold.
+function bindHeaderCondense() {
+  const header = $('site-shell-header');
+  if (!header) return;
+  let condensed = false;
+  const update = () => {
+    const y = window.scrollY;
+    if (!condensed && y > 300) { condensed = true; header.classList.add('is-condensed'); }
+    else if (condensed && y < 240) { condensed = false; header.classList.remove('is-condensed'); }
+  };
+  addEventListener('scroll', update, { passive: true });
+  update();
+}
+
 function initPage(pageInit) {
   document.addEventListener('DOMContentLoaded', () => {
     loadState();
     replacePlaceholder('site-header', headerHTML());
     replacePlaceholder('site-footer', footerHTML());
+    if ($('site-promises')) replacePlaceholder('site-promises', promisesHTML());
     document.body.insertAdjacentHTML('beforeend', shellHTML());
     bindGlobalEvents();
+    bindHeaderCondense();
     onChange(renderChrome);
     renderChrome();
     if (pageInit) pageInit();

@@ -15,43 +15,82 @@ initPage(() => {
     'Primljena': 'bg-canvas/15 text-canvas',
   };
 
-  const FACTS = [
-    ['Godina osnivanja', '2012', 'Porodična firma iz Zalužana'],
-    ['Zaposlenih', '17', 'Prodaja, magacin i vozači'],
-    ['Artikala na stanju', `${PRODUCTS.length}`, 'Od ploče do vijka'],
-    ['Bonitet', 'A+', 'Uredno izmirene obaveze'],
-  ];
+  const inCategory = (id) => PRODUCTS.filter((p) => p.category === id);
+  const countLabel = (n) => `${n} ${plural(n, 'artikal', 'artikla', 'artikala')}`;
 
-  function renderFacts() {
-    $('home-facts').innerHTML = FACTS.map(([label, value, note]) => `
-      <div class="border-t border-canvas/20 pt-5 text-center">
-        <dt class="eyebrow text-canvas/60">${label}</dt>
-        <dd class="tnum font-display mt-4 text-[clamp(2.6rem,5vw,4.4rem)] leading-none">${value}</dd>
-        <p class="mt-4 text-[14px] leading-snug text-canvas/60">${note}</p>
-      </div>`).join('');
+  // The cover ends in the catalogue instead of a slogan: four categories with
+  // their real counts, so the first screen already sells something.
+  function renderCoverLinks() {
+    $('home-cover-links').innerHTML = CATEGORIES.map((c) => `
+      <a href="katalog.html?kat=${c.id}" class="group flex items-baseline gap-3 border-t border-ink/20 py-3 transition-colors hover:border-ink">
+        <span class="text-[16px] font-medium group-hover:text-steel">${c.label}</span>
+        <span class="tnum ml-auto whitespace-nowrap text-[13px] text-muted">${countLabel(inCategory(c.id).length)} &middot; od ${KM(minPrice(c.id))}</span>
+      </a>`).join('');
   }
 
+  // Category tiles show the goods, not a stock photograph of a man in a hard
+  // hat: each one carries the drawing of a real article from that category.
   function renderCategories() {
     $('home-categories').innerHTML = CATEGORIES.map((c) => {
-      const count = PRODUCTS.filter((p) => p.category === c.id).length;
+      const items = inCategory(c.id);
+      const lead = items.find((p) => p.featured) || items[0];
       return `
-        <a href="katalog.html?kat=${c.id}" class="group relative block overflow-hidden bg-surface">
-          <div class="aspect-[4/5] overflow-hidden">
-            <img src="${c.app || c.image}" alt="" loading="lazy"
-                 class="h-full w-full object-cover transition-transform duration-[900ms] group-hover:scale-105" />
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-deeper/90 via-deeper/25 to-transparent"></div>
-          <div class="absolute inset-x-0 bottom-0 p-5 text-canvas lg:p-7">
-            <p class="eyebrow text-canvas/70">${count} ${plural(count, 'artikal', 'artikla', 'artikala')}</p>
-            <h3 class="u-head mt-2 text-[clamp(1.1rem,1.6vw,1.6rem)]">${c.label}</h3>
-            <p class="tnum mt-2 text-[14px] text-canvas/75">od ${KM(minPrice(c.id))}</p>
-          </div>
+        <a href="katalog.html?kat=${c.id}" class="group flex flex-col bg-surface">
+          <span class="block overflow-hidden bg-well">
+            <span class="block aspect-[4/3] p-4 transition-transform duration-[900ms] group-hover:scale-[1.04]">${productArt(lead)}</span>
+          </span>
+          <span class="flex flex-1 flex-col p-5">
+            <span class="text-[17px] font-medium leading-snug group-hover:text-steel">${c.label}</span>
+            <span class="mt-1.5 text-[14px] leading-snug text-muted">${esc(c.lead)}</span>
+            <span class="tnum mt-auto pt-4 text-[13px] text-muted">${countLabel(items.length)} &middot; od ${KM(minPrice(c.id))}</span>
+          </span>
         </a>`;
     }).join('');
   }
 
+  // ------------------------------------------------------------------
+  // Articles with filters that actually filter. A filter bar that only
+  // looked like one would be exactly the invented UI we are removing.
+  // ------------------------------------------------------------------
+  const MAX_SHOWN = 8;
+  let filterCat = 'sve';
+  let inStockOnly = false;
+
+  // Featured articles come first so the default view is the curated mix the
+  // counter staff would name, not the first eight rows of the price list.
+  const matching = () => PRODUCTS
+    .filter((p) => (filterCat === 'sve' || p.category === filterCat) && (!inStockOnly || p.stock > 0))
+    .sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+
+  function renderFilters() {
+    const chip = (key, label) => `
+      <button type="button" data-cat="${key}" aria-pressed="${filterCat === key}" class="chip">${label}</button>`;
+    $('home-filters').innerHTML =
+      chip('sve', 'Sve') + CATEGORIES.map((c) => chip(c.id, c.label)).join('') +
+      `<button type="button" id="home-stock" aria-pressed="${inStockOnly}" class="chip ml-auto">Samo na stanju</button>`;
+  }
+
   function renderFeatured() {
-    $('home-featured').innerHTML = PRODUCTS.filter((p) => p.featured).map(productCard).join('');
+    const found = matching();
+    const shown = found.slice(0, MAX_SHOWN);
+    $('home-featured').innerHTML = shown.length
+      ? shown.map(productCard).join('')
+      : '<p class="col-span-full py-10 text-[15px] text-muted">Nema artikala za ovaj izbor.</p>';
+    $('home-count').textContent = shown.length
+      ? `Prikazano ${shown.length} od ${countLabel(found.length)}`
+      : `0 od ${countLabel(PRODUCTS.length)}`;
+  }
+
+  function bindFilters() {
+    $('home-filters').addEventListener('click', (e) => {
+      const catBtn = e.target.closest('[data-cat]');
+      const stockBtn = e.target.closest('#home-stock');
+      if (catBtn) filterCat = catBtn.dataset.cat;
+      else if (stockBtn) inStockOnly = !inStockOnly;
+      else return;
+      renderFilters();
+      renderFeatured();
+    });
   }
 
   function renderPortal() {
@@ -171,13 +210,15 @@ initPage(() => {
     io.observe(video);
   }
 
-  renderFacts();
   renderZones();
   renderPortal();
   bindYardVideo();
+  bindFilters();
 
   const renderPriced = () => {
+    renderCoverLinks();
     renderCategories();
+    renderFilters();
     renderFeatured();
     renderCalcExample();
   };

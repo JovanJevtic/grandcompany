@@ -14,87 +14,70 @@
   <div id="site-header"></div>
 
   <main>
-    <!-- 1. Cover: one line edge to edge, photograph underneath -->
+    <!-- 1. Cover: one line edge to edge, then straight into the catalogue -->
     <section class="bg-canvas pt-10 lg:pt-14">
       <h1 class="cover-title font-display whitespace-nowrap px-4 text-center text-[clamp(1.9rem,8.1vw,7.8rem)] lg:px-6">
         Sve <em class="font-script text-[1.1em] lowercase not-italic tracking-normal">za</em> gradilište
       </h1>
-      <div class="mt-5 flex flex-wrap items-start justify-between gap-4 px-4 lg:px-6">
-        <p class="eyebrow max-w-[22ch] leading-[1.5] text-ink">Knauf suha gradnja,<br />izolacija, veziva, oprema</p>
-        <p class="eyebrow max-w-[22ch] text-right leading-[1.5] text-ink">Stovarište Zalužani<br />od 2012.</p>
+
+      <div class="mt-8 grid gap-8 px-4 lg:mt-10 lg:grid-cols-12 lg:gap-12 lg:px-6">
+        <div id="home-cover-links" class="grid gap-x-12 sm:grid-cols-2 lg:col-span-8"></div>
+        <div class="flex flex-col items-start justify-end gap-5 lg:col-span-4">
+          <p class="max-w-[30ch] text-[15px] leading-relaxed text-muted">
+            Stovarište u Zalužanima od 2012. Uz svaki artikal stoji cijena, dimenzija i stanje na skladištu.
+          </p>
+          <a href="katalog.html" class="btn-line">Pogledaj katalog <span class="arrow" aria-hidden="true">&rarr;</span></a>
+        </div>
       </div>
 
-      <figure class="relative mt-10">
-        <img src="img/gc/stovariste-vazduh.jpg" alt="Stovarište Grand Company u Zalužanima iz vazduha" class="cover-photo h-[62vh] min-h-[420px] w-full object-cover lg:h-[78vh]" />
-        <figcaption class="absolute inset-x-0 bottom-0 flex flex-wrap items-end justify-between gap-6 p-5 lg:p-8">
-          <div class="bg-canvas px-5 py-4">
-            <p class="eyebrow">Stovarište</p>
-            <p class="mt-1 text-[20px] font-medium">Nenada Kostića 151, Banja Luka</p>
-          </div>
-          <a href="katalog.html" class="btn-line bg-canvas">Pogledaj katalog <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <figure class="relative mt-10 lg:mt-14">
+        <img src="img/gc/stovariste-vazduh.jpg" alt="Stovarište Grand Company u Zalužanima iz vazduha" class="cover-photo h-[300px] w-full object-cover lg:h-[420px]" />
+        <figcaption class="absolute bottom-0 left-0 bg-canvas px-5 py-4 lg:m-5">
+          <p class="eyebrow">Stovarište</p>
+          <p class="mt-1 text-[18px] font-medium lg:text-[20px]">Nenada Kostića 151, Banja Luka</p>
         </figcaption>
       </figure>
-
-      <form action="katalog.html" role="search" class="mx-auto mt-8 flex max-w-3xl px-4 lg:px-6">
-        <label for="hero-q" class="sr-only">Pretraga kataloga</label>
-        <input id="hero-q" name="q" type="search" placeholder="Naziv, šifra ili dimenzija artikla"
-               class="h-16 min-w-0 flex-1 border border-ink/20 bg-surface px-6 text-[16px] text-ink placeholder-muted focus:border-ink focus:ring-0" />
-        <button class="btn-solid h-16 px-8">Traži</button>
-      </form>
     </section>
 
-    <!-- 2. Who we are: photograph bleeding off the left edge -->
-    <section class="bg-canvas py-24 lg:py-40">
-      <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-0">
-        <figure class="lg:col-span-6">
-          <img src="img/gc/palete-viljuskar.jpg" alt="Palete materijala i viljuškar na stovarištu" loading="lazy" class="h-[46vh] min-h-[320px] w-full object-cover lg:h-[62vh]" />
-        </figure>
-        <p class="vertical-rule hidden lg:col-span-1 lg:mx-auto lg:block">Knauf &bull; Knauf Insulation &bull; Ceresit &bull; Lukavac</p>
-        <div class="px-5 text-center lg:col-span-5 lg:px-10">
-          <p class="eyebrow">O nama</p>
-          <h2 class="u-head mt-5 text-[clamp(2rem,4.2vw,3.9rem)]">Materijal koji drži konstrukciju</h2>
-          <p class="mx-auto mt-6 max-w-text text-[17px] leading-relaxed text-muted">
-            Od 2012. snabdijevamo izvođače, zanatlije i investitore u Banjoj Luci i regiji. Držimo
-            kompletne Knauf sisteme, pa uz ploču dobijate profil, vunu, masu i vijak koji joj odgovaraju.
-          </p>
-          <a href="o-nama.html" class="btn-line mt-9">O firmi <span class="arrow" aria-hidden="true">&rarr;</span></a>
-        </div>
-      </div>
-    </section>
+    <!-- 2. Why buy here: the most concrete copy on the site, up front -->
+    <div id="site-promises"></div>
 
-    <!-- 3. Numbers on dark -->
-    <section class="bg-deep py-24 text-canvas lg:py-32">
+    <!-- 3. The catalogue starts here, with filters that actually filter -->
+    <section class="bg-canvas py-16 lg:py-24">
       <div class="mx-auto max-w-page px-5 lg:px-10">
-        <p class="eyebrow text-center text-canvas/60">Grand Company u brojkama</p>
-        <h2 class="u-head mx-auto mt-5 max-w-[20ch] text-center text-[clamp(1.8rem,3.4vw,3rem)]">Trinaest godina na istoj adresi</h2>
-        <dl id="home-facts" class="mt-16 grid grid-cols-2 gap-x-6 gap-y-12 lg:grid-cols-4"></dl>
+        <h2 class="s-head">Sa stovarišta</h2>
+        <div id="home-filters" class="mt-6 flex flex-wrap items-center gap-2"></div>
+        <div class="mt-5 flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1 border-t border-ink/15 pt-4">
+          <p id="home-count" class="tnum text-[13px] text-muted"></p>
+          <p class="text-[13px] text-muted">Cijene su sa PDV-om. Partneri nakon prijave vide cijenu sa svojim rabatom.</p>
+        </div>
+        <div id="home-featured" class="mt-8 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4"></div>
+        <div class="mt-12"><a href="katalog.html" class="btn-line">Cijeli katalog <span class="arrow" aria-hidden="true">&rarr;</span></a></div>
       </div>
     </section>
 
-    <!-- 4. Categories over a photograph -->
+    <!-- 4. Categories, shown as goods rather than as stock photography -->
     <section class="relative isolate">
       <img src="img/app/drywall-room.jpg" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover" />
-      <div class="absolute inset-0 -z-10 bg-canvas/80"></div>
-      <div class="mx-auto max-w-page px-5 py-24 text-center lg:px-10 lg:py-36">
-        <p class="eyebrow">Asortiman</p>
-        <h2 class="u-head mx-auto mt-5 max-w-[24ch] text-[clamp(1.9rem,3.8vw,3.3rem)]">Četiri grupe artikala za grubu i završnu fazu</h2>
-        <a href="katalog.html" class="btn-line mt-9">Cijeli katalog <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <div class="absolute inset-0 -z-10 bg-canvas/85"></div>
+      <div class="mx-auto max-w-page px-5 pt-16 lg:px-10 lg:pt-24">
+        <h2 class="s-head">Asortiman</h2>
       </div>
-      <div id="home-categories" class="mx-auto grid max-w-page grid-cols-2 gap-px bg-ink/10 pb-24 lg:grid-cols-4 lg:pb-36"></div>
+      <div id="home-categories" class="mx-auto mt-8 grid max-w-page grid-cols-2 gap-px bg-ink/10 pb-16 lg:grid-cols-4 lg:pb-24"></div>
     </section>
 
-    <!-- 5. Featured articles -->
-    <section class="bg-canvas py-24 lg:py-36">
-      <div class="mx-auto max-w-page px-5 lg:px-10">
-        <div class="text-center">
-          <p class="eyebrow">Sa stovarišta</p>
-          <h2 class="u-head mx-auto mt-5 max-w-[22ch] text-[clamp(1.9rem,3.8vw,3.3rem)]">Artikli koji najčešće idu na kamion</h2>
-          <p class="mx-auto mt-6 max-w-text text-[17px] leading-relaxed text-muted">
-            Cijene su sa PDV-om. Partneri nakon prijave vide cijenu sa svojim ugovorenim rabatom.
+    <!-- 5. Calculator: a panel pair floating on a material photograph -->
+    <section class="relative isolate">
+      <img src="img/app/drywall-frame.jpg" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover" />
+      <div class="absolute inset-0 -z-10 bg-deeper/35"></div>
+      <div class="mx-auto grid max-w-5xl gap-px px-5 py-16 lg:grid-cols-2 lg:py-24">
+        <div class="flex flex-col justify-center bg-deep px-8 py-12 text-canvas lg:px-12">
+          <h2 class="s-head">Unesite mjere zida i odmah vidite koliko materijala treba</h2>
+          <p class="mt-5 text-[15px] leading-relaxed text-canvas/70">
+            Po Knauf normativu W111, sa dodatkom za otpad i zaokruživanjem na cijela pakovanja.
           </p>
         </div>
-        <div id="home-featured" class="mt-16 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4"></div>
-        <div class="mt-14 text-center"><a href="katalog.html" class="btn-line">Svih 30 artikala <span class="arrow" aria-hidden="true">&rarr;</span></a></div>
+        <div id="home-calc" class="bg-surface"></div>
       </div>
     </section>
 
@@ -104,48 +87,30 @@
         <source src="img/gc/kran-video.mp4" type="video/mp4" />
       </video>
       <div class="absolute inset-0 bg-gradient-to-t from-deeper via-deeper/55 to-deeper/25"></div>
-      <div class="relative mx-auto flex min-h-[76vh] max-w-page flex-col items-center justify-center px-5 py-24 text-center lg:px-10">
-        <p class="eyebrow text-canvas/70">Naša mehanizacija</p>
-        <h2 class="font-display mt-6 max-w-[14ch] text-[clamp(2.4rem,6.4vw,5.8rem)]">Kran spušta paletu</h2>
-        <p class="mx-auto mt-7 max-w-text text-[17px] leading-relaxed text-canvas/80">
+      <div class="relative mx-auto flex min-h-[60vh] max-w-page flex-col justify-center px-5 py-20 lg:px-10">
+        <h2 class="font-display max-w-[14ch] text-[clamp(2.2rem,5.4vw,4.6rem)]">Kran spušta paletu</h2>
+        <p class="mt-6 max-w-text text-[17px] leading-relaxed text-canvas/80">
           Vlastiti kamioni sa hidrauličnom dizalicom podižu ploče, vunu i vreće direktno na etažu ili
           skelu, pa ekipa ne nosi materijal stepeništem.
         </p>
-        <div class="mt-10 flex flex-wrap justify-center gap-4">
+        <div class="mt-9 flex flex-wrap gap-4">
           <a href="dostava.html" class="btn-line on-dark">Uslovi dostave <span class="arrow" aria-hidden="true">&rarr;</span></a>
           <a href="katalog.html" class="btn-solid bg-canvas text-ink hover:bg-surface">Naruči materijal</a>
         </div>
       </div>
     </section>
 
-    <!-- 7. Calculator: a panel pair floating on a material photograph -->
-    <section class="relative isolate">
-      <img src="img/app/drywall-frame.jpg" alt="" loading="lazy" class="absolute inset-0 -z-10 h-full w-full object-cover" />
-      <div class="absolute inset-0 -z-10 bg-deeper/35"></div>
-      <div class="mx-auto grid max-w-5xl gap-px px-5 py-24 lg:grid-cols-2 lg:py-36">
-        <div class="flex flex-col justify-center bg-deep px-8 py-14 text-center text-canvas lg:px-12">
-          <p class="eyebrow text-canvas/60">Kalkulator materijala</p>
-          <h2 class="u-head mt-5 text-[clamp(1.5rem,2.2vw,2rem)]">Unesite mjere zida i odmah vidite koliko materijala treba</h2>
-          <p class="mt-6 text-[15px] leading-relaxed text-canvas/70">
-            Po Knauf normativu W111, sa dodatkom za otpad i zaokruživanjem na cijela pakovanja.
-          </p>
-        </div>
-        <div id="home-calc" class="bg-surface"></div>
-      </div>
-    </section>
-
-    <!-- 8. Partner portal on dark -->
-    <section class="bg-deep py-24 text-canvas lg:py-36">
+    <!-- 7. Partner portal on dark -->
+    <section class="bg-deep py-16 text-canvas lg:py-24">
       <div class="mx-auto max-w-page px-5 lg:px-10">
-        <div class="text-center">
-          <p class="eyebrow text-canvas/60">Za firme</p>
-          <h2 class="u-head mx-auto mt-5 max-w-[24ch] text-[clamp(1.9rem,3.8vw,3.3rem)]">Portal koji radi umjesto telefona</h2>
-          <p class="mx-auto mt-6 max-w-text text-[17px] leading-relaxed text-canvas/70">
+        <div>
+          <h2 class="s-head">Portal koji radi umjesto telefona</h2>
+          <p class="mt-5 max-w-text text-[17px] leading-relaxed text-canvas/70">
             Nakon prijave cijene u katalogu uključuju vaš rabat, a narudžbe, fakture i kreditni limit
             stoje na jednom ekranu, sa podacima iz Pantheona.
           </p>
         </div>
-        <div class="mt-16 grid items-center gap-12 lg:grid-cols-12">
+        <div class="mt-12 grid items-center gap-12 lg:grid-cols-12">
           <div class="lg:col-span-5">
             <ul class="divide-y divide-canvas/15 border-y border-canvas/15 text-[16px]">
               <li class="py-4">Rabat od 10 do 22% na sve artikle</li>
@@ -153,6 +118,9 @@
               <li class="py-4">Pregled narudžbi, faktura i rokova</li>
               <li class="py-4">Sačuvana gradilišta za istovar kranom</li>
             </ul>
+            <p class="mt-6 text-[14px] leading-relaxed text-canvas/60">
+              Bonitet A+, uredno izmirene obaveze od 2012. godine.
+            </p>
             <div class="mt-10 flex flex-wrap gap-4">
               <button data-login class="btn-solid bg-canvas text-ink hover:bg-surface">Prijava na portal</button>
               <a href="partneri.html" class="btn-line on-dark">Uslovi partnerstva <span class="arrow" aria-hidden="true">&rarr;</span></a>
@@ -164,53 +132,77 @@
       </div>
     </section>
 
-    <!-- 9. Delivery zones -->
-    <section class="bg-canvas py-24 lg:py-36">
+    <!-- 8. Delivery zones -->
+    <section class="bg-canvas py-16 lg:py-24">
       <div class="grid items-center gap-12 lg:grid-cols-12 lg:gap-0">
-        <div class="px-5 text-center lg:col-span-5 lg:px-12 lg:text-left">
-          <p class="eyebrow">Dostava</p>
-          <h2 class="u-head mt-5 text-[clamp(1.9rem,3.4vw,3rem)]">Zone i cijene istovara</h2>
-          <p class="mt-6 text-[17px] leading-relaxed text-muted">Zonu i način dostave birate u korpi, uz procjenu težine pošiljke.</p>
-          <div class="mt-10 overflow-x-auto">
+        <div class="px-5 lg:col-span-5 lg:px-12">
+          <h2 class="s-head">Zone i cijene istovara</h2>
+          <p class="mt-5 text-[17px] leading-relaxed text-muted">Zonu i način dostave birate u korpi, uz procjenu težine pošiljke.</p>
+          <div class="mt-8 overflow-x-auto">
             <table id="home-zones" class="w-full min-w-[360px] text-left text-[15px]"></table>
           </div>
-          <a href="dostava.html" class="btn-line mt-10">Priprema gradilišta <span class="arrow" aria-hidden="true">&rarr;</span></a>
+          <a href="dostava.html" class="btn-line mt-8">Priprema gradilišta <span class="arrow" aria-hidden="true">&rarr;</span></a>
         </div>
         <figure class="overflow-hidden lg:col-span-7">
-          <img src="img/gc/kran-utovar.jpg" alt="Kamion sa kranom utovara palete na stovarištu" data-parallax loading="lazy" class="h-[46vh] min-h-[320px] w-full scale-110 object-cover lg:h-[70vh]" />
+          <img src="img/gc/kran-utovar.jpg" alt="Kamion sa kranom utovara palete na stovarištu" data-parallax loading="lazy" class="h-[40vh] min-h-[300px] w-full scale-110 object-cover lg:h-[56vh]" />
         </figure>
       </div>
     </section>
 
-    <!-- 10. The yard, as a wordmark watermark over dark -->
-    <section class="relative isolate overflow-hidden bg-deep py-24 text-canvas lg:py-36">
-      <p aria-hidden="true" class="font-script pointer-events-none absolute inset-x-0 top-1/3 -z-10 whitespace-nowrap text-center text-[clamp(8rem,22vw,20rem)] leading-none text-canvas/[0.06]">Zalužani</p>
-      <div class="mx-auto max-w-page px-5 lg:px-10">
-        <div class="text-center">
-          <p class="eyebrow text-canvas/60">Stovarište</p>
-          <h2 class="u-head mx-auto mt-5 max-w-[24ch] text-[clamp(1.9rem,3.8vw,3.3rem)]">Roba je ovdje, ne u katalogu</h2>
+    <!-- 9. Who we are — after the goods, not before them -->
+    <section class="bg-canvas py-16 lg:py-24">
+      <div class="grid items-center gap-10 lg:grid-cols-12 lg:gap-0">
+        <figure class="lg:col-span-6">
+          <img src="img/gc/palete-viljuskar.jpg" alt="Palete materijala i viljuškar na stovarištu" loading="lazy" class="h-[40vh] min-h-[300px] w-full object-cover lg:h-[54vh]" />
+        </figure>
+        <div class="px-5 lg:col-span-5 lg:col-start-8 lg:px-0">
+          <h2 class="s-head">Veleprodaja i maloprodaja Knauf sistema suhe gradnje, izolacije i veziva</h2>
+          <p class="mt-5 max-w-text text-[17px] leading-relaxed text-muted">
+            Od 2012. snabdijevamo izvođače, zanatlije i investitore u Banjoj Luci i regiji. Držimo
+            kompletne Knauf sisteme, pa uz ploču dobijate profil, vunu, masu i vijak koji joj odgovaraju.
+            Sedamnaest ljudi u prodaji, magacinu i na kamionima.
+          </p>
+          <a href="o-nama.html" class="btn-line mt-8">O firmi <span class="arrow" aria-hidden="true">&rarr;</span></a>
         </div>
-        <div class="mt-16 grid gap-6 lg:grid-cols-12">
-          <figure class="lg:col-span-7"><img src="img/gc/stovariste-ulaz.jpg" alt="Ulaz u prodavnicu sa nadstrešnicom i paletama" loading="lazy" class="aspect-[16/10] w-full object-cover" /></figure>
-          <figure class="lg:col-span-5"><img src="img/gc/prodavnica.jpg" alt="Prodavnica i dvorište sa robom" loading="lazy" class="aspect-[16/10] w-full object-cover" /></figure>
-          <figure class="lg:col-span-5"><img src="img/gc/stovariste-pregled.jpg" alt="Pregled stovarišta iz vazduha" loading="lazy" class="aspect-[16/10] w-full object-cover" /></figure>
-          <figure class="lg:col-span-7"><img src="img/gc/tabla.jpg" alt="Tabla Grand Company na ulazu iz ulice Nenada Kostića" loading="lazy" class="aspect-[16/10] w-full object-cover" /></figure>
+      </div>
+    </section>
+
+    <!-- 10. The yard itself; every photograph says what it shows -->
+    <section class="bg-deep py-16 text-canvas lg:py-24">
+      <div class="mx-auto max-w-page px-5 lg:px-10">
+        <h2 class="s-head">Roba je ovdje, ne u katalogu</h2>
+        <div class="mt-10 grid gap-6 lg:grid-cols-12">
+          <figure class="lg:col-span-7">
+            <img src="img/gc/stovariste-ulaz.jpg" alt="Ulaz u prodavnicu sa nadstrešnicom i paletama" loading="lazy" class="aspect-[16/10] w-full object-cover" />
+            <figcaption class="mt-3 text-[13px] text-canvas/60">Ulaz sa nadstrešnicom, roba na paletama pod krovom.</figcaption>
+          </figure>
+          <figure class="lg:col-span-5">
+            <img src="img/gc/prodavnica.jpg" alt="Prodavnica i dvorište sa robom" loading="lazy" class="aspect-[16/10] w-full object-cover" />
+            <figcaption class="mt-3 text-[13px] text-canvas/60">Prodavnica i dvorište, odakle se utovara na licu mjesta.</figcaption>
+          </figure>
+          <figure class="lg:col-span-5">
+            <img src="img/gc/stovariste-pregled.jpg" alt="Pregled stovarišta iz vazduha" loading="lazy" class="aspect-[16/10] w-full object-cover" />
+            <figcaption class="mt-3 text-[13px] text-canvas/60">Stovarište iz vazduha: ploče, vuna i vreće razdvojeni po grupama.</figcaption>
+          </figure>
+          <figure class="lg:col-span-7">
+            <img src="img/gc/tabla.jpg" alt="Tabla Grand Company na ulazu iz ulice Nenada Kostića" loading="lazy" class="aspect-[16/10] w-full object-cover" />
+            <figcaption class="mt-3 text-[13px] text-canvas/60">Tabla na ulazu iz Nenada Kostića, po kojoj nas nalazite.</figcaption>
+          </figure>
         </div>
       </div>
     </section>
 
     <!-- 11. Visit -->
-    <section class="bg-canvas py-24 lg:py-32">
-      <div class="mx-auto max-w-page px-5 text-center lg:px-10">
-        <p class="eyebrow">Kontakt</p>
-        <h2 class="u-head mx-auto mt-5 max-w-[20ch] text-[clamp(1.9rem,3.8vw,3.3rem)]">Svratite na stovarište</h2>
-        <dl class="mx-auto mt-14 grid max-w-4xl grid-cols-2 gap-x-8 gap-y-10 text-left lg:grid-cols-4">
+    <section class="bg-canvas py-16 lg:py-24">
+      <div class="mx-auto max-w-page px-5 lg:px-10">
+        <h2 class="s-head">Svratite na stovarište</h2>
+        <dl class="mt-10 grid max-w-4xl grid-cols-2 gap-x-8 gap-y-10 text-left lg:grid-cols-4">
           <div><dt class="eyebrow">Adresa</dt><dd class="mt-2 text-[17px]">Nenada Kostića 151<br />78000 Banja Luka</dd></div>
           <div><dt class="eyebrow">Radno vrijeme</dt><dd class="tnum mt-2 text-[17px]">Pon–pet 7–17h<br />Subota 7–14h</dd></div>
           <div><dt class="eyebrow">Veleprodaja</dt><dd class="mt-2 text-[17px]"><a href="tel:+38751388995" class="tnum link-line">051 388-995</a></dd></div>
           <div><dt class="eyebrow">Viber i WhatsApp</dt><dd class="mt-2 text-[17px]"><a href="tel:+38765516696" class="tnum link-line">065 516-696</a></dd></div>
         </dl>
-        <div class="mt-14 flex flex-wrap justify-center gap-4">
+        <div class="mt-12 flex flex-wrap gap-4">
           <a href="https://www.google.com/maps/search/?api=1&amp;query=Nenada+Kosti%C4%87a+151+Banja+Luka" target="_blank" rel="noopener" class="btn-solid">Otvori u mapama</a>
           <a href="kontakt.html" class="btn-line">Pošaljite upit <span class="arrow" aria-hidden="true">&rarr;</span></a>
         </div>

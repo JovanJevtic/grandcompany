@@ -29,6 +29,16 @@ body.no-scroll { overflow: hidden; }
 h1, h2, h3, legend, summary { font-weight: 500; letter-spacing: -0.01em; }
 .u-head { text-transform: uppercase; letter-spacing: -0.005em; line-height: 1.04; }
 
+/* Section heading: left, sentence case, one line. The caps treatment is
+   reserved for the cover line — repeated in every section it reads as a
+   template rather than a voice. */
+.s-head {
+  font-size: clamp(1.45rem, 2.6vw, 2.2rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+}
+
 /* Small caps label that sits above a heading */
 .eyebrow {
   font-size: 12px;
@@ -74,6 +84,26 @@ h1, h2, h3, legend, summary { font-weight: 500; letter-spacing: -0.01em; }
   transition: background-color 0.25s ease;
 }
 .btn-solid:hover { background-color: #274C77; }
+
+/* Once past the cover the header drops its category row and tightens up, so
+   it stops eating ~105px of every screen on the way down the page. */
+#site-shell-header { transition: box-shadow 0.25s ease; }
+#site-shell-header.is-condensed [data-hdr-nav] { display: none; }
+#site-shell-header.is-condensed [data-hdr-main] { padding-top: 0.4rem; padding-bottom: 0.4rem; }
+#site-shell-header.is-condensed { box-shadow: 0 10px 30px -24px rgba(0, 0, 0, 0.6); }
+
+/* Category and filter chips */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid rgba(25, 24, 23, 0.2);
+  padding: 0.55rem 1rem;
+  font-size: 13px;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.chip:hover { border-color: #191817; }
+.chip[aria-pressed='true'] { background-color: #191817; border-color: #191817; color: #F1ECE4; }
 
 /* Brand list set vertically alongside a photograph */
 .vertical-rule {
