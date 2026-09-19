@@ -230,3 +230,89 @@ const DELIVERY_ZONES = [
 
 const FREE_STANDARD_DELIVERY_OVER = 3000; // KM
 const CRANE_RECOMMEND_OVER_KG = 1000;     // above ~1 t we recommend the crane truck
+
+// ---------------------------------------------------------------------
+// Knauf wall and ceiling systems.
+//
+// `thickness` and `build` are arithmetic from the profile and board sizes,
+// so they are exact. `rw` is the published order of magnitude for a typical
+// build-up and is labelled approximate everywhere it is shown: the binding
+// number is the one on the Knauf tehnički list for the exact construction.
+// ---------------------------------------------------------------------
+const WALL_SYSTEMS = [
+  {
+    code: 'W111',
+    name: 'Pregradni zid, jednostruka obloga',
+    use: 'Standardna pregrada u stanu i kancelariji.',
+    profile: 'CW 75',
+    thickness: 100,
+    build: '1 × GKB 12,5 mm sa svake strane, CW 75 na razmaku 62,5 cm, kamena vuna 50 mm',
+    rw: 47,
+    skus: ['KNF-001', 'PRF-075', 'PRF-UW75', 'ISO-001', 'CHM-001'],
+    calc: 'kalkulator.html',
+  },
+  {
+    code: 'W112',
+    name: 'Pregradni zid, dvostruka obloga',
+    use: 'Kad treba više zvuka i otpornosti na udarce — hodnici, ordinacije, hoteli.',
+    profile: 'CW 75',
+    thickness: 125,
+    build: '2 × GKB 12,5 mm sa svake strane, CW 75, kamena vuna 50 mm',
+    rw: 54,
+    skus: ['KNF-001', 'PRF-075', 'PRF-UW75', 'ISO-001', 'CHM-001'],
+    calc: 'kalkulator.html',
+  },
+  {
+    code: 'W115',
+    name: 'Zid sa dvostrukom potkonstrukcijom',
+    use: 'Zid između dva stana ili do stubišta, gdje je zvuk glavni zahtjev.',
+    profile: '2 × CW 50',
+    thickness: 155,
+    build: '2 × GKB 12,5 mm spolja, dva odvojena reda CW 50, vuna u oba polja',
+    rw: 64,
+    skus: ['KNF-001', 'PRF-050', 'ISO-001', 'CHM-001'],
+    calc: 'kalkulator.html',
+  },
+  {
+    code: 'D112',
+    name: 'Spušteni plafon na dvostrukoj potkonstrukciji',
+    use: 'Plafon ispod betona ili krovne konstrukcije, sa prostorom za instalacije.',
+    profile: 'CD 60/27 + UD 28/27',
+    thickness: 27,
+    build: 'GKB 12,5 mm na ukrštenoj CD rešetki, direktni ovjesi, obodni UD profil',
+    rw: null,
+    skus: ['KNF-001', 'PRF-CD60', 'PRF-UD28', 'ACC-001'],
+    calc: 'kalkulator.html',
+  },
+];
+
+// Four steps, written the way the counter actually works.
+const ORDER_STEPS = [
+  ['Izbor', 'Artikle birate u katalogu ili kalkulator sam složi spisak po mjerama zida.'],
+  ['Upit ili narudžba', 'Korpa šalje upit. Partneri nakon prijave naručuju po svojoj cijeni.'],
+  ['Potvrda i rok', 'Javljamo stanje i termin. Ono što je na stanju ide isti ili sljedeći dan.'],
+  ['Istovar', 'Kamion sa kranom spušta paletu na etažu ili skelu, ne na ulicu.'],
+];
+
+// Questions the counter gets on the phone, with the answers it gives.
+const HOME_FAQ = [
+  ['Imate li robu na stanju ili se čeka?',
+   'Stanje na sajtu čitamo iz Pantheona, istog iz kojeg radi prodaja. Zeleno „na stanju" znači da je roba u Zalužanima danas. Za veće količine ipak nazovite, jer se jedna narudžba može podudariti sa vašom.'],
+  ['Dobijem li atest i deklaraciju uz robu?',
+   'Da. CE deklaraciju i protivpožarni atest izdajemo uz otpremnicu, za tehnički prijem. Za Knauf sisteme dajemo i tehnički list sistema.'],
+  ['Postoji li minimalna narudžba?',
+   'Za maloprodaju ne. Za dostavu kranom računamo izlazak vozila, pa se ispod jedne palete obično više isplati preuzeti na stovarištu.'],
+  ['Sečete li ploče po mjeri?',
+   'Ne. Ploče idu u punom formatu 2000 × 1250 mm. Kalkulator računa otpad i zaokružuje na cijele ploče, pa se ne kupuje višak napamet.'],
+  ['Može li povrat ako ostane materijala?',
+   'Neotvorena i neoštećena pakovanja primamo nazad uz otpremnicu, u roku od 15 dana. Vreće veziva koje su stajale na vlazi ne možemo primiti.'],
+  ['Kako plaćaju firme?',
+   'Ugovorni partneri plaćaju po fakturi, sa valutom do 90 dana uz mjenicu ili bankarsku garanciju. Kreditni limit i otvorene stavke vidite na portalu.'],
+];
+
+const BRANDS = [
+  ['Knauf', 'Gips-kartonske ploče i kompletni sistemi suhe gradnje. Ovlašćeni smo distributer.'],
+  ['Knauf Insulation', 'Kamena i staklena mineralna vuna za zidove, plafone i potkrovlja.'],
+  ['Ceresit', 'Ljepila, mase za armiranje i fasadni sistemi.'],
+  ['Lukavac', 'Cement iz domaće proizvodnje, u vrećama i na paleti.'],
+];

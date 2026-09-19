@@ -52,7 +52,7 @@ initPage(() => {
   // Articles with filters that actually filter. A filter bar that only
   // looked like one would be exactly the invented UI we are removing.
   // ------------------------------------------------------------------
-  const MAX_SHOWN = 8;
+  const MAX_SHOWN = 12;
   let filterCat = 'sve';
   let inStockOnly = false;
 
@@ -79,6 +79,52 @@ initPage(() => {
     $('home-count').textContent = shown.length
       ? `Prikazano ${shown.length} od ${countLabel(found.length)}`
       : `0 od ${countLabel(PRODUCTS.length)}`;
+  }
+
+  // Knauf systems: the one thing a contractor cannot get from a price list.
+  // Each card names what goes into the wall and prices that build-up per m².
+  function renderSystems() {
+    $('home-systems').innerHTML = WALL_SYSTEMS.map((s) => {
+      const parts = s.skus.map((sku) => bySku[sku]).filter(Boolean);
+      return `
+        <article class="flex flex-col bg-surface p-6 lg:p-7">
+          <div class="flex items-baseline justify-between gap-3 border-b border-ink/15 pb-4">
+            <p class="tnum text-[20px] font-medium">${s.code}</p>
+            <p class="tnum text-[13px] text-muted">${s.thickness} mm${s.rw ? ` &middot; oko ${s.rw} dB` : ''}</p>
+          </div>
+          <h3 class="mt-4 text-[16px] font-medium leading-snug">${s.name}</h3>
+          <p class="mt-2 text-[14px] leading-relaxed text-muted">${s.use}</p>
+          <p class="mt-4 text-[13px] leading-relaxed text-ink/75">${s.build}</p>
+          <ul class="mt-4 flex flex-wrap gap-1.5">
+            ${parts.map((p) => `<li class="bg-well px-2 py-1 text-[11px] uppercase tracking-label text-muted">${esc(p.art?.label || p.sku)}</li>`).join('')}
+          </ul>
+          <a href="${s.calc}" class="btn-line mt-auto pt-0 !mt-6">Izračunaj <span class="arrow" aria-hidden="true">&rarr;</span></a>
+        </article>`;
+    }).join('');
+  }
+
+  function renderStatic() {
+    if (!$('home-steps')) return;
+    $('home-steps').innerHTML = ORDER_STEPS.map(([title, text], i) => `
+      <li class="border-t border-ink/20 pt-5">
+        <p class="tnum text-[13px] text-muted">0${i + 1}</p>
+        <p class="mt-3 text-[16px] font-medium">${title}</p>
+        <p class="mt-2 text-[14px] leading-relaxed text-muted">${text}</p>
+      </li>`).join('');
+
+    if ($('home-faq')) $('home-faq').innerHTML = HOME_FAQ.map(([q, a]) => `
+      <details class="border-b border-ink/15 py-5">
+        <summary class="flex items-start justify-between gap-6 text-[17px] leading-snug">
+          ${q}<span class="faq-sign mt-1 shrink-0 text-[20px] leading-none text-muted" aria-hidden="true">+</span>
+        </summary>
+        <p class="mt-4 max-w-text text-[15px] leading-relaxed text-muted">${a}</p>
+      </details>`).join('');
+
+    if ($('home-brands')) $('home-brands').innerHTML = BRANDS.map(([name, text]) => `
+      <div class="border-t border-canvas/20 pt-5">
+        <p class="text-[17px] font-medium">${name}</p>
+        <p class="mt-2 text-[14px] leading-relaxed text-canvas/60">${text}</p>
+      </div>`).join('');
   }
 
   function bindFilters() {
@@ -212,6 +258,7 @@ initPage(() => {
 
   renderZones();
   renderPortal();
+  renderStatic();
   bindYardVideo();
   bindFilters();
 
@@ -220,6 +267,7 @@ initPage(() => {
     renderCategories();
     renderFilters();
     renderFeatured();
+    renderSystems();
     renderCalcExample();
   };
   renderPriced();
