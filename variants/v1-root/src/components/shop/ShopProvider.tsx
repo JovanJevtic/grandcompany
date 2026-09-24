@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { useLenis } from 'lenis/react'
-import { DEFAULT_FILTERS, type Filters, productById } from '@/lib/shop'
+import { DEFAULT_FILTERS, type Filters, formatNumber, productById } from '@/lib/shop'
 
 // Stanje prodavnice na jednom mjestu: korpa, sačuvano, poređenje, filteri kataloga, otvoreni panel i obavijest.
 // Korpa, sačuvano i poređenje se pamte u localStorage, da ostanu i poslije zatvaranja stranice.
@@ -12,9 +12,16 @@ export type Panel = { kind: PanelKind } | { kind: 'product'; id: string } | null
 
 export type Line = { id: string; qty: number }
 
-const KEYS = { cart: 'gc-cart', saved: 'gc-saved', compare: 'gc-compare' } as const
+const KEYS = { cart: 'gc-v1-cart', saved: 'gc-v1-saved', compare: 'gc-v1-compare' } as const
 export const COMPARE_MAX = 3
-export const QTY_MAX = 999
+export const QTY_MAX = 9999
+
+// Količina ide u koracima pakovanja (ploča 2,5 m², ploča vune 0,6 m², rolna 6 m²), zaokruženo na 2 decimale.
+export function clampQty(id: string, qty: number) {
+  const step = productById(id)?.step ?? 1
+  const n = Math.ceil((Number.isFinite(qty) ? qty : step) / step - 1e-9) * step
+  return Math.min(QTY_MAX, Math.max(step, Math.round(n * 100) / 100))
+}
 
 type Toast = { text: string; action?: { label: string; panel: PanelKind } } | null
 
@@ -25,6 +32,7 @@ type Shop = {
   count: number
   subtotal: number
   add: (id: string, qty?: number) => void
+  addMany: (lines: Line[], label: string) => void
   setQty: (id: string, qty: number) => void
   remove: (id: string) => void
   clearCart: () => void
@@ -39,6 +47,12 @@ type Shop = {
   toast: Toast
   notify: (text: string, action?: NonNullable<Toast>['action']) => void
   ready: boolean
+}
+
+function merge(c: Line[], id: string, qty: number) {
+  const found = c.find((l) => l.id === id)
+  if (found) return c.map((l) => (l.id === id ? { ...l, qty: clampQty(id, l.qty + qty) } : l))
+  return [...c, { id, qty: clampQty(id, qty) }]
 }
 
 const Ctx = createContext<Shop | null>(null)
@@ -82,7 +96,7 @@ export default function ShopProvider({ children }: { children: React.ReactNode }
   useEffect(() => {
     const known = <T extends { id: string }>(l: T[]) => l.filter((x) => productById(x.id))
     /* eslint-disable react-hooks/set-state-in-effect -- localStorage ne postoji na serveru: čita se tek poslije prvog prikaza */
-    setCart(known(read<Line[]>(KEYS.cart, [])).map((l) => ({ id: l.id, qty: Math.min(QTY_MAX, Math.max(1, Math.floor(l.qty) || 1)) })))
+    setCart(known(read<Line[]>(KEYS.cart, [])).map((l) => ({ id: l.id, qty: clampQty(l.id, l.qty) })))
     setSaved(read<string[]>(KEYS.saved, []).filter((id) => productById(id)))
     setCompare(read<string[]>(KEYS.compare, []).filter((id) => productById(id)).slice(0, COMPARE_MAX))
     setReady(true)
@@ -105,22 +119,27 @@ export default function ShopProvider({ children }: { children: React.ReactNode }
     toastTimer.current = setTimeout(() => setToast(null), 3200)
   }, [])
 
+  // Bez zadate količine dodaje se jedno pakovanje (npr. jedna ploča od 2,5 m²).
   const add = useCallback(
-    (id: string, qty = 1) => {
+    (id: string, qty?: number) => {
       const p = productById(id)
       if (!p) return
-      setCart((c) => {
-        const found = c.find((l) => l.id === id)
-        if (found) return c.map((l) => (l.id === id ? { ...l, qty: Math.min(QTY_MAX, l.qty + qty) } : l))
-        return [...c, { id, qty: Math.min(QTY_MAX, qty) }]
-      })
-      notify(`${p.name}: dodato u korpu`, { label: 'Korpa', panel: 'cart' })
+      const q = qty ?? p.step
+      setCart((c) => merge(c, id, q))
+      notify(`${p.name}: ${formatNumber(clampQty(id, q))} ${p.unit} u korpi`, { label: 'Korpa', panel: 'cart' })
+    },
+    [notify],
+  )
+  const addMany = useCallback(
+    (lines: Line[], label: string) => {
+      setCart((c) => lines.reduce((acc, l) => (productById(l.id) ? merge(acc, l.id, l.qty) : acc), c))
+      notify(`${label}: dodato u korpu`, { label: 'Korpa', panel: 'cart' })
     },
     [notify],
   )
   const setQty = useCallback(
     (id: string, qty: number) =>
-      setCart((c) => c.map((l) => (l.id === id ? { ...l, qty: Math.min(QTY_MAX, Math.max(1, Math.floor(qty) || 1)) } : l))),
+      setCart((c) => c.map((l) => (l.id === id ? { ...l, qty: clampQty(id, qty) } : l))),
     [],
   )
   const remove = useCallback((id: string) => setCart((c) => c.filter((l) => l.id !== id)), [])
@@ -147,7 +166,6 @@ export default function ShopProvider({ children }: { children: React.ReactNode }
   // Otvoren panel zaključava skrol stranice (isto kao meni landinga).
   const openPanel = useCallback((p: Panel) => setPanel(p), [])
   const closePanel = useCallback(() => setPanel(null), [])
-  // `start()` se zove samo pri zatvaranju panela: preloader landinga drži skrol zaključan dok traje uvod.
   const locked = useRef(false)
   useEffect(() => {
     if (!lenis) return
@@ -163,12 +181,13 @@ export default function ShopProvider({ children }: { children: React.ReactNode }
   const setFilters = useCallback((patch: Partial<Filters>) => setFiltersState((f) => ({ ...f, ...patch })), [])
   const resetFilters = useCallback(() => setFiltersState(DEFAULT_FILTERS), [])
 
-  const count = useMemo(() => cart.reduce((n, l) => n + l.qty, 0), [cart])
+  // Broj stavki (artikala) u korpi, ne zbir količina: 22,5 m² ploča je jedna stavka.
+  const count = cart.length
   const subtotal = useMemo(() => cart.reduce((n, l) => n + l.qty * (productById(l.id)?.price ?? 0), 0), [cart])
 
   const value: Shop = {
     cart, saved, compare, count, subtotal,
-    add, setQty, remove, clearCart, toggleSaved, toggleCompare,
+    add, addMany, setQty, remove, clearCart, toggleSaved, toggleCompare,
     panel, openPanel, closePanel,
     filters, setFilters, resetFilters,
     toast, notify, ready,

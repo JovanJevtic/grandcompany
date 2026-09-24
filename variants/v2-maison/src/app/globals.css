@@ -3,6 +3,8 @@
 :root {
   --bg: #fef5f9;
   --ink: #222a36;
+  /* svijetlo polje za crteže artikala (SVG packshot) */
+  --well: #ffffff;
   /* veličina wordmarka; postavlja se iz JS-a tako da tekst popuni širinu ekrana */
   --wm-fs: 10.6vw;
 }
@@ -10,6 +12,7 @@
 @theme inline {
   --color-bg: var(--bg);
   --color-ink: var(--ink);
+  --color-well: var(--well);
   --font-sans: var(--font-inter-tight);
 
   /* Tipografska skala prodavnice: ista veličina kao u landingu (label, tekst, izjava), plus naslov sekcije. */
@@ -180,7 +183,9 @@ button:not(:disabled),
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
+    /* `transition: none`, ne kratko trajanje: kratko trajanje bi uključilo prelaz za SVE osobine (podrazumijevano
+       transition-property: all), pa bi mjerenje širine wordmarka čitalo staru veličinu fonta. */
+    transition: none !important;
     scroll-behavior: auto !important;
   }
 }

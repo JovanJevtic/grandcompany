@@ -5,8 +5,10 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
 import Bundles from './Bundles'
 import CartDrawer from './CartDrawer'
+import CategoryTiles from './CategoryTiles'
 import Faq from './Faq'
 import Materials from './Materials'
+import Panels from './Panels'
 import NewArrivals from './NewArrivals'
 import Pricing from './Pricing'
 import Process from './Process'
@@ -34,7 +36,8 @@ export default function Commerce() {
         ScrollTrigger.create({
           trigger: root.current,
           start: 'top 50%',
-          end: 'bottom 50%',
+          // Do kraja stranice: i podnožje sa kontaktima je ispod prodavnice, pa značka ostaje skrivena.
+          end: 'max',
           onToggle: (self) => gsap.to(badge, { autoAlpha: self.isActive ? 0 : 1, duration: 0.4, overwrite: 'auto' }),
         })
       })
@@ -47,6 +50,7 @@ export default function Commerce() {
       <div ref={root} className="relative z-30 border-t-[10px] border-ink bg-bg">
         <ShopBar />
         <TrustStrip />
+        <CategoryTiles />
         <NewArrivals />
         <Shop />
         <Bundles />
@@ -58,6 +62,7 @@ export default function Commerce() {
         <Quote />
       </div>
       <CartDrawer />
+      <Panels />
     </>
   )
 }

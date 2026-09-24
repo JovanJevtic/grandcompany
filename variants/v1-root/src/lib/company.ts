@@ -4,23 +4,29 @@
 // tada prikazuje kao istaknuta oznaka [sjedište], a u podnožju se red jednostavno preskače.
 // Ništa se ne izmišlja: dopuni stvarnim podacima iz registracije firme.
 
+import { COMPANY as GC, FREE_DELIVERY_OVER } from '@/gc/gc'
+
 export const COMPANY = {
   brand: 'GRAND COMPANY',
-  legalName: 'GRAND COMPANY d.o.o. za usluge i trgovinu',
+  legalName: GC.name,
   city: 'Banja Luka',
   country: 'Bosna i Hercegovina',
   founded: '23. aprila 2012.',
-  director: 'Predrag Uzelac',
+  director: GC.founder,
   activityCode: 'G 46.73',
 
+  address: GC.address as string | null, // sjedište i stovarište
+  jib: GC.jib as string | null,
+  vat: GC.pib as string | null, // PDV broj (PIB)
+  court: `MBS ${GC.mbs}` as string | null, // matični broj subjekta upisa; registarski sud dopuniti
   // NEPOZNATO — dopuniti:
-  address: null as string | null, // sjedište i adresa prodajnog mjesta
-  jib: null as string | null, // JIB (identifikacioni broj)
-  vat: null as string | null, // PDV broj (ako je obveznik)
-  court: null as string | null, // registarski sud i broj registracije
   account: null as string | null, // žiro račun / banka
-  email: null as string | null,
-  phone: null as string | null,
+  email: GC.emailInfo as string | null,
+  emailSales: GC.emailSales as string | null,
+  phone: GC.phoneLandline as string | null,
+  phoneHref: GC.phoneLandlineHref,
+  mobile: GC.phoneMobile as string | null,
+  mobileHref: GC.phoneMobileHref,
   web: null as string | null,
 }
 
@@ -28,9 +34,9 @@ export const COMPANY = {
 // tekstovima (kroz oznake {rokIsporuke} itd.), pa su uvijek usklađene.
 export const TERMS = {
   currency: 'KM',
-  freeDeliveryFrom: 300, // KM, primjer
-  deliveryDays: '1 do 3 radna dana', // primjer
-  deliveryZone: 'Banja Luka i okolina', // primjer
+  freeDeliveryFrom: FREE_DELIVERY_OVER, // KM, standardna dostava (iz src/gc)
+  deliveryDays: 'u terminu koji dogovaramo pri potvrdi narudžbe',
+  deliveryZone: 'Banja Luka i regija do 50 km',
   withdrawalDays: 14, // dani; provjeriti sa pravnikom
 }
 
@@ -57,7 +63,7 @@ const TOKENS: Record<string, string | null> = {
   web: COMPANY.web,
   rokIsporuke: TERMS.deliveryDays,
   zonaDostave: TERMS.deliveryZone,
-  besplatnaDostava: `${TERMS.freeDeliveryFrom},00 ${TERMS.currency}`,
+  besplatnaDostava: `${TERMS.freeDeliveryFrom.toLocaleString('de-DE')},00 ${TERMS.currency}`,
   rokOdustanka: `${TERMS.withdrawalDays} dana`,
 }
 

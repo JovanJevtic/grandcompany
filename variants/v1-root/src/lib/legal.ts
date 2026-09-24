@@ -54,7 +54,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         blocks: [
           {
             t: 'p',
-            text: 'Ploče, profili, kamena vuna, građa i slična roba često se isporučuju na paletama ili u većim količinama. Način isporuke, vrstu vozila i termin dogovaramo s vama unaprijed, obično telefonom ili e-poštom.',
+            text: 'Ploče, profili, kamena vuna, stiropor, vreće veziva i slična roba često se isporučuju na paletama ili u većim količinama. Način isporuke, vrstu vozila i termin dogovaramo s vama unaprijed, obično telefonom ili e-poštom.',
           },
           {
             t: 'p',
@@ -197,9 +197,8 @@ export const LEGAL_DOCS: LegalDoc[] = [
           {
             t: 'ul',
             items: [
-              'robu koja je rezana, miješana ili izrađena po mjeri ili prema specifikaciji kupca (na primjer ploče, profili ili građa rezani na traženu dimenziju);',
+              'robu koja je rezana, miješana ili izrađena po mjeri ili prema specifikaciji kupca (na primjer ploče ili profili rezani na traženu dimenziju);',
               'robu koja je ugrađena ili obrađena tako da se ne može vratiti u originalnom stanju;',
-              'otvorenu higijenski osjetljivu robu, na primjer dijelove sanitarne opreme čija je higijenska ambalaža otvorena;',
               'oštećenu ili korištenu robu čija je vrijednost umanjena preko mjere potrebne za pregled.',
             ],
           },
@@ -519,7 +518,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
           },
           {
             t: 'p',
-            text: 'Kod robe koja se prodaje po dimenziji ili količini (na primjer ploče, građa ili rolne) nedostatak je najbolje prijaviti prije rezanja ili ugradnje cijele količine.',
+            text: 'Kod robe koja se prodaje po dimenziji ili količini (na primjer ploče, profili ili rolne) nedostatak je najbolje prijaviti prije rezanja ili ugradnje cijele količine.',
           },
         ],
       },
@@ -1235,7 +1234,6 @@ export const LEGAL_DOCS: LegalDoc[] = [
             items: [
               'robu koja je rezana, miješana ili izrađena po mjeri ili prema specifikaciji kupca;',
               'robu koja je ugrađena ili obrađena tako da se ne može vratiti u originalnom stanju;',
-              'otvorenu higijenski osjetljivu robu, na primjer dijelove sanitarne opreme čija je higijenska ambalaža otvorena;',
               'oštećenu ili korištenu robu čija je vrijednost umanjena preko mjere potrebne za pregled.',
             ],
           },
@@ -1287,7 +1285,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         blocks: [
           {
             t: 'p',
-            text: '{naziv} bavi se trgovinom na veliko i malo građevinskim materijalom: sistemima suhe gradnje, kamenom vunom, drvom i sanitarnom opremom. Prodavnica je namijenjena privatnim kupcima i izvođačima radova.',
+            text: '{naziv} bavi se trgovinom na veliko i malo građevinskim materijalom: Knauf sistemima suhe gradnje, izolacijom (kamena i staklena vuna, stiropor, XPS), vezivima i ljepilima, vijcima i priborom. Prodavnica je namijenjena privatnim kupcima i izvođačima radova.',
           },
           {
             t: 'dl',
@@ -1296,7 +1294,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
               { k: 'Sjedište', v: '{sjediste}' },
               {
                 k: 'Djelatnost',
-                v: 'Trgovina na veliko drvom, građevinskim materijalom i sanitarnom opremom, šifra G 46.73',
+                v: 'Trgovina na veliko i malo građevinskim materijalom, šifra G 46.73',
               },
               { k: 'JIB', v: '{jib}' },
               { k: 'PDV broj', v: '{pdv}' },
@@ -1412,7 +1410,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
           },
           {
             t: 'p',
-            text: 'Za teške, obimne ili teško izvodljive uzorke (na primjer ploče, građu ili kamenu vunu) uzorak možda nije moguć. Tada vam nudimo alternativu, na primjer opis materijala i savjet našeg stručnog tima.',
+            text: 'Za teške, obimne ili teško izvodljive uzorke (na primjer ploče, profile ili kamenu vunu) uzorak možda nije moguć. Tada vam nudimo alternativu, na primjer opis materijala i savjet našeg stručnog tima.',
           },
         ],
       },
@@ -1537,7 +1535,7 @@ export const LEGAL_DOCS: LegalDoc[] = [
         blocks: [
           {
             t: 'p',
-            text: 'Stručan tim pomaže pri izboru materijala, na primjer sistema suhe gradnje, izolacije od kamene vune, drveta ili sanitarne opreme. Ako niste sigurni šta odgovara vašem poslu, opišite zadatak i pomoći ćemo.',
+            text: 'Stručan tim pomaže pri izboru materijala, na primjer sistema suhe gradnje, izolacije za zidove, potkrovlja i fasade, ili veziva i pribora. Ako niste sigurni šta odgovara vašem poslu, opišite zadatak i pomoći ćemo.',
           },
           {
             t: 'p',

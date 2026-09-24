@@ -1,21 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useLenis } from 'lenis/react'
 import { COLORS } from '@/lib/content'
 import { SITE } from '@/lib/company'
-import { EV } from '@/lib/motion'
-import { scrollToChapter } from '@/lib/nav'
+import { scrollToTop } from '@/lib/nav'
 import ShopLink from './ShopLink'
 import { useShop } from './ShopProvider'
 
 const NAV = [
   { label: 'Katalog', href: '/#katalog' },
-  { label: 'Novo', href: '/#novo' },
+  { label: 'Kompleti', href: '/#kompleti' },
   { label: 'Radovi', href: '/#radovi' },
-  { label: 'Materijali', href: '/#materijali' },
   { label: 'Cijene', href: '/#cijene' },
+  { label: 'Dostava', href: '/#dostava' },
+  { label: 'Ponuda', href: '/#ponuda' },
 ]
 
 // Mali brojač uz stavku zaglavlja: prazan krug za 0, popunjen akcentom kad ima nečega.
@@ -31,51 +30,32 @@ function Count({ n }: { n: number }) {
   )
 }
 
-// Zaglavlje prodavnice: naziv, sekcije, pretraga, sačuvano, poređenje i korpa.
-// Na početnoj se pojavi tek kad landing završi (variant "home"); na pravnim stranicama je uvijek tu ("page").
+// Zaglavlje prodavnice: naziv, sekcije, pretraga, sačuvano, poređenje i korpa. Uvijek vidljivo (nema više
+// landinga sa preloaderom iznad prodavnice).
 export default function ShopHeader({ variant = 'home' }: { variant?: 'home' | 'page' }) {
   const { count, saved, compare, openPanel } = useShop()
   const lenis = useLenis()
-  const [inShop, setInShop] = useState(false)
-  const shown = variant === 'page' || inShop
-
-  // Prikaz: kad vrh prodavnice pređe gornjih 20% ekrana, pa dok god je bilo šta od nje tu (i pri povratku naviše nestaje).
-  useEffect(() => {
-    if (variant === 'page') return
-    const shop = document.querySelector('[data-shop]')
-    if (!shop) return
-    const io = new IntersectionObserver(([e]) => setInShop(e.isIntersecting), { rootMargin: '0px 0px -80% 0px' })
-    io.observe(shop)
-    return () => io.disconnect()
-  }, [variant])
 
   const wordmark = 'font-serif text-[22px] uppercase leading-none tracking-[0.01em] max-sm:text-[18px]'
 
   return (
     <header
-      inert={!shown}
-      className={`fixed inset-x-0 top-0 z-30 bg-bg text-ink transition-transform duration-700 [transition-timing-function:var(--ease-expo)] ${
-        shown ? 'translate-y-0' : '-translate-y-full'
-      }`}
+      className="fixed inset-x-0 top-0 z-30 bg-bg text-ink"
     >
       {SITE.demo && (
         <p className="lbl bg-ink px-[var(--pad)] py-2 text-center text-bg">
-          Demo prodavnica <span className="max-sm:hidden">· artikli, cijene i uslovi su primjer</span>
+          Demo prodavnica <span className="max-sm:hidden">· narudžbe i upiti se još ne šalju</span>
         </p>
       )}
       <div className="flex h-[60px] items-center justify-between gap-6 border-b border-ink/15 px-[var(--pad)]">
         <div className="flex items-center gap-6 md:gap-9">
-          {variant === 'home' ? (
-            <button type="button" data-hover className="lbl cursor-pointer" onClick={() => window.dispatchEvent(new Event(EV.menu))}>
-              Meni
-            </button>
-          ) : (
-            <Link href="/" className="lbl">
+          {variant === 'page' && (
+            <Link href="/" className="lbl max-sm:hidden">
               Početna
             </Link>
           )}
           {variant === 'home' ? (
-            <button type="button" data-hover className={`${wordmark} cursor-pointer`} onClick={() => scrollToChapter(lenis, -1)}>
+            <button type="button" data-hover className={`${wordmark} cursor-pointer`} onClick={() => scrollToTop(lenis)}>
               Grand Company
             </button>
           ) : (

@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { COLORS } from '@/lib/content'
 import { TERMS } from '@/lib/company'
 import {
+  BRANDS,
   CATEGORIES,
   DEFAULT_FILTERS,
   PRICE_RANGES,
@@ -14,11 +15,12 @@ import {
   formatPrice,
   type Filters,
 } from '@/lib/shop'
+import { plural } from '@/gc/gc'
 import { Section, SectionHead } from './parts'
 import ProductCard from './ProductCard'
 import { useShop } from './ShopProvider'
 
-const PAGE = 9
+const PAGE = 12
 
 function Select<T extends string>({
   label,
@@ -47,7 +49,7 @@ function Select<T extends string>({
   )
 }
 
-// 06.2 — Katalog: pretraga, filteri, sortiranje i mreža artikala.
+// 05 — Katalog: pretraga, filteri, sortiranje i mreža artikala.
 export default function Catalog() {
   const { filters, setFilters, resetFilters, saved, compare, openPanel } = useShop()
 
@@ -62,7 +64,7 @@ export default function Catalog() {
 
   return (
     <Section id="katalog" color={COLORS.connect}>
-      <SectionHead no="006.2" side="Katalog" title="Katalog" />
+      <SectionHead no="004" side="Katalog · zalihe iz Pantheona" title="Katalog" />
 
       {/* pretraga */}
       <div data-reveal className="mt-[4vw] grid grid-cols-12 items-end gap-x-6 max-md:mt-8">
@@ -71,7 +73,7 @@ export default function Catalog() {
           <input
             type="search"
             className="field text-ink"
-            placeholder="Artikal, materijal ili namjena…"
+            placeholder="Artikal, šifra, brend ili vrsta radova…"
             value={filters.q}
             onChange={(e) => setFilters({ q: e.target.value })}
             aria-label="Pretraga kataloga"
@@ -95,12 +97,18 @@ export default function Catalog() {
       </div>
 
       {/* filteri */}
-      <div data-reveal className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 text-ink md:grid-cols-4">
+      <div data-reveal className="mt-8 grid grid-cols-2 gap-x-6 gap-y-6 text-ink md:grid-cols-5">
         <Select<Filters['use']>
-          label="Namjena"
+          label="Vrsta radova"
           value={filters.use}
           onChange={(use) => setFilters({ use })}
-          options={[{ id: 'sve', label: 'Sve namjene' }, ...USES.map((u) => ({ id: u.id, label: u.label }))]}
+          options={[{ id: 'sve', label: 'Svi radovi' }, ...USES.map((u) => ({ id: u.id, label: u.label }))]}
+        />
+        <Select<string>
+          label="Brend"
+          value={filters.brand}
+          onChange={(brand) => setFilters({ brand })}
+          options={[{ id: 'sve', label: 'Svi brendovi' }, ...BRANDS.map((b) => ({ id: b, label: b }))]}
         />
         <Select<Filters['avail']>
           label="Dostupnost"
@@ -108,7 +116,7 @@ export default function Catalog() {
           onChange={(avail) => setFilters({ avail })}
           options={[
             { id: 'sve', label: 'Sve' },
-            { id: 'na-stanju', label: 'Samo na stanju' },
+            { id: 'na-stanju', label: 'Samo „Na stanju“' },
           ]}
         />
         <Select<Filters['price']> label="Cijena" value={filters.price} onChange={(price) => setFilters({ price })} options={PRICE_RANGES} />
@@ -118,7 +126,7 @@ export default function Catalog() {
       {/* brojač i prečice */}
       <div className="mt-10 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-current pt-5">
         <p className="lbl" aria-live="polite">
-          {list.length} {list.length === 1 ? 'artikal' : 'artikala'}
+          {list.length} {plural(list.length, 'artikal', 'artikla', 'artikala')}
           {dirty && (
             <button type="button" className="link-u ml-4 cursor-pointer" onClick={resetFilters}>
               Poništi filtere
@@ -132,15 +140,15 @@ export default function Catalog() {
           <button type="button" className="link-u cursor-pointer" onClick={() => openPanel({ kind: 'compare' })}>
             Poređenje ({compare.length})
           </button>
-          <span className="max-md:hidden">Besplatna dostava za narudžbe preko {formatPrice(TERMS.freeDeliveryFrom)}</span>
+          <span className="max-md:hidden">Besplatna standardna dostava preko {formatPrice(TERMS.freeDeliveryFrom)}</span>
         </p>
       </div>
 
       {/* mreža */}
       {shown.length > 0 ? (
-        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-12 md:grid-cols-3 md:gap-x-6 md:gap-y-[4.5vw]">
+        <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-12 md:grid-cols-3 md:gap-x-6 md:gap-y-[4.5vw] xl:grid-cols-4">
           {shown.map((p, i) => (
-            <ProductCard key={p.id} p={p} index={i % 3} />
+            <ProductCard key={p.id} p={p} index={i % 4} />
           ))}
         </div>
       ) : (

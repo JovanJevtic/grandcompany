@@ -2,53 +2,20 @@
 
 import { useState } from 'react'
 import { resetFilters } from '@/lib/cart'
-import { TONES } from '@/lib/reveal'
-import type { CategoryId } from '@/lib/shop'
+import { CATEGORIES, PRODUCTS, USES, artikala } from '@/lib/shop'
 import { useScrollTo } from '@/lib/useScrollTo'
 import SectionHead from './SectionHead'
 
-// Opisi su opšti, bez brojki i garancija. Tehničke podatke i listove daje klijent za svaki artikal posebno.
-const MATERIALS: {
-  id: string
-  name: string
-  category: CategoryId
-  intro: string
-  uses: string[]
-  traits: string[]
-}[] = [
-  {
-    id: 'gips',
-    name: 'Gips-karton',
-    category: 'suha-gradnja',
-    intro: 'Ploče sa gipsanim jezgrom u kartonskom omotaču. Čista i brza gradnja pregradnih zidova, plafona i obloga.',
-    uses: ['Pregradni zidovi', 'Spušteni plafoni', 'Obloge potkrovlja'],
-    traits: ['Standardna ploča', 'Vlagootporna za kupatila', 'Protivpožarna ploča'],
-  },
-  {
-    id: 'vuna',
-    name: 'Kamena vuna',
-    category: 'kamena-vuna',
-    intro: 'Izolacija od vlakana kamena. Čuva toplotu, prigušuje buku i ne gori.',
-    uses: ['Fasade', 'Kosi krov i potkrovlje', 'Pregradni zidovi'],
-    traits: ['Toplotna izolacija', 'Zvučna izolacija', 'Negorivo vlakno'],
-  },
-  {
-    id: 'drvo',
-    name: 'Drvo',
-    category: 'drvo',
-    intro: 'Rezana građa i ploče za krovne konstrukcije, podove i oplate.',
-    uses: ['Krovna konstrukcija', 'Podovi i oplate', 'Potkonstrukcija'],
-    traits: ['Letve i daske', 'OSB ploče', 'Rezanje po dogovoru'],
-  },
-  {
-    id: 'sanitarija',
-    name: 'Sanitarna oprema',
-    category: 'sanitarna',
-    intro: 'Keramika i armatura za kupatilo: umivaonici, WC šolje i baterije.',
-    uses: ['Kupatila', 'Sanitarni čvorovi', 'Adaptacije'],
-    traits: ['Sanitarna keramika', 'Hromirane baterije', 'Uz stručan savjet pri izboru'],
-  },
-]
+// Četiri grupe iz kataloga (src/gc): opis primjene, fotografija ugradnje i ono što je stvarno u ponudi.
+const MATERIALS = CATEGORIES.map((c) => {
+  const items = PRODUCTS.filter((p) => p.category === c.id)
+  return {
+    ...c,
+    uses: USES.filter((u) => items.some((p) => p.uses.includes(u.id))).map((u) => u.name),
+    brands: [...new Set(items.map((p) => p.brand))],
+    count: items.length,
+  }
+})
 
 export default function Materials() {
   const [active, setActive] = useState(0)
@@ -58,10 +25,10 @@ export default function Materials() {
   return (
     <section id="materijali" data-spy className="gutter scroll-mt-[var(--bar)] py-[14dvh]">
       <SectionHead
-        no="05"
+        no="06"
         label="Materijali"
         title="Znajte šta ugrađujete"
-        lead="Od čega je napravljeno, gdje se koristi i po čemu se razlikuje."
+        lead="Gdje se koristi, po čemu se razlikuje i koje brendove držimo na stanju."
         meta={`${MATERIALS.length} grupe`}
       />
 
@@ -96,13 +63,21 @@ export default function Materials() {
           aria-labelledby={`mat-tab-${m.id}`}
           className="fade-up md:col-span-6 md:col-start-7"
         >
-          <div className="aspect-[16/10] w-full" style={{ background: TONES[(active * 2 + 2) % TONES.length] }} />
-          <p className="mt-6 max-w-[46ch] text-lead uppercase">{m.intro}</p>
+          {/* Fotografija ugradnje: ilustruje grupu, ne prikazuje konkretan artikal. */}
+          <figure>
+            <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink/10">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={m.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+            </div>
+            <figcaption className="mt-2 text-micro uppercase text-ink/60">{m.name} · primjer ugradnje</figcaption>
+          </figure>
+          <p className="mt-6 max-w-[46ch] text-lead uppercase">{m.lead}</p>
+          <p className="mt-4 max-w-[60ch] text-small normal-case leading-[1.3]">{m.usage}</p>
 
           <div className="mt-8 grid gap-6 sm:grid-cols-2">
             {[
               ['Primjena', m.uses],
-              ['Osobine', m.traits],
+              ['Brendovi', m.brands],
             ].map(([label, list]) => (
               <div key={label as string}>
                 <p className="text-micro uppercase text-ink/60">{label as string}</p>
@@ -121,12 +96,12 @@ export default function Materials() {
             <button
               type="button"
               onClick={() => {
-                resetFilters({ category: m.category })
+                resetFilters({ category: m.id })
                 scrollTo('prodavnica')
               }}
               className="border-2 border-ink px-4 py-3.5 text-micro uppercase transition-colors duration-300 hover:bg-ink hover:text-bg"
             >
-              Pogledaj u prodavnici →
+              {artikala(m.count)} u katalogu →
             </button>
             <button
               type="button"

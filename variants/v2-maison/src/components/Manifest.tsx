@@ -47,15 +47,15 @@ export default function Manifest() {
           data-lines
           className="invisible text-center text-[clamp(14px,1.56vw,28px)] uppercase leading-none"
         >
-          Pristupačne cijene
+          Paleta ne ostaje
           <br />
-          i stručan savjet
+          na ulici.
           <br />
-          za svakog investitora,
+          Kamion sa kranom
           <br />
-          a ne samo za velike
+          je spušta na etažu
           <br />
-          izvođače radova.
+          ili na skelu.
         </p>
       </div>
     </section>

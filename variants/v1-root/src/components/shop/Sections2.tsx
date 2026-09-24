@@ -1,40 +1,43 @@
 import { COLORS } from '@/lib/content'
-import { DELIVERY_FACTS, DELIVERY_STEPS, FAQ, PAYMENTS, TIERS, TIER_TABLE } from '@/lib/shop'
+import { COMPANY } from '@/lib/company'
+import { CRANE_RECOMMEND_OVER_KG } from '@/gc/gc'
+import { DELIVERY, DELIVERY_STEPS, FAQ, FREE_DELIVERY_OVER, PAYMENTS, TIERS, formatNumber, formatPrice } from '@/lib/shop'
 import ShopLink from './ShopLink'
-import { Section, SectionHead, T } from './parts'
+import { Photo, Section, SectionHead, T } from './parts'
 
 // Dio 2: cijene, dostava, pitanja (server-komponente).
 
-// 06.5 — Cijene i uslovi
+// 008 — Cijene i uslovi: nivoi partnera (maloprodaja i tri nivoa rabata).
 export function Pricing() {
+  const rows: { row: string; get: (t: (typeof TIERS)[number]) => string }[] = [
+    { row: 'Ko', get: (t) => t.who },
+    { row: 'Rabat na katalog', get: (t) => t.price },
+    { row: 'Kreditni limit', get: (t) => t.limit },
+    { row: 'Plaćanje', get: (t) => t.days },
+  ]
   return (
     <Section id="cijene" color={COLORS.connect}>
-      <SectionHead no="006.5" side="Cijene i uslovi" title="Cijene" />
-      <p data-reveal className="copy-l mt-[3vw] max-w-[28ch] max-md:mt-6">
-        Kupite jedan artikal ili cijelu isporuku. Za veće količine dogovaramo uslove.
+      <SectionHead no="008" side="Cijene i uslovi" title="Cijene" />
+      <p data-reveal className="copy-l mt-[3vw] max-w-[30ch] max-md:mt-6">
+        Katalog važi za sve. Ugovorni partneri dobijaju rabat, kreditni limit i <em>valutu do 90 dana</em>.
       </p>
 
-      <div data-reveal className="mt-[5vw] grid border border-current max-md:mt-10 md:grid-cols-3">
-        {TIERS.map((t, i) => (
+      <div data-reveal className="mt-[5vw] grid gap-px border border-current bg-current max-md:mt-10 md:grid-cols-2 xl:grid-cols-4">
+        {TIERS.map((t) => (
           <article
             key={t.no}
-            className={`flex flex-col p-[2.2vw] max-md:p-6 ${i > 0 ? 'border-current max-md:border-t md:border-l' : ''}`}
-            style={t.featured ? { background: COLORS.connect, color: 'var(--bg)' } : undefined}
+            className="flex flex-col bg-bg p-[2.2vw] max-md:p-6"
+            style={t.featured ? { background: COLORS.connect, color: 'var(--bg)' } : { color: COLORS.connect }}
           >
             <p className="lbl flex justify-between">
               <span>{t.no}</span>
-              {t.featured && <span>Veće količine</span>}
+              {t.featured && <span>Srednje firme</span>}
             </p>
-            <h3 className="mt-[7vw] font-serif leading-[0.95] tracking-[-0.01em] [font-size:clamp(38px,4.4vw,76px)] max-md:mt-14">
-              {t.name}
-            </h3>
-            <p className="mt-6 flex flex-wrap items-baseline gap-x-3">
-              <span className="copy-l">{t.price}</span>
-              <span className="lbl">{t.note}</span>
-            </p>
+            <h3 className="mt-[5vw] font-serif leading-[0.95] tracking-[-0.01em] [font-size:clamp(38px,4vw,70px)] max-md:mt-12">{t.name}</h3>
+            <p className="copy-l mt-6">{t.price}</p>
             <p className="copy mt-3">{t.who}</p>
             <ul className="mt-8 flex-1 border-t border-current pt-6">
-              {t.features.map((f) => (
+              {[t.limit, t.days].map((f) => (
                 <li key={f} className="copy flex gap-3 py-1.5">
                   <span aria-hidden className="lbl pt-[0.6em]">
                     ✓
@@ -56,10 +59,10 @@ export function Pricing() {
 
       {/* poređenje nivoa */}
       <div data-reveal className="mt-[6vw] overflow-x-auto text-ink max-md:mt-14">
-        <table className="w-full min-w-[520px] border-collapse text-left">
+        <table className="w-full min-w-[640px] border-collapse text-left">
           <thead>
             <tr style={{ color: COLORS.connect }}>
-              <th className="lbl w-[34%] pb-4 font-normal">Poređenje</th>
+              <th className="lbl w-[20%] pb-4 font-normal">Poređenje</th>
               {TIERS.map((t) => (
                 <th key={t.no} className="lbl pb-4 font-normal">
                   {t.name}
@@ -68,12 +71,12 @@ export function Pricing() {
             </tr>
           </thead>
           <tbody>
-            {TIER_TABLE.map((r) => (
+            {rows.map((r) => (
               <tr key={r.row} className="border-t" style={{ borderColor: COLORS.connect }}>
                 <th className="copy py-4 pr-4 font-normal">{r.row}</th>
-                {r.cells.map((c, i) => (
-                  <td key={i} className="copy py-4 pr-4">
-                    {c === true ? '✓' : c === false ? '—' : c}
+                {TIERS.map((t) => (
+                  <td key={t.no} className="copy py-4 pr-4">
+                    {r.get(t)}
                   </td>
                 ))}
               </tr>
@@ -105,13 +108,58 @@ export function Pricing() {
   )
 }
 
-// 06.6 — Dostava
+// 009 — Dostava: zone, standardna dostava i kamion sa kranom.
 export function Delivery() {
   return (
     <Section id="dostava" color={COLORS.why}>
-      <SectionHead no="006.6" side="Kako roba stiže" title="Dostava" />
+      <SectionHead no="009" side="Kako roba stiže" title="Dostava" />
 
-      <ol className="mt-[5vw] grid gap-x-6 gap-y-10 max-md:mt-10 md:grid-cols-3">
+      <div className="mt-[5vw] grid grid-cols-12 gap-x-6 gap-y-10 max-md:mt-10">
+        <div className="col-span-12 md:col-span-5">
+          <p data-reveal className="copy-l max-w-[22ch]">
+            Standardno do adrese ili <em>kranom na etažu</em>, našim kamionima.
+          </p>
+          <p data-reveal className="copy mt-6 max-w-[40ch] text-ink">
+            Standardna dostava je besplatna za narudžbe preko {formatPrice(FREE_DELIVERY_OVER)}. Za isporuke teže od{' '}
+            {formatNumber(CRANE_RECOMMEND_OVER_KG)} kg preporučujemo kamion sa kranom. Kran se obračunava kao prevoz plus istovar.
+          </p>
+        </div>
+        <figure className="col-span-12 md:col-span-6 md:col-start-7">
+          <Photo src="/photos/kran-utovar.jpg" alt="Naš kamion sa kranom podiže paletu" className="aspect-[16/10]" />
+          <figcaption className="lbl mt-3">Utovar palete kranom, naše stovarište</figcaption>
+        </figure>
+      </div>
+
+      {/* cjenovnik po zonama */}
+      <div data-reveal className="mt-[6vw] overflow-x-auto text-ink max-md:mt-14">
+        <table className="w-full min-w-[640px] border-collapse text-left">
+          <thead>
+            <tr style={{ color: COLORS.why }}>
+              <th className="lbl w-[28%] pb-4 font-normal">Zona</th>
+              <th className="lbl pb-4 font-normal">Standardna dostava</th>
+              <th className="lbl pb-4 font-normal">Kamion sa kranom, prevoz</th>
+              <th className="lbl pb-4 font-normal">Istovar kranom</th>
+              <th className="lbl pb-4 font-normal">Kran ukupno</th>
+            </tr>
+          </thead>
+          <tbody>
+            {DELIVERY.map((z) => (
+              <tr key={z.id} className="border-t" style={{ borderColor: COLORS.why }}>
+                <th className="copy py-4 pr-4 font-normal">{z.label}</th>
+                <td className="copy py-4 pr-4">{formatPrice(z.standard)}</td>
+                <td className="copy py-4 pr-4">{formatPrice(z.kranTransport)}</td>
+                <td className="copy py-4 pr-4">{formatPrice(z.kranWork)}</td>
+                <td className="copy py-4 pr-4">{formatPrice(z.kranTransport + z.kranWork)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="lbl mt-4" style={{ color: COLORS.base }}>
+          Cijene sa PDV-om. Standardna dostava besplatna preko {formatPrice(FREE_DELIVERY_OVER)}; kran se uvijek obračunava. Dalje od 50 km cijenu šaljemo uz predračun.
+        </p>
+      </div>
+
+      <ol className="mt-[6vw] grid gap-x-6 gap-y-10 max-md:mt-14 md:grid-cols-3">
         {DELIVERY_STEPS.map((s, i) => (
           <li key={s.no} data-reveal style={{ ['--i' as string]: i }} className="border-t border-current pt-4">
             <p className="lbl">{s.no}</p>
@@ -124,16 +172,6 @@ export function Delivery() {
         ))}
       </ol>
 
-      <dl className="mt-[6vw] grid gap-x-6 border-t border-current max-md:mt-14 md:grid-cols-3">
-        {DELIVERY_FACTS.map((f, i) => (
-          <div key={f.k} data-reveal style={{ ['--i' as string]: i }} className="border-b border-current py-5 md:border-b-0">
-            <dt className="lbl">{f.k}</dt>
-            <dd className="copy-l mt-4 text-ink">
-              <T s={f.v} />
-            </dd>
-          </div>
-        ))}
-      </dl>
       <p data-reveal className="mt-8">
         <ShopLink href="/dostava" className="lbl link-u">
           Uslovi dostave →
@@ -143,22 +181,27 @@ export function Delivery() {
   )
 }
 
-// 06.7 — Česta pitanja
+// 010 — Česta pitanja
 export function Faq() {
   return (
     <Section id="pitanja" color={COLORS.who}>
-      <SectionHead no="006.7" side="Česta pitanja" title="Pitanja" />
+      <SectionHead no="010" side="Česta pitanja" title="Pitanja" />
 
       <div className="mt-[4vw] grid grid-cols-12 gap-x-6 gap-y-10 max-md:mt-8">
         <div className="col-span-12 md:col-span-4">
           <p data-reveal className="copy-l max-w-[18ch]">
-            Ne nalazite odgovor? Naš tim je tu.
+            Ne nalazite odgovor? Pozovite prodaju.
           </p>
-          <p data-reveal className="mt-6">
-            <ShopLink href="/#kontakt" className="pill">
-              Kontakt
+          <div data-reveal className="mt-6 flex flex-wrap gap-3">
+            {COMPANY.phoneHref && (
+              <a href={COMPANY.phoneHref} className="pill">
+                {COMPANY.phone}
+              </a>
+            )}
+            <ShopLink href="/#ponuda" className="pill">
+              Zatražite ponudu
             </ShopLink>
-          </p>
+          </div>
         </div>
 
         <div className="col-span-12 border-b border-current md:col-span-8">

@@ -12,6 +12,7 @@ export const EV = {
   ready: 'gc:ready', // loader je završen, počinje ulazak prstena
   contact: 'gc:contact', // detail: true = otvori, false = zatvori
   filter: 'gc:filter', // detail: id kategorije — prodavnica se filtrira i prikaže
+  use: 'gc:use', // detail: vrsta radova (UseCases) — prodavnica prikaže samo taj materijal
 } as const
 
 export function prefersReducedMotion() {

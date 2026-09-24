@@ -1,12 +1,13 @@
-import { productById } from '@/lib/shop'
+import { productById, round2 } from '@/lib/shop'
 
+// Količine su u jedinici artikla (m², kom, kut...), pa mogu biti decimalne (ploča = 2,5 m²).
 // Korpa je običan modul sa pretplatom (koristi se kroz useSyncExternalStore u ShopProvider). Sačuvana je u
 // localStorage, pa preživi osvježavanje stranice. Server uvijek vidi praznu korpu; preglednik je učita tek pri
 // pretplati, da se prvi prikaz podudara sa serverskim.
 export type Lines = Record<string, number>
 
 const KEY = 'gc:cart'
-const MAX = 999
+const MAX = 9999
 const EMPTY: Lines = {}
 
 let lines: Lines = EMPTY
@@ -17,7 +18,7 @@ function read(): Lines {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? '{}') as Record<string, unknown>
     const clean: Lines = {}
     for (const [id, q] of Object.entries(raw)) {
-      if (productById(id) && typeof q === 'number' && Number.isInteger(q) && q > 0) clean[id] = Math.min(q, MAX)
+      if (productById(id) && typeof q === 'number' && Number.isFinite(q) && q > 0) clean[id] = Math.min(round2(q), MAX)
     }
     return Object.keys(clean).length ? clean : EMPTY
   } catch {
@@ -59,12 +60,12 @@ export const cart = {
 
   add(id: string, qty = 1) {
     if (!productById(id)) return
-    commit({ ...lines, [id]: Math.min((lines[id] ?? 0) + qty, MAX) })
+    commit({ ...lines, [id]: Math.min(round2((lines[id] ?? 0) + qty), MAX) })
   },
   setQty(id: string, qty: number) {
     if (!lines[id]) return
-    if (qty <= 0) return cart.remove(id)
-    commit({ ...lines, [id]: Math.min(Math.floor(qty), MAX) })
+    if (qty <= 0.001) return cart.remove(id)
+    commit({ ...lines, [id]: Math.min(round2(qty), MAX) })
   },
   remove(id: string) {
     const rest = { ...lines }

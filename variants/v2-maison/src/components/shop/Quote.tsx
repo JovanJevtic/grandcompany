@@ -2,14 +2,15 @@
 
 import { useState, type FormEvent } from 'react'
 import { cartCount, cartLines, cartTotal, useShop } from '@/lib/cart'
-import { artikala, money } from '@/lib/shop'
+import { COMPANY } from '@/gc/gc'
+import { artikala, money, qtyLabel } from '@/lib/shop'
 import { OpenBox } from './Reveal'
 import SectionHead from './SectionHead'
 
 const KINDS = [
   ['privatni', 'Privatni kupac'],
   ['izvodjac', 'Izvođač radova'],
-  ['investitor', 'Investitor'],
+  ['firma', 'Firma / partner'],
 ]
 
 const FIELD =
@@ -22,14 +23,14 @@ export default function Quote() {
 
   function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: poslati podatke (mail servis ili API). Za sada forma samo prikazuje potvrdu.
+    // Demo: forma nije povezana sa mail servisom, pa se ništa ne šalje. Potvrda to kaže otvoreno.
     setSent(true)
   }
 
   return (
     <section id="ponuda" data-spy className="gutter scroll-mt-[var(--bar)] py-[14dvh]">
       <SectionHead
-        no="09"
+        no="10"
         label="Upit"
         title="Zatražite ponudu"
         lead="Pošaljite predmjer ili spisak artikala. Javljamo se sa cijenom i rokom isporuke."
@@ -39,9 +40,11 @@ export default function Quote() {
         <div className="grid gap-10 p-6 md:grid-cols-12 md:gap-[3vw] md:p-[3vw]">
           {sent ? (
             <div className="flex min-h-[40dvh] flex-col items-start justify-center gap-6 md:col-span-12">
-              <p className="text-title uppercase">Hvala.</p>
-              <p className="max-w-[40ch] text-small uppercase">
-                Vaš upit je primljen. Javljamo se sa ponudom čim ga pregledamo.
+              <p className="text-title uppercase">Upit nije poslan.</p>
+              <p className="max-w-[46ch] text-small uppercase">
+                Ovo je demo prodavnica i forma još nije povezana. Pozovite{' '}
+                <a href={COMPANY.phoneLandlineHref} className="underline underline-offset-4">{COMPANY.phoneLandline}</a> ili pišite na{' '}
+                <a href={`mailto:${COMPANY.emailSales}`} className="underline underline-offset-4">{COMPANY.emailSales}</a>.
               </p>
               <button
                 type="button"
@@ -94,7 +97,7 @@ export default function Quote() {
                   type="submit"
                   className="flex w-full items-center justify-between bg-ink px-4 py-4 text-micro uppercase text-bg transition-opacity duration-300 hover:opacity-85 md:w-auto md:min-w-[320px]"
                 >
-                  <span>Pošalji upit</span>
+                  <span>Pošalji upit (demo)</span>
                   <span aria-hidden>→</span>
                 </button>
               </form>
@@ -114,7 +117,7 @@ export default function Quote() {
                       {lines.map((l) => (
                         <li key={l.key} className="flex items-baseline justify-between gap-4 border-b border-ink/25 py-2.5 uppercase">
                           <span className="text-micro">
-                            <span className="tabular-nums opacity-60">{l.qty} ×</span> {l.name}
+                            <span className="tabular-nums opacity-60">{qtyLabel(l.qty, l.unit)} ·</span> {l.name}
                           </span>
                           <span className="shrink-0 text-micro tabular-nums">{money(l.price * l.qty)}</span>
                         </li>

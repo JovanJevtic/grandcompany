@@ -3,7 +3,8 @@
 import { useEffect, useRef } from 'react'
 import { useLenis } from 'lenis/react'
 import { cartCount, cartLines, cartTotal, closeCart, removeFromCart, setQty, useShop } from '@/lib/cart'
-import { artikala, money } from '@/lib/shop'
+import { artikala, money, qtyLabel } from '@/lib/shop'
+import ProductImage from './ProductImage'
 import { useScrollTo } from '@/lib/useScrollTo'
 
 const FOCUSABLE = 'button:not(:disabled), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
@@ -102,7 +103,10 @@ export default function CartDrawer() {
               {lines.map((l) => (
                 <li key={l.key} className="border-b border-bg/25 py-5">
                   <div className="flex items-start justify-between gap-4 uppercase">
-                    <div className="min-w-0">
+                    {l.image && (
+                      <ProductImage src={l.image} drawing={l.drawing} alt="" className="size-16 shrink-0" />
+                    )}
+                    <div className="min-w-0 flex-1">
                       <p className="text-small">{l.name}</p>
                       <p className="mt-1.5 text-micro opacity-60">{l.spec}</p>
                     </div>
@@ -114,16 +118,16 @@ export default function CartDrawer() {
                       <button
                         type="button"
                         aria-label={`Smanji količinu: ${l.name}`}
-                        onClick={() => setQty(l.key, l.qty - 1)}
+                        onClick={() => setQty(l.key, l.qty - l.step)}
                         className="w-9 transition-colors duration-300 hover:bg-bg hover:text-ink"
                       >
                         −
                       </button>
-                      <span className="grid min-w-10 place-items-center border-x-2 border-bg tabular-nums">{l.qty}</span>
+                      <span className="grid min-w-16 place-items-center border-x-2 border-bg px-2 tabular-nums">{qtyLabel(l.qty, l.unit)}</span>
                       <button
                         type="button"
                         aria-label={`Povećaj količinu: ${l.name}`}
-                        onClick={() => setQty(l.key, l.qty + 1)}
+                        onClick={() => setQty(l.key, l.qty + l.step)}
                         className="w-9 transition-colors duration-300 hover:bg-bg hover:text-ink"
                       >
                         +
@@ -153,7 +157,7 @@ export default function CartDrawer() {
               <p className="text-lead tabular-nums">{money(cartTotal(cart))}</p>
             </div>
             <p className="mt-3 text-micro uppercase opacity-60">
-              Konačnu cijenu, dostavu i plaćanje potvrđujemo ponudom.
+              Cijene u KM sa PDV-om. Dostavu i plaćanje potvrđujemo ponudom. Demo prodavnica: ništa se ne naplaćuje.
             </p>
             <button
               type="button"

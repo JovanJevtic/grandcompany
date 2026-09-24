@@ -1,24 +1,36 @@
+import { productById, type Product } from '@/lib/shop'
+
 export const BRAND = 'GRAND COMPANY'
 
-// Ploče u prstenu: w = širina u jedinicama `u` (visina je uvijek 0.5625u), a = gornja, b = donja boja.
-// Sive nijanse od gotovo crne do gotovo bijele, da prsten ima isti kontrast kao sa fotografijama.
-export const TILES: { w: number; a: string; b: string }[] = [
-  { w: 1, a: '#e8e8e6', b: '#bdbdba' },
-  { w: 1, a: '#2b2b2b', b: '#0d0d0d' },
-  { w: 0.75, a: '#9a9a98', b: '#6b6b69' },
-  { w: 1, a: '#f4f4f2', b: '#d0d0cd' },
-  { w: 1.125, a: '#555555', b: '#2f2f2f' },
-  { w: 0.75, a: '#c8c8c5', b: '#8d8d8a' },
-  { w: 1, a: '#161616', b: '#050505' },
-  { w: 1, a: '#b5b5b2', b: '#7d7d7a' },
-  { w: 0.75, a: '#dcdcd9', b: '#a6a6a3' },
-  { w: 1.125, a: '#3c3c3c', b: '#1b1b1b' },
-  { w: 1, a: '#ececea', b: '#c4c4c1' },
-  { w: 0.75, a: '#7b7b79', b: '#4e4e4c' },
-  { w: 1, a: '#d3d3d0', b: '#9c9c99' },
-  { w: 1.125, a: '#242424', b: '#0a0a0a' },
-  { w: 0.75, a: '#a9a9a6', b: '#727270' },
+// Ploče u prstenu: naši artikli (packshot crtež ili fotografija). w = širina u jedinicama `u`
+// (visina je uvijek 0.5625u); a/b su boje podloge, koje koristi i "pikselizirani" mozaik kad je kontakt otvoren.
+const RING: [string, number][] = [
+  ['KNF-001', 1],
+  ['ISO-003', 1],
+  ['PRF-075', 0.75],
+  ['CHM-001', 1],
+  ['KNF-003', 1.125],
+  ['ISO-004', 0.75],
+  ['ACC-001', 1],
+  ['PRF-CD60', 1],
+  ['KNF-002', 0.75],
+  ['CHM-006', 1.125],
+  ['ISO-006', 1],
+  ['ACC-003', 0.75],
+  ['KNF-004', 1],
+  ['ISO-007', 1.125],
+  ['CHM-004', 0.75],
 ]
+
+export type Tile = { w: number; p: Product; a: string; b: string }
+
+// Svijetla podloga za crteže (na crnom sajtu), tamnija za fotografije.
+export const WELL = { a: '#f1f1ec', b: '#d9dad3' }
+
+export const TILES: Tile[] = RING.flatMap(([sku, w]) => {
+  const p = productById(sku)
+  return p ? [{ w, p, ...(p.drawing ? WELL : { a: '#8d8d88', b: '#4a4a47' }) }] : []
+})
 
 export const TEXT = {
   left: 'Od 2012. u Banjoj Luci',

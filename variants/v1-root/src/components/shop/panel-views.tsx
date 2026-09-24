@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useLenis } from 'lenis/react'
-import { COLORS, TONES } from '@/lib/content'
-import { TERMS } from '@/lib/company'
+import { COLORS } from '@/lib/content'
+import { COMPANY, TERMS } from '@/lib/company'
 import {
   AVAIL_LABEL,
   CATEGORIES,
@@ -12,12 +12,14 @@ import {
   PRODUCTS,
   applyFilters,
   categoryLabel,
+  formatNumber,
   formatPrice,
+  formatStock,
   productById,
 } from '@/lib/shop'
 import { scrollToId } from '@/lib/nav'
 import ShopLink from './ShopLink'
-import { AvailDot } from './parts'
+import { AvailDot, ProductImage } from './parts'
 import { useShop } from './ShopProvider'
 
 // Sadržaj panela (desna traka): korpa, narudžba, sačuvano, poređenje, pregled artikla, pretraga, uzorci, upit.
@@ -44,20 +46,23 @@ export function PanelLayout({ title, children, footer }: { title: string; childr
   )
 }
 
-function Flat({ tone, className = '' }: { tone: number; className?: string }) {
-  return <div aria-hidden className={className} style={{ background: TONES[tone % TONES.length] }} />
+function Thumb({ p, className = '' }: { p: Parameters<typeof ProductImage>[0]['p']; className?: string }) {
+  return <ProductImage p={p} reveal={false} className={className} />
 }
 
-function Qty({ value, onChange }: { value: number; onChange: (n: number) => void }) {
+// Količina u koracima pakovanja (npr. ploča 2,5 m²).
+function Qty({ value, step = 1, unit, onChange }: { value: number; step?: number; unit?: string; onChange: (n: number) => void }) {
+  const round = (n: number) => Math.round(n * 100) / 100
   return (
     <div className="lbl inline-flex items-center border border-ink/40">
-      <button type="button" aria-label="Smanji količinu" disabled={value <= 1} className="size-9 cursor-pointer disabled:opacity-30" onClick={() => onChange(value - 1)}>
+      <button type="button" aria-label="Smanji količinu" disabled={value <= step} className="size-9 cursor-pointer disabled:opacity-30" onClick={() => onChange(round(value - step))}>
         −
       </button>
-      <span className="w-9 text-center tabular-nums" aria-live="polite">
-        {value}
+      <span className="min-w-9 px-1 text-center tabular-nums normal-case" aria-live="polite">
+        {formatNumber(value)}
+        {unit ? ` ${unit}` : ''}
       </span>
-      <button type="button" aria-label="Povećaj količinu" className="size-9 cursor-pointer" onClick={() => onChange(value + 1)}>
+      <button type="button" aria-label="Povećaj količinu" className="size-9 cursor-pointer" onClick={() => onChange(round(value + step))}>
         +
       </button>
     </div>
@@ -84,9 +89,11 @@ function NotConnected({ what, onBack }: { what: string; onBack: () => void }) {
         kontaktirati direktno, a naš tim će vam pomoći.
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <ShopLink href="/#kontakt" className="pill pill-solid" style={CTA}>
-          Kontakt
-        </ShopLink>
+        {COMPANY.phoneHref && (
+          <a href={COMPANY.phoneHref} className="pill pill-solid" style={CTA}>
+            Pozovite {COMPANY.phone}
+          </a>
+        )}
         <button type="button" className="pill" onClick={onBack}>
           Nazad
         </button>
@@ -139,7 +146,7 @@ export function CartView() {
             <span className="copy-l">{formatPrice(subtotal)}</span>
           </div>
           <p className="lbl mt-2" style={muted}>
-            Cijene su u KM, sa PDV-om. Trošak dostave potvrđujemo prije obrade narudžbe.
+            Cijene su u KM, sa PDV-om. Dostava i istovar kranom obračunavaju se po zoni i potvrđuju prije obrade narudžbe.
           </p>
           <button type="button" className="pill pill-solid mt-5 w-full" style={CTA} onClick={() => openPanel({ kind: 'checkout' })}>
             Nastavi na narudžbu
@@ -167,7 +174,7 @@ export function CartView() {
           if (!p) return null
           return (
             <li key={l.id} className="flex gap-4 py-5">
-              <Flat tone={p.tone} className="size-[84px] shrink-0" />
+              <Thumb p={p} className="size-[84px] shrink-0" />
               <div className="flex min-w-0 flex-1 flex-col">
                 <button type="button" className="copy cursor-pointer text-left" onClick={() => openPanel({ kind: 'product', id: p.id })}>
                   {p.name}
@@ -176,7 +183,7 @@ export function CartView() {
                   {formatPrice(p.price)} / {p.unit}
                 </p>
                 <div className="mt-3 flex items-center justify-between gap-3">
-                  <Qty value={l.qty} onChange={(n) => setQty(l.id, n)} />
+                  <Qty value={l.qty} step={p.step} unit={p.unit} onChange={(n) => setQty(l.id, n)} />
                   <p className="copy">{formatPrice(p.price * l.qty)}</p>
                 </div>
                 <button type="button" className="lbl link-u mt-3 cursor-pointer self-start" onClick={() => remove(l.id)}>
@@ -259,13 +266,14 @@ export function CheckoutView() {
 
         <p className="copy-l mt-10">Isporuka</p>
         <div className="mt-3">
-          <Radio name="delivery" value="dostava" label="Dostava na adresu" checked={delivery === 'dostava'} onChange={() => setDelivery('dostava')} />
-          <Radio name="delivery" value="preuzimanje" label="Lično preuzimanje" checked={delivery === 'preuzimanje'} onChange={() => setDelivery('preuzimanje')} />
+          <Radio name="delivery" value="dostava" label="Standardna dostava na adresu" checked={delivery === 'dostava'} onChange={() => setDelivery('dostava')} />
+          <Radio name="delivery" value="kran" label="Kamion sa kranom, istovar na etažu" checked={delivery === 'kran'} onChange={() => setDelivery('kran')} />
+          <Radio name="delivery" value="preuzimanje" label="Preuzimanje na stovarištu" checked={delivery === 'preuzimanje'} onChange={() => setDelivery('preuzimanje')} />
         </div>
 
         <p className="copy-l mt-8">Plaćanje</p>
         <div className="mt-3">
-          <Radio name="payment" value="pouzecem" label="Pouzećem, pri isporuci" checked={payment === 'pouzecem'} onChange={() => setPayment('pouzecem')} />
+          <Radio name="payment" value="pouzecem" label="Pri preuzimanju ili isporuci" checked={payment === 'pouzecem'} onChange={() => setPayment('pouzecem')} />
           <Radio name="payment" value="racun" label="Uplata na račun (predračun)" checked={payment === 'racun'} onChange={() => setPayment('racun')} />
         </div>
 
@@ -276,7 +284,7 @@ export function CheckoutView() {
               return p ? (
                 <li key={l.id} className="copy flex justify-between gap-4">
                   <span>
-                    {l.qty} × {p.name}
+                    {formatNumber(l.qty)} {p.unit} · {p.name}
                   </span>
                   <span className="shrink-0">{formatPrice(p.price * l.qty)}</span>
                 </li>
@@ -288,7 +296,7 @@ export function CheckoutView() {
             <span>{formatPrice(subtotal)}</span>
           </p>
           <p className="lbl mt-2" style={muted}>
-            Cijene su u KM, sa PDV-om. Trošak dostave potvrđujemo prije obrade narudžbe.
+            Cijene su u KM, sa PDV-om. Dostava i istovar kranom obračunavaju se po zoni i potvrđuju prije obrade narudžbe.
           </p>
         </div>
 
@@ -351,7 +359,7 @@ export function SavedView() {
         <ul className="divide-y divide-ink/15 border-y border-ink/15">
           {items.map((p) => (
             <li key={p.id} className="flex gap-4 py-5">
-              <Flat tone={p.tone} className="size-[84px] shrink-0" />
+              <Thumb p={p} className="size-[84px] shrink-0" />
               <div className="flex min-w-0 flex-1 flex-col">
                 <button type="button" className="copy cursor-pointer text-left" onClick={() => openPanel({ kind: 'product', id: p.id })}>
                   {p.name}
@@ -386,7 +394,8 @@ export function CompareView() {
   const rows: { label: string; get: (p: (typeof items)[number]) => React.ReactNode }[] = [
     { label: 'Cijena', get: (p) => `${formatPrice(p.price)} / ${p.unit}` },
     { label: 'Kategorija', get: (p) => categoryLabel(p.category) },
-    { label: 'Dostupnost', get: (p) => AVAIL_LABEL[p.avail] },
+    { label: 'Brend', get: (p) => p.brand },
+    { label: 'Na stanju', get: (p) => `${AVAIL_LABEL[p.avail]} · ${formatStock(p)}` },
     { label: 'Dimenzije', get: (p) => p.specs.dimenzije },
     { label: 'Pakovanje', get: (p) => p.specs.pakovanje },
     { label: 'Primjena', get: (p) => p.specs.primjena },
@@ -406,13 +415,13 @@ export function CompareView() {
         />
       ) : (
         <div className="overflow-x-auto" data-lenis-prevent-wheel>
-          <table className="w-full min-w-[520px] border-collapse text-left">
+          <table className="w-full min-w-[520px] table-fixed border-collapse text-left">
             <thead>
               <tr>
                 <th className="w-[22%]" />
                 {items.map((p) => (
                   <th key={p.id} className="p-2 pb-5 align-top font-normal">
-                    <Flat tone={p.tone} className="aspect-[4/5] w-full" />
+                    <Thumb p={p} className="aspect-[4/5] w-full" />
                     <p className="copy mt-3">{p.name}</p>
                     <button type="button" className="lbl link-u mt-2 cursor-pointer" onClick={() => toggleCompare(p.id)}>
                       Ukloni
@@ -456,9 +465,9 @@ export function CompareView() {
 
 export function ProductView({ id }: { id: string }) {
   const { add, saved, toggleSaved, compare, toggleCompare, closePanel } = useShop()
-  const [qty, setQty] = useState(1)
   const goTo = useGoTo()
   const p = productById(id)
+  const [qty, setQty] = useState(p?.step ?? 1)
 
   if (!p) {
     return (
@@ -473,7 +482,7 @@ export function ProductView({ id }: { id: string }) {
       title="Artikal"
       footer={
         <div className="flex flex-wrap items-center gap-4">
-          <Qty value={qty} onChange={setQty} />
+          <Qty value={qty} step={p.step} unit={p.unit} onChange={setQty} />
           <button
             type="button"
             className="pill pill-solid flex-1"
@@ -488,10 +497,10 @@ export function ProductView({ id }: { id: string }) {
         </div>
       }
     >
-      <Flat tone={p.tone} className="aspect-[4/3] w-full" />
+      <Thumb p={p} className="aspect-[4/3] w-full" />
       <div className="lbl mt-5 flex justify-between gap-3" style={muted}>
         <span>{categoryLabel(p.category)}</span>
-        <span>{p.isNew ? 'Novo' : p.bestseller ? 'Najtraženije' : ''}</span>
+        <span>{p.brand}</span>
       </div>
       <h3 className="copy-l mt-3">{p.name}</h3>
       <p className="copy-l mt-4">
@@ -502,12 +511,14 @@ export function ProductView({ id }: { id: string }) {
       </p>
       <p className="lbl mt-3">
         <AvailDot avail={p.avail} />
-        {AVAIL_LABEL[p.avail]}
+        {AVAIL_LABEL[p.avail]} · {formatStock(p)}
+        <span style={muted}> · stanje iz Pantheona</span>
       </p>
       <p className="copy mt-6">{p.summary}</p>
 
       <dl className="mt-8 border-t border-ink/15">
         {[
+          ['Šifra', p.id],
           ['Dimenzije', p.specs.dimenzije],
           ['Pakovanje', p.specs.pakovanje],
           ['Primjena', p.specs.primjena],
@@ -528,8 +539,8 @@ export function ProductView({ id }: { id: string }) {
         <button type="button" className="pill" aria-pressed={compare.includes(p.id)} onClick={() => toggleCompare(p.id)}>
           {compare.includes(p.id) ? 'U poređenju ✓' : 'Poredi'}
         </button>
-        <button type="button" className="pill" onClick={() => goTo('kontakt')}>
-          Pitaj stručni tim
+        <button type="button" className="pill" onClick={() => goTo('ponuda')}>
+          Zatraži ponudu
         </button>
       </div>
     </PanelLayout>
@@ -551,7 +562,7 @@ export function SearchView() {
         autoFocus
         type="search"
         className="field"
-        placeholder="Artikal, materijal ili namjena…"
+        placeholder="Artikal, šifra, brend ili vrsta radova…"
         value={q}
         onChange={(e) => setQ(e.target.value)}
         aria-label="Pretraga artikala"
@@ -586,7 +597,7 @@ export function SearchView() {
           {results.map((p) => (
             <li key={p.id}>
               <button type="button" className="flex w-full cursor-pointer items-center gap-4 py-4 text-left" onClick={() => openPanel({ kind: 'product', id: p.id })}>
-                <Flat tone={p.tone} className="size-[56px] shrink-0" />
+                <Thumb p={p} className="size-[56px] shrink-0" />
                 <span className="min-w-0 flex-1">
                   <span className="copy block">{p.name}</span>
                   <span className="lbl mt-1 block" style={muted}>
@@ -676,7 +687,7 @@ export function FormView({ kind }: { kind: 'samples' | 'inquiry' }) {
           {!samples && (
             <label className="block sm:col-span-2">
               <span className="lbl" style={muted}>Materijali i količine *</span>
-              <textarea required className="field field-sm" placeholder="Npr. gips-karton ploče 12,5 mm, 120 kom; kamena vuna 100 mm, 30 paketa" />
+              <textarea required className="field field-sm" placeholder="Npr. Knauf GKB 12,5 mm, 300 m²; CW 75, 120 kom; kamena vuna 50 mm, 150 m²" />
             </label>
           )}
           <label className="block sm:col-span-2">

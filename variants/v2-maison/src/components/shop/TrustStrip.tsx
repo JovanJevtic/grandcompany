@@ -1,11 +1,11 @@
 import Reveal from './Reveal'
 
-// Tekstovi uslova su probni: potvrditi sa klijentom prije puštanja u rad.
+// Četiri obećanja firme (iz podataka Grand Company: istovar kranom, stanje iz Pantheona, atesti, valuta partnera).
 const ITEMS = [
-  { title: 'Dostava ili preuzimanje', text: 'Isporuka na adresu i gradilište, ili preuzimanje u Banjoj Luci.' },
-  { title: 'Cijene za izvođače', text: 'Poseban cjenovnik za izvođače radova i veće količine.' },
-  { title: 'Stručan savjet', text: 'Pomoć pri izboru i obračunu materijala za vaš objekat.' },
-  { title: 'Sve na jednom mjestu', text: 'Suha gradnja, izolacija, drvo i sanitarija u jednoj narudžbi.' },
+  { title: 'Istovar kranom na etažu', text: 'Vlastiti kamioni sa kranom spuštaju paletu na etažu ili skelu, ne na ulicu.' },
+  { title: 'Zalihe uživo iz Pantheona', text: 'Stanje na sajtu čitamo iz istog sistema iz kojeg radi prodaja.' },
+  { title: 'Atesti uz robu', text: 'CE deklaracija i protivpožarni atest uz otpremnicu, za tehnički prijem.' },
+  { title: 'Plaćanje do 90 dana', text: 'Za ugovorne partnere, po fakturi, uz mjenicu ili bankarsku garanciju.' },
 ]
 
 export default function TrustStrip() {

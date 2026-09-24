@@ -55,3 +55,9 @@ export function showCategory(cat: string) {
   window.dispatchEvent(new CustomEvent(EV.filter, { detail: cat }))
   scrollToTarget('#ponuda')
 }
+
+// Prikaži prodavnicu filtriranu na jednu vrstu radova ("Šta gradite?").
+export function showUse(use: string) {
+  window.dispatchEvent(new CustomEvent(EV.use, { detail: use }))
+  scrollToTarget('#ponuda')
+}

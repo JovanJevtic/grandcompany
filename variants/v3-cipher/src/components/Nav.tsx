@@ -25,16 +25,17 @@ function Roll({ text }: { text: string }) {
 
 // Linkovi vode na sekcije ispod heroja (glatki skrol radi Lenis). "Kontakt" u heroju otvara kontakt, a dalje niz
 // stranicu vodi na podnožje.
-const RIGHT = [
-  { label: 'Materijali', href: '#materijali' },
-  { label: 'Cijene', href: '#cijene' },
-  { label: 'Kontakt', href: '#kontakt' },
+// Sredina: Ponuda (a na širokom ekranu i Materijali, Cijene). Desno: Sačuvano i Poređenje (iz grand-root), Kontakt, Korpa.
+const CENTER = [
+  { label: 'Ponuda', href: '#ponuda', xl: false },
+  { label: 'Materijali', href: '#materijali', xl: true },
+  { label: 'Cijene', href: '#cijene', xl: true },
 ]
 
 export default function Nav() {
   const root = useRef<HTMLElement>(null)
   const [open, setOpen] = useState(false)
-  const { count, setCartOpen } = useShop()
+  const { count, setCartOpen, saved, compare, setPanel } = useShop()
 
   // Stavke navigacije se pojave tek kad se loader završi.
   useGSAP(
@@ -64,7 +65,7 @@ export default function Nav() {
     <header ref={root} className="pointer-events-none fixed inset-x-0 top-0 z-40 h-[88px] mix-blend-difference">
       <a
         href="#"
-        className="pointer-events-auto absolute left-5 top-[15px] text-[30px] font-medium lowercase leading-[48px] tracking-[-0.035em] text-fg"
+        className="pointer-events-auto absolute left-5 top-[15px] text-[30px] max-sm:text-[25px] font-medium lowercase leading-[48px] tracking-[-0.035em] text-fg"
         onClick={(e) => {
           e.preventDefault()
           if (open) toggle(false)
@@ -78,34 +79,34 @@ export default function Nav() {
         aria-label="Glavna navigacija"
         className={`transition-opacity duration-500 ${open ? 'pointer-events-none opacity-0' : ''}`}
       >
-        <a
-          data-navitem
-          href="#ponuda"
-          className="pointer-events-auto absolute left-1/2 top-[37px] -translate-x-1/2 text-fg max-md:hidden"
-        >
-          <Roll text="Ponuda" />
-        </a>
+        <div className="absolute left-1/2 top-[37px] flex -translate-x-1/2 gap-8 text-fg max-lg:hidden">
+          {CENTER.map(({ label, href, xl }) => (
+            <a data-navitem key={label} href={href} className={`pointer-events-auto ${xl ? 'max-xl:hidden' : ''}`}>
+              <Roll text={label} />
+            </a>
+          ))}
+        </div>
         <div className="absolute right-5 top-[37px] flex gap-10 text-fg max-lg:gap-6">
-          {RIGHT.map(({ label, href }) => {
-            const contact = label === 'Kontakt'
-            return (
-              <a
-                data-navitem
-                key={label}
-                href={href}
-                className={`pointer-events-auto ${contact ? '' : 'max-lg:hidden'}`}
-                onClick={(e) => {
-                  // u heroju se otvara kontakt (pikselizirani prsten), a niže na stranici Lenis vodi do podnožja
-                  if (contact && window.scrollY < window.innerHeight * 0.4) {
-                    e.preventDefault()
-                    toggle(true)
-                  }
-                }}
-              >
-                <Roll text={label} />
-              </a>
-            )
-          })}
+          <button data-navitem type="button" className="pointer-events-auto max-md:hidden" onClick={() => setPanel('saved')}>
+            <Roll text={`Sačuvano (${saved.length})`} />
+          </button>
+          <button data-navitem type="button" className="pointer-events-auto max-md:hidden" onClick={() => setPanel('compare')}>
+            <Roll text={`Poređenje (${compare.length})`} />
+          </button>
+          <a
+            data-navitem
+            href="#kontakt"
+            className="pointer-events-auto"
+            onClick={(e) => {
+              // u heroju se otvara kontakt (pikselizirani prsten), a niže na stranici Lenis vodi do podnožja
+              if (window.scrollY < window.innerHeight * 0.4) {
+                e.preventDefault()
+                toggle(true)
+              }
+            }}
+          >
+            <Roll text="Kontakt" />
+          </a>
           <button
             data-navitem
             type="button"
@@ -114,6 +115,15 @@ export default function Nav() {
             onClick={() => setCartOpen(true)}
           >
             <Roll text={`Korpa (${count})`} />
+          </button>
+        </div>
+        {/* na mobilnom Sačuvano i Poređenje idu u drugi red, ispod Kontakta i Korpe */}
+        <div className="absolute right-5 top-[62px] flex gap-6 text-fg md:hidden">
+          <button data-navitem type="button" className="pointer-events-auto" onClick={() => setPanel('saved')}>
+            <Roll text={`Sačuvano (${saved.length})`} />
+          </button>
+          <button data-navitem type="button" className="pointer-events-auto" onClick={() => setPanel('compare')}>
+            <Roll text={`Poređenje (${compare.length})`} />
           </button>
         </div>
       </nav>

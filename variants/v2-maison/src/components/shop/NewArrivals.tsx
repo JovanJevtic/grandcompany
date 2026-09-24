@@ -4,18 +4,18 @@ import { useRef } from 'react'
 import { useShop } from '@/lib/cart'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
-import { PRODUCTS } from '@/lib/shop'
+import { FEATURED } from '@/lib/shop'
 import ProductCard from './ProductCard'
 import SectionHead from './SectionHead'
 
-const NEW = PRODUCTS.filter((p) => p.isNew)
+const NEW = FEATURED
 const pad = (n: number) => String(n).padStart(2, '0')
 
 // Na desktopu se sekcija pina, a skrol stranice pomjera artikle ulijevo. Na mobilnom je običan swipe.
 // id stoji na vanjskom elementu: pin ubacuje spacer oko sekcije, pa link vodi na početak cijelog puta.
 export default function NewArrivals() {
   const root = useRef<HTMLDivElement>(null)
-  const { cart, saved } = useShop()
+  const { cart, saved, compare } = useShop()
 
   useGSAP(
     () => {
@@ -62,11 +62,11 @@ export default function NewArrivals() {
       >
         <div className="gutter">
           <SectionHead
-            no="01"
-            label="Novo"
-            title="Novo u ponudi"
-            lead="Nova roba na policama. Prevucite ili skrolajte da vidite sve."
-            meta={`${NEW.length} novih`}
+            no="02"
+            label="Najčešće birano"
+            title="Najčešće birano"
+            lead="Artikli koji najčešće idu u narudžbe. Prevucite ili skrolajte da vidite sve."
+            meta={`${NEW.length} artikala`}
           />
         </div>
 
@@ -74,7 +74,7 @@ export default function NewArrivals() {
           <div data-track className="flex w-max gap-4 px-5 md:gap-[2vw] md:px-[8.33vw]">
             {NEW.map((p, i) => (
               <div key={p.id} className="w-[68vw] shrink-0 snap-start sm:w-[44vw] md:w-[31dvh] md:min-w-[250px]">
-                <ProductCard product={p} index={i} qty={cart[p.id] ?? 0} saved={saved.includes(p.id)} reveal={false} />
+                <ProductCard product={p} index={i} qty={cart[p.id] ?? 0} saved={saved.includes(p.id)} compared={compare.includes(p.id)} reveal={false} />
               </div>
             ))}
           </div>

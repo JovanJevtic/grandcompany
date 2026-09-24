@@ -4,25 +4,21 @@ import { useState } from 'react'
 import { showCategory } from '@/lib/scroll'
 import { CATS, PRODUCTS, artikala } from '@/lib/shop'
 import SectionHead from './SectionHead'
-import { tileBg, tileInk } from './tile'
-
-// koja siva ploča predstavlja koji materijal
-const TILE_FOR = [0, 1, 5, 9, 12]
 const two = (n: number) => String(n).padStart(2, '0')
 
-// Materijali: popis od pet redova. Ispod kursora ostaje pun red, ostali potamne (kao u prstenu), a desno se
-// mijenja ploča sa opisom. Klik otvara tu kategoriju u prodavnici.
+// Materijali: popis naše četiri grupe (tekst `usage` iz kataloga). Ispod kursora ostaje pun red, ostali potamne (kao u prstenu), a desno se
+// mijenja fotografija primjene sa opisom (fotografija je radova, ne artikla). Klik otvara tu kategoriju u prodavnici.
 export default function Materials() {
   const [active, setActive] = useState(0)
 
   return (
     <section id="materijali" className="border-t border-line px-5 py-[clamp(72px,11vw,176px)]">
       <SectionHead
-        no="03 / 06"
+        no="06 / 12"
         eyebrow="Materijali"
         title={
           <>
-            pet materijala. <em>jedan sistem</em>.
+            četiri grupe. <em>jedan sistem</em>.
           </>
         }
         intro="Sve što treba da zid, plafon ili izolacija budu urađeni kako treba, od ploče do posljednjeg vijka."
@@ -52,16 +48,20 @@ export default function Materials() {
             {CATS.map((c, i) => (
               <div
                 key={c.id}
-                className="absolute inset-0 flex flex-col justify-between p-6 transition-opacity duration-700"
-                style={{ background: tileBg(TILE_FOR[i]), color: tileInk(TILE_FOR[i]), opacity: active === i ? 1 : 0 }}
+                className="absolute inset-0 isolate flex flex-col justify-between p-6 text-white transition-opacity duration-700"
+                style={{ opacity: active === i ? 1 : 0 }}
               >
+                {/* eslint-disable-next-line @next/next/no-img-element -- lokalna fotografija primjene */}
+                <img src={c.photo} alt="" className="absolute inset-0 -z-10 h-full w-full object-cover" />
+                <span className="absolute inset-0 -z-10 bg-[linear-gradient(180deg,rgba(0,0,0,0.35),rgba(0,0,0,0.15)_35%,rgba(0,0,0,0.85))]" />
                 <p className="info flex justify-between font-medium">
                   <span>{two(i + 1)}</span>
                   <span>{c.name}</span>
                 </p>
                 <div>
                   <p className="max-w-[34ch] text-[15px] leading-[1.5]">{c.text}</p>
-                  <ul className="mt-6 border-t border-current/30">
+                  <p className="info mb-3 opacity-70">U ponudi, između ostalog</p>
+                  <ul className="border-t border-current/30">
                     {c.facts.map((f) => (
                       <li key={f} className="border-b border-current/30 py-2.5 text-[13px]">
                         {f}

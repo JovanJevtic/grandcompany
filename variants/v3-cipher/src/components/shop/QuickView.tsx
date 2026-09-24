@@ -4,20 +4,20 @@ import { useRef, useState } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { BRAND, pad } from '@/lib/content'
 import { EASE, prefersReducedMotion } from '@/lib/motion'
-import { PRODUCTS, STOCK_LABEL, catName, km, type Product } from '@/lib/shop'
+import { PRODUCTS, STOCK_LABEL, catName, km, qtyText, round2, type Product } from '@/lib/shop'
+import ProductImage from './ProductImage'
 import { useShop } from './ShopProvider'
-import { tileBg, tileInk } from './tile'
 import { useDialog } from './useDialog'
 
 // Brzi pregled: ploča artikla raste iz svog položaja do gotovo cijelog ekrana (isti pokret kao ploče u heroju),
-// a desno se pojavi crni panel sa opisom, količinom i dugmetom za korpu.
+// a desno se pojavi crni panel sa opisom, količinom i dugmetom za korpu. Dodato: Sačuvaj i Poredi (grand-root).
 function Panel({ p, rect }: { p: Product; rect: DOMRect }) {
-  const { add, closeView } = useShop()
+  const { add, closeView, saved, compare, toggleSaved, toggleCompare } = useShop()
   const layer = useRef<HTMLDivElement>(null)
   const side = useRef<HTMLDivElement>(null)
   const closing = useRef(false)
-  const [qty, setQty] = useState(1)
-  const ink = tileInk(p.tile)
+  const [qty, setQty] = useState(p.step)
+  const ink = p.drawing ? '#000' : '#fff'
   const no = PRODUCTS.indexOf(p) + 1
   const margin = () => (window.innerWidth < 768 ? 0 : 24)
 
@@ -61,8 +61,12 @@ function Panel({ p, rect }: { p: Product; rect: DOMRect }) {
       aria-modal="true"
       aria-label={p.name}
       className="fixed z-[70] overflow-hidden focus:outline-none"
-      style={{ background: tileBg(p.tile), top: rect.top, left: rect.left, width: rect.width, height: rect.height }}
+      style={{ top: rect.top, left: rect.left, width: rect.width, height: rect.height }}
     >
+      {/* slika stoji u lijevom dijelu (na mobilnom u gornjoj trećini), da je panel ne prekrije */}
+      <div className="absolute inset-x-0 top-0 h-[34%] md:inset-y-0 md:right-[min(560px,46%)] md:h-auto">
+        <ProductImage p={p} pad="10%" eager />
+      </div>
       <div data-x className="info absolute bottom-6 left-6 flex gap-6 font-medium" style={{ color: ink }}>
         <span>{pad(no)}</span>
         <span>{BRAND}</span>
@@ -94,7 +98,7 @@ function Panel({ p, rect }: { p: Product; rect: DOMRect }) {
           <span className="info text-dim">/ {p.unit}</span>
         </p>
         <p data-x className="info mt-3 text-dim">
-          {STOCK_LABEL[p.stock]}
+          {STOCK_LABEL[p.level]} · {p.brand} · šifra {p.sku}
         </p>
 
         <p data-x className="mt-7 max-w-[46ch] text-[15px] leading-[1.55]">
@@ -110,15 +114,24 @@ function Panel({ p, rect }: { p: Product; rect: DOMRect }) {
           ))}
         </dl>
 
+        <div data-x className="mt-6 grid grid-cols-2 gap-2">
+          <button type="button" className="chip" aria-pressed={saved.includes(p.id)} onClick={() => toggleSaved(p.id)}>
+            {saved.includes(p.id) ? 'Sačuvano ✓' : 'Sačuvaj'}
+          </button>
+          <button type="button" className="chip" aria-pressed={compare.includes(p.id)} onClick={() => toggleCompare(p.id)}>
+            {compare.includes(p.id) ? 'U poređenju ✓' : 'Poredi'}
+          </button>
+        </div>
+
         <div data-x className="mt-auto flex gap-3 pt-8">
           <div className="inline-flex items-center border border-line">
-            <button type="button" aria-label="Smanji količinu" onClick={() => setQty((q) => Math.max(1, q - 1))} className="size-[50px] text-[16px] leading-none">
+            <button type="button" aria-label="Smanji količinu" onClick={() => setQty((q) => Math.max(p.step, round2(q - p.step)))} className="size-[50px] text-[16px] leading-none">
               −
             </button>
-            <span className="min-w-8 text-center text-[13px] font-medium tabular-nums" aria-live="polite">
-              {qty}
+            <span className="min-w-14 text-center text-[13px] font-medium tabular-nums" aria-live="polite">
+              {qtyText(qty)} {p.unit}
             </span>
-            <button type="button" aria-label="Povećaj količinu" onClick={() => setQty((q) => Math.min(999, q + 1))} className="size-[50px] text-[16px] leading-none">
+            <button type="button" aria-label="Povećaj količinu" onClick={() => setQty((q) => Math.min(9999, round2(q + p.step)))} className="size-[50px] text-[16px] leading-none">
               +
             </button>
           </div>
@@ -130,7 +143,7 @@ function Panel({ p, rect }: { p: Product; rect: DOMRect }) {
             }}
             className="btn btn-solid flex-1 justify-between"
           >
-            <span>+ Dodaj u korpu</span>
+            <span>+ U korpu</span>
             <span className="tabular-nums">{km(p.price * qty)}</span>
           </button>
         </div>

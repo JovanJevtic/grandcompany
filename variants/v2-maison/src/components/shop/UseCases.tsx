@@ -13,10 +13,10 @@ export default function UseCases() {
     <section id="namjena" data-spy className="scroll-mt-[var(--bar)] py-[14dvh]">
       <div className="gutter">
         <SectionHead
-          no="04"
+          no="05"
           label="Po namjeni"
           title="Šta gradite?"
-          lead="Izaberite vrstu radova i vidite samo materijal koji vam treba."
+          lead="Izaberite vrstu radova i katalog pokazuje samo materijal za taj posao."
           meta={`${USES.length} vrsta radova`}
         />
       </div>

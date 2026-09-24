@@ -68,7 +68,8 @@ export default function Panels() {
 
   // Fokus ide u panel kad se otvori (čitači ekrana i tastatura).
   useEffect(() => {
-    if (entered) box.current?.focus({ preventScroll: true })
+    // Polje sa autoFocus (pretraga) zadržava fokus; inače fokus ide na sam panel.
+    if (entered && !box.current?.contains(document.activeElement)) box.current?.focus({ preventScroll: true })
   }, [entered, shown?.kind])
 
   return (

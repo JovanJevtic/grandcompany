@@ -61,13 +61,22 @@ export const VAT_RATE: number = raw.VAT_RATE
 export const FREE_DELIVERY_OVER: number = raw.FREE_STANDARD_DELIVERY_OVER
 export const CRANE_RECOMMEND_OVER_KG: number = raw.CRANE_RECOMMEND_OVER_KG
 
+// Material or work shots only — posed stock photos of workers are banned by
+// the design system (design/DESIGN-SYSTEM.md, "Fotografija").
+const CATEGORY_PHOTO: Record<CategoryId, string> = {
+  'suha-gradnja': '/photos/drywall-wall.jpg',
+  izolacija: '/photos/facade.jpg',
+  veziva: '/photos/pallets-bags.jpg',
+  oprema: '/photos/drywall-frame.jpg',
+}
+
 export const CATEGORIES: Category[] = raw.CATEGORIES.map((c) => ({
   id: c.id as CategoryId,
   label: c.label,
   lead: c.lead,
   usage: c.usage,
   color: c.color,
-  photo: photoOf((c as { app?: string }).app ?? c.image),
+  photo: CATEGORY_PHOTO[c.id as CategoryId] ?? photoOf(c.image),
 }))
 
 const PHOTOS = raw.PRODUCT_PHOTOS as Record<string, string>

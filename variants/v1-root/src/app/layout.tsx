@@ -20,9 +20,9 @@ const serif = Instrument_Serif({
 const sans = Inter_Tight({ variable: "--f-sans", subsets: ["latin", "latin-ext"] });
 
 export const metadata: Metadata = {
-  title: "GRAND COMPANY — Građevinski materijal, Banja Luka",
+  title: "Grand Company — suha gradnja, izolacija i fasade, Banja Luka",
   description:
-    "GRAND COMPANY d.o.o. iz Banje Luke: veleprodaja i maloprodaja građevinskog materijala, sistemi suhe gradnje i kamena vuna. Zašto mi, ko smo, šta nudimo i kako radimo, uz prodavnicu materijala.",
+    "Grand Company d.o.o. Banja Luka: Knauf ploče i profili, kamena vuna i stiropor, ljepila, mase i vijci. Zalihe iz Pantheona, istovar kranom na etažu, plaćanje do 90 dana za ugovorne partnere.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

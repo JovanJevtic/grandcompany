@@ -1,17 +1,12 @@
 'use client'
 
 import { ReactLenis, type LenisRef } from 'lenis/react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 
-// Stranica se uvijek skroluje OKOMITO. Na desktopu vertikalni točkić (i vodoravni potez po touchpadu,
-// gestureOrientation: 'both') pomjera vodoravnu traku landinga, jer je ona zalijepljena i vezana za skrol
-// (vidi Motion.tsx); kad traka stigne do kraja, skrol nastavlja u prodavnicu ispod.
+// Glatki okomiti skrol (Lenis). Vodoravni potezi po touchpadu ostaju prirodni, za traku "Najčešće birano".
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<LenisRef>(null)
-
-  // Bira se jednom, pri učitavanju. Ne utiče na HTML, pa nema greške pri hidrataciji.
-  const [desktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches)
 
   useEffect(() => {
     function update(time: number) {
@@ -37,7 +32,7 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
         autoRaf: false,
         lerp: 0.09,
         orientation: 'vertical',
-        gestureOrientation: desktop ? 'both' : 'vertical',
+        gestureOrientation: 'vertical',
       }}
     >
       {children}

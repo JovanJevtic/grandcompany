@@ -326,31 +326,6 @@ html.lenis-stopped {
   }
 }
 
-/* Kursor-tačka postoji samo na uređajima sa mišem. */
-@media (hover: none), (pointer: coarse) {
-  .cursor-dot {
-    display: none;
-  }
-}
-
-/* Na mobilnom nema traka, pa sadržaj ide do desne ivice. */
-@media (max-width: 767px) {
-  :root {
-    --re: 100vw;
-  }
-}
-
-/* Siva "video" ploča u hero-u: lagano prelijevanje da se vidi da je živa. */
-@keyframes sheen {
-  from { background-position: 100% 0; }
-  to { background-position: 0 0; }
-}
-.hero-sheen {
-  background: linear-gradient(110deg, #7c7872 25%, #948f88 50%, #7c7872 75%);
-  background-size: 250% 100%;
-  animation: sheen 7s ease-in-out infinite alternate;
-}
-
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

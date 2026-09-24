@@ -1,4 +1,4 @@
-import { TONES } from '@/lib/content'
+import type { Availability, Product } from '@/lib/shop'
 import { parseText } from '@/lib/company'
 
 // Tekst sa oznakama iz company.ts: {sjediste} → vrijednost (ili istaknuta oznaka ako je nepoznata), *kurziv*.
@@ -71,14 +71,17 @@ export function SectionHead({
   )
 }
 
-// Siva ploča umjesto fotografije (slike još stižu). Otvara se sa lijeva na desno kad uđe u ekran.
-export function Plate({
-  tone = 0,
+// Fotografija ambijenta (naše stovarište, kran, primjena materijala). Otvara se sa lijeva na desno kad uđe u
+// ekran, kao sive ploče na Marijinom landingu.
+export function Photo({
+  src,
+  alt,
   className = '',
   index = 0,
   children,
 }: {
-  tone?: number
+  src: string
+  alt: string
   className?: string
   index?: number
   children?: React.ReactNode
@@ -86,22 +89,53 @@ export function Plate({
   return (
     <div
       data-reveal="clip"
-      className={`relative overflow-hidden ${className}`}
+      className={`${className.includes('absolute') ? '' : 'relative'} overflow-hidden ${className}`}
       style={{ ['--i' as string]: index }}
-      aria-hidden
     >
-      <div className="plate-in absolute inset-0" style={{ background: TONES[tone % TONES.length] }} />
+      {/* eslint-disable-next-line @next/next/no-img-element -- statične fotografije iz /public, bez optimizacije */}
+      <img src={src} alt={alt} loading="lazy" className="plate-in absolute inset-0 size-full object-cover" />
       {children}
     </div>
   )
 }
 
-// Tačka dostupnosti u paleti sajta: puna tamna = na stanju, orange = ograničeno, prazan krug = po narudžbi.
-export function AvailDot({ avail }: { avail: 'na-stanju' | 'ograniceno' | 'po-narudzbi' }) {
+// Slika artikla. Crtež (SVG) stoji cijeli na svijetloj podlozi; fotografija artikla popunjava okvir.
+export function ProductImage({
+  p,
+  className = '',
+  index = 0,
+  reveal = true,
+}: {
+  p: Pick<Product, 'image' | 'drawing' | 'name'>
+  className?: string
+  index?: number
+  reveal?: boolean
+}) {
+  return (
+    <div
+      data-reveal={reveal ? 'clip' : undefined}
+      className={`relative overflow-hidden ${className}`}
+      style={{ ['--i' as string]: index }}
+    >
+      <div className={`${reveal ? 'plate-in' : ''} absolute inset-0 ${p.drawing ? 'bg-[#efe9d6]' : ''}`}>
+        {/* eslint-disable-next-line @next/next/no-img-element -- statične slike iz /public, bez optimizacije */}
+        <img
+          src={p.image}
+          alt={p.name}
+          loading="lazy"
+          className={`size-full ${p.drawing ? 'object-contain p-[8%]' : 'object-cover'}`}
+        />
+      </div>
+    </div>
+  )
+}
+
+// Tačka dostupnosti u paleti sajta: puna tamna = na stanju, orange = ograničeno, prazan krug = malo na stanju.
+export function AvailDot({ avail }: { avail: Availability }) {
   const style =
-    avail === 'na-stanju'
+    avail === 'high'
       ? { background: 'var(--ink)' }
-      : avail === 'ograniceno'
+      : avail === 'mid'
         ? { background: '#d6956d' }
         : { border: '1px solid var(--ink)' }
   return <span aria-hidden className="mr-2 inline-block size-[7px] rounded-full align-[1px]" style={style} />
