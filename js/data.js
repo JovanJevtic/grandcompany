@@ -310,7 +310,7 @@ const HOME_FAQ = [
    'Ugovorni partneri plaćaju po fakturi, sa valutom do 90 dana uz mjenicu ili bankarsku garanciju. Kreditni limit i otvorene stavke vidite na portalu.'],
 ];
 
-const BRANDS = [
+const BRAND_NOTES = [
   ['Knauf', 'Gips-kartonske ploče i kompletni sistemi suhe gradnje. Ovlašćeni smo distributer.'],
   ['Knauf Insulation', 'Kamena i staklena mineralna vuna za zidove, plafone i potkrovlja.'],
   ['Ceresit', 'Ljepila, mase za armiranje i fasadni sistemi.'],

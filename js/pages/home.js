@@ -120,7 +120,7 @@ initPage(() => {
         <p class="mt-4 max-w-text text-[15px] leading-relaxed text-muted">${a}</p>
       </details>`).join('');
 
-    if ($('home-brands')) $('home-brands').innerHTML = BRANDS.map(([name, text]) => `
+    if ($('home-brands')) $('home-brands').innerHTML = BRAND_NOTES.map(([name, text]) => `
       <div class="border-t border-canvas/20 pt-5">
         <p class="text-[17px] font-medium">${name}</p>
         <p class="mt-2 text-[14px] leading-relaxed text-canvas/60">${text}</p>
