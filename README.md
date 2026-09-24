@@ -24,6 +24,7 @@ python3 -m http.server 8642
 | `partneri.html` | Pregled partnerskog naloga, nivoi, koraci, zahtjev za partnerstvo, pitanja |
 | `dostava.html` | Načini dostave, cjenovnik zona, proces istovara kranom, težine, pitanja |
 | `o-nama.html` | Priča, brojke, principi rada, podaci o firmi |
+| `pravno.html?dok=povrat-robe` | Uslovi i pravila kupovine: povrat, plaćanje, reklamacije, privatnost… (NACRT, iz GCKit) |
 | `kontakt.html` | Telefoni, radno vrijeme, mapa, forma za upit |
 
 ## Struktura koda
@@ -36,6 +37,7 @@ python3 -m http.server 8642
 | `js/art.js` | SVG ilustracije proizvoda iz recepta `product.art` u `data.js` |
 | `js/ui.js` | Zajednički **izgled** — header, footer, korpa, modali, prijava, kartica proizvoda, `initPage()` |
 | `js/pages/*.js` | Logika pojedinačne stranice |
+| `js/ecom.js` | Povezuje GCKit komponente (`vendor/gckit/`, iz `../ecom-components`) sa katalogom i korpom: sačuvano, poređenje, brzi pregled, prijedlozi pretrage |
 | `js/motion.js` | GSAP + Lenis animacije (sajt radi i bez njih) |
 | `css/site.css`, `js/tw-config.js` | Fontovi, bazni stilovi i paleta boja |
 

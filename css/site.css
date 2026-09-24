@@ -156,3 +156,7 @@ html.lenis, html.lenis body { height: auto; }
   html { scroll-behavior: auto; }
   .drawer { transition: none; }
 }
+
+/* GCKit panels (saved, compare, quick view) sit above the cart drawer (z-50)
+   and modals (z-55) but under the toast (z-60), so "U korpu" feedback shows */
+:root { --gck-z: 56; }

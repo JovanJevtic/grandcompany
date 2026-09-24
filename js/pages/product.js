@@ -152,6 +152,10 @@ initPage(() => {
             <button data-add="${p.sku}" class="${BTN_PRIMARY} min-w-[200px] flex-1 px-8 py-4 text-[16px]">Dodaj u korpu</button>
           </div>
           <p id="line-total" class="mt-3 text-[15px] text-muted"></p>
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button type="button" data-gck-save="${p.sku}" aria-pressed="${GCKit.saved.list.has(p.sku)}" class="gck-btn gck-btn--line gck-btn--small">Sačuvaj</button>
+            <button type="button" data-gck-compare="${p.sku}" aria-pressed="${GCKit.compare.list.has(p.sku)}" class="gck-btn gck-btn--line gck-btn--small">Uporedi</button>
+          </div>
 
           ${showCalc ? `<a href="kalkulator.html" class="mt-5 inline-flex items-center gap-2 text-[15px] text-steel link-line">Izračunajte količinu za pregradni zid ${ICON.arrow}</a>` : ''}
 

@@ -22,6 +22,8 @@ const ICON = {
   doc: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>',
   card: '<svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="6" width="18" height="13" rx="1"/><path d="M3 10h18M7 15h4"/></svg>',
   check: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+  heart: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  compare: '<svg viewBox="0 0 24 24" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M8 4v16M16 4v16M4 8h8M12 16h8"/></svg>',
   arrow: '<svg viewBox="0 0 24 24" class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
 };
 
@@ -107,6 +109,12 @@ function headerHTML() {
       ${searchForm('hdr-q', 'mx-auto hidden max-w-2xl flex-1 lg:flex')}
       <div class="ml-auto flex items-center gap-2 lg:ml-0">
         <button id="btn-account" class="flex h-11 items-center gap-2 px-1.5 text-[12px] uppercase tracking-label transition-colors hover:text-steel sm:px-2">${ICON.user}<span id="account-label" class="hidden max-w-[180px] truncate sm:inline">Prijava za partnere</span></button>
+        <button type="button" data-gck-open="saved" class="relative hidden h-11 w-10 sm:flex items-center justify-center transition-colors hover:text-steel" aria-label="Sačuvani artikli" title="Sačuvano">${ICON.heart}
+          <span data-gck-count="saved" hidden class="tnum absolute -right-1 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-surface">0</span>
+        </button>
+        <button type="button" data-gck-open="compare" class="relative hidden h-11 w-10 sm:flex items-center justify-center transition-colors hover:text-steel" aria-label="Poređenje artikala" title="Poređenje">${ICON.compare}
+          <span data-gck-count="compare" hidden class="tnum absolute -right-1 top-0 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-ink px-1 text-[10px] font-bold text-surface">0</span>
+        </button>
         <button id="btn-cart" class="relative flex h-11 items-center gap-2 border border-ink px-3 text-[12px] uppercase tracking-label transition-colors hover:bg-ink hover:text-canvas sm:px-5">
           ${ICON.cart}<span id="cart-total" class="tnum hidden sm:inline">Korpa</span>
           <span id="cart-count" class="absolute -right-2 -top-2 hidden h-5 min-w-[20px] items-center justify-center rounded-full bg-steel px-1 text-[11px] font-bold text-surface">0</span>
@@ -129,6 +137,10 @@ function headerHTML() {
         <div class="mt-2 grid grid-cols-2 gap-x-4">
           <a href="katalog.html" class="py-2 text-[16px] font-medium">Svi proizvodi</a>
           ${CATEGORIES.map((c) => `<a href="katalog.html?kat=${c.id}" class="py-2 text-[16px]">${c.label}</a>`).join('')}
+        </div>
+        <div class="mt-5 grid grid-cols-2 gap-x-4 border-t border-ink/10 pt-4 sm:hidden">
+          <button type="button" data-gck-open="saved" class="flex items-center gap-2 py-2 text-left text-[16px]">${ICON.heart}Sačuvano <span data-gck-count="saved" hidden class="tnum text-muted">0</span></button>
+          <button type="button" data-gck-open="compare" class="flex items-center gap-2 py-2 text-left text-[16px]">${ICON.compare}Poređenje <span data-gck-count="compare" hidden class="tnum text-muted">0</span></button>
         </div>
         <p class="mt-5 text-[13px] font-medium text-muted">Usluge i firma</p>
         <div class="mt-2 grid grid-cols-2 gap-x-4">
@@ -183,7 +195,7 @@ function footerHTML() {
         </div>
         ${col('Katalog', [['katalog.html', 'Svi proizvodi'], ...CATEGORIES.map((c) => [`katalog.html?kat=${c.id}`, c.label])])}
         ${col('Usluge', [['kalkulator.html', 'Kalkulator utroška'], ['dostava.html', 'Dostava i kran'], ['partneri.html', 'Partnerski program'], ['korpa.html', 'Korpa i narudžba']])}
-        ${col('Firma', [['o-nama.html', 'O nama'], ['kontakt.html', 'Kontakt'], ['kontakt.html#poruka', 'Pošaljite upit'], ['zasluge.html', 'Zasluge za fotografije']])}
+        ${col('Firma', [['o-nama.html', 'O nama'], ['kontakt.html', 'Kontakt'], ['kontakt.html#poruka', 'Pošaljite upit'], ['pravno.html', 'Uslovi i pravila kupovine'], ['zasluge.html', 'Zasluge za fotografije']])}
         <div class="lg:col-span-3">
           <p class="eyebrow text-canvas/50">Pozovite nas</p>
           <ul class="mt-5 space-y-3 text-[14px] text-canvas/60">
@@ -504,10 +516,13 @@ function productCard(p) {
   const photo = PRODUCT_PHOTOS[p.sku];
   return `
   <article data-product="${p.sku}" class="group flex flex-col">
-    <a href="${url}" class="relative block overflow-hidden bg-well" tabindex="-1" aria-hidden="true">
-      <div class="aspect-square ${photo ? '' : 'p-3'} transition-transform duration-[900ms] group-hover:scale-[1.04]">${productArt(p)}</div>
-      ${b2b ? `<span class="absolute left-0 top-0 bg-ink px-3 py-1.5 text-[11px] uppercase tracking-label text-canvas">Rabat −${pct(discount())}</span>` : ''}
-    </a>
+    <div class="relative overflow-hidden bg-well">
+      <a href="${url}" class="block" tabindex="-1" aria-hidden="true">
+        <div class="aspect-square ${photo ? '' : 'p-3'} transition-transform duration-[900ms] group-hover:scale-[1.04]">${productArt(p)}</div>
+      </a>
+      ${b2b ? `<span class="pointer-events-none absolute left-0 top-0 bg-ink px-3 py-1.5 text-[11px] uppercase tracking-label text-canvas">Rabat −${pct(discount())}</span>` : ''}
+      ${productTools(p)}
+    </div>
     <div class="flex flex-1 flex-col pt-5">
       <h3 class="text-[16px] font-medium leading-snug"><a href="${url}" class="link-line">${esc(p.name)}</a></h3>
       <p class="mt-2 text-[11px] uppercase leading-relaxed tracking-label text-muted">${esc(p.brand)} &middot; ${esc(p.spec)}</p>
@@ -613,6 +628,7 @@ function initPage(pageInit) {
     bindHeaderCondense();
     onChange(renderChrome);
     renderChrome();
+    initEcom();
     if (pageInit) pageInit();
   });
 
