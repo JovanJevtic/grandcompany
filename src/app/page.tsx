@@ -5,17 +5,24 @@ import Mark from "@/components/Mark";
 import Nav from "@/components/Nav";
 import ScrollFx from "@/components/ScrollFx";
 import SmoothScroll from "@/components/SmoothScroll";
+import Bundles from "@/components/shop/Bundles";
 import CartDrawer from "@/components/shop/CartDrawer";
+import Categories from "@/components/shop/Categories";
+import Delivery from "@/components/shop/Delivery";
+import Faq from "@/components/shop/Faq";
 import Footer from "@/components/shop/Footer";
+import ListDrawer from "@/components/shop/ListDrawer";
 import Materials from "@/components/shop/Materials";
 import Novo from "@/components/shop/Novo";
 import Pricing from "@/components/shop/Pricing";
+import Promises from "@/components/shop/Promises";
 import QuickView from "@/components/shop/QuickView";
+import Quote from "@/components/shop/Quote";
 import Shop from "@/components/shop/Shop";
 import ShopProvider from "@/components/shop/ShopProvider";
 import Steps from "@/components/shop/Steps";
-
-const FACTS = ["Veleprodaja i maloprodaja", "Sistemi suhe gradnje", "Kamena vuna", "Od 2012. u Banjoj Luci"];
+import Toast from "@/components/shop/Toast";
+import UseCases from "@/components/shop/UseCases";
 
 export default function Home() {
   return (
@@ -31,24 +38,25 @@ export default function Home() {
         {/* Hero je fiksan sloj; ovaj prazan blok drži prvi ekran, a prodavnica se preko njega navlači kao zavjesa. */}
         <div aria-hidden className="h-svh" />
         <div className="relative z-[38] bg-bg">
-          <ul className="grid grid-cols-2 gap-px border-t border-line bg-line md:grid-cols-4">
-            {FACTS.map((t, i) => (
-              <li key={t} data-reveal className="bg-bg px-5 pb-6 pt-5 md:pb-8">
-                <span className="info text-dim">0{i + 1}</span>
-                <p className="mt-10 max-w-[16ch] text-[clamp(20px,2vw,28px)] font-medium leading-[1.05] tracking-[-0.04em] md:mt-14">{t}</p>
-              </li>
-            ))}
-          </ul>
+          <Promises />
+          <Categories />
           <Shop />
           <Novo />
+          <Bundles />
+          <UseCases />
           <Materials />
           <Pricing />
+          <Delivery />
           <Steps />
+          <Faq />
+          <Quote />
           <Footer />
         </div>
       </main>
       <CartDrawer />
+      <ListDrawer />
       <QuickView />
+      <Toast />
       <SmoothScroll />
       <ScrollFx />
     </ShopProvider>

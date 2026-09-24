@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { BRAND, TEXT, TILES, pad } from '@/lib/content'
+import { catName, km } from '@/lib/shop'
+import { openContact, scrollToTarget } from '@/lib/scroll'
+import ProductImage from '@/components/shop/ProductImage'
 import { EASE, EV, prefersReducedMotion } from '@/lib/motion'
 import { lockScroll, unlockScroll } from '@/lib/scroll'
 
@@ -42,6 +45,8 @@ export default function Constellation() {
     () => {
       const el = root.current!
       const tiles = [...el.querySelectorAll<HTMLElement>('[data-tile]')]
+      const imgs = tiles.map((tile) => tile.querySelector('img'))
+      const copy = el.querySelectorAll<HTMLElement>('[data-herocopy]')
       const canvas = canvasRef.current!
       const ctx = canvas.getContext('2d')!
       const buf = document.createElement('canvas')
@@ -100,8 +105,24 @@ export default function Constellation() {
           bctx.globalAlpha = t[i].intro * 0.9
           bctx.fillStyle = TILES[i].a
           bctx.fillRect(x, y, w, h)
-          bctx.fillStyle = TILES[i].b
-          bctx.fillRect(x + w * 0.35, y + h * 0.45, w * 0.65, h * 0.55)
+          const img = imgs[i]
+          if (img && img.complete && img.naturalWidth > 0) {
+            // isti kadar kao u DOM-u: crtež "contain" sa odmakom, fotografija "cover"
+            const iw = img.naturalWidth
+            const ih = img.naturalHeight
+            if (TILES[i].p.drawing) {
+              const k = Math.min((w * 0.84) / iw, (h * 0.84) / ih)
+              bctx.drawImage(img, x + (w - iw * k) / 2, y + (h - ih * k) / 2, iw * k, ih * k)
+            } else {
+              const k = Math.max(w / iw, h / ih)
+              const sw = w / k
+              const sh = h / k
+              bctx.drawImage(img, (iw - sw) / 2, (ih - sh) / 2, sw, sh, x, y, w, h)
+            }
+          } else {
+            bctx.fillStyle = TILES[i].b
+            bctx.fillRect(x + w * 0.35, y + h * 0.45, w * 0.65, h * 0.55)
+          }
         }
         bctx.globalAlpha = 1
         ctx.clearRect(0, 0, W, H)
@@ -170,11 +191,13 @@ export default function Constellation() {
       const intro = () => {
         gsap.to(t, { intro: 1, duration: 1.5, ease: EASE.expo, stagger: 0.11 })
         gsap.to(s, { introAngle: 0, duration: 3.4, ease: 'power3.out' })
+        gsap.fromTo(copy, { autoAlpha: 0, y: 16 }, { autoAlpha: 1, y: 0, duration: 1.2, delay: 0.6, stagger: 0.12, ease: EASE.expo })
       }
       if (reduce || document.documentElement.dataset.ready === '1') {
         gsap.set(t, { intro: 1 })
         s.introAngle = 0
       } else {
+        gsap.set(copy, { autoAlpha: 0 })
         window.addEventListener(EV.ready, intro, { once: true })
       }
 
@@ -266,19 +289,40 @@ export default function Constellation() {
           key={i}
           type="button"
           data-tile
-          aria-label={`Stavka ponude ${pad(i + 1)} — ${BRAND}`}
-          className="absolute left-0 top-0 cursor-pointer will-change-transform"
+          aria-label={`Uvećaj: ${tile.p.name}`}
+          className="absolute left-0 top-0 cursor-pointer overflow-hidden will-change-transform"
           style={{
             width: `calc(var(--u) * ${tile.w})`,
             height: 'calc(var(--u) * 0.5625)',
-            background: `linear-gradient(160deg, ${tile.a}, ${tile.b})`,
             opacity: 0,
           }}
           onPointerEnter={() => ctrl.current.enter(i)}
           onPointerLeave={() => ctrl.current.leave()}
           onClick={(e) => setExpanded({ i, rect: e.currentTarget.getBoundingClientRect() })}
-        />
+        >
+          <ProductImage p={tile.p} pad="8%" eager />
+        </button>
       ))}
+
+      {/* Rečenica o firmi i dva dugmeta (obrazac sa Korvae); tekst je "difference", pa je čitljiv i preko svijetlih ploča */}
+      <div
+        className={`pointer-events-none absolute inset-0 z-[1100] transition-opacity duration-500 ${contact || expanded ? 'opacity-0' : ''}`}
+      >
+        <div className="absolute left-5 top-[104px] max-w-[min(290px,20vw)] text-white mix-blend-difference max-md:max-w-[78vw] md:top-[118px]">
+          <p data-herocopy className="info">Knauf suha gradnja · izolacija · veziva</p>
+          <h1 data-herocopy className="mt-4 text-[clamp(20px,1.6vw,26px)] font-medium leading-[1.02] tracking-[-0.04em]">
+            Građevinski materijal za suhu gradnju i fasade, <em className="font-serif font-normal tracking-[-0.02em]">kranom na vašu etažu</em>.
+          </h1>
+        </div>
+        <div data-herocopy className="pointer-events-auto absolute bottom-[64px] left-5 flex flex-wrap gap-2 max-md:bottom-[60px]">
+          <button type="button" onClick={() => scrollToTarget('#ponuda')} className="btn btn-solid">
+            Pogledaj ponudu
+          </button>
+          <button type="button" onClick={() => scrollToTarget('#upit')} className="btn bg-black">
+            Zatraži ponudu
+          </button>
+        </div>
+      </div>
 
       {/* mozaik: prsten nacrtan u sve krupnijim blokovima dok je kontakt otvoren */}
       <canvas ref={canvasRef} className="pointer-events-none absolute inset-0" style={{ opacity: 0 }} aria-hidden />
@@ -291,14 +335,18 @@ export default function Constellation() {
       >
         {/* na mobilnom je preširok tekst lijevo skriven, da se red ne lomi */}
         <p className="w-1/3 font-medium max-md:w-1/4">
-          <span className={hover === null ? 'max-md:hidden' : ''}>{hover !== null ? pad(hover + 1) : TEXT.left}</span>
+          <span className={hover === null ? 'max-md:hidden' : ''}>{hover !== null ? catName(TILES[hover].p.cat) : TEXT.left}</span>
         </p>
-        <p className="w-1/3 text-center font-medium max-md:w-2/4">{hover !== null ? BRAND : TEXT.center}</p>
+        <p className="w-1/3 truncate text-center font-medium max-md:w-2/4">{hover !== null ? TILES[hover].p.name : TEXT.center}</p>
         <div className="flex w-1/3 justify-end max-md:w-1/4">
-          <a href="#" className="pointer-events-auto flex items-center gap-2 font-mono text-[12px] leading-none tracking-[-0.02em]">
+          <button
+            type="button"
+            onClick={openContact}
+            className="pointer-events-auto flex items-center gap-2 font-mono text-[12px] leading-none tracking-[-0.02em]"
+          >
             {BRAND}
             <span className="text-[10px]">↗</span>
-          </a>
+          </button>
         </div>
       </div>
 
@@ -307,13 +355,15 @@ export default function Constellation() {
           ref={layer}
           onClick={closeExpanded}
           className="fixed z-[2000] cursor-pointer overflow-hidden"
-          style={{ background: `linear-gradient(160deg, ${TILES[expanded.i].a}, ${TILES[expanded.i].b})` }}
           role="dialog"
-          aria-label={`Stavka ponude ${pad(expanded.i + 1)}`}
+          aria-label={TILES[expanded.i].p.name}
         >
-          <div className="info absolute inset-x-6 bottom-6 flex justify-between mix-blend-difference text-white">
+          <ProductImage p={TILES[expanded.i].p} pad="9%" eager />
+          <div className="info absolute inset-x-6 bottom-6 flex justify-between gap-6 text-white mix-blend-difference">
             <span data-x>{pad(expanded.i + 1)}</span>
-            <span data-x>{BRAND}</span>
+            <span data-x className="text-center">
+              {TILES[expanded.i].p.name} · {km(TILES[expanded.i].p.price)} / {TILES[expanded.i].p.unit}
+            </span>
             <span data-x>Zatvori</span>
           </div>
         </div>

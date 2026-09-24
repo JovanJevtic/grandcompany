@@ -250,3 +250,11 @@ html[data-expanded] .mark {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Pravne stranice: podatak koji nije poznat (null u company.ts) istaknut je kao [oznaka]. */
+.missing {
+  padding: 0 0.25em;
+  border: 1px dashed var(--dim);
+  color: var(--fg);
+  white-space: nowrap;
+}

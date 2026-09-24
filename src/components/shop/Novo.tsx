@@ -8,10 +8,10 @@ import { scrollToTarget } from '@/lib/scroll'
 import { PRODUCTS } from '@/lib/shop'
 import ProductCard from './ProductCard'
 
-const NEW = PRODUCTS.filter((p) => p.isNew)
+const NEW = PRODUCTS.filter((p) => p.featured)
 const two = (n: number) => String(n).padStart(2, '0')
 
-// Novo u ponudi: na velikom ekranu se sekcija pinuje, a skrolom se traka artikala pomjera vodoravno.
+// Najčešće birano (bivše "Novo u ponudi"): istaknuti artikli iz kataloga. Na velikom ekranu se sekcija pinuje, a skrolom se traka artikala pomjera vodoravno.
 // Na manjim ekranima (i sa "smanji pokrete") to je obična traka koja se prevlači prstom.
 export default function Novo() {
   const root = useRef<HTMLElement>(null)
@@ -54,10 +54,10 @@ export default function Novo() {
   )
 
   return (
-    <section id="novo" ref={root} className="relative border-t border-line">
+    <section id="birano" ref={root} className="relative border-t border-line">
       <div data-pin className="flex flex-col justify-between max-lg:py-[clamp(72px,11vw,176px)] lg:h-svh lg:overflow-hidden lg:pb-8 lg:pt-[104px]">
         <div className="info flex justify-between px-5 text-dim">
-          <span>Novo u ponudi</span>
+          <span>03 / 12 · Najčešće birano</span>
           <span data-count className="tabular-nums">
             01 / {two(NEW.length)}
           </span>
@@ -69,9 +69,9 @@ export default function Novo() {
         >
           <div className="shrink-0 max-lg:w-[86vw] lg:w-[min(42vw,760px)] lg:pr-10">
             <h2 data-head className="display text-[clamp(52px,7.6vw,128px)]">
-              novo u <em>ponudi</em>.
+              najčešće <em>birano</em>.
             </h2>
-            <p className="mt-8 max-w-[38ch] text-[15px] leading-[1.55] text-dim">Najnoviji artikli u katalogu. Listajte skrolom.</p>
+            <p className="mt-8 max-w-[38ch] text-[15px] leading-[1.55] text-dim">Artikli koje izdvajamo u katalogu: osnova za zid, plafon i fasadu. Listajte skrolom.</p>
           </div>
 
           {NEW.map((p) => (

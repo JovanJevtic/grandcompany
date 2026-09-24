@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { EASE, EV, prefersReducedMotion } from '@/lib/motion'
-import { CATS, PRODUCTS, artikala, norm, type CatId } from '@/lib/shop'
+import { CATS, PRODUCTS, USES, artikala, norm, nameOfUse, type CatId, type UseId } from '@/lib/shop'
 import ProductCard from './ProductCard'
 import SectionHead from './SectionHead'
 
@@ -22,7 +22,8 @@ export default function Shop() {
   const [q, setQ] = useState('')
   const [cat, setCat] = useState<Cat>('sve')
   const [sort, setSort] = useState<Sort>('preporuceno')
-  const [onlyStock, setOnlyStock] = useState(false)
+  const [onlyStock, setOnlyStock] = useState(false) // ovdje: samo najčešće birani artikli
+  const [use, setUse] = useState<UseId | null>(null)
 
   // Materijali i podnožje traže prikaz jedne kategorije (vidi showCategory u lib/scroll.ts).
   useEffect(() => {
@@ -30,24 +31,37 @@ export default function Shop() {
       setCat((e as CustomEvent<CatId>).detail)
       setQ('')
       setOnlyStock(false)
+      setUse(null)
+    }
+    // "Šta gradite?" traži samo materijal za jednu vrstu radova
+    const onUse = (e: Event) => {
+      setUse((e as CustomEvent<UseId>).detail)
+      setCat('sve')
+      setQ('')
+      setOnlyStock(false)
     }
     window.addEventListener(EV.filter, on)
-    return () => window.removeEventListener(EV.filter, on)
+    window.addEventListener(EV.use, onUse)
+    return () => {
+      window.removeEventListener(EV.filter, on)
+      window.removeEventListener(EV.use, onUse)
+    }
   }, [])
 
   const list = useMemo(() => {
     const words = norm(q).split(/\s+/).filter(Boolean)
     const out = PRODUCTS.filter((p) => {
       if (cat !== 'sve' && p.cat !== cat) return false
-      if (onlyStock && p.stock === 'narudzba') return false
+      if (onlyStock && !p.featured) return false
+      if (use && !USES.find((u) => u.id === use)?.skus.includes(p.id)) return false
       if (!words.length) return true
-      const hay = norm(`${p.name} ${p.spec} ${p.desc}`)
+      const hay = norm(`${p.name} ${p.spec} ${p.desc} ${p.brand} ${p.sku}`)
       return words.every((w) => hay.includes(w))
     })
     if (sort === 'cijena-gore') out.sort((a, b) => a.price - b.price)
     if (sort === 'cijena-dole') out.sort((a, b) => b.price - a.price)
     return out
-  }, [q, cat, sort, onlyStock])
+  }, [q, cat, sort, onlyStock, use])
 
   const key = list.map((p) => p.id).join()
 
@@ -79,19 +93,20 @@ export default function Shop() {
     setQ('')
     setCat('sve')
     setOnlyStock(false)
+    setUse(null)
   }
 
   return (
     <section id="ponuda" ref={root} className="relative px-5 pb-[clamp(72px,10vw,160px)] pt-[clamp(72px,11vw,176px)]">
       <SectionHead
-        no="01 / 06"
-        eyebrow="Webshop"
+        no="02 / 12"
+        eyebrow="Webshop · demo"
         title={
           <>
             cijela <em>ponuda</em>.
           </>
         }
-        intro="Ploče, profili, izolacija i sve sitnice za suhu gradnju na jednom mjestu. Odaberite artikle, dodajte ih u korpu i pošaljite narudžbu."
+        intro="Knauf ploče i profili, mineralna vuna i stiropor, mase, ljepila i vijci. Cijene su maloprodajne, sa PDV-om; stanje je iz Pantheona."
       />
 
       <div data-reveal className="mt-[clamp(56px,8vw,120px)]">
@@ -104,7 +119,7 @@ export default function Shop() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Artikal, dimenzija, oznaka…"
+            placeholder="Artikal, dimenzija, šifra…"
             autoComplete="off"
             className="field col-span-12 md:col-span-10"
           />
@@ -128,15 +143,23 @@ export default function Shop() {
               </button>
             ))}
             <button type="button" className="chip" aria-pressed={onlyStock} onClick={() => setOnlyStock((v) => !v)}>
-              Samo dostupno odmah
+              Najčešće birano
             </button>
           </div>
         </div>
+        {use && (
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <span className="info text-dim">Namjena</span>
+            <button type="button" className="chip" aria-pressed onClick={() => setUse(null)} aria-label={`Ukloni filter namjene: ${nameOfUse(use)}`}>
+              {nameOfUse(use)} ×
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="info mt-[clamp(32px,4vw,56px)] flex justify-between border-t border-line pt-5 text-dim">
         <span aria-live="polite">{artikala(list.length)}</span>
-        <span>Cijene u KM</span>
+        <span>Cijene u KM, sa PDV-om</span>
       </div>
 
       {list.length ? (

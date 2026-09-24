@@ -5,9 +5,9 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import { BRAND } from '@/lib/content'
 import { EASE, prefersReducedMotion } from '@/lib/motion'
 import { scrollToTarget } from '@/lib/scroll'
-import { PRODUCTS, km } from '@/lib/shop'
+import { PRODUCTS, km, qtyText, round2 } from '@/lib/shop'
+import ProductImage from './ProductImage'
 import { useShop } from './ShopProvider'
-import { tileBg } from './tile'
 import { useDialog } from './useDialog'
 
 // Korpa: panel koji se izvlači s desne strane. Slanje narudžbe još nije povezano ni s čim (nema servera za to),
@@ -56,7 +56,7 @@ export default function CartDrawer() {
   const copyList = async () => {
     const text = [
       `${BRAND} — narudžba`,
-      ...items.map(({ p, q }) => `${q} × ${p.name} (${km(p.price)} / ${p.unit}) = ${km(p.price * q)}`),
+      ...items.map(({ p, q }) => `${qtyText(q)} ${p.unit} × ${p.name} [${p.sku}] (${km(p.price)} / ${p.unit}) = ${km(p.price * q)}`),
       `Ukupno: ${km(total)}`,
     ].join('\n')
     try {
@@ -110,20 +110,22 @@ export default function CartDrawer() {
             <ul data-lenis-prevent className="flex-1 overflow-y-auto border-t border-line px-6">
               {items.map(({ p, q }) => (
                 <li key={p.id} data-x className="grid grid-cols-[64px_1fr_auto] gap-4 border-b border-line py-5">
-                  <span aria-hidden className="aspect-square" style={{ background: tileBg(p.tile) }} />
+                  <span aria-hidden className="relative aspect-square overflow-hidden">
+                    <ProductImage p={p} pad="8%" />
+                  </span>
                   <div className="min-w-0">
                     <p className="text-[15px] font-medium leading-[1.25] tracking-[-0.01em]">{p.name}</p>
                     <p className="mt-1 text-[13px] text-dim">
                       {km(p.price)} / {p.unit}
                     </p>
                     <div className="mt-3 inline-flex items-center border border-line">
-                      <button type="button" aria-label={`Smanji količinu: ${p.name}`} onClick={() => setQty(p.id, q - 1)} className="size-9 text-[16px] leading-none">
+                      <button type="button" aria-label={`Smanji količinu: ${p.name}`} onClick={() => setQty(p.id, round2(q - p.step))} className="size-9 text-[16px] leading-none">
                         −
                       </button>
-                      <span className="min-w-8 text-center text-[13px] font-medium tabular-nums" aria-live="polite">
-                        {q}
+                      <span className="min-w-14 px-1 text-center text-[13px] font-medium tabular-nums" aria-live="polite">
+                        {qtyText(q)} {p.unit}
                       </span>
-                      <button type="button" aria-label={`Povećaj količinu: ${p.name}`} onClick={() => setQty(p.id, q + 1)} className="size-9 text-[16px] leading-none">
+                      <button type="button" aria-label={`Povećaj količinu: ${p.name}`} onClick={() => setQty(p.id, round2(q + p.step))} className="size-9 text-[16px] leading-none">
                         +
                       </button>
                     </div>
@@ -139,7 +141,7 @@ export default function CartDrawer() {
             </ul>
             <div data-x className="border-t border-line px-6 pb-6 pt-5">
               <p className="flex items-baseline justify-between">
-                <span className="info text-dim">Ukupno</span>
+                <span className="info text-dim">Ukupno sa PDV-om</span>
                 <span className="text-[26px] font-medium leading-none tracking-[-0.03em] tabular-nums">{km(total)}</span>
               </p>
               <button type="button" onClick={() => setStep('zavrsi')} className="btn btn-solid mt-5 w-full">
@@ -154,12 +156,23 @@ export default function CartDrawer() {
                 online slanje narudžbe još <em className="font-serif font-normal tracking-[-0.03em]">nije aktivno</em>.
               </p>
               <p className="mt-5 max-w-[38ch] text-[15px] leading-[1.55] text-dim">
-                Kopirajte listu artikala i pošaljite je nama. Korpa ostaje sačuvana u ovom pregledaču.
+                Ovo je demo prodavnica. Kopirajte listu artikala, ili je pošaljite kroz obrazac za upit ispod na stranici.
+                Korpa ostaje sačuvana u ovom pregledaču.
               </p>
             </div>
             <div className="flex flex-col gap-3">
               <button type="button" onClick={copyList} className="btn btn-solid w-full">
                 {copied ? 'Kopirano ✓' : 'Kopiraj listu'}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  close()
+                  scrollToTarget('#upit')
+                }}
+                className="btn w-full"
+              >
+                Pošalji kao upit
               </button>
               <button type="button" onClick={() => setStep('korpa')} className="btn w-full">
                 Nazad u korpu
