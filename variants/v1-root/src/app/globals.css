@@ -1,0 +1,370 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #faf6e7;
+  --ink: #1a120b;
+  --base: #687d79;
+  /* boja poglavlja koje je trenutno aktivno (linije, kursor); mijenja se pri skrolu */
+  --c: #faf6e7;
+  /* boja navigacije (MENI / KONTAKT) */
+  --nav: #faf6e7;
+  /* lijeva i desna ivica sadržaja, tj. gdje završavaju naslagane trake (postavlja JS) */
+  --le: 0px;
+  --re: calc(100vw - 320px);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-base: var(--base);
+  --font-serif: var(--f-serif), Georgia, serif;
+  --font-sans: var(--f-sans), system-ui, sans-serif;
+}
+
+html {
+  background: var(--bg);
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar {
+  display: none;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Stranica se skroluje samo okomito. Vodoravna traka landinga (desktop) je "zalijepljena" (pin) i pomjera se
+   uz okomiti skrol, a ispod nje ide prodavnica (vidi Motion.tsx). `clip` (ne `hidden`) da body ne postane
+   vlastiti scroll kontejner. */
+body {
+  overflow-x: clip;
+}
+
+/* Tipografija. U sloju `components`, da je Tailwind utility klase (npr. md:text-[26dvh]) mogu preglasati. */
+@layer components {
+  /* Oznake: sitne, velika slova. */
+  .lbl {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  /* Dugmad i linkovi unutar oznake nasljeđuju izgled (inače <button> vraća male slova i svoj font). */
+  .lbl button,
+  .lbl a,
+  .lbl select {
+    font: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+
+  /* Tekst poglavlja. Kurziv u <em> daje isti ritam kao na referenci. */
+  .body {
+    font-family: var(--font-serif);
+    font-size: clamp(15px, 1.9dvh, 22px);
+    line-height: 1.25;
+  }
+  .body-l {
+    font-family: var(--font-serif);
+    font-size: clamp(22px, 3.3dvh, 40px);
+    line-height: 1.1;
+  }
+  .body em,
+  .body-l em {
+    font-style: italic;
+  }
+
+  /* Džinovski naslovi poglavlja. */
+  .giant {
+    font-family: var(--font-serif);
+    font-size: 32dvh;
+    line-height: 0.9;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ---------- Prodavnica i pravne stranice (okomiti tok) ---------- */
+
+:root {
+  /* bočni razmak: isti kao odmak navigacije (45px) */
+  --pad: 45px;
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-expo-io: cubic-bezier(0.87, 0, 0.13, 1);
+}
+@media (max-width: 767px) {
+  :root {
+    --pad: 20px;
+  }
+}
+
+/* Lenis: dok je zaustavljen (meni, paneli), stranica ne smije da se skroluje ni na druge načine. */
+html.lenis-stopped {
+  overflow: hidden;
+}
+[data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@layer components {
+  /* Isti tip slova kao poglavlja landinga, ali u vw jedinicama (ovdje se skroluje okomito, ne po visini ekrana). */
+  .copy {
+    font-family: var(--font-serif);
+    font-size: clamp(18px, 1.5vw, 24px);
+    line-height: 1.28;
+  }
+  .copy-l {
+    font-family: var(--font-serif);
+    font-size: clamp(26px, 3vw, 46px);
+    line-height: 1.08;
+  }
+  .copy em,
+  .copy-l em {
+    font-style: italic;
+  }
+  .giant-v {
+    font-family: var(--font-serif);
+    font-size: clamp(64px, 19.5vw, 360px);
+    line-height: 0.86;
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  /* Dugme-pilula (kao "Klikni za uvećanje" u galeriji). Boja dolazi iz --acc sekcije. */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--acc, var(--ink));
+    border-radius: 999px;
+    padding: 11px 16px;
+    color: var(--acc, var(--ink));
+    background: transparent;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    line-height: 1;
+    text-transform: uppercase;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 0.4s var(--ease-expo),
+      color 0.4s var(--ease-expo),
+      opacity 0.3s;
+  }
+  .pill:hover:not(:disabled) {
+    background: var(--acc, var(--ink));
+    color: var(--pfg, var(--ink));
+  }
+  .pill:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  /* Popunjena dugmad: tamni tekst na akcentnoj boji (krem na svijetlom orange/plavom ima slab kontrast). */
+  .pill-solid {
+    background: var(--acc, var(--ink));
+    color: var(--ink);
+  }
+  .pill-solid:hover:not(:disabled) {
+    background: transparent;
+    color: var(--acc, var(--ink));
+  }
+  .pill-on {
+    background: var(--acc, var(--ink));
+    color: var(--ink);
+  }
+
+  /* Polja za unos: samo donja crta, serifni tekst (kao pretraga na referenci). */
+  .field {
+    width: 100%;
+    border: 0;
+    border-bottom: 1px solid var(--ink);
+    border-radius: 0;
+    background: transparent;
+    padding: 14px 0;
+    color: var(--ink);
+    font-family: var(--font-serif);
+    font-size: clamp(22px, 2.4vw, 36px);
+    line-height: 1.1;
+    outline: none;
+    transition: box-shadow 0.3s;
+  }
+  .field:focus {
+    box-shadow: 0 1px 0 var(--ink);
+  }
+  .field::placeholder {
+    color: color-mix(in srgb, var(--ink) 38%, transparent);
+  }
+  .field-sm {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    padding: 12px 0;
+  }
+  textarea.field-sm {
+    min-height: 88px;
+    resize: vertical;
+  }
+  select.field-sm {
+    appearance: none;
+    padding-right: 22px;
+    cursor: pointer;
+    background: transparent
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none' stroke='%231a120b'%3E%3Cpath d='m1 1 4 4 4-4'/%3E%3C/svg%3E")
+      no-repeat right 2px center;
+  }
+
+  /* Podvučen link koji se "crta" pri prelasku miša. */
+  .link-u {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0 1px;
+    transition: background-size 0.5s var(--ease-expo);
+  }
+  .link-u:hover,
+  .link-u:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  /* Nepoznat podatak firme u pravnom tekstu, npr. [sjedište]: istaknut da se ne previdi. */
+  .missing {
+    background: color-mix(in srgb, var(--c, #d6956d) 28%, transparent);
+    border-radius: 2px;
+    padding: 0 3px;
+    font-style: normal;
+  }
+
+  /* FAQ i ostale <details> liste */
+  details > summary {
+    list-style: none;
+    cursor: pointer;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details > summary .plus {
+    position: relative;
+    display: block;
+    width: 14px;
+    height: 14px;
+  }
+  details > summary .plus::before,
+  details > summary .plus::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+    transition: transform 0.5s var(--ease-expo);
+  }
+  details > summary .plus::after {
+    transform: rotate(90deg);
+  }
+  details[open] > summary .plus::after {
+    transform: rotate(0deg);
+  }
+}
+
+/* Izranjanje sekcija prodavnice (Reveal.tsx): isti tajming kao na landingu (expo.out, ~1.2s).
+   Sakriveno je samo dok radi JS (klasa .rv), pa bez JS-a sadržaj ostaje vidljiv. */
+.rv [data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 1.2s var(--ease-expo),
+    transform 1.2s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+.rv [data-reveal][data-in] {
+  opacity: 1;
+  transform: none;
+}
+/* Ploče se otvaraju sa lijeva na desno, kao na landingu. Posmatra se spoljni omotač, a maska (clip-path) ide na
+   unutrašnji sloj: IntersectionObserver bi element sa zatvorenom maskom smatrao nevidljivim i nikad ga ne bi otvorio. */
+.rv [data-reveal='clip'] {
+  opacity: 1;
+  transform: none;
+}
+.plate-in {
+  transition: transform 1.4s var(--ease-expo);
+}
+.rv [data-reveal='clip'] .plate-in {
+  clip-path: inset(0 100% 0 0);
+  transition:
+    clip-path 1.5s var(--ease-expo-io),
+    transform 1.4s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 70ms), 0s;
+}
+.rv [data-reveal='clip'][data-in] .plate-in {
+  clip-path: inset(0 0 0 0);
+}
+.group:hover .plate-in {
+  transform: scale(1.04);
+}
+
+/* Brze radnje na kartici artikla (Sačuvaj, Poredi): na uređajima sa mišem tek na prelazak, na dodir uvijek. */
+.card-actions {
+  transition: opacity 0.3s;
+}
+@media (hover: hover) and (pointer: fine) {
+  .card-actions {
+    opacity: 0;
+  }
+  .group:hover .card-actions,
+  .group:focus-within .card-actions {
+    opacity: 1;
+  }
+}
+
+/* Kursor-tačka postoji samo na uređajima sa mišem. */
+@media (hover: none), (pointer: coarse) {
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* Na mobilnom nema traka, pa sadržaj ide do desne ivice. */
+@media (max-width: 767px) {
+  :root {
+    --re: 100vw;
+  }
+}
+
+/* Siva "video" ploča u hero-u: lagano prelijevanje da se vidi da je živa. */
+@keyframes sheen {
+  from { background-position: 100% 0; }
+  to { background-position: 0 0; }
+}
+.hero-sheen {
+  background: linear-gradient(110deg, #7c7872 25%, #948f88 50%, #7c7872 75%);
+  background-size: 250% 100%;
+  animation: sheen 7s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0s !important;
+    scroll-behavior: auto !important;
+  }
+  .rv [data-reveal],
+  .rv [data-reveal='clip'] {
+    opacity: 1;
+    transform: none;
+  }
+  .rv [data-reveal='clip'] .plate-in {
+    clip-path: none;
+  }
+}

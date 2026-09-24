@@ -1,0 +1,252 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #000;
+  --fg: #e9eae4;
+  /* osnovna jedinica veličine ploča u prstenu (postavlja JS iz veličine ekrana) */
+  --u: 240px;
+}
+
+/* Linije i prigušeni tekst se računaju iz trenutne boje teksta, pa rade i u svijetloj sekciji (.tone-light). */
+:root,
+.tone-light {
+  --line: color-mix(in srgb, var(--fg) 18%, transparent);
+  --dim: color-mix(in srgb, var(--fg) 60%, transparent);
+}
+.tone-light {
+  --bg: #e9eae4;
+  --fg: #000;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+/* Tamna kolona unutar svijetle sekcije (Cijene). */
+:root,
+.tone-dark {
+  --line: color-mix(in srgb, var(--fg) 18%, transparent);
+  --dim: color-mix(in srgb, var(--fg) 60%, transparent);
+}
+.tone-dark {
+  --bg: #000;
+  --fg: #e9eae4;
+  background: var(--bg);
+  color: var(--fg);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-fg: var(--fg);
+  --color-line: var(--line);
+  --color-dim: var(--dim);
+  --font-sans: var(--f-sans), system-ui, sans-serif;
+  --font-serif: var(--f-serif), Georgia, serif;
+  --font-mono: var(--f-mono), system-ui, sans-serif;
+}
+
+html {
+  background: var(--bg);
+  scrollbar-width: none; /* bez trake za skrol: prsten u heroju računa širinu ekrana, a nagrađivani sajtovi je ionako kriju */
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+}
+/* Stranica se ne skroluje dok traje loader (data-ready još nije postavljen) ni dok je nešto otvoreno preko nje. */
+html:not([data-ready]),
+html[data-lock] {
+  overflow: hidden;
+}
+
+/* Preporučeni CSS za Lenis */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
+}
+
+body {
+  color: var(--fg);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 1px solid var(--fg);
+  outline-offset: 3px;
+}
+
+/* Znak u sredini nestaje kad je neka slika uvećana. */
+.mark {
+  transition: opacity 0.5s;
+}
+html[data-expanded] .mark {
+  opacity: 0;
+}
+
+/* Navigacija: svako slovo je u maski sa dvije kopije; na hover se slova redom "prevrnu" prema gore. */
+@layer components {
+  .roll {
+    display: inline-flex;
+    text-transform: uppercase;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .roll .c {
+    display: inline-block;
+    height: 1em;
+    overflow: hidden;
+  }
+  .roll .c > span {
+    display: block;
+    transition: transform 0.55s cubic-bezier(0.7, 0, 0.2, 1);
+    transition-delay: calc(var(--i) * 22ms);
+  }
+  .roll:hover .c > span,
+  .roll:focus-visible .c > span {
+    transform: translateY(-100%);
+  }
+
+  /* Sitni tekst u dnu: široko razmaknuta slova. */
+  .info {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  /* ——— Prodavnica (sekcije ispod heroja) ——— */
+
+  /* Veliki naslov: isti glas kao "grand company" gore lijevo (srednja debljina, tijesna slova); jedna riječ u kurzivu. */
+  .display {
+    font-weight: 500;
+    letter-spacing: -0.055em;
+    line-height: 0.92;
+    font-size: clamp(52px, 10.4vw, 176px);
+  }
+  .display em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: -0.03em;
+    padding-right: 0.04em;
+  }
+
+  /* Dugmad: pravougaona kao i ploče; na hover se boje zamijene. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8em;
+    border: 1px solid var(--fg);
+    padding: 17px 22px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+    color: var(--fg);
+    background: transparent;
+    cursor: pointer;
+    transition:
+      background-color 0.45s cubic-bezier(0.7, 0, 0.2, 1),
+      color 0.45s cubic-bezier(0.7, 0, 0.2, 1);
+  }
+  .btn:hover,
+  .btn:focus-visible {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .btn-solid {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .btn-solid:hover,
+  .btn-solid:focus-visible {
+    background: transparent;
+    color: var(--fg);
+  }
+
+  .chip {
+    border: 1px solid var(--line);
+    padding: 11px 14px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1;
+    cursor: pointer;
+    transition:
+      background-color 0.35s,
+      color 0.35s,
+      border-color 0.35s;
+  }
+  .chip:hover {
+    border-color: var(--fg);
+  }
+  .chip[aria-pressed='true'] {
+    background: var(--fg);
+    border-color: var(--fg);
+    color: var(--bg);
+  }
+
+  /* Polje za pretragu: samo donja linija, krupan tekst. */
+  .field {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    padding: 10px 0 14px;
+    font-size: clamp(24px, 3vw, 44px);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    color: var(--fg);
+    border-radius: 0;
+    transition: border-color 0.35s;
+  }
+  .field::placeholder {
+    color: var(--dim);
+    opacity: 1;
+  }
+  .field:focus {
+    outline: none;
+    border-color: var(--fg);
+  }
+
+  /* Hover izolacija (kao u prstenu): element ispod kursora ostaje pun, ostali potamne. */
+  .iso-i {
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (hover: hover) {
+    .iso:has(.iso-i:hover) .iso-i:not(:hover) {
+      opacity: 0.28;
+    }
+  }
+
+  .no-bar {
+    scrollbar-width: none;
+  }
+  .no-bar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
