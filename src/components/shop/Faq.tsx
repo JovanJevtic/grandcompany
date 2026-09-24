@@ -2,42 +2,18 @@
 
 import { useState } from 'react'
 import { ScrollTrigger } from '@/lib/gsap'
+import { FAQ } from '@/gc/gc'
 import SectionHead from './SectionHead'
 
-// Odgovori su probni i namjerno opšti: bez rokova i brojki koje klijent nije potvrdio.
-const QA = [
-  {
-    q: 'Prodajete li i privatnim kupcima, ili samo na veliko?',
-    a: 'Prodajemo i privatnim kupcima i izvođačima radova, u maloprodaji i u veleprodaji.',
-  },
-  {
-    q: 'Kako da izračunam koliko materijala mi treba?',
-    a: 'Pošaljite dimenzije ili predmjer. Naš stručni tim pomaže pri obračunu količina i izboru materijala.',
-  },
-  {
-    q: 'Plaćam li online kada popunim korpu?',
-    a: 'Ne. Korpa služi da sastavite spisak. Narudžbu potvrđujemo ponudom, a plaćanje dogovaramo pri potvrdi.',
-  },
-  {
-    q: 'Dostavljate li na gradilište?',
-    a: 'Dostavu dogovaramo pri potvrdi narudžbe, u zavisnosti od količine i lokacije. Moguće je i preuzimanje u Banjoj Luci.',
-  },
-  {
-    q: 'Postoji li poseban cjenovnik za izvođače?',
-    a: 'Da. Za izvođače radova i veće količine radimo poseban cjenovnik. Zatražite ga putem upita.',
-  },
-  {
-    q: 'Šta ako artikla nema na zalihi?',
-    a: 'Za artikle koji nisu na zalihi javljamo rok isporuke prije nego što potvrdite narudžbu.',
-  },
-]
+// Pitanja i odgovori iz kataloga Grand Company (HOME_FAQ).
+const QA = FAQ.map(([q, a]) => ({ q, a }))
 
 export default function Faq() {
   const [open, setOpen] = useState<number | null>(0)
 
   return (
     <section id="pitanja" data-spy className="gutter scroll-mt-[var(--bar)] py-[14dvh]">
-      <SectionHead no="08" label="Pitanja" title="Česta pitanja" meta={`${QA.length} odgovora`} />
+      <SectionHead no="09" label="Pitanja" title="Česta pitanja" meta={`${QA.length} odgovora`} />
 
       <div className="mt-[8dvh] border-b-2 border-ink md:ml-[33.33%]">
         {QA.map(({ q, a }, i) => {

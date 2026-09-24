@@ -3,7 +3,9 @@
 import { useEffect, useRef } from 'react'
 import { useLenis } from 'lenis/react'
 import { gsap, SplitText, useGSAP } from '@/lib/gsap'
+import { COMPANY, PHOTOS_GC } from '@/gc/gc'
 import { EASE, INTRO, MQ } from '@/lib/motion'
+import { useScrollTo } from '@/lib/useScrollTo'
 
 const inset = (t: number, r: number, b: number, l: number) => `inset(${t}px ${r}px ${b}px ${l}px)`
 
@@ -12,6 +14,7 @@ export default function Hero() {
   const lenis = useLenis()
   const lenisRef = useRef<typeof lenis>(undefined)
   const introDone = useRef(false)
+  const scrollTo = useScrollTo()
 
   // Skrol je zaključan dok traje uvodna animacija, pa se otključa čim se završi.
   useEffect(() => {
@@ -25,6 +28,7 @@ export default function Hero() {
       const frame = el.querySelector<HTMLElement>('[data-frame]')!
       const media = el.querySelector<HTMLElement>('[data-frame-media]')!
       const caption = el.querySelector<HTMLElement>('[data-caption]')!
+      const copy = el.querySelector<HTMLElement>('[data-copy]')!
 
       const mm = gsap.matchMedia()
       mm.add(
@@ -62,7 +66,7 @@ export default function Hero() {
 
           if (reduce) {
             gsap.set(frame, { clipPath: A })
-            gsap.set(caption, { visibility: 'visible' })
+            gsap.set([caption, copy], { visibility: 'visible' })
             introDone.current = true
             lenisRef.current?.start()
             return
@@ -91,6 +95,7 @@ export default function Hero() {
             )
             .to(media, { scale: 1, duration: 2.2, ease: EASE.out }, INTRO.frame)
             .to(capSplit.chars, { yPercent: 0, duration: 0.9, ease: EASE.quint, stagger: 0.03 }, INTRO.caption)
+            .fromTo(copy, { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1, ease: EASE.quint }, INTRO.caption - 0.4)
 
           // 2) Skrol: hero se pina i okvir se širi do ruba ekrana. Trajanje je pola visine ekrana.
           gsap
@@ -115,16 +120,55 @@ export default function Hero() {
 
   return (
     <section id="hero" ref={root} className="relative z-[100] h-dvh">
-      {/* Okvir je cijeli ekran, a vidljiv dio određuje clip-path. Video je ovdje siva ploča. */}
+      {/* Okvir je cijeli ekran, a vidljiv dio određuje clip-path. U okviru je naše stovarište iz vazduha. */}
       <div data-frame className="absolute inset-0 overflow-hidden" style={{ clipPath: 'inset(50% 0% 50% 0%)' }}>
-        <div data-frame-media className="hero-sheen absolute inset-0" />
+        <div data-frame-media className="absolute inset-0 bg-ink/20">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={PHOTOS_GC.yardAerial}
+            alt="Stovarište Grand Company u Banjoj Luci, snimak iz vazduha"
+            fetchPriority="high"
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/45 to-ink/10" />
+        </div>
+
+        {/* Rečenica i dva dugmeta stoje unutar početnog okvira (80 % širine, dno ~10 % visine ekrana). */}
+        <div
+          data-copy
+          className="invisible absolute bottom-[31dvh] left-[9vw] right-[9vw] text-bg md:bottom-[29dvh] md:left-[13vw] md:right-auto md:max-w-[52vw]"
+        >
+          <p className="text-micro uppercase opacity-80">Građevinski materijal · Banja Luka · od {COMPANY.founded}.</p>
+          <h2 className="mt-3 text-[clamp(26px,3.6vw,64px)] uppercase leading-[0.95]">
+            Knauf suha gradnja i izolacija, kranom do etaže.
+          </h2>
+          <p className="mt-4 max-w-[48ch] text-micro uppercase opacity-80">
+            Ploče, profili, kamena vuna, stiropor, ljepila i pribor. Vlastiti kamioni sa kranom spuštaju paletu na etažu
+            ili skelu.
+          </p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => scrollTo('prodavnica')}
+              className="bg-bg px-4 py-3 text-micro uppercase text-ink transition-opacity duration-300 hover:opacity-85"
+            >
+              Pogledaj katalog →
+            </button>
+            <a
+              href={COMPANY.phoneLandlineHref}
+              className="border-2 border-bg px-4 py-[10px] text-micro uppercase transition-colors duration-300 hover:bg-bg hover:text-ink"
+            >
+              Pozovite {COMPANY.phoneLandline}
+            </a>
+          </div>
+        </div>
       </div>
 
       <p
         data-caption
         className="invisible absolute left-0 top-[89.8%] w-full -translate-y-1/2 text-center text-[clamp(14px,1.56vw,26px)] uppercase leading-none"
       >
-        Građevinski materijal
+        Stovarište i vozni park
       </p>
     </section>
   )

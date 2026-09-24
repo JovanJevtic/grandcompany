@@ -4,71 +4,71 @@ import { useRef } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
 import { BRAND } from './SiteChrome'
-import { TONES, revealChars, revealLines, revealMedia } from '@/lib/reveal'
+import { revealChars, revealLines, revealMedia } from '@/lib/reveal'
 
+// Stovarište i vozni park: samo naše fotografije i činjenice iz podataka firme. Nema izmišljenih projekata.
 type Block =
-  | { kind: 'wide'; text: string }
-  | { kind: 'pair'; text: string }
-  | { kind: 'tall'; text: string }
+  | { kind: 'wide'; text: string; photos: [Photo] }
+  | { kind: 'pair'; text: string; photos: [Photo, Photo] }
+  | { kind: 'tall'; text: string; photos: [Photo] }
 
-type Item = { category: string; blocks: Block[] }
+type Photo = { src: string; alt: string }
+type Item = { category: string; side: Photo; blocks: Block[] }
 
-// Sve grupe ponude nose isti naziv: GRAND COMPANY. Razlikuju se po kategoriji i opisu.
 const ITEMS: Item[] = [
   {
-    category: 'Građevinski materijal',
+    category: 'Stovarište',
+    side: { src: '/photos/tabla.jpg', alt: 'Tabla Grand Company na ulazu' },
     blocks: [
       {
         kind: 'wide',
-        text: 'Opšta prodaja materijala za gradnju i opremanje objekata, u veleprodaji i u maloprodaji.',
+        photos: [{ src: '/photos/stovariste-pregled.jpg', alt: 'Stovarište sa paletama materijala' }],
+        text: 'Stovarište u Banjoj Luci. Ploče, profili, izolacija i veziva stoje na paletama, spremni za utovar.',
       },
       {
         kind: 'pair',
-        text: 'Za privatne kupce i za izvođače radova, uz stručan savjet pri izboru materijala.',
+        photos: [
+          { src: '/photos/stovariste-ulaz.jpg', alt: 'Ulaz na stovarište' },
+          { src: '/photos/palete-viljuskar.jpg', alt: 'Viljuškar utovaruje palete' },
+        ],
+        text: 'Stanje na sajtu čitamo iz Pantheona, istog sistema iz kojeg radi prodaja. Viljuškar utovara palete direktno na kamion.',
       },
     ],
   },
   {
-    category: 'Sistemi suhe gradnje',
+    category: 'Vozni park',
+    side: { src: '/photos/stovariste-vazduh.jpg', alt: 'Stovarište iz vazduha' },
     blocks: [
       {
         kind: 'tall',
-        text: 'Materijali za građenje i uređenje enterijera suhim postupkom.',
-      },
-      {
-        kind: 'pair',
-        text: 'Stručni tim odgovara na pitanja i pomaže pri izboru pravog rješenja za vaš objekat.',
-      },
-    ],
-  },
-  {
-    category: 'Kamena vuna',
-    blocks: [
-      {
-        kind: 'pair',
-        text: 'Izolacioni materijal koji prodajemo kao zaseban proizvod.',
+        photos: [{ src: '/photos/kran-utovar.jpg', alt: 'Kamion sa kranom pri utovaru' }],
+        text: 'Vlastiti kamioni sa kranom spuštaju paletu na etažu ili skelu, ne na ulicu.',
       },
       {
         kind: 'wide',
-        text: 'Uz to, u našoj djelatnosti su i drvo i sanitarna oprema.',
+        photos: [{ src: '/photos/prodavnica.jpg', alt: 'Prodavnica Grand Company' }],
+        text: 'Prodavnica za manje količine i lično preuzimanje. CE deklaracija i protivpožarni atest idu uz otpremnicu.',
       },
     ],
   },
 ]
 
-// Siva ploča umjesto fotografije. Tri sloja: maska (clip-path), zum, paralaksa.
-function Media({ tone, className = '' }: { tone: number; className?: string }) {
+// Fotografija u tri sloja: maska (clip-path), zum, paralaksa.
+function Media({ photo, className = '' }: { photo: Photo; className?: string }) {
   return (
     <div
       data-media
-      className={`relative cursor-pointer overflow-hidden ${className}`}
+      className={`relative overflow-hidden bg-ink/10 ${className}`}
       style={{ clipPath: 'inset(0% 50% 0% 50%)' }}
     >
       <div data-scale className="absolute inset-0">
-        <div
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           data-par
-          className="absolute left-0 top-[-10%] h-[120%] w-full transition-[filter] duration-500 hover:brightness-95"
-          style={{ background: TONES[tone % TONES.length] }}
+          src={photo.src}
+          alt={photo.alt}
+          loading="lazy"
+          className="absolute left-0 top-[-10%] h-[120%] w-full object-cover transition-[filter] duration-500 hover:brightness-95"
         />
       </div>
     </div>
@@ -77,8 +77,7 @@ function Media({ tone, className = '' }: { tone: number; className?: string }) {
 
 const TEXT = 'invisible max-w-full text-[clamp(13px,1.25vw,20px)] uppercase leading-[1.05] md:max-w-[71%]'
 
-function Article({ item, index }: { item: Item; index: number }) {
-  let tone = index * 2
+function Article({ item }: { item: Item }) {
   return (
     <article data-project className="relative z-30 flex flex-col md:flex-row">
       {/* Lijeva kolona ostaje zalijepljena dok se desno mijenjaju slike. */}
@@ -92,18 +91,18 @@ function Article({ item, index }: { item: Item; index: number }) {
         <p data-cat className="invisible mt-[34px] text-center text-[clamp(11px,0.97vw,16px)] uppercase leading-none">
           {item.category}
         </p>
-        <Media tone={tone++} className="mt-10 hidden aspect-[2/3] w-full md:block" />
+        <Media photo={item.side} className="mt-10 hidden aspect-[2/3] w-full md:block" />
       </div>
 
       <div className="flex flex-col gap-[15dvh] px-5 pb-[6dvh] pt-[8dvh] md:ml-[8.33vw] md:w-[58.33vw] md:px-0 md:pb-0 md:pt-[15dvh]">
         {item.blocks.map((block, i) => (
           <div key={i} className="flex flex-col gap-[15dvh]">
-            {block.kind === 'wide' && <Media tone={tone++} className="aspect-[840/509] w-full" />}
-            {block.kind === 'tall' && <Media tone={tone++} className="aspect-[0.9] w-full md:ml-[14.9%] md:w-[70.3%]" />}
+            {block.kind === 'wide' && <Media photo={block.photos[0]} className="aspect-[840/509] w-full" />}
+            {block.kind === 'tall' && <Media photo={block.photos[0]} className="aspect-[0.9] w-full md:ml-[14.9%] md:w-[70.3%]" />}
             {block.kind === 'pair' && (
               <div className="flex justify-between gap-3">
-                <Media tone={tone++} className="aspect-[362/471] w-[48%] md:w-[43.1%]" />
-                <Media tone={tone++} className="aspect-[362/471] w-[48%] md:w-[43.1%] md:-translate-y-[15dvh]" />
+                <Media photo={block.photos[0]} className="aspect-[362/471] w-[48%] md:w-[43.1%]" />
+                <Media photo={block.photos[1]} className="aspect-[362/471] w-[48%] md:w-[43.1%] md:-translate-y-[15dvh]" />
               </div>
             )}
             <p data-text className={TEXT}>
@@ -158,7 +157,7 @@ export default function Projects() {
   return (
     <div ref={root} className="relative z-30">
       {ITEMS.map((item, i) => (
-        <Article key={i} item={item} index={i} />
+        <Article key={i} item={item} />
       ))}
     </div>
   )

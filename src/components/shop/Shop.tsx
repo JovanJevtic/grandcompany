@@ -58,7 +58,7 @@ function Select({
 }
 
 export default function Shop() {
-  const { query, category, use, price, sort, onlySaved, saved, cart } = useShop()
+  const { query, category, use, price, sort, onlySaved, saved, cart, compare } = useShop()
 
   const items = useMemo(
     () => filterProducts({ query, category, use, price, sort, onlySaved }, saved),
@@ -77,10 +77,10 @@ export default function Shop() {
   return (
     <section id="prodavnica" data-spy className="gutter scroll-mt-[var(--bar)] py-[14dvh]">
       <SectionHead
-        no="02"
-        label="Prodavnica"
+        no="03"
+        label="Katalog"
         title="Cijela ponuda"
-        lead="Građevinski materijal, suha gradnja, kamena vuna, drvo i sanitarna oprema na jednom mjestu."
+        lead="Knauf suha gradnja, izolacija, veziva i pribor. Cijene u KM sa PDV-om, po jedinici artikla."
       />
 
       {/* Pretraga */}
@@ -93,7 +93,7 @@ export default function Shop() {
           type="search"
           value={query}
           onChange={(e) => setFilter({ query: e.target.value })}
-          placeholder="Artikal ili materijal"
+          placeholder="Artikal, brend ili šifra"
           autoComplete="off"
           className="w-full min-w-0 bg-transparent text-lead uppercase outline-none placeholder:text-ink/25"
         />
@@ -167,7 +167,7 @@ export default function Shop() {
       {items.length > 0 ? (
         <div className="mt-6 grid grid-cols-2 gap-x-3 gap-y-10 md:grid-cols-3 md:gap-x-[1.5vw] md:gap-y-[6dvh] xl:grid-cols-4">
           {items.map((p, i) => (
-            <ProductCard key={p.id} product={p} index={i} qty={cart[p.id] ?? 0} saved={saved.includes(p.id)} />
+            <ProductCard key={p.id} product={p} index={i} qty={cart[p.id] ?? 0} saved={saved.includes(p.id)} compared={compare.includes(p.id)} />
           ))}
         </div>
       ) : (
