@@ -37,6 +37,10 @@ export type Product = {
   image: string
   /** true when `image` is a drawing: show it with object-fit: contain */
   drawing: boolean
+  /** Photograph for cards: our own product photo, or a stock photo of the same kind of material */
+  photo: string
+  /** true when `photo` shows this kind of material, not this exact article (label it "ilustracija") */
+  illustrative: boolean
 }
 
 export type Partner = {
@@ -81,6 +85,19 @@ export const CATEGORIES: Category[] = raw.CATEGORIES.map((c) => ({
 
 const PHOTOS = raw.PRODUCT_PHOTOS as Record<string, string>
 
+// Pexels stock photos (free licence, see /stock/credits.json) showing the same
+// kind of material. Articles with our own photo (PRODUCT_PHOTOS) keep it.
+const STOCK_BY_SKU: Record<string, string> = {
+  'KNF-001': 'board-stack', 'KNF-002': 'board-green', 'KNF-003': 'board-stack-2', 'KNF-004': 'board-cut',
+  'PRF-050': 'profiles-stack', 'PRF-075': 'profiles-stack', 'PRF-100': 'profiles-stack', 'PRF-UW75': 'profiles-stack-2',
+  'PRF-CD60': 'profile-texture', 'PRF-UD28': 'profile-wall',
+  'ISO-001': 'wool-closeup', 'ISO-002': 'wool-roof', 'ISO-005': 'eps-blocks', 'ISO-006': 'eps-board',
+  'CHM-001': 'filler-spatula', 'CHM-002': 'filler-spatula-2', 'CHM-003': 'bag-pour', 'CHM-004': 'eps-facade',
+  'CHM-005': 'tile-adhesive', 'CHM-007': 'plaster-texture',
+  'ACC-001': 'screws-wood', 'ACC-002': 'screws-wood-2', 'ACC-004': 'tape-rolls', 'ACC-005': 'tape-rolls-2',
+  'ACC-006': 'board-green-ceiling',
+}
+
 export const PRODUCTS: Product[] = raw.PRODUCTS.map((p) => ({
   sku: p.sku,
   name: p.name,
@@ -96,7 +113,12 @@ export const PRODUCTS: Product[] = raw.PRODUCTS.map((p) => ({
   pack: (p as { pack?: { size: number; name: string } }).pack,
   image: PHOTOS[p.sku] ?? `/products/${p.sku}.svg`,
   drawing: !PHOTOS[p.sku],
+  photo: PHOTOS[p.sku] ?? (STOCK_BY_SKU[p.sku] ? `/stock/${STOCK_BY_SKU[p.sku]}.jpg` : `/products/${p.sku}.svg`),
+  illustrative: !PHOTOS[p.sku],
 }))
+
+/** Stock photography for sections (Pexels, free licence) — names map to /stock/<name>.jpg */
+export const STOCK = (name: string) => `/stock/${name}.jpg`
 
 export const PARTNERS = raw.PARTNERS as unknown as Partner[]
 export const PARTNER_TIERS = raw.PARTNER_TIERS as PartnerTier[]
