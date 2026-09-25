@@ -1,0 +1,290 @@
+@import "tailwindcss";
+
+/* Grand Company house style — tokens from DESIGN-SYSTEM.md (Ponos is the house model). */
+:root {
+  --canvas: #f1ece4;
+  --surface: #fbf8f3;
+  --well: #e6e0d5;
+  --ink: #191817;
+  --deep: #262320;
+  --deeper: #100f0e;
+  --muted: #6b655d;
+  --steel: #274c77;
+  --header: 64px;
+  --ease-io: cubic-bezier(0.76, 0, 0.24, 1);
+  --ease-out: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-well: var(--well);
+  --color-ink: var(--ink);
+  --color-deep: var(--deep);
+  --color-deeper: var(--deeper);
+  --color-muted: var(--muted);
+  --color-steel: var(--steel);
+  --font-sans: var(--font-instrument), system-ui, sans-serif;
+  --font-display: var(--font-montserrat), system-ui, sans-serif;
+  --font-script: var(--font-pinyon), cursive;
+}
+
+html {
+  background: var(--canvas);
+  scroll-padding-top: var(--header);
+}
+
+body {
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+@layer components {
+/* ——— Type roles ——— */
+
+/* h1 cover line: Montserrat 900 caps, home page only */
+.cover {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.035em;
+  line-height: 0.86;
+}
+/* the one script word inside the cover line */
+.script {
+  font-family: var(--font-script);
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
+  display: inline-block;
+  font-size: 0.8em;
+  line-height: 1;
+  padding-inline: 0.08em 0.12em;
+  vertical-align: baseline;
+}
+
+/* section heading: Montserrat 500, sentence case, left, one line */
+.s-head {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(30px, 3.6vw, 52px);
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+}
+.s-sub {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(20px, 1.8vw, 26px);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+/* functional micro label (table head, dt, card tag) — never decoration above an h2 */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— Buttons ——— */
+
+.btn-line,
+.btn-solid {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 18px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.2;
+  border: 1px solid currentColor;
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    border-color 0.3s,
+    opacity 0.3s;
+  white-space: nowrap;
+}
+/* Ponos detail: a second hairline under the outline button */
+.btn-line {
+  box-shadow:
+    0 4px 0 -1px var(--btn-gap, var(--canvas)),
+    0 4px 0 0 currentColor;
+}
+.btn-line:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--canvas);
+}
+.on-dark .btn-line {
+  --btn-gap: var(--deep);
+}
+.bg-surface .btn-line {
+  --btn-gap: var(--surface);
+}
+.on-dark .btn-line:hover {
+  background: var(--canvas);
+  border-color: var(--canvas);
+  color: var(--ink);
+}
+.btn-solid {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--canvas);
+}
+.btn-solid:hover {
+  opacity: 0.86;
+}
+.btn-solid:disabled,
+.btn-line:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    border-color 0.25s;
+}
+.chip:hover {
+  border-color: var(--ink);
+}
+.chip[aria-pressed='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--canvas);
+}
+
+.link-u {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+}
+
+
+/* inputs in house style */
+.field {
+  width: 100%;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  padding: 11px 12px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.field:focus {
+  border-color: var(--ink);
+}
+.field::placeholder {
+  color: color-mix(in srgb, var(--ink) 38%, transparent);
+}
+select.field {
+  appearance: none;
+  padding-right: 34px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5 6 6.5l5-5' fill='none' stroke='%23191817' stroke-width='1.4'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 11px;
+}
+
+
+/* horizontal strip: native swipe with snap, no visible scrollbar */
+.strip {
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+}
+
+/* ——— Layout ——— */
+
+@utility gutter {
+  padding-inline: 16px;
+  @media (min-width: 768px) {
+    padding-inline: 32px;
+  }
+  @media (min-width: 1280px) {
+    padding-inline: 48px;
+  }
+}
+@utility wrap {
+  width: 100%;
+  max-width: 1440px;
+  margin-inline: auto;
+}
+
+button:not(:disabled),
+[role='button'],
+select,
+summary {
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* content rising when it enters the viewport (class set by useInView) */
+[data-rise] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.9s var(--ease-out) var(--d, 0ms),
+    transform 1.1s var(--ease-out) var(--d, 0ms);
+}
+[data-rise][data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+@keyframes bump {
+  40% {
+    transform: scale(1.35);
+  }
+}
+.bump {
+  animation: bump 0.4s var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+  [data-rise] {
+    opacity: 1;
+    transform: none;
+  }
+}
