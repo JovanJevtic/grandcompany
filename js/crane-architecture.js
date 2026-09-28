@@ -52,9 +52,8 @@ export function architectureKit({box,rod,group,batch,m}) {
     }
   }
   function excavation(site) {
-    // Continuous ground extends well beyond every shot; only the excavation has an edge.
-    for(const [x,z,w,d] of [[-492.7,0,1014.6,2000],[510.2,0,979.6,2000],[17.5,-501.5,5.8,997],[17.5,500.8,5.8,998.4]]) {
-      box(site,m.earth,x,-.66,z,w,1.3,d);
+    // A paved work area dissolves into the page; no landscape or soil plinth.
+    for(const [x,z,w,d] of [[-27.7,-7.5,84.6,125],[45.2,-7.5,49.6,125],[17.5,-36.5,5.8,67],[17.5,28.3,5.8,53.4]]) {
       box(site,m.ground,x,-.06,z,w,.1,d);
     }
     const pit=group(site,18,0,1.4);

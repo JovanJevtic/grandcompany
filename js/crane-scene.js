@@ -1,11 +1,11 @@
 import * as THREE from '../vendor/three.module.min.js';
-import {craneRigKit} from './crane-rig.js?v=12';
-import {applyConstructionSurfaces} from './crane-surfaces.js?v=12';
+import {craneRigKit} from './crane-rig.js?v=18';
+import {applyConstructionSurfaces} from './crane-surfaces.js?v=18';
 import {RoundedBoxGeometry} from '../vendor/three-addons/geometries/RoundedBoxGeometry.js';
 import {createDeliveryEffects} from './crane-effects.js?v=6';
-import {detailKit} from './crane-details.js?v=10';
+import {detailKit} from './crane-details.js?v=18';
 
-import {architectureKit} from './crane-architecture.js?v=13';
+import {architectureKit} from './crane-architecture.js?v=14';
 import {createSiteActivity} from './crane-activity.js?v=11';
 
 export const clamp = (n, a = 0, b = 1) => Math.min(b, Math.max(a, n));
@@ -36,10 +36,6 @@ export function choreography(progress) {
 
 export function createCraneScene() {
   const scene = new THREE.Scene();
-  scene.fog=new THREE.Fog('#64715f',75,165);
-  // Matching, tone-mapped sky removes the edge of the distant ground plane.
-  const atmosphere=new THREE.Mesh(new THREE.SphereGeometry(200,24,12),new THREE.MeshBasicMaterial({color:scene.fog.color,side:THREE.BackSide,fog:false,transparent:true,opacity:0,depthWrite:false}));
-  atmosphere.renderOrder=-10;scene.add(atmosphere);
   const mat = (color, roughness=.65, metalness=0) => new THREE.MeshStandardMaterial({color,roughness,metalness});
   const m = {
     yellow:mat('#eaaa19',.34,.45), edge:mat('#be7c08',.4,.45), steel:mat('#353b3c',.5,.65),
@@ -50,49 +46,53 @@ export function createCraneScene() {
     skin:mat('#bf9279',.85), net:mat('#778a73',.95), red:mat('#ae4935',.55,.25), joint:mat('#807a6f',.95), hazard:mat('#efb724',.5,.15), lamp:mat('#fff6d9',.3),
   };
   Object.assign(m,{earth:mat('#806d4f',1),facade:mat('#d7d4c5',.8),frame:mat('#34484d',.4,.45),formwork:mat('#ba682e',.8),asphalt:mat('#727970',.95)});
-  m.cargo=mat('#a46f4c',.93);m.sling=mat('#48594e',.92);
+  m.galvanized=mat('#89908f',.51,.68);
+  m.cargo=mat('#94684d',.95);m.sling=mat('#50535c',.92);
   m.window=new THREE.MeshPhysicalMaterial({color:'#253537',roughness:.09,metalness:.32,clearcoat:1,ior:1.5});
-  m.yellow=new THREE.MeshPhysicalMaterial({color:'#b88b28',roughness:.49,metalness:.12,clearcoat:.12,clearcoatRoughness:.4});
-  m.edge.color.set('#866526');
-  m.concrete.color.set('#858781');m.slab.color.set('#9d9e95');
-  m.brick.color.set('#856c59');m.ground.color.set('#888374');
-  m.earth.color.set('#554d3e');m.asphalt.color.set('#454b48');m.white.color.set('#b5b8af');m.pale.color.set('#bfc0b4');m.timber.color.set('#93805c');m.facade.color.set('#a6aaa1');
+  m.yellow=new THREE.MeshPhysicalMaterial({color:'#aa8a3b',roughness:.56,metalness:.3,clearcoat:.18,clearcoatRoughness:.5});
+  m.edge.color.set('#726042');
+  m.red.color.set('#69473e');m.blue.color.set('#515e62');
+  m.concrete.color.set('#92908a');m.slab.color.set('#aaa59c');
+  m.brick.color.set('#856c59');m.ground.color.set('#35363c');
+  m.ground.roughness=.78;m.ground.metalness=.12;
+  m.paving=mat('#5b5b62',.8,.06);
+  m.earth.color.set('#49484b');m.asphalt.color.set('#292c33');m.white.color.set('#b5b8af');m.pale.color.set('#bfc0b4');m.timber.color.set('#857964');m.facade.color.set('#a6aaa1');
   m.net.transparent=true;m.net.opacity=.42;m.net.side=THREE.DoubleSide;
   m.glass=new THREE.MeshPhysicalMaterial({color:'#273d42',metalness:.28,roughness:.08,transparent:true,opacity:.87,clearcoat:1});
   if(typeof document!=='undefined') {
     // Fine surface relief keeps the model an illustration with tangible materials.
     let seed=711;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
-    const surface=document.createElement('canvas');surface.width=surface.height=256;
-    const ctx=surface.getContext('2d'),pixels=ctx.createImageData(256,256);
+    const surface=document.createElement('canvas');surface.width=surface.height=512;
+    const ctx=surface.getContext('2d'),pixels=ctx.createImageData(512,512);
     for(let i=0;i<pixels.data.length;i+=4) {const shade=150+random()*80;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=shade;pixels.data[i+3]=255;}
     ctx.putImageData(pixels,0,0);
     const grain=new THREE.CanvasTexture(surface);grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(3,3);
-    for(const name of ['concrete','slab','pale','brick','ground']) {m[name].bumpMap=grain;m[name].bumpScale=.012;m[name].roughnessMap=grain;}
+    for(const name of ['concrete','slab','pale','brick']) {m[name].bumpMap=grain;m[name].bumpScale=.012;m[name].roughnessMap=grain;}
     // Broad color variation reads as cast concrete; the fine grain provides relief.
-    const stone=surface.cloneNode(),sc=stone.getContext('2d');sc.fillStyle='#ddd9ce';sc.fillRect(0,0,256,256);
+    const stone=surface.cloneNode();stone.width=stone.height=1024;const sc=stone.getContext('2d');sc.scale(4,4);sc.fillStyle='#ddd9ce';sc.fillRect(0,0,256,256);
     for(let i=0;i<2600;i++){const value=110+random()*80;sc.fillStyle=`rgba(${value},${value},${value},.08)`;sc.fillRect(random()*256,random()*256,random()*5+1,random()*2+1);}
     for(let y=0;y<256;y+=64){sc.fillStyle='rgba(80,70,50,.08)';sc.fillRect(0,y,256,1);}
     const stoneMap=new THREE.CanvasTexture(stone);stoneMap.colorSpace=THREE.SRGBColorSpace;
     for(const name of ['concrete','slab'])m[name].map=stoneMap;
-    const stripes=surface.cloneNode(),hc=stripes.getContext('2d');hc.fillStyle='#edac16';hc.fillRect(0,0,256,256);hc.strokeStyle='#262b2a';hc.lineWidth=32;
+    const stripes=surface.cloneNode();stripes.width=stripes.height=1024;const hc=stripes.getContext('2d');hc.scale(4,4);hc.fillStyle='#edac16';hc.fillRect(0,0,256,256);hc.strokeStyle='#262b2a';hc.lineWidth=32;
     for(let x=-256;x<512;x+=80){hc.beginPath();hc.moveTo(x,0);hc.lineTo(x+256,256);hc.stroke();}
     m.hazard.map=new THREE.CanvasTexture(stripes);m.hazard.map.colorSpace=THREE.SRGBColorSpace;m.hazard.color.set('#ffffff');
     const netCanvas=document.createElement('canvas');netCanvas.width=netCanvas.height=64;
     const nc=netCanvas.getContext('2d');nc.strokeStyle='#ffffff';nc.lineWidth=2;
     for(let i=0;i<=64;i+=16){nc.beginPath();nc.moveTo(i,0);nc.lineTo(i,64);nc.moveTo(0,i);nc.lineTo(64,i);nc.stroke();}
     m.net.map=new THREE.CanvasTexture(netCanvas);m.net.map.wrapS=m.net.map.wrapT=THREE.RepeatWrapping;m.net.map.repeat.set(4,3);m.net.alphaTest=.1;
-    const wood=surface.cloneNode();const wc=wood.getContext('2d');wc.fillStyle='#c9b898';wc.fillRect(0,0,256,256);
+    const wood=surface.cloneNode();wood.width=wood.height=1024;const wc=wood.getContext('2d');wc.scale(4,4);wc.fillStyle='#c9b898';wc.fillRect(0,0,256,256);
     for(let i=0;i<300;i++){wc.strokeStyle=`rgba(65,45,20,${random()*.3})`;wc.beginPath();const y=random()*256;wc.moveTo(0,y);wc.bezierCurveTo(90,y+random()*5,180,y-random()*5,256,y);wc.stroke();}
     m.timber.bumpMap=new THREE.CanvasTexture(wood);m.timber.bumpScale=.035;
   }
   applyConstructionSurfaces(m);
   const boxGeo = new THREE.BoxGeometry(1,1,1);
   const roundedBoxGeo = new RoundedBoxGeometry(1,1,1,1,.009);
-  const rodGeo = new THREE.CylinderGeometry(1,1,1,12);
+  const rodGeo = new THREE.CylinderGeometry(1,1,1,20);
   const unitY = new THREE.Vector3(0,1,0);
   function group(parent,x=0,y=0,z=0) { const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);return g; }
   function mesh(parent,geo,material,x,y,z,sx,sy,sz) {
-    const o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;
+    const o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=![m.ground,m.asphalt,m.paving].includes(material);o.receiveShadow=true;parent.add(o);return o;
   }
   const box=(g,material,x,y,z,w,h,d)=>mesh(g,[m.pale,m.yellow,m.white].includes(material)?roundedBoxGeo:boxGeo,material,x,y,z,w,h,d);
   function rod(g,material,a,b,r=.045) {
@@ -117,7 +117,7 @@ export function createCraneScene() {
     for(const items of buckets.values()) {
       const inst=new THREE.InstancedMesh(items[0].geometry,items[0].material,items.length);
       items.forEach((o,i)=>{o.updateMatrix();inst.setMatrixAt(i,o.matrix);g.remove(o);});
-      inst.castShadow=true;inst.receiveShadow=true;g.add(inst);
+      inst.castShadow=![m.ground,m.asphalt,m.paving].includes(inst.material);inst.receiveShadow=true;g.add(inst);
     }
   }
   // Once assembled, the entire site can share a handful of instanced draws.
@@ -135,7 +135,7 @@ export function createCraneScene() {
     const result=new THREE.Group();
     for(const b of buckets.values()){
       const inst=new THREE.InstancedMesh(b.geometry,b.material,b.matrices.length);
-      b.matrices.forEach((matrix,i)=>inst.setMatrixAt(i,matrix));inst.castShadow=true;inst.receiveShadow=true;result.add(inst);
+      b.matrices.forEach((matrix,i)=>inst.setMatrixAt(i,matrix));inst.castShadow=![m.ground,m.asphalt,m.paving].includes(inst.material);inst.receiveShadow=true;result.add(inst);
     }
     return result;
   }
@@ -251,17 +251,17 @@ export function createCraneScene() {
   const site=group(scene);
   architecture.excavation(site);
   // Access road and kerbs keep the complex legible.
-  box(site,m.asphalt,0,.005,8,400,.035,4);
-  for(let x=-83;x<85;x+=2)box(site,m.line,x,.03,8,.8,.012,.07);
-  for(let x=-83;x<85;x+=1.5)box(site,m.slab,x,.12,5.8,1.4,.24,.2);
-  for(let x=-76;x<=76;x+=2) {
+  box(site,m.asphalt,0,.005,8,140,.035,4);
+  for(let x=-50;x<52;x+=2)box(site,m.line,x,.03,8,.8,.012,.07);
+  for(let x=-50;x<52;x+=1.5)box(site,m.paving,x,.12,5.8,1.4,.24,.2);
+  for(let x=-32;x<=40;x+=2) {
     if(x>=-4&&x<2)continue;
     rod(site,m.steel,[x,0,13.5],[x,1.7,13.5],.035);
     box(site,m.slab,x+1,.85,13.5,1.95,1.6,.06);
   }
   // A continuous approach road and pavement connect the surrounding blocks.
-  box(site,m.slab,0,.02,16.5,400,.12,3.8);
-  for(let x=-80;x<85;x+=4)box(site,m.joint,x,.082,16.5,.025,.005,3.8);
+  box(site,m.paving,0,.02,16.5,140,.12,3.8);
+  for(let x=-48;x<53;x+=4)box(site,m.joint,x,.082,16.5,.025,.005,3.8);
   // Stacked materials and site offices.
   for(let i=0;i<7;i++)pallet(site,-10+i*2.4,0,4.3,true,i%3);
   const offices=group(site,0,0,2);
@@ -275,8 +275,8 @@ export function createCraneScene() {
   }
   batch(offices);
   const floors=[];
-  function building(x,z,w,d,n,offset,brick=true,style=null) {
-    const base=group(site,x,0,z);
+  function building(x,z,w,d,n,offset,brick=true,style=null,parent=site) {
+    const base=group(parent,x,0,z);
     for(let f=0;f<=n;f++) {
       const level=group(base,0,f*2.35,0);
       box(level,m.slab,0,.1,0,w,.2,d);
@@ -301,7 +301,7 @@ export function createCraneScene() {
       }
       // Fall protection around unfinished slab perimeter.
       if(f>=n-1)for(const side of [-1,1]) {
-        for(let px=-w/2;px<=w/2;px+=1.5)rod(level,m.yellow,[px,.2,side*d/2],[px,1.2,side*d/2],.025);
+        for(let px=-w/2;px<=w/2;px+=1.5)rod(level,m.galvanized,[px,.2,side*d/2],[px,1.2,side*d/2],.025);
         for(const h of [.7,1.15])box(level,m.timber,0,h,side*d/2,w,.08,.06);
       }
       details.floor(level,{w,d,f,n,brick});
@@ -316,15 +316,18 @@ export function createCraneScene() {
   building(1,-10,6,6,7,.02,false,'office');
   building(12,-10,7,6,9,.035,true,'residential');
   // Neighbouring work zones fill the periphery as the camera enters the site.
-  building(-23,-13,10,9,5,.015,false,'frame');
-  building(30,-16,11,10,7,.02,true,'residential');
-  building(-10,-31,13,9,6,.015,false,'office');
-  building(17,-36,14,11,5,.02,true);
-  for(const x of [-34,39])for(let z=-15;z<4;z+=3.3)pallet(site,x,0,z,true,Math.abs(z)%3);
+  const district=group(scene),districtFloorStart=floors.length;
+  building(-23,-13,10,9,5,.015,false,'frame',district);
+  building(30,-16,11,10,7,.02,true,'residential',district);
+  building(-10,-31,13,9,6,.015,false,'office',district);
+  building(17,-36,14,11,5,.02,true,null,district);
+  for(const x of [-34,39])for(let z=-15;z<4;z+=3.3)pallet(district,x,0,z,true,Math.abs(z)%3);
   for(const x of [-37,43]) {
-    box(site,m.concrete,x,.22,-23,9,.44,12);
-    for(let dx=-3.6;dx<4;dx+=1.2)for(let z=-28;z<-17;z+=1.5)rod(site,m.steel,[x+dx,.45,z],[x+dx,1.2,z],.02);
+    box(district,m.concrete,x,.22,-23,9,.44,12);
+    for(let dx=-3.6;dx<4;dx+=1.2)for(let z=-28;z<-17;z+=1.5)rod(district,m.steel,[x+dx,.45,z],[x+dx,1.2,z],.02);
   }
+  const finishedDistrict=flatten(district);
+  district.clear();district.add(finishedDistrict);floors.splice(districtFloorStart);
   const scaffold=group(site,12,0,-10);
   for(let y=.4;y<17;y+=2.35) {
     for(let x=-3.9;x<4;x+=1.3)for(const z of [-3.7,3.7]) {
@@ -359,10 +362,28 @@ export function createCraneScene() {
   pallet(truck,-.8,1,0);details.truck(truck);batch(truck);details.site(site);batch(site);
   const growingParts=[...site.children];
   const finishedSite=flatten(site);site.add(finishedSite);
-  const ambient=new THREE.HemisphereLight('#dce6ed','#55554a',.42);scene.add(ambient);
-  const key=new THREE.DirectionalLight('#fff1db',3.1);key.position.set(-22,29,12);key.castShadow=true;
+  function architecturalFade(root) {
+    const copies=new Map();
+    root.traverse(object=>{
+      if(!object.isMesh)return;
+      const source=object.material;
+      if(!copies.has(source)) {
+        const copy=source.clone();
+        copy.onBeforeCompile=source.onBeforeCompile;
+        copy.customProgramCacheKey=source.customProgramCacheKey;
+        copy.transparent=true;
+        copies.set(source,{material:copy,opacity:source.opacity});
+      }
+      object.material=copies.get(source).material;
+    });
+    return opacity=>{for(const entry of copies.values())entry.material.opacity=entry.opacity*opacity;};
+  }
+  const siteFade=architecturalFade(finishedSite);
+  const districtFade=architecturalFade(finishedDistrict);
+  const ambient=new THREE.HemisphereLight('#e9eced','#403d38',.3);scene.add(ambient);
+  const key=new THREE.DirectionalLight('#fff4e5',3.2);key.position.set(-22,29,12);key.castShadow=true;
   key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-48,right:48,top:45,bottom:-40,near:1,far:150});key.shadow.radius=4;key.shadow.bias=-.0003;key.shadow.normalBias=.04;scene.add(key);
-  const fill=new THREE.DirectionalLight('#bed3e3',.45);fill.position.set(20,15,-20);scene.add(fill);
+  const fill=new THREE.DirectionalLight('#d6e1e8',.28);fill.position.set(20,15,-20);scene.add(fill);
   const shadow=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.ShadowMaterial({opacity:.34}));
   shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.35;shadow.receiveShadow=true;scene.add(shadow);
   const deliveryEffects=createDeliveryEffects(scene);
@@ -388,17 +409,23 @@ export function createCraneScene() {
         const delta=end.clone().sub(start),part=sling.parts[i];part.position.copy(start.clone().add(end).multiplyScalar(.5));part.scale.y=delta.length();part.quaternion.setFromUnitVectors(unitY,delta.normalize());
       });
     }
-    activityRoot.visible=p>.51;
+    activityRoot.visible=p>.57;
     activity.update(p);
     const travel=11*smooth(.51,.72,p);truck.position.x=-10+travel;
     wheels.forEach(wheel=>{wheel.rotation.z=-travel/.38;});
     site.visible=p>.46;
-    for(const f of floors) {const r=smooth(f.at,f.at+.023,p);f.group.visible=r>0;f.group.scale.y=Math.max(.001,r);f.group.position.y=f.height-(1-r)*.15;}
-    site.position.y=-.35*(1-smooth(.46,.51,p));
+    // Keep the side copy clear until it has scrolled past the scene.
+    district.visible=p>.73;
+    district.scale.y=1;
+    districtFade(smooth(.73,.82,p));
+    for(const f of floors) {f.group.visible=true;f.group.scale.y=1;f.group.position.y=f.height;}
+    siteFade(smooth(.46,.57,p));
+    key.shadow.intensity=smooth(.46,.6,p);
+    site.position.y=0;
     activityRoot.position.y=site.position.y;
-    scaffold.visible=p>.60;
-    scaffold.scale.y=Math.max(.001,smooth(.60,.68,p));
-    const assembled=p>=.685;
+    scaffold.visible=true;
+    scaffold.scale.y=1;
+    const assembled=true;
     growingParts.forEach(part=>{part.visible=!assembled&&(part!==scaffold||p>.60);});
     finishedSite.visible=assembled;
     target.set(...s.target);
@@ -426,10 +453,9 @@ export function createCraneScene() {
     }
     camera.position.set(target.x+Math.sin(s.azimuth)*Math.cos(s.elevation)*distance,target.y+Math.sin(s.elevation)*distance,target.z+Math.cos(s.azimuth)*Math.cos(s.elevation)*distance);
     camera.aspect=aspect;camera.lookAt(target);camera.updateProjectionMatrix();
-    atmosphere.position.copy(camera.position);atmosphere.visible=p>.46;
-    atmosphere.material.opacity=smooth(.46,.60,p);
+
     return s;
   }
   update(0);
-  return {scene,camera,update,load,site,slew,trolley,hoists,floors,activity,activityRoot,truck,wheels,materials:m};
+  return {scene,camera,update,load,site,slew,trolley,hoists,floors,activity,activityRoot,truck,wheels,lighting:{key,fill},materials:m};
 }

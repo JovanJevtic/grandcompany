@@ -56,6 +56,17 @@ export function craneRigKit({box,rod,group,batch,m}) {
         box(g,m.cargo,cx,y+.1,cz,.5,.215,.022);
       }
     }
+    // Pressed clay ribs, pallet fasteners and lifting-frame bolts read at close range.
+    for(let layer=0;layer<5;layer++)for(let x=0;x<3;x++)for(const side of [-1,1]) {
+      for(let rib=0;rib<5;rib++)box(g,m.brick,-.75+x*.55+rib*.095,.455+layer*.23,side*.584,.008,.18,.008);
+    }
+    for(const x of [-.67,0,.67])for(let z=-.55;z<.7;z+=.275)for(const dx of [-.055,.055])
+      rod(g,m.galvanized,[x+dx,.315,z],[x+dx,.326,z],.012);
+    for(const x of [-.9,.9])for(const z of [-.69,.69]) {
+      box(g,m.steel,x,2.125,z,.21,.025,.21);
+      for(const dx of [-.065,.065])for(const dz of [-.065,.065])
+        rod(g,m.galvanized,[x+dx,2.13,z+dz],[x+dx,2.16,z+dz],.018);
+    }
     // Packing bands and folded cardboard protectors run over the actual load.
     for(const x of [-.59,.59]) {
       for(const z of [-.602,.602])box(g,m.sling,x,.89,z,.056,1.15,.017);

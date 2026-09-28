@@ -57,6 +57,7 @@ function headerHTML() {
   const q = page === 'katalog' ? params.get('q') || '' : '';
 
 
+  const homeNav = page === 'home' ? `<nav class="home-navigation" aria-label="Glavna navigacija"><a href="katalog.html">Materijali</a><a href="dostava.html">Dostava kranom</a><a href="partneri.html">Za partnere</a><a href="kontakt.html">Kontakt</a></nav>` : '';
   const serviceLinks = SERVICE_LINKS.map(
     (l) => `<a href="${l.href}" ${page === l.page ? 'aria-current="page"' : ''} class="nav-link">${l.label}</a>`
   ).join('');
@@ -64,7 +65,7 @@ function headerHTML() {
   const searchForm = (id, extra) => `
     <form action="katalog.html" role="search" class="flex ${extra}">
       <label for="${id}" class="sr-only">Pretraga kataloga</label>
-      <input id="${id}" name="q" type="search" value="${esc(q)}" placeholder="Pretražite ploče, profile, vunu, ljepila…"
+      <input id="${id}" name="q" type="search" value="${esc(q)}" placeholder="${page === 'home' ? 'Pretraga materijala' : 'Pretražite ploče, profile, vunu, ljepila…'}"
              class="w-full min-w-0 border border-r-0 border-espresso/25 bg-paper px-4 py-2.5 text-[15px] placeholder-umber/70 focus:border-espresso focus:ring-0" />
       <button class="flex items-center gap-2 bg-espresso px-4 text-[14px] font-medium text-cream hover:bg-oxide">${ICON.search}<span class="hidden xl:inline">Traži</span></button>
     </form>`;
@@ -87,6 +88,7 @@ function headerHTML() {
         <span class="brand-symbol" aria-hidden="true">G<span>↗</span></span>
         <span class="brand-name">GRAND<span>COMPANY</span></span>
       </a>
+      ${homeNav}
       ${searchForm('hdr-q', 'header-search')}
       <div class="header-actions">
         <button id="btn-account" class="account-button">${ICON.user}<span id="account-label">Prijava za partnere</span></button>

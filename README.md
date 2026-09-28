@@ -147,3 +147,35 @@ Canvas sada pokriva cijeli viewport bez bočne maske. Time je uklonjeno zeleno p
 Teren se nastavlja daleko izvan kadra, cesta i pločnik prolaze kroz scenu, a okolne zgrade i dodatne radne zone daju dubinu. Udaljeni teren prelazi u atmosferu iste boje, bez vidljivog ruba postolja. Kamera prvo otkriva gradilište, zatim silazi i prilazi paleti i radnicima na prijemnoj ploči. Završni kadar namjerno prikazuje unutrašnjost gradilišta, pa se više ne pokušava uklopiti čitav kran i svaka zgrada u mali zajednički okvir.
 
 Desktop dobija završni prostor bez teksta za prilazak kamere. Na telefonu i u reduced-motion/fallback prikazu taj dodatni prostor se ne prikazuje. Provjereno: širina canvasa i odsustvo maske, obični scroll, početni/prilazni/završni kadrovi na desktopu i telefonu, fallback i deset testova geometrije i kretanja. Paleta ostaje vidljiva tokom prilaska i završava na ploči.
+
+## Antracitni gradient i neutralna podloga v14
+
+Uklonjene su zelena magla, neprozirna atmosfera i veliki slojevi zemlje. Scena ostaje transparentna preko antracitnog CSS gradienta s toplim šampanjskim i hladnim plavosivim osvjetljenjem. Naslovi, dugmad, linije i mobilna podloga koriste istu paletu.
+
+Oko zgrada ostaje ograničena, glatka betonska radna površina; njeni udaljeni rubovi i cesta postepeno postaju transparentni. Plohe podloge ne bacaju pravougaone sjene izvan vidljivog dijela. Zadržani su široko gradilište i prilazak kamere. Provjereno Playwrightom na 1440 i 390 px, bez grešaka konzole; deset testova geometrije i animacije prolazi.
+
+## Gradient koji prati scroll v15
+
+Tri sloja gradienta prate napredak scene: indigo i ljubičasta u uvodu, kobaltno plava tokom otkrivanja gradilišta, zatim topliji šampanjski tonovi u završnom prilasku. Položaj svjetlosnih preliva i dopunsko osvjetljenje 3D scene mijenjaju se zajedno sa scrollom. `js/crane-ambience.js` koristi postojeći render ciklus; povratni scroll vraća iste boje, a reduced-motion zadržava početnu paletu.
+
+Zaglavlje početne stranice, pretraga i mobilni meni usklađeni su s tamnom paletom. Bočne zgrade pojavljuju se kasnije kako ne bi prekrivale tekst dostave. Playwright provjera na 1440 i 390 px obuhvata promjenu i povratak gradienta, prirodni scroll teksta, mobilni meni, reduced-motion, horizontalni overflow i konzolu.
+
+## Arhitektonski redizajn početne stranice v16
+
+Početna stranica koristi grafitnu scenu sa srebrnim, čeličnoplavim i toplim bakarnim osvjetljenjem koje prati scroll. Veći, lakši sans-serif naslovi kombinovani su s kurzivnim Instrument Serif akcentima. Uvod ima manje pomoćnog sadržaja, novu hijerarhiju i jednu liniju navigacije s pretragom, nalogom i korpom. Kran ostaje u sredini, tekst prolazi prirodnim scrollom, a 3D prikaz je ograničen na svoju sekciju.
+
+`css/home-editorial.css` uređuje ostatak početne: velike fotografske kategorije u dvije kolone, toplu kamenu podlogu kataloga, grafitni kalkulator, partnerske kartice i završne sekcije u istoj paleti. Mobilni prikaz ima zaseban raspored i meni. Zajednički header dobija novu navigaciju samo na početnoj stranici.
+
+## Oštriji 3D prikaz v17
+
+Render sada cilja 2× CSS dimenzije, odnosno do 2,5× na Retina desktop ekranima, uz granicu 6,5 miliona piksela na desktopu i 2,5 miliona na telefonu. `js/crane-quality.js` ograničava dimenzije i prema GPU limitu. Renderer i postprocessing usklađuju pixel ratio nakon promjene veličine.
+
+Desktop koristi 4096 px mapu sjena, telefon 2048 px. Kontaktno sjenčenje koristi 32 uzorka na desktopu i 24 na telefonu. Teksture betona, drveta i sigurnosnih pruga su 1024 px; sitni reljef je 512 px. Anizotropno filtriranje do 8× održava kose površine čitljivijim. Cilindrični dijelovi imaju 20 umjesto 12 segmenata. Dodatni kvalitet povećava GPU rad; testovi granica alokacije i geometrije prolaze.
+
+## Arhitektonska scena v18
+
+Uklonjene su geometrijske figure radnika iz krupnog kadra. Prijemna etaža dobija geodetski stativ i pripremljenu opremu za dizanje. Paleta ima rebra glinenih blokova, pričvrsnice u drvetu i vijčane spojeve nosivog okvira. Pocinčane ograde, suzdržaniji lak krana i tamniji temeljni premaz podupirača smanjuju količinu žutih i crvenih elemenata.
+
+Beton koristi suptilnije varijacije, tragove oplate i rupe veznih šipki na vertikalnim površinama. Dopunsko i ambijentalno svjetlo su smanjeni da se jasnije razlikuju osvijetljene i zaklonjene plohe.
+
+Gradilište i okolni objekti pojavljuju se postepenom promjenom neprozirnosti, u punim proporcijama; etaže se više ne rastežu. Materijali za prelaz su kopije da promjena ne utiče na kran i teret. Kontaktne sjene prate prelaz kako se ne bi vidjeli obrisi još nevidljive opreme. Provjereni su desktop i mobilni završni kadar, konzola i 13 testova geometrije, kvaliteta i proporcija.

@@ -27,11 +27,11 @@ revision = hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest(
 (static / 'build.json').write_text(json.dumps({
     'revision': revision,
     'generatedAt': datetime.now(timezone.utc).isoformat(),
-    'hero': 'threejs-immersive-site-v13',
-    'design': 'grand-industrial-v7',
+    'hero': 'threejs-architectural-v18',
+    'design': 'grand-editorial-v16',
     'files': {name: value for name, value in files.items() if name in (
-        'index.html', 'css/site.css', 'css/design.css', 'css/construction-story.css', 'js/ui.js', 'js/tw-config.js', 'js/crane-hero.js', 'js/crane-scene.js', 'js/crane-details.js',
-        'js/crane-rig.js', 'js/crane-surfaces.js', 'js/crane-architecture.js', 'js/crane-activity.js', 'js/crane-renderer.js', 'js/crane-effects.js')},
+        'index.html', 'css/site.css', 'css/design.css', 'css/construction-story.css', 'css/home-editorial.css', 'js/ui.js', 'js/tw-config.js', 'js/crane-hero.js', 'js/crane-ambience.js', 'js/crane-scene.js', 'js/crane-details.js',
+        'js/crane-rig.js', 'js/crane-surfaces.js', 'js/crane-architecture.js', 'js/crane-activity.js', 'js/crane-renderer.js', 'js/crane-quality.js', 'js/crane-effects.js')},
 }, indent=2) + '\n')
 (output / 'config.json').write_text(json.dumps({'version': 3}, indent=2) + '\n')
 print(f'Prepared {len(files)} files. Revision: {revision}')

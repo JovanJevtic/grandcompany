@@ -155,3 +155,17 @@ test('final approach moves into the site, keeps cargo visible and has ground acr
     assert.ok(before.distanceTo(w.camera.position)<1e-9,'entry does not reverse consistently');
   }
 });
+
+test('architectural reveal preserves full floor proportions and crane opacity',()=>{
+  const w=createCraneScene();
+  for(const p of [.47,.51,.56,.74,.81,1,.51]) {
+    w.update(p);
+    for(const floor of w.floors) {
+      assert.equal(floor.group.scale.y,1,'building floor is being stretched');
+      assert.equal(floor.group.position.y,floor.height,'building floor is moving');
+    }
+    assert.equal(w.site.position.y,0);
+    assert.equal(w.materials.yellow.opacity,1,'site fade must not fade the crane');
+    assert.equal(w.materials.steel.opacity,1,'site fade must not fade lifting hardware');
+  }
+});

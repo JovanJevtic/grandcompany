@@ -72,25 +72,6 @@ export function detailKit({box,rod,group,batch,m}) {
     for(const z of [-.08,.08])ring(g,m.steel,[0,.25,z],.18,'xy',.032);
     rod(g,m.steel,[0,-.05,0],[0,-.2,0],.07);
   }
-  function worker(parent,x,z,signal=false) {
-    const g=group(parent,x,.22,z);
-    g.rotation.y=signal?-.65:.55;
-    for(const side of [-1,1]) {
-      rod(g,m.blue,[side*.09,.72,0],[side*.12,.15,side*.035],.065);
-      box(g,m.rubber,side*.12,.07,.065,.13,.14,.25);
-      const elbow=[side*.3,signal&&side===1?1.34:.86,0];
-      const hand=[side*.28,signal&&side===1?1.7:.67,.12];
-      rod(g,m.blue,[side*.18,1.12,0],elbow,.052);rod(g,m.blue,elbow,hand,.043);
-      rod(g,m.skin,hand,[hand[0],hand[1]+.08,hand[2]],.045);
-    }
-    box(g,m.red,0,.99,0,.37,.46,.24);
-    for(const x of [-.115,.115])box(g,m.line,x,1.01,.125,.035,.37,.01);
-    box(g,m.line,0,.89,.13,.36,.036,.01);
-    rod(g,m.skin,[0,1.25,0],[0,1.44,0],.102);
-    rod(g,m.white,[0,1.42,0],[0,1.5,0],.125);
-    rod(g,m.white,[0,1.42,.025],[0,1.445,.025],.155);
-    batch(g);
-  }
   function floor(g,{w,d,f,n,brick}) {
     // Slab joints and tie holes break up uninterrupted concrete surfaces.
     for(let x=-w/2+.7;x<w/2;x+=1.4) {
@@ -135,8 +116,21 @@ export function detailKit({box,rod,group,batch,m}) {
       for(let i=0;i<8;i++)rod(g,m.steel,[-w/2+.6,.3,-1.5+i*.07],[-w/2+2.2,.3,-1.5+i*.07],.019);
       for(let i=0;i<3;i++)box(g,m.brick,w/2-.65,.35+i*.21,-d/2+.8,.75,.2,.7);
       if(n===4) {
-        // A clear receiving zone, crew and tools give the delivery a readable scale.
-        worker(g,-2.05,1.6,true);worker(g,2.2,-1.6,false);
+        // Survey equipment and secured lifting hardware establish a working roof.
+        const survey=group(g,-2.05,.2,1.65);
+        for(let i=0;i<3;i++) {
+          const angle=i*Math.PI*2/3;
+          rod(survey,m.galvanized,[Math.cos(angle)*.32,0,Math.sin(angle)*.32],[0,1.18,0],.022);
+          rod(survey,m.rubber,[Math.cos(angle)*.32,0,Math.sin(angle)*.32],[Math.cos(angle)*.29,.22,Math.sin(angle)*.29],.025);
+        }
+        box(survey,m.steel,0,1.21,0,.25,.08,.23);
+        box(survey,m.white,0,1.36,0,.19,.23,.18);
+        rod(survey,m.rubber,[-.14,1.4,0],[.14,1.4,0],.065);
+        batch(survey);
+        for(let i=0;i<3;i++) {
+          ring(g,m.steel,[2.15+i*.13,.23,-1.5],.095,'xz',.016);
+          box(g,m.steel,2.15+i*.13,.23,-1.41,.13,.025,.025);
+        }
         for(const x of [-1.2,1.2])for(const z of [-1.05,1.05]) {
           box(g,m.yellow,x,.207,z,.45,.008,.035);
           box(g,m.yellow,x-Math.sign(x)*.2,.207,z-Math.sign(z)*.2,.035,.008,.45);
@@ -148,7 +142,7 @@ export function detailKit({box,rod,group,batch,m}) {
         ring(g,m.rubber,[2,.218,.6],.19,'xz',.025);
       }
       for(const side of [-1,1]) {
-        for(let z=-d/2;z<=d/2;z+=1.5)rod(g,m.yellow,[side*w/2,.2,z],[side*w/2,1.2,z],.025);
+        for(let z=-d/2;z<=d/2;z+=1.5)rod(g,m.galvanized,[side*w/2,.2,z],[side*w/2,1.2,z],.025);
         for(const y of [.7,1.15])box(g,m.timber,side*w/2,y,0,.06,.08,d);
         box(g,m.timber,0,.32,side*d/2,w,.17,.05);
       }
