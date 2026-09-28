@@ -12,7 +12,7 @@ initPage(() => {
   if (!p) {
     $('product-root').innerHTML = `
       <div class="py-24 text-center">
-        <p class="font-serif text-[46px] italic leading-tight">Artikal nije pronađen.</p>
+        <p class="font-display text-[46px] leading-tight">Artikal nije pronađen.</p>
         <p class="mt-3 text-umber">Šifra „${esc(sku || '')}" ne postoji u katalogu ili je artikal povučen iz prodaje.</p>
         <a href="katalog.html" class="${BTN_PRIMARY} mt-8 px-7 py-3.5">Nazad na katalog</a>
       </div>`;
@@ -58,7 +58,7 @@ initPage(() => {
         : 'Artikal držimo na lageru jer se provjereno slaže sa sistemima iz naše ponude. Za zamjenske proizvode i veće količine pitajte u prodaji.';
       return `
         <div class="grid gap-8 lg:grid-cols-12">
-          <p class="font-serif text-[28px] leading-snug lg:col-span-6">${esc(p.desc)}</p>
+          <p class="font-display text-[28px] leading-snug lg:col-span-6">${esc(p.desc)}</p>
           <div class="space-y-4 text-[16px] leading-relaxed text-umber lg:col-span-5 lg:col-start-8">
             <p>${esc(cat.usage)}</p>
             <p>${brandNote}</p>
@@ -86,7 +86,7 @@ initPage(() => {
         <ul class="max-w-3xl divide-y divide-espresso/10 border-y border-espresso/15">
           ${docsFor().map(([name, note]) => `
             <li class="flex flex-wrap items-center justify-between gap-4 py-4">
-              <div class="flex items-start gap-3"><span class="text-oxide">${ICON.doc}</span><div><p class="font-serif text-[20px] leading-snug">${name}</p><p class="text-[14px] text-umber">${note}</p></div></div>
+              <div class="flex items-start gap-3"><span class="text-oxide">${ICON.doc}</span><div><p class="font-display text-[20px] leading-snug">${name}</p><p class="text-[14px] text-umber">${note}</p></div></div>
               <button data-doc="${esc(name)}" class="${BTN_GHOST} px-4 py-2 text-[14px]">Zatraži dokument</button>
             </li>`).join('')}
         </ul>
@@ -136,7 +136,7 @@ initPage(() => {
             <span>Šifra ${p.sku}</span>
             <a href="katalog.html?kat=${cat.id}" class="inline-flex items-center gap-1.5 hover:text-espresso"><span class="h-2 w-2" style="background:${cat.color}" aria-hidden="true"></span>${cat.label}</a>
           </div>
-          <h1 class="mt-3 font-serif text-[clamp(2.3rem,3.6vw,3.5rem)] leading-[1.04]">${esc(p.name)}</h1>
+          <h1 class="mt-3 font-display text-[clamp(2.3rem,3.6vw,3.5rem)] leading-[1.04]">${esc(p.name)}</h1>
           <p class="mt-3 text-[16px] text-umber">${esc(p.spec)}</p>
 
           <div class="mt-5 flex flex-wrap items-center gap-x-4 gap-y-1 border-y border-espresso/15 py-3 text-[14px]">
@@ -146,7 +146,7 @@ initPage(() => {
 
           <div class="mt-6">
             ${b2b ? `<p class="text-[14px] text-umber"><span class="line-through">${KM(p.price)}</span><span class="ml-2 text-oxide">rabat −${pct(discount())} za ${esc(b2b.name)}</span></p>` : ''}
-            <p class="mt-1 font-serif text-[54px] leading-none ${b2b ? 'text-oxide' : ''}">${KM(priceOf(p))}<span class="ml-2 font-sans text-[16px] text-umber">po ${p.unit}, sa PDV-om</span></p>
+            <p class="mt-1 font-display text-[54px] leading-none ${b2b ? 'text-oxide' : ''}">${KM(priceOf(p))}<span class="ml-2 font-sans text-[16px] text-umber">po ${p.unit}, sa PDV-om</span></p>
             ${p.pack ? `<p class="mt-2 text-[15px] text-umber">Jedna ${p.pack.name} od ${qtyFmt(p.pack.size)} ${p.unit} košta ${KM(priceOf(p) * p.pack.size)}.</p>` : ''}
             ${b2b ? '' : `<button data-login class="mt-3 text-left text-[15px] text-umber"><span class="text-oxide underline underline-offset-4">Prijavite se kao partner</span> i platite od ${KM(p.price * 0.9)} do ${KM(p.price * 0.78)} po ${p.unit}.</button>`}
           </div>
@@ -196,7 +196,7 @@ initPage(() => {
     $('related').innerHTML = `
       <div class="mx-auto max-w-[1440px] px-5 py-14 lg:px-12 lg:py-20">
         <div class="flex flex-wrap items-end justify-between gap-4">
-          <h2 class="font-serif text-[clamp(2rem,3.4vw,3rem)] leading-tight">Uz ovaj artikal najčešće idu</h2>
+          <h2 class="font-display text-[clamp(2rem,3.4vw,3rem)] leading-tight">Uz ovaj artikal najčešće idu</h2>
           <a href="katalog.html?kat=${cat.id}" class="link-line text-[15px]">Sve iz kategorije ${esc(cat.label.toLowerCase())}</a>
         </div>
         <div class="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">${related.map(productCard).join('')}</div>

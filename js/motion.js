@@ -1,7 +1,7 @@
 // =====================================================================
 // GRAND COMPANY — motion layer
 // GSAP 3 + ScrollTrigger + SplitText + Lenis (vendored in /vendor)
-// One orchestrated moment (the cover assembling) plus photo parallax.
+// Cover entrance, scroll-driven transparent crane artwork and photo parallax.
 // Progressive enhancement: the site works fully without this file.
 // =====================================================================
 
@@ -14,7 +14,8 @@ window.addEventListener('load', () => {
   gsap.registerPlugin(ScrollTrigger, SplitText);
 
   // --- Lenis smooth scroll, driven by the GSAP ticker ---
-  const lenis = new Lenis({ lerp: 0.1, smoothWheel: true });
+  if (document.body.dataset.page !== 'home') {
+  const lenis = new Lenis({ lerp: 0.1, smoothWheel: document.body.dataset.page !== 'home' });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -31,6 +32,8 @@ window.addEventListener('load', () => {
     });
   });
 
+  }
+
   // --- The cover assembles: headline lines rise, photo unveils, lede follows ---
   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
 
@@ -38,16 +41,6 @@ window.addEventListener('load', () => {
   if (title) {
     const split = new SplitText(title, { type: 'lines', mask: 'lines' });
     tl.from(split.lines, { yPercent: 110, duration: 1.0, stagger: 0.1 }, 0.05);
-  }
-
-  const coverPhoto = document.querySelector('.cover-photo');
-  if (coverPhoto) {
-    tl.fromTo(
-      coverPhoto,
-      { clipPath: 'inset(0 0 100% 0)' },
-      { clipPath: 'inset(0 0 0% 0)', duration: 1.1, ease: 'power4.inOut' },
-      0.2
-    );
   }
 
   const lede = document.querySelectorAll('.cover-lede');

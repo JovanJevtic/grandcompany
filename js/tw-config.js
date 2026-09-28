@@ -2,16 +2,17 @@ tailwind.config = {
   theme: {
     extend: {
       fontFamily: {
+        display: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
         serif: ['"Instrument Serif"', 'Georgia', 'serif'],
         sans: ['"Instrument Sans"', 'system-ui', 'sans-serif'],
       },
       colors: {
-        cream: '#EFE9DD',
-        bone: '#E5DECE',
-        paper: '#F8F4EC',
-        espresso: '#221C14',
-        umber: '#6B5D49',
-        oxide: '#7D2E1D',
+        cream: '#F5F5F0',
+        bone: '#E9EAE3',
+        paper: '#FFFFFF',
+        espresso: '#222722',
+        umber: '#666D63',
+        oxide: '#445940',
         // Material colours — each one belongs to a product family
         dusk: '#4F6D8F',
         ochre: '#C08A2E',

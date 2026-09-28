@@ -1,0 +1,9 @@
+.git
+.claude
+.mcp.json
+.playwright-mcp
+tests
+README.md
+design/*.md
+img/*prompts.md
+scripts

@@ -51,23 +51,12 @@ initPage(() => {
   }
 
   function renderCategories() {
-    $('home-categories').innerHTML = CATEGORIES.map((c) => {
-      const count = PRODUCTS.filter((p) => p.category === c.id).length;
-      return `
-        <a href="katalog.html?kat=${c.id}" class="group relative block overflow-hidden bg-espresso">
-          <div class="aspect-[4/5] overflow-hidden">
-            <img src="${c.image}" alt="" class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" />
-          </div>
-          <div class="absolute inset-0 bg-gradient-to-t from-espresso/90 via-espresso/20 to-transparent"></div>
-          <div class="absolute inset-x-0 bottom-0 p-5 pb-6 text-cream">
-            <p class="font-serif text-[34px] leading-none">${c.label}</p>
-            <p class="mt-2 text-[14px] text-cream/80">${c.lead}</p>
-            <p class="mt-4 flex items-center justify-between gap-3 text-[14px]">
-              <span>${count} ${plural(count, 'artikal', 'artikla', 'artikala')}, od ${KM(minPrice(c.id))}</span>${ICON.arrow}
-            </p>
-          </div>
-          <span class="absolute inset-x-0 bottom-0 h-1.5" style="background:${c.color}" aria-hidden="true"></span>
-        </a>`;
+    $('home-categories').innerHTML = CATEGORIES.map((c,i) => {
+      const count = PRODUCTS.filter(p => p.category === c.id).length;
+      return `<a href="katalog.html?kat=${c.id}" class="category-card">
+        <div class="category-image"><img src="${c.image}" alt="" loading="lazy"><span class="category-number">0${i+1}</span><span class="category-arrow">↗</span></div>
+        <div class="category-info"><span>${count} ${plural(count,'artikal','artikla','artikala')}</span><h3>${c.label}</h3><p>${c.lead}</p></div>
+      </a>`;
     }).join('');
   }
 
@@ -101,7 +90,7 @@ initPage(() => {
     $('home-calc').innerHTML = `
       <div class="bg-paper p-6 text-espresso shadow-[0_40px_80px_-40px_rgba(0,0,0,0.55)] lg:p-8">
         <div class="flex flex-wrap items-baseline justify-between gap-3 border-b border-espresso pb-3">
-          <p class="font-serif text-[28px] leading-none">Zid 5 × 2,8 m</p>
+          <p class="font-display text-[28px] leading-none">Zid 5 × 2,8 m</p>
           <p class="text-[14px] text-umber">${fmt0.format(bom.P)} m², jednostruka obloga, CW 75</p>
         </div>
         <ul class="divide-y divide-espresso/10">
@@ -117,30 +106,24 @@ initPage(() => {
         <p class="mt-1 text-[14px] text-umber">i još ${rest} ${plural(rest, 'stavka', 'stavke', 'stavki')}: vijci, bandaž traka i zvučna traka</p>
         <div class="mt-5 flex items-baseline justify-between border-t border-espresso pt-4">
           <span class="text-[15px]">Ukupno sa PDV-om</span>
-          <span class="font-serif text-[40px] leading-none ${partner() ? 'text-oxide' : ''}">${KM(bomTotal(bom))}</span>
+          <span class="font-display text-[40px] leading-none ${partner() ? 'text-oxide' : ''}">${KM(bomTotal(bom))}</span>
         </div>
       </div>`;
   }
 
   function renderTiers() {
     const mine = TIER_OF[state.partnerId];
-    $('home-tiers').innerHTML = PARTNER_TIERS.map((t, i) => `
-      <div class="bg-espresso p-6 ${i === mine ? 'outline outline-1 -outline-offset-1 outline-cream/70' : ''}">
-        <p class="text-[14px] text-cream/60">${t.name}${i === mine ? ', vaš nivo' : ''}</p>
-        <p class="mt-2 font-serif text-[52px] leading-none">${t.rebate}</p>
-        <p class="mt-3 text-[15px]">${t.who}</p>
-        <p class="mt-1 text-[14px] text-cream/60">${t.days}</p>
-      </div>`).join('');
+    $('home-tiers').innerHTML = PARTNER_TIERS.map((t,i) => `<a href="partneri.html" class="partner-card ${i===2?'partner-card-featured':''}"><div class="partner-card-top"><span>${t.name}${i===mine?', vaš nivo':''}</span><span>↗</span></div><p class="partner-rebate">${t.rebate}</p><p>${t.who}</p><p class="partner-days">${t.days}</p></a>`).join('');
   }
 
   function renderGuides() {
     $('home-guides').innerHTML = GUIDES.map((g) => {
       const p = bySku[g.sku];
       return `
-        <article class="flex flex-col border border-espresso/15 bg-paper">
-          <div class="aspect-[16/10] bg-bone p-4">${productArt(p)}</div>
+        <article class="guide-card">
+          <div class="guide-image">${productArt(p)}</div>
           <div class="flex flex-1 flex-col p-6">
-            <h3 class="font-serif text-[26px] leading-tight">${g.title}</h3>
+            <h3 class="font-display text-[26px] leading-tight">${g.title}</h3>
             <p class="mt-3 flex-1 text-[15px] leading-relaxed text-umber">${g.text}</p>
             <a href="${g.href}" class="link-line mt-5 self-start text-[15px] text-oxide">${g.cta}</a>
           </div>
