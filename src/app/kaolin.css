@@ -1,0 +1,72 @@
+/* ——— Kaolin: jedan objekat koji se na skrol transformiše kroz deset stanja ———
+   Nema 3D-a: radi se o nizu providnih WebP slika koje se preklapaju (crossfade),
+   uz blagi zum, pomak i jedva primjetnu rotaciju cijelog objekta. Sekcija je visoka,
+   a scena je zalepljena na ekran, pa skrol "skrubuje" transformaciju. */
+
+.kaolin {
+  /* visina objekta u kadru; ista za sva stanja (svaka slika dobija svoj odnos) */
+  --object-h: min(42vh, 45vw, 460px);
+  position: relative;
+  background: var(--bg);
+  height: 480vh;
+  margin-block: 18dvh;
+}
+
+.kaolin-stage {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  display: grid;
+  place-items: center;
+  overflow: clip;
+}
+
+/* Kontejner cijelog objekta: GSAP ga lagano skalira i naginje kroz sekciju. */
+.kaolin-object {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  will-change: transform;
+}
+
+/* Jedno stanje (jedna slika). Slike su naslagane jedna preko druge. */
+.kaolin-state {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
+
+/* Puna visina objekta: `--ratio` je odnos visine slike i visine samog objekta,
+   pa sva stanja izgledaju jednako velika iako su na slikama različito krupna. */
+.kaolin-shape {
+  display: flex;
+  height: calc(var(--object-h) * var(--ratio, 1));
+  will-change: transform;
+}
+.kaolin-shape img {
+  display: block;
+  height: 100%;
+  width: auto;
+}
+
+@media (max-width: 767px) {
+  .kaolin {
+    height: 340vh;
+    margin-block: 10dvh;
+  }
+}
+
+/* Bez animacije: samo završno stanje, u normalnom toku stranice (bez dugog skrola). */
+@media (prefers-reduced-motion: reduce) {
+  .kaolin {
+    height: auto;
+    margin-block: 6dvh;
+  }
+  .kaolin-stage {
+    position: relative;
+    height: 80dvh;
+  }
+}

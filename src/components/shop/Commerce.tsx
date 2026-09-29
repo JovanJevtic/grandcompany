@@ -5,6 +5,7 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
 import Pricing from './Pricing'
 import SectionHead from './SectionHead'
+import Kaolin from './Kaolin'
 import UseCases from './UseCases'
 
 // Prodavnica je svedena na tri stvari: linija sa kategorijama, pet vrsta radova i partnerski nivoi.
@@ -41,6 +42,8 @@ export default function Commerce() {
         <SectionHead no="01" label="Kategorije" meta="4 grupe" />
       </div>
       <UseCases />
+      {/* Nakon pet vrsta radova: jedan objekat koji se na skrol transformiše od sirovog kaolina do porcelana. */}
+      <Kaolin />
       <Pricing />
     </div>
   )
