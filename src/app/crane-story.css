@@ -40,12 +40,6 @@
   transition: color 0.35s ease;
 }
 
-/* Uvodni splash: uz reduced motion se ne prikazuje uopšte (ni prije hidratacije). */
-@media (prefers-reduced-motion: reduce) {
-  [data-splash] {
-    display: none;
-  }
-}
 /* Preko krem sekcija heading je tamno plav (ista boja kao tekst sajta). */
 [data-brand-band].brand-dark {
   color: var(--ink);

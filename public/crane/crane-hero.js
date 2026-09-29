@@ -115,7 +115,9 @@ function init() {
   canvas.addEventListener('webglcontextrestored',onContextRestored);
   cover.classList.add('crane-ready');cover.classList.toggle('crane-reduced',reduced.matches);measure();
   // Javljamo ostatku stranice da se raspored promijenio (sekcije su više niske dok scena ne krene),
-  // pa GSAP/ScrollTrigger treba ponovo da izmjeri pozicije.
+  // pa GSAP/ScrollTrigger treba ponovo da izmjeri pozicije. Flag je i za uvodni splash: on
+  // čeka da scena bude spremna, inače se animacija uvoda zamrzne dok se WebGL inicijalizuje.
+  window.__gcCraneReady=true;
   window.dispatchEvent(new CustomEvent('gc:crane-ready'));
 
   // Gašenje: bez ovoga bi stara scena ostala da animira u pozadini nakon nove montaže.
@@ -130,6 +132,7 @@ function init() {
       cancelAnimationFrame(frame);
       pipeline.dispose();renderer.dispose();
       cover.classList.remove('crane-ready','crane-reduced');
+      window.__gcCraneReady=false;
       window.__gcCrane=null;
     },
   };

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./crane-story.css";
 @import "./kaolin.css";
+@import "./splash.css";
 
 :root {
   --bg: #fef5f9;

@@ -90,13 +90,23 @@ export default function SiteChrome() {
           // sačuvani niz ostao prazan.
           const chars = gsap.utils.toArray<HTMLElement>('.ch', wm)
           if (!chars.length) return
-          gsap.from(chars, {
-            yPercent: 160,
-            duration: 1.2,
-            ease: EASE.quint,
-            stagger: 0.05,
-            delay: INTRO.letters,
-          })
+          // Na kraju se transformacija sklanja, pa slova ostaju čista i ako je animaciju
+          // prekinuo zastoj glavne niti ili ponovno montiranje komponente.
+          const clear = () => gsap.set(chars, { clearProps: 'transform' })
+          gsap.fromTo(
+            chars,
+            { yPercent: 160 },
+            {
+              yPercent: 0,
+              duration: 1.2,
+              ease: EASE.quint,
+              stagger: 0.05,
+              delay: INTRO.letters,
+              onComplete: clear,
+            },
+          )
+          // Sigurnosna mreža: slova se pokažu i ako tween iz bilo kog razloga ne stigne do kraja.
+          window.setTimeout(clear, (INTRO.letters + 1.2 + 0.5) * 1000)
         }
         if (!document.querySelector('[data-splash]') || document.documentElement.dataset.gcSplash === 'done')
           letters()

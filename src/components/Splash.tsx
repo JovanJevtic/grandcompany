@@ -2,24 +2,15 @@
 
 import { useEffect, useRef } from 'react'
 import { useLenis } from 'lenis/react'
-import { gsap, useGSAP } from '@/lib/gsap'
 import GcMonogram from './GcMonogram'
 
-// Uvodni splash prije sadržaja (uzor: leome-and-partners.com).
-// Redoslijed: četiri kvadratića stoje skupljeni u 2x2 blok, raziđu se u čoškove okvira,
-// i tek ONDA iz dna izranja monogram unutar tog okvira. Sve na tamno plavoj podlozi.
-const CELL = 12 // stranica kvadratića
-const TIGHT = 7 // početni razmak u 2x2 bloku
-
-// Polazište kvadratića (u centru, blago razmaknuti). Krajnje pozicije se računaju
-// iz stvarne veličine okvira, da raspored ostane isti na svakoj širini ekrana.
-const START = [
-  { x: -TIGHT, y: -TIGHT },
-  { x: TIGHT, y: -TIGHT },
-  { x: -TIGHT, y: TIGHT },
-  { x: TIGHT, y: TIGHT },
-]
-
+// Uvodni splash (uzor: leome-and-partners.com): četiri kvadratića se skupe u 2x2 blok,
+// raziđu se u čoškove okvira, pa iz dna izranja monogram; na kraju se zavjesa podigne.
+//
+// Animacija je u `splash.css` (CSS keyframes), a ne u GSAP-u — CSS animacija traje svoje
+// vrijeme nezavisno od glavne niti. Ovaj modul: zaključava skrol, čeka da 3D scena bude
+// spremna i da frejmovi teku (inače se uvod zamrzne), pa pusti uvod, i na kraju sakrije
+// splash i javi ostatku strane da je gotovo.
 export default function Splash() {
   const root = useRef<HTMLDivElement>(null)
   const lenis = useLenis()
@@ -33,95 +24,88 @@ export default function Splash() {
     return () => lenis.start()
   }, [lenis])
 
-  useGSAP(
-    () => {
-      const el = root.current!
-      let finished = false
-      const finish = () => {
-        if (finished) return
-        finished = true
-        el.style.display = 'none'
-        lenisRef.current?.start()
-        // Wordmark čeka ovaj signal da pusti slova (vidi SiteChrome).
-        document.documentElement.dataset.gcSplash = 'done'
-        window.dispatchEvent(new CustomEvent('gc:splash-done'))
-      }
+  useEffect(() => {
+    const el = root.current
+    if (!el) return
+    let done = false
+    let kicked = false
+    let safety = 0
 
-      // Uz reduced motion nema uvoda — sajt je odmah tu.
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        finish()
-        return
-      }
+    const finish = () => {
+      if (done) return
+      done = true
+      el.style.display = 'none'
+      lenisRef.current?.start()
+      document.documentElement.dataset.gcSplash = 'done'
+      window.dispatchEvent(new CustomEvent('gc:splash-done'))
+    }
 
-      const frame = el.querySelector<HTMLElement>('[data-frame]')!
-      const cells = gsap.utils.toArray<HTMLElement>('[data-cell]', el)
-      const mark = el.querySelector<HTMLElement>('[data-mark]')!
+    // Uvod kreće tek kad glavna nit diše: 3D scena i hidratacija znaju da blokiraju nit
+    // nekoliko sekundi, a animacija pokrenuta prije toga se ne vidi (zamrzne se u prvom frejmu).
+    let raf = 0
+    const kick = () => {
+      if (kicked) return
+      kicked = true
+      window.setTimeout(() => el.classList.add('is-playing'), 150)
+      // Sigurnosna mreža: splash se sakrije i ako animacija ne javi kraj.
+      safety = window.setTimeout(finish, 4200)
+    }
 
-      // Čoškovi okvira u koje se kvadratići razilaze.
-      const box = frame.getBoundingClientRect()
-      const spreadX = box.width / 2
-      const spreadY = box.height / 2
+    // Frejmovi su pouzdan signal da nit diše — dok je blokirana, `requestAnimationFrame` ne stiže.
+    // Na strani sa 3D scenom čeka se i da scena bude spremna (`__gcCraneReady`), jer njena
+    // inicijalizacija ume da blokira nit nekoliko sekundi i pojede uvod.
+    let last = performance.now()
+    const flow = () => {
+      const now = performance.now()
+      const gap = now - last
+      last = now
+      const craneDone = window.__gcCraneReady === true || !document.querySelector('.construction-story')
+      if (craneDone && gap < 150 && now > 350) kick()
+      else raf = requestAnimationFrame(flow)
+    }
+    raf = requestAnimationFrame(flow)
+    // Kapija: ako nešto zaglavi, uvod se ipak pusti.
+    const cap = window.setTimeout(kick, 8000)
 
-      // Početno stanje (kvadratići u centru, monogram dole) već stoji u markup-u, pa se
-      // ne resetuje — tako splash izgleda isto i dok se JS još učitava.
-      gsap.set(mark, { yPercent: 115 })
+    // Kraj se čita iz same animacije (animationend na zavjesi), pa se sakrivanje poklopi sa CSS-om.
+    const onEnd = (e: AnimationEvent) => {
+      if (e.animationName === 'splash-curtain') finish()
+    }
+    el.addEventListener('animationend', onEnd)
 
-      gsap
-        .timeline({ onComplete: finish, defaults: { ease: 'power3.out' } })
-        .to({}, { duration: 0.2 })
-        .to(cells, {
-          x: (i: number) => (START[i].x < 0 ? -spreadX : spreadX),
-          y: (i: number) => (START[i].y < 0 ? -spreadY : spreadY),
-          duration: 0.9,
-          ease: 'power3.inOut',
-        })
-        // Monogram izranja iz dna tek kad su kvadratići na mjestu.
-        .to(mark, { yPercent: 0, duration: 0.8, ease: 'power3.out' }, '+=0.05')
-        .to({}, { duration: 0.45 })
-        // Zavjesa se diže i otkriva sajt.
-        .to(el, { yPercent: -100, duration: 0.8, ease: 'power3.inOut' })
-    },
-    { scope: root },
-  )
+    return () => {
+      el.removeEventListener('animationend', onEnd)
+      cancelAnimationFrame(raf)
+      window.clearTimeout(cap)
+      window.clearTimeout(safety)
+    }
+  }, [])
+
+  // Krajnje pozicije kvadratića: iz centra okvira u njegove ćoškove.
+  const corner = (sx: -1 | 1, sy: -1 | 1) =>
+    ({
+      '--x0': `${sx * 7}px`,
+      '--y0': `${sy * 7}px`,
+      '--x1': `calc(var(--splash-frame) * ${sx * 0.5})`,
+      '--y1': `calc(var(--splash-frame) * 1.12 * ${sy * 0.5})`,
+    }) as React.CSSProperties
 
   return (
     <div
       ref={root}
       data-splash
       aria-hidden
-      className="fixed inset-0 z-[900] overflow-hidden"
-      style={{ background: 'var(--ink)' }}
+      className="splash"
+      // Isti stil i u markup-u, da splash prekrije stranu i prije nego stigne CSS.
+      style={{ background: '#222a36', position: 'fixed', inset: 0, zIndex: 900, overflow: 'hidden' }}
     >
-      {/* Okvir: njegovi čoškovi su krajnje pozicije kvadratića, a monogram stoji u sredini. */}
-      <div
-        data-frame
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-        style={{ width: 'var(--splash-frame)', height: 'calc(var(--splash-frame) * 1.12)' }}
-      >
-        {START.map((start, i) => (
-          <span
-            key={i}
-            data-cell
-            className="absolute left-1/2 top-1/2 block"
-            style={{
-              width: CELL,
-              height: CELL,
-              marginLeft: -CELL / 2,
-              marginTop: -CELL / 2,
-              background: 'var(--splash-mark)',
-              // Početno stanje u markup-u: vidi se i prije hidratacije.
-              transform: `translate(${start.x}px, ${start.y}px)`,
-            }}
-          />
+      <div className="splash-frame">
+        {([[-1, -1], [1, -1], [-1, 1], [1, 1]] as const).map(([sx, sy], i) => (
+          <span key={i} data-cell className="splash-cell" style={corner(sx, sy)} />
         ))}
 
-        {/* Maska drži monogram skrivenim dok ne izroni iz dna. */}
-        <div
-          data-mask
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
-          style={{ width: 'calc(var(--splash-frame) * 0.47)' }}
-        >
-          <div data-mark style={{ color: 'var(--splash-mark)', transform: 'translateY(115%)' }}>
+        <div className="splash-mark-mask">
+          <div data-mark className="splash-mark">
             <GcMonogram className="block h-auto w-full" />
           </div>
         </div>

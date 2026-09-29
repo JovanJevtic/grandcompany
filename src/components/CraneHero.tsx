@@ -8,6 +8,8 @@ declare global {
   interface Window {
     /** Ručka koju ostavlja public/crane/crane-hero.js da bi scena mogla da se ugasi. */
     __gcCrane?: { dispose: () => void } | null
+    /** Da li je 3D scena spremna. Uvodni splash čeka ovaj flag prije nego pusti animaciju. */
+    __gcCraneReady?: boolean
   }
 }
 

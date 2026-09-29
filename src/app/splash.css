@@ -1,0 +1,100 @@
+/* ——— Uvodni splash ———
+   Namjerno je na CSS animacijama, a ne na GSAP-u: GSAP sa `lagSmoothing(0)` (koji je uključen
+   zbog Lenis-a) ume da preskoči cijeli uvod kad prvi frejm kasni.
+
+   Animacija se ne pokreće sama, nego klasom `is-playing` koju doda JS kada je glavni posao
+   gotov (3D scena javi `gc:crane-ready`, ili istekne kapija). Dok traje učitavanje vidi se
+   mirno "loading" stanje — četiri kvadratića u 2x2 bloku — pa se uvod odigra na slobodnoj
+   glavnoj niti i ne može se zamrznuti u prvom frejmu.
+
+   Vremenski plan uvoda: kvadratići 0.35s → 1.05s, monogram 1.05s → 1.75s, zavjesa 1.85s → 2.55s. */
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+  overflow: hidden;
+  background: var(--ink);
+  will-change: transform;
+}
+
+.splash-frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--splash-frame);
+  height: calc(var(--splash-frame) * 1.12);
+  transform: translate(-50%, -50%);
+}
+
+/* Kvadratić: mirno stanje je tijesan 2x2 blok u centru okvira, a uvod ga razilazi u ćoškove.
+   Početne i krajnje pozicije dolaze iz `--x0/--y0/--x1/--y1` (postavljene u markup-u),
+   pa se sve računa iz veličine okvira — bez mjerenja u JS-u. */
+.splash-cell {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  background: var(--splash-mark);
+  transform: translate(var(--x0), var(--y0));
+}
+
+/* Maska drži monogram skrivenim dok ne izroni iz dna. */
+.splash-mark-mask {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: calc(var(--splash-frame) * 0.47);
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+}
+
+.splash-mark {
+  color: var(--splash-mark);
+  transform: translateY(115%);
+}
+
+/* Uvod: pokreće ga JS klasom kad je glavni posao gotov. */
+.splash.is-playing {
+  animation: splash-curtain 0.7s var(--ease-io) 1.85s both;
+}
+.splash.is-playing .splash-cell {
+  animation: splash-cell 0.7s var(--ease-io) 0.35s both;
+}
+.splash.is-playing .splash-mark {
+  animation: splash-mark 0.7s var(--ease-out) 1.05s both;
+}
+
+@keyframes splash-cell {
+  from {
+    transform: translate(var(--x0), var(--y0));
+  }
+  to {
+    transform: translate(var(--x1), var(--y1));
+  }
+}
+
+@keyframes splash-mark {
+  from {
+    transform: translateY(115%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes splash-curtain {
+  to {
+    transform: translateY(-100%);
+  }
+}
+
+/* Uz reduced motion uvoda nema uopšte (ni prije hidratacije). */
+@media (prefers-reduced-motion: reduce) {
+  .splash {
+    display: none;
+    animation: none;
+  }
+}
