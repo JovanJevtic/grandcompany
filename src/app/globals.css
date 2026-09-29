@@ -4,7 +4,8 @@
 @import "./splash.css";
 
 :root {
-  --bg: #fef5f9;
+  /* "papir" sajta: skoro bijelo, sa tragom svijetlo plave — nastavlja se na nebo iz herosa */
+  --bg: #f8fafc;
   --ink: #222a36;
   /* splash: okvir od četiri kvadratića i visina okvira (blago uspravan, kao na uzoru) */
   --splash-frame: clamp(190px, 20vw, 340px);

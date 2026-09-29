@@ -2,12 +2,12 @@
    Namjerno je na CSS animacijama, a ne na GSAP-u: GSAP sa `lagSmoothing(0)` (koji je uključen
    zbog Lenis-a) ume da preskoči cijeli uvod kad prvi frejm kasni.
 
-   Animacija se ne pokreće sama, nego klasom `is-playing` koju doda JS kada je glavni posao
-   gotov (3D scena javi `gc:crane-ready`, ili istekne kapija). Dok traje učitavanje vidi se
-   mirno "loading" stanje — četiri kvadratića u 2x2 bloku — pa se uvod odigra na slobodnoj
-   glavnoj niti i ne može se zamrznuti u prvom frejmu.
+   Animacije kreću same, čim se splash naslika — ne čekaju hidrataciju ni 3D scenu.
+   `transform`/`opacity` animacije vozi kompozitor, pa ih blokada glavne niti (WebGL
+   inicijalizacija zna da blokira nekoliko sekundi) ne zamrzava. Zato uvod traje uvijek isto,
+   bez obzira koliko se scena sporo diže. Skrivanje i `gc:splash-done` javlja Splash.tsx.
 
-   Vremenski plan uvoda: kvadratići 0.35s → 1.05s, monogram 1.05s → 1.75s, zavjesa 1.85s → 2.55s. */
+   Vremenski plan uvoda: kvadratići 0.2s → 0.8s, monogram 0.8s → 1.4s, zavjesa 1.5s → 2.1s. */
 
 .splash {
   position: fixed;
@@ -56,15 +56,15 @@
   transform: translateY(115%);
 }
 
-/* Uvod: pokreće ga JS klasom kad je glavni posao gotov. */
-.splash.is-playing {
-  animation: splash-curtain 0.7s var(--ease-io) 1.85s both;
+/* Uvod ide odmah — bez klase koju čeka JS. */
+.splash {
+  animation: splash-curtain 0.6s var(--ease-io) 1.5s both;
 }
-.splash.is-playing .splash-cell {
-  animation: splash-cell 0.7s var(--ease-io) 0.35s both;
+.splash .splash-cell {
+  animation: splash-cell 0.6s var(--ease-io) 0.2s both;
 }
-.splash.is-playing .splash-mark {
-  animation: splash-mark 0.7s var(--ease-out) 1.05s both;
+.splash .splash-mark {
+  animation: splash-mark 0.6s var(--ease-out) 0.8s both;
 }
 
 @keyframes splash-cell {

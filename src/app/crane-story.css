@@ -43,7 +43,7 @@
 
 [data-brand-band].brand-dark {
   color: var(--ink);
-  background: linear-gradient(to bottom, var(--bg) 58%, rgba(254, 245, 249, 0));
+  background: linear-gradient(to bottom, var(--bg) 58%, rgba(248, 250, 252, 0));
 }
 [data-brand-band].brand-light {
   color: #fff;
@@ -197,10 +197,6 @@
   height: 250svh;
   pointer-events: none;
 }
-.construction-story:not(.crane-ready) .story-immersion,
-.construction-story.crane-reduced .story-immersion {
-  display: none;
-}
 
 .story-masthead {
   position: absolute;
@@ -217,22 +213,11 @@
   border-bottom: 1px solid var(--story-line);
 }
 
-/* ——— Bez scene (WebGL nedostupan ili reduced motion): statično nebo ——— */
-
-.construction-story:not(.crane-ready) .crane-stage,
-.construction-story.crane-reduced .crane-stage {
-  position: relative;
-  top: 0;
-  margin-bottom: 0;
-  height: 60svh;
-}
-.construction-story:not(.crane-ready) .story-section,
-.construction-story.crane-reduced .story-section {
-  min-height: auto;
-  padding-block: 56px;
-}
-.construction-story:not(.crane-ready) .story-masthead,
-.construction-story.crane-reduced .story-masthead {
+/* ——— Bez scene (WebGL se još diže ili nije dostupan) ———
+   Izgled na vrhu strane ostaje isti kao sa scenom, samo nema praznog skrola za animaciju.
+   Tako nema vidljivog skoka kad scena javi `crane-ready` — ranije je splash taj skok krio. */
+.construction-story:not(.crane-ready) .story-immersion,
+.construction-story.crane-reduced .story-immersion {
   display: none;
 }
 

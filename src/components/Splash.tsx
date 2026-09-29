@@ -7,10 +7,12 @@ import GcMonogram from './GcMonogram'
 // Uvodni splash (uzor: leome-and-partners.com): četiri kvadratića se skupe u 2x2 blok,
 // raziđu se u čoškove okvira, pa iz dna izranja monogram; na kraju se zavjesa podigne.
 //
-// Animacija je u `splash.css` (CSS keyframes), a ne u GSAP-u — CSS animacija traje svoje
-// vrijeme nezavisno od glavne niti. Ovaj modul: zaključava skrol, čeka da 3D scena bude
-// spremna i da frejmovi teku (inače se uvod zamrzne), pa pusti uvod, i na kraju sakrije
-// splash i javi ostatku strane da je gotovo.
+// Animacija je u `splash.css` (CSS keyframes) i kreće sama, čim se splash naslika — ne čeka
+// ni hidrataciju ni 3D scenu. `transform`/`opacity` vozi kompozitor, pa blokada glavne niti
+// (WebGL inicijalizacija ume da blokira nekoliko sekundi) ne zamrzava uvod i ne odlaže ga.
+//
+// Ovaj modul samo zaključava skrol dok uvod traje i, kad animacija istekne, skloni splash
+// i javi ostatku strane (`gc:splash-done`) da mogu da krenu.
 export default function Splash() {
   const root = useRef<HTMLDivElement>(null)
   const lenis = useLenis()
@@ -28,8 +30,6 @@ export default function Splash() {
     const el = root.current
     if (!el) return
     let done = false
-    let kicked = false
-    let safety = 0
 
     const finish = () => {
       if (done) return
@@ -40,43 +40,29 @@ export default function Splash() {
       window.dispatchEvent(new CustomEvent('gc:splash-done'))
     }
 
-    // Uvod kreće tek kad glavna nit diše: 3D scena i hidratacija znaju da blokiraju nit
-    // nekoliko sekundi, a animacija pokrenuta prije toga se ne vidi (zamrzne se u prvom frejmu).
-    let raf = 0
-    const kick = () => {
-      if (kicked) return
-      kicked = true
-      window.setTimeout(() => el.classList.add('is-playing'), 150)
-      // Sigurnosna mreža: splash se sakrije i ako animacija ne javi kraj.
-      safety = window.setTimeout(finish, 4200)
+    // Uz reduced motion uvoda nema (CSS ga sakrije), pa nema ni čekanja.
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finish()
+      return
     }
 
-    // Frejmovi su pouzdan signal da nit diše — dok je blokirana, `requestAnimationFrame` ne stiže.
-    // Na strani sa 3D scenom čeka se i da scena bude spremna (`__gcCraneReady`), jer njena
-    // inicijalizacija ume da blokira nit nekoliko sekundi i pojede uvod.
-    let last = performance.now()
-    const flow = () => {
-      const now = performance.now()
-      const gap = now - last
-      last = now
-      const craneDone = window.__gcCraneReady === true || !document.querySelector('.construction-story')
-      if (craneDone && gap < 150 && now > 350) kick()
-      else raf = requestAnimationFrame(flow)
+    // Ako je glavna nit bila blokirana i uvod se već odigrao, ne puštamo ga ponovo.
+    const running = el.getAnimations({ subtree: true })
+    if (running.length && running.every((a) => a.playState === 'finished')) {
+      finish()
+      return
     }
-    raf = requestAnimationFrame(flow)
-    // Kapija: ako nešto zaglavi, uvod se ipak pusti.
-    const cap = window.setTimeout(kick, 8000)
 
-    // Kraj se čita iz same animacije (animationend na zavjesi), pa se sakrivanje poklopi sa CSS-om.
+    // Kraj se čita iz same animacije, pa se skrivanje poklopi sa CSS-om.
     const onEnd = (e: AnimationEvent) => {
-      if (e.animationName === 'splash-curtain') finish()
+      if (e.target === el && e.animationName === 'splash-curtain') finish()
     }
     el.addEventListener('animationend', onEnd)
+    // Sigurnosna mreža: splash se skloni i ako `animationend` iz bilo kog razloga ne stigne.
+    const safety = window.setTimeout(finish, 2600)
 
     return () => {
       el.removeEventListener('animationend', onEnd)
-      cancelAnimationFrame(raf)
-      window.clearTimeout(cap)
       window.clearTimeout(safety)
     }
   }, [])
