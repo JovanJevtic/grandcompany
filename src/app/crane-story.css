@@ -46,10 +46,11 @@
     display: none;
   }
 }
+/* Preko krem sekcija heading je tamno plav (ista boja kao tekst sajta). */
 [data-brand-band].brand-dark {
-  color: var(--brand-brown);
-  /* Preko krem sekcija heading dobija podlogu u boji strane koja se na dnu gubi:
-     sadržaj koji skrola ispod njega ne prolazi kroz slova. */
+  color: var(--ink);
+  /* Podloga u boji strane, koja se na dnu gubi: sadržaj koji skrola ispod headinga
+     ne prolazi kroz slova. */
   background: linear-gradient(to bottom, var(--bg) 58%, rgba(254, 245, 249, 0));
 }
 /* Tamno podnožje na kraju strane: heading se vraća u bijelo, bez podloge. */

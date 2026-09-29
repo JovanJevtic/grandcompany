@@ -4,8 +4,8 @@
 :root {
   --bg: #fef5f9;
   --ink: #222a36;
-  /* heading preko krem sekcija: tamno smeđa, da se razlikuje od plavo-crnog ink teksta */
-  --brand-brown: #3a2418;
+  /* splash: okvir od četiri kvadratića i visina okvira (blago uspravan, kao na uzoru) */
+  --splash-frame: clamp(190px, 20vw, 340px);
   /* boja splash-a: kvadratići i monogram prije nego se sajt učita */
   --splash-mark: #f3ecdf;
   /* svijetlo polje za crteže artikala (SVG packshot) */

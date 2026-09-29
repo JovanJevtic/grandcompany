@@ -6,25 +6,18 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import GcMonogram from './GcMonogram'
 
 // Uvodni splash prije sadržaja (uzor: leome-and-partners.com).
-// Četiri kvadratića se skupe u centar, raziđu se u čoškove, pa monogram izranja iz dna.
-// Sve radi na tamno plavoj podlozi, u boji monograma (#f3ecdf).
+// Redoslijed: četiri kvadratića stoje skupljeni u 2x2 blok, raziđu se u čoškove okvira,
+// i tek ONDA iz dna izranja monogram unutar tog okvira. Sve na tamno plavoj podlozi.
 const CELL = 12 // stranica kvadratića
 const TIGHT = 7 // početni razmak u 2x2 bloku
-const SPREAD = 112 // koliko kvadratići odlutaju od centra
-const MARK_W = 190 // širina monograma u splash-u
-const MARK_H = Math.round((MARK_W * 216) / 281)
 
+// Polazište kvadratića (u centru, blago razmaknuti). Krajnje pozicije se računaju
+// iz stvarne veličine okvira, da raspored ostane isti na svakoj širini ekrana.
 const START = [
   { x: -TIGHT, y: -TIGHT },
   { x: TIGHT, y: -TIGHT },
   { x: -TIGHT, y: TIGHT },
   { x: TIGHT, y: TIGHT },
-]
-const END = [
-  { x: -SPREAD, y: -SPREAD },
-  { x: SPREAD, y: -SPREAD },
-  { x: -SPREAD, y: SPREAD },
-  { x: SPREAD, y: SPREAD },
 ]
 
 export default function Splash() {
@@ -60,21 +53,33 @@ export default function Splash() {
         return
       }
 
+      const frame = el.querySelector<HTMLElement>('[data-frame]')!
       const cells = gsap.utils.toArray<HTMLElement>('[data-cell]', el)
       const mark = el.querySelector<HTMLElement>('[data-mark]')!
-      // Početno stanje (kvadratići skupljeni u centar, monogram dole) već stoji u markup-u,
-      // pa se ne resetuje — tako splash izgleda isto i dok se JS još učitava.
+
+      // Čoškovi okvira u koje se kvadratići razilaze.
+      const box = frame.getBoundingClientRect()
+      const spreadX = box.width / 2
+      const spreadY = box.height / 2
+
+      // Početno stanje (kvadratići u centru, monogram dole) već stoji u markup-u, pa se
+      // ne resetuje — tako splash izgleda isto i dok se JS još učitava.
       gsap.set(mark, { yPercent: 115 })
 
       gsap
         .timeline({ onComplete: finish, defaults: { ease: 'power3.out' } })
-        .to({}, { duration: 0.3 })
-        // Razilaženje u čoškove oko mjesta gdje će se pojaviti monogram.
-        .to(cells, { x: (i: number) => END[i].x, y: (i: number) => END[i].y, duration: 0.95, ease: 'power3.inOut' })
-        .to(mark, { yPercent: 0, duration: 0.9, ease: 'power3.out' }, '-=0.5')
-        .to({}, { duration: 0.55 })
+        .to({}, { duration: 0.2 })
+        .to(cells, {
+          x: (i: number) => (START[i].x < 0 ? -spreadX : spreadX),
+          y: (i: number) => (START[i].y < 0 ? -spreadY : spreadY),
+          duration: 0.9,
+          ease: 'power3.inOut',
+        })
+        // Monogram izranja iz dna tek kad su kvadratići na mjestu.
+        .to(mark, { yPercent: 0, duration: 0.8, ease: 'power3.out' }, '+=0.05')
+        .to({}, { duration: 0.45 })
         // Zavjesa se diže i otkriva sajt.
-        .to(el, { yPercent: -100, duration: 0.85, ease: 'power3.inOut' })
+        .to(el, { yPercent: -100, duration: 0.8, ease: 'power3.inOut' })
     },
     { scope: root },
   )
@@ -87,28 +92,34 @@ export default function Splash() {
       className="fixed inset-0 z-[900] overflow-hidden"
       style={{ background: 'var(--ink)' }}
     >
-      <div className="absolute left-1/2 top-1/2">
-        {START.map((_, i) => (
+      {/* Okvir: njegovi čoškovi su krajnje pozicije kvadratića, a monogram stoji u sredini. */}
+      <div
+        data-frame
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: 'var(--splash-frame)', height: 'calc(var(--splash-frame) * 1.12)' }}
+      >
+        {START.map((start, i) => (
           <span
             key={i}
             data-cell
-            className="absolute block"
+            className="absolute left-1/2 top-1/2 block"
             style={{
               width: CELL,
               height: CELL,
               marginLeft: -CELL / 2,
               marginTop: -CELL / 2,
               background: 'var(--splash-mark)',
-              // Početno stanje je i u markup-u, da splash izgleda isto prije hidratacije.
-              transform: `translate(${START[i].x}px, ${START[i].y}px)`,
+              // Početno stanje u markup-u: vidi se i prije hidratacije.
+              transform: `translate(${start.x}px, ${start.y}px)`,
             }}
           />
         ))}
 
         {/* Maska drži monogram skrivenim dok ne izroni iz dna. */}
         <div
-          className="absolute overflow-hidden"
-          style={{ width: MARK_W, height: MARK_H, marginLeft: -MARK_W / 2, marginTop: -MARK_H / 2 }}
+          data-mask
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 overflow-hidden"
+          style={{ width: 'calc(var(--splash-frame) * 0.47)' }}
         >
           <div data-mark style={{ color: 'var(--splash-mark)', transform: 'translateY(115%)' }}>
             <GcMonogram className="block h-auto w-full" />

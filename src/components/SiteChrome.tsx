@@ -35,7 +35,9 @@ export default function SiteChrome() {
         const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
         // Slova u maskama: svako slovo izranja odozdo. Razdvaja se PRIJE mjerenja širine.
-        const split = SplitText.create(wm, { type: 'chars', mask: 'chars', charsClass: 'ch' })
+        // U dev-u se efekat montira dvaput, pa se drugo razdvajanje preskače (ono na već
+        // razdvojenom wordmarku ne nađe tekst).
+        if (!wm.querySelector('.ch')) SplitText.create(wm, { type: 'chars', mask: 'chars', charsClass: 'ch' })
         const fit = () =>
           document.documentElement.style.setProperty(
             '--wm-fs',
@@ -82,14 +84,20 @@ export default function SiteChrome() {
 
         // Slova wordmarka izranjaju tek kad se uvodni splash skloni — inače se animacija
         // potroši za zavjesom. Ako splasha nema (ili je već gotov), ide odmah.
-        const letters = () =>
-          gsap.from(split.chars, {
+        const letters = () => {
+          // Chars se čitaju iz DOM-a u trenutku animacije: SplitText pri ponovnom
+          // razdvajanju (font, promjena širine) zamijeni elemente novima, pa bi
+          // sačuvani niz ostao prazan.
+          const chars = gsap.utils.toArray<HTMLElement>('.ch', wm)
+          if (!chars.length) return
+          gsap.from(chars, {
             yPercent: 160,
             duration: 1.2,
             ease: EASE.quint,
             stagger: 0.05,
             delay: INTRO.letters,
           })
+        }
         if (!document.querySelector('[data-splash]') || document.documentElement.dataset.gcSplash === 'done')
           letters()
         else window.addEventListener('gc:splash-done', letters, { once: true })
