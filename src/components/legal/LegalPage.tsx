@@ -10,9 +10,9 @@ import { T } from './LegalText'
 
 const COPY = 'text-[clamp(15px,1.1vw,18px)] font-medium normal-case leading-[1.5]'
 
-// Stranice sa radnjom: dugme vodi na formu za upit u prodavnici.
+// Stranice sa radnjom: dugme vodi na kontakt u podnožju (forma za upit je uklonjena sa početne).
 const CTA: Record<string, { label: string; href: string }> = {
-  'upit-za-izvodjace': { label: 'Pošaljite upit', href: '/#ponuda' },
+  'upit-za-izvodjace': { label: 'Pošaljite upit', href: '/#kontakt' },
 }
 
 function Block({ b }: { b: LegalBlock }) {
@@ -82,10 +82,10 @@ function LegalBar() {
         Sve politike
       </Link>
       <Link
-        href="/#prodavnica"
+        href="/#namjena"
         className="ml-auto flex shrink-0 items-center gap-2 border-l-2 border-ink px-4 transition-colors duration-300 hover:bg-ink hover:text-bg md:px-[3.05vw]"
       >
-        Prodavnica <span aria-hidden>→</span>
+        Šta gradite <span aria-hidden>→</span>
       </Link>
     </div>
   )

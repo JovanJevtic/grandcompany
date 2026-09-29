@@ -4,6 +4,10 @@
 :root {
   --bg: #fef5f9;
   --ink: #222a36;
+  /* heading preko krem sekcija: tamno smeđa, da se razlikuje od plavo-crnog ink teksta */
+  --brand-brown: #3a2418;
+  /* boja splash-a: kvadratići i monogram prije nego se sajt učita */
+  --splash-mark: #f3ecdf;
   /* svijetlo polje za crteže artikala (SVG packshot) */
   --well: #ffffff;
   /* veličina wordmarka; postavlja se iz JS-a tako da tekst popuni širinu ekrana */

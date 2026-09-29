@@ -22,6 +22,13 @@ export default function SiteChrome() {
       const band = el.querySelector<HTMLElement>('[data-brand-band]')!
       let dead = false
       let onResize: (() => void) | null = null
+      let onZone: (() => void) | null = null
+      let onCleanup: (() => void) | null = null
+      // Kad se scena učita, visine sekcija se promijene pa GSAP triggeri moraju da se izmjere ponovo.
+      const onCraneReady = () => {
+        onZone?.()
+        ScrollTrigger.refresh()
+      }
 
       const boot = contextSafe!(() => {
         if (dead) return
@@ -39,34 +46,53 @@ export default function SiteChrome() {
         window.addEventListener('resize', fit)
         gsap.set(wm, { visibility: 'visible' })
 
-        // 3D scena krana je tamna, pa bi se tamni wordmark na njoj izgubio. Dok je scena
-        // u kadru, pojas iza wordmarka dobija krem podlogu; poslije je providan.
+        // Wordmark lebdi iznad svega i mijenja boju prema sadržaju ispod sebe:
+        // bijel preko tamne 3D scene i preko tamnog podnožja, tamno smeđ preko krem sekcija.
         const hero = document.getElementById('hero')!
-        if (hero) {
-          ScrollTrigger.create({
-            start: 0,
-            end: () => hero.offsetTop + hero.offsetHeight - band.offsetHeight,
-            invalidateOnRefresh: true,
-            onToggle: (self) => band.classList.toggle('band-solid', self.isActive),
-          })
-          // Scena se učitava posle prvog mjerenja i tada se visine sekcija promijene,
-          // pa se granice svih triggera moraju ponovo izračunati.
-          window.addEventListener('gc:crane-ready', () => ScrollTrigger.refresh(), { once: true })
+        const footer = document.getElementById('kontakt')
+        const zone = () => {
+          const line = band.offsetHeight
+          const light = footer ? footer.getBoundingClientRect().top < line : false
+          const overScene = hero ? hero.getBoundingClientRect().bottom > line : false
+          band.classList.toggle('brand-light', light)
+          band.classList.toggle('brand-dark', !light && !overScene)
         }
+        // Provjera ide i na skrol i na kratak interval: `scroll` event ne stiže uvijek
+        // (smooth scroll), a rAF/GSAP ticker znaju da spavaju. Interval je 4x u sekundi,
+        // a mjerenje je jeftino — `classList.toggle` ne dira DOM dok se stanje ne promijeni.
+        const tick = () => zone()
+        const timer = window.setInterval(tick, 250)
+        window.addEventListener('scroll', tick, { passive: true })
+        window.addEventListener('resize', tick)
+        onZone = () => zone()
+        onCleanup = () => {
+          window.clearInterval(timer)
+          window.removeEventListener('scroll', tick)
+          window.removeEventListener('resize', tick)
+        }
+        zone()
+        // Scena se učitava posle prvog mjerenja i tada se visine sekcija promijene,
+        // pa se i GSAP triggeri moraju ponovo izmjeriti.
+        window.addEventListener('gc:crane-ready', onCraneReady, { once: true })
 
         if (reduce) {
           gsap.set(badge, { x: 0, y: 0 })
           return
         }
 
-        gsap.from(split.chars, {
-          yPercent: 160,
-          duration: 1.2,
-          ease: EASE.quint,
-          stagger: 0.05,
-          delay: INTRO.letters,
-        })
-
+        // Slova wordmarka izranjaju tek kad se uvodni splash skloni — inače se animacija
+        // potroši za zavjesom. Ako splasha nema (ili je već gotov), ide odmah.
+        const letters = () =>
+          gsap.from(split.chars, {
+            yPercent: 160,
+            duration: 1.2,
+            ease: EASE.quint,
+            stagger: 0.05,
+            delay: INTRO.letters,
+          })
+        if (!document.querySelector('[data-splash]') || document.documentElement.dataset.gcSplash === 'done')
+          letters()
+        else window.addEventListener('gc:splash-done', letters, { once: true })
         // Značka uklizne s lijeve strane dok se hero scena kreće.
         // Trigger je element, ne selektor: useGSAP sa `scope` sužava selektore na svoj kontejner.
         const trigger = () => ({
@@ -86,6 +112,8 @@ export default function SiteChrome() {
       return () => {
         dead = true
         if (onResize) window.removeEventListener('resize', onResize)
+        if (onCleanup) onCleanup()
+        window.removeEventListener('gc:crane-ready', onCraneReady)
       }
     },
     { scope: root },
@@ -93,15 +121,16 @@ export default function SiteChrome() {
 
   return (
     <div ref={root}>
-      {/* Wordmark: fiksan iza sadržaja (z-5). Klase slika i hero prolaze preko njega. */}
+      {/* Wordmark: fiksiran iznad svih sekcija (z-150) i providan — lebdi preko 3D scene
+          i preko sadržaja dok se skrola. Boju mijenja skrol (bijel / tamno smeđ). */}
       <div
         data-brand-band
-        className="pointer-events-none fixed inset-x-0 top-0 z-[5] select-none pt-4 text-center transition-colors duration-300"
+        className="pointer-events-none fixed inset-x-0 top-0 z-[150] select-none pt-4 text-center"
         style={{ height: 'var(--story-header)' }}
       >
         <h1
           data-wordmark
-          className="invisible inline-block whitespace-nowrap font-bold uppercase leading-none text-ink"
+          className="invisible inline-block whitespace-nowrap font-bold uppercase leading-none"
           style={{ fontSize: 'var(--wm-fs)' }}
         >
           {BRAND}

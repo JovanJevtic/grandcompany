@@ -3,23 +3,14 @@
 import { useRef } from 'react'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
-import Bundles from './Bundles'
-import CartDrawer from './CartDrawer'
-import CategoryTiles from './CategoryTiles'
-import Faq from './Faq'
-import Materials from './Materials'
-import Panels from './Panels'
-import NewArrivals from './NewArrivals'
 import Pricing from './Pricing'
-import Process from './Process'
-import Quote from './Quote'
-import Shop from './Shop'
-import ShopBar from './ShopBar'
-import TrustStrip from './TrustStrip'
+import SectionHead from './SectionHead'
 import UseCases from './UseCases'
 
-// Prodavnica: jedna stranica ispod landinga. Ima puni krem podlogu (bg-bg), pa prekriva fiksni wordmark
-// iza sebe, kao da landing "završava" i počinje nova stranica. Deblja linija (10px) označava prelaz.
+// Prodavnica je svedena na tri stvari: linija sa kategorijama, pet vrsta radova i partnerski nivoi.
+// Sve između je uklonjeno (katalog, kompleti, upit, korpa, pitanja...) — komponente ostaju u repou
+// ako zatrebaju. Deblja linija (10px) i krem podloga i dalje označavaju prelaz sa landinga,
+// a velika praznina na vrhu ostavlja prostor za fiksni wordmark iznad sekcije.
 export default function Commerce() {
   const root = useRef<HTMLDivElement>(null)
 
@@ -28,17 +19,16 @@ export default function Commerce() {
       const mm = gsap.matchMedia()
       mm.add(MQ, (ctx) => {
         const { mobile } = ctx.conditions as { mobile: boolean }
-        // Fiksna značka iz landinga na uskom ekranu prekriva sadržaj (pretragu, kartice), pa se sakriva
-        // dok je prodavnica na ekranu. Na širokom ekranu stoji u marginama i ostaje.
+        // Na uskom ekranu fiksna značka pada preko kartica, pa se sakrije dok je prodavnica u kadru.
         if (!mobile) return
         const badge = document.querySelector('[data-badge]')
         if (!badge) return
         ScrollTrigger.create({
           trigger: root.current,
           start: 'top 50%',
-          // Do kraja stranice: i podnožje sa kontaktima je ispod prodavnice, pa značka ostaje skrivena.
           end: 'max',
-          onToggle: (self) => gsap.to(badge, { autoAlpha: self.isActive ? 0 : 1, duration: 0.4, overwrite: 'auto' }),
+          onToggle: (self) =>
+            gsap.to(badge, { autoAlpha: self.isActive ? 0 : 1, duration: 0.4, overwrite: 'auto' }),
         })
       })
     },
@@ -46,23 +36,12 @@ export default function Commerce() {
   )
 
   return (
-    <>
-      <div ref={root} className="relative z-30 border-t-[10px] border-ink bg-bg">
-        <ShopBar />
-        <TrustStrip />
-        <CategoryTiles />
-        <NewArrivals />
-        <Shop />
-        <Bundles />
-        <UseCases />
-        <Materials />
-        <Pricing />
-        <Process />
-        <Faq />
-        <Quote />
+    <div ref={root} className="relative z-30 border-t-[10px] border-ink bg-bg pb-[10dvh] pt-[28dvh]">
+      <div className="gutter">
+        <SectionHead no="01" label="Kategorije" meta="4 grupe" />
       </div>
-      <CartDrawer />
-      <Panels />
-    </>
+      <UseCases />
+      <Pricing />
+    </div>
   )
 }

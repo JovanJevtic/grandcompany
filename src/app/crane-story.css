@@ -25,16 +25,37 @@
 }
 
 /* Wordmark je fiksiran, pa se ispod njega ostavlja prazan pojas u toku dokumenta.
-   Bez njega bi scena krenula odmah uz vrh i prvi kadar bi bio "preskočen". */
+   Bez njega bi scena krenula odmah uz vrh i prvi kadar bi bio "preskočen".
+   Pojas je u boji osnove scene (#18191a = rgb(24 25 26)) da se bijeli heading vidi. */
 .story-spacer {
   height: var(--story-header);
-  background: var(--bg);
+  background: #18191a;
 }
 
-/* Wordmark pojas (wordmark je fiksiran u SiteChrome): krem podloga dok je tamna 3D
-   scena u kadru, poslije providan da ne prekriva sadržaj ispod sebe. */
-.band-solid {
-  background: var(--bg);
+/* Wordmark pojas (wordmark je fiksiran u SiteChrome): providan je i "lebdi" iznad sadržaja,
+   pa mu boju mijenja klasa koju dodaje skrol — bijel preko tamne scene, smeđ preko krem sekcija,
+   ponovo bijel preko tamnog podnožja. */
+[data-brand-band] {
+  color: #fff;
+  transition: color 0.35s ease;
+}
+
+/* Uvodni splash: uz reduced motion se ne prikazuje uopšte (ni prije hidratacije). */
+@media (prefers-reduced-motion: reduce) {
+  [data-splash] {
+    display: none;
+  }
+}
+[data-brand-band].brand-dark {
+  color: var(--brand-brown);
+  /* Preko krem sekcija heading dobija podlogu u boji strane koja se na dnu gubi:
+     sadržaj koji skrola ispod njega ne prolazi kroz slova. */
+  background: linear-gradient(to bottom, var(--bg) 58%, rgba(254, 245, 249, 0));
+}
+/* Tamno podnožje na kraju strane: heading se vraća u bijelo, bez podloge. */
+[data-brand-band].brand-light {
+  color: #fff;
+  background: none;
 }
 
 /* ——— Scena ——— */
@@ -201,7 +222,8 @@
   min-height: 95svh;
 }
 .story-immersion {
-  height: 120svh;
+  /* Prazan prostor kroz koji se scena krana odigrava do kraja; teksta nema. */
+  height: 250svh;
   pointer-events: none;
 }
 .construction-story:not(.crane-ready) .story-immersion,
@@ -405,8 +427,10 @@
     margin-bottom: 0;
     border-bottom: 1px solid var(--story-line);
   }
+  /* Na mobilnom je tekst kratak, pa prazan prostor drži scenu u kadru dovoljno dugo
+     da se animacija krana odigra (bez njega je sekcija kraća od ekrana). */
   .story-immersion {
-    display: none;
+    height: 200svh;
   }
   .scene-caption {
     bottom: 16px;
