@@ -15,7 +15,7 @@ export function ambienceAt(progress) {
 }
 export function createScrollAmbience(root) {
   const layers=[...root.querySelectorAll('[data-ambience]')];
-  const baseColors=[[24,25,26],[27,33,38],[40,33,29]];
+  const baseColors=[[238,244,249],[217,231,242],[184,204,225]];
   return progress=>{
     const state=ambienceAt(progress);
     layers.forEach((layer,i)=>{

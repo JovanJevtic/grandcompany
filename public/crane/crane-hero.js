@@ -5,7 +5,7 @@
 // gornja ivica scene, pa se visina offseta mjeri iz njega, a ne iz headera.
 // Dodat je i dispose() da se scena ugasi ako se stranica montira ponovo.
 import * as THREE from '../vendor/three.module.min.js';
-import {createScrollAmbience} from './crane-ambience.js?v=16';
+import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
 import {createCraneRenderer} from './crane-renderer.js?v=18';
 import {craneQuality} from './crane-quality.js?v=17';

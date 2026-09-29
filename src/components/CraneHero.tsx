@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import { COMPANY } from '@/gc/gc'
-import { useScrollTo } from '@/lib/useScrollTo'
 
 declare global {
   interface Window {
@@ -18,11 +17,11 @@ declare global {
 // iste relativne putanje do Three.js-a i ne ulaze u JS bundle ostatka sajta.
 const SCRIPT = '/crane/crane-hero.js'
 
-// Scena se pinuje, a tekst je sveden na uvodnu rečenicu — ostatak visine je prazan prostor
-// kroz koji se kran odigrava (story-immersion).
+// Scena se pinuje, a preko nje je nebo: plavo-sivi gradijent, bijela skica grada uz dno i
+// razbacani oblaci. Skica se zamućuje i povlači dok kamera ulazi u kadar (`--scene-progress`).
+// Ostatak visine je prazan prostor (story-immersion) kroz koji se animacija krana odigra.
 export default function CraneHero() {
   const root = useRef<HTMLElement>(null)
-  const scrollTo = useScrollTo()
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -45,19 +44,21 @@ export default function CraneHero() {
 
       <section id="hero" ref={root} className="construction-story">
         <div className="crane-stage" aria-hidden="true">
-          <div className="scene-ambience">
-            <span className="ambience-layer ambience-indigo" data-ambience />
-            <span className="ambience-layer ambience-cobalt" data-ambience />
-            <span className="ambience-layer ambience-champagne" data-ambience />
+          {/* Nebo ispod krana: gradijent + bijele skice + oblaci. Sve je iza canvasa. */}
+          <div className="scene-sky">
+            <div className="sky-line" />
+            <div className="sky-clouds">
+              <span className="sky-cloud sky-cloud--a" />
+              <span className="sky-cloud sky-cloud--b" />
+              <span className="sky-cloud sky-cloud--c" />
+            </div>
           </div>
+
           <figure className="crane-viewport">
-            <div className="crane-poster" />
             <canvas />
           </figure>
-          {/* Zatamnjenje ivica: tekst mora da ostane čitljiv preko svijetlih kadrova scene. */}
-          <div className="scene-scrim" />
+
           <div className="scene-caption">
-            <span>Stovarište i vozni park</span>
             <span className="scene-meter">
               <i />
             </span>
@@ -69,19 +70,6 @@ export default function CraneHero() {
             <div className="story-masthead">
               <span>Građevinski materijali &amp; logistika</span>
               <span>Banja Luka, BiH / od {COMPANY.founded}.</span>
-            </div>
-
-            <div className="story-copy">
-              <p className="eyebrow">Dobri temelji za velike ideje.</p>
-              <h1>Knauf suha gradnja i izolacija, kranom do etaže.</h1>
-              <div className="story-actions">
-                <button type="button" className="action-solid" onClick={() => scrollTo('namjena')}>
-                  Pogledajte ponudu →
-                </button>
-                <a href={COMPANY.phoneLandlineHref} className="action-outline">
-                  Pozovite {COMPANY.phoneLandline}
-                </a>
-              </div>
             </div>
           </section>
 
