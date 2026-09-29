@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./crane-story.css";
 
 :root {
   --bg: #fef5f9;
@@ -7,6 +8,8 @@
   --well: #ffffff;
   /* veličina wordmarka; postavlja se iz JS-a tako da tekst popuni širinu ekrana */
   --wm-fs: 10.6vw;
+  /* dno wordmarka: ispod te linije počinje 3D scena krana i prazan pojas iznad nje */
+  --story-header: calc(16px + var(--wm-fs) * 0.862);
 }
 
 @theme inline {
@@ -41,26 +44,6 @@ body {
   font-family: var(--font-sans), system-ui, sans-serif;
   font-weight: 700;
   -webkit-font-smoothing: antialiased;
-}
-
-/* Marquee: pomjera se od 0 do -50%, pa je petlja bez šava kad su dvije kopije iste. */
-@keyframes marquee {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.animate-marquee {
-  animation: marquee 40s linear infinite;
-}
-
-/* Siva "video" ploča u hero okviru: lagano prelijevanje da se vidi da je živa. */
-@keyframes sheen {
-  from { background-position: 100% 0; }
-  to { background-position: 0 0; }
-}
-.hero-sheen {
-  background: linear-gradient(110deg, #c6c9ce 25%, #d8dade 50%, #c6c9ce 75%);
-  background-size: 250% 100%;
-  animation: sheen 6s ease-in-out infinite alternate;
 }
 
 /* SplitText maske sijeku sve što viri iznad reda (č, š, ž, ć). Padding proširuje masku, a negativna

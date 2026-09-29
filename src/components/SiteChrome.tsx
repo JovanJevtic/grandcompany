@@ -1,17 +1,16 @@
 'use client'
 
 import { useRef } from 'react'
-import { gsap, SplitText, useGSAP } from '@/lib/gsap'
+import { gsap, ScrollTrigger, SplitText, useGSAP } from '@/lib/gsap'
 import { EASE, INTRO, SIDE, fitFontSize } from '@/lib/motion'
 import BadgeMark from './BadgeMark'
 
 export const BRAND = 'GRAND COMPANY'
-const MARQUEE_ITEM = `Od 2012. ${BRAND} građevinski materijal`
 
 // Boja koja u `mix-blend-mode: difference` na krem pozadini daje tačno boju teksta (#222A36).
 const DIFF = 'rgb(220, 203, 195)'
 
-// Elementi koji stoje fiksno preko cijele stranice: wordmark, značka i marquee.
+// Elementi koji stoje fiksno preko cijele stranice: wordmark i značka.
 export default function SiteChrome() {
   const root = useRef<HTMLDivElement>(null)
 
@@ -20,7 +19,7 @@ export default function SiteChrome() {
       const el = root.current!
       const wm = el.querySelector<HTMLElement>('[data-wordmark]')!
       const badge = el.querySelector<HTMLElement>('[data-badge]')!
-      const marquee = el.querySelector<HTMLElement>('[data-marquee]')!
+      const band = el.querySelector<HTMLElement>('[data-brand-band]')!
       let dead = false
       let onResize: (() => void) | null = null
 
@@ -40,8 +39,23 @@ export default function SiteChrome() {
         window.addEventListener('resize', fit)
         gsap.set(wm, { visibility: 'visible' })
 
+        // 3D scena krana je tamna, pa bi se tamni wordmark na njoj izgubio. Dok je scena
+        // u kadru, pojas iza wordmarka dobija krem podlogu; poslije je providan.
+        const hero = document.getElementById('hero')!
+        if (hero) {
+          ScrollTrigger.create({
+            start: 0,
+            end: () => hero.offsetTop + hero.offsetHeight - band.offsetHeight,
+            invalidateOnRefresh: true,
+            onToggle: (self) => band.classList.toggle('band-solid', self.isActive),
+          })
+          // Scena se učitava posle prvog mjerenja i tada se visine sekcija promijene,
+          // pa se granice svih triggera moraju ponovo izračunati.
+          window.addEventListener('gc:crane-ready', () => ScrollTrigger.refresh(), { once: true })
+        }
+
         if (reduce) {
-          gsap.set([badge, marquee], { x: 0, y: 0 })
+          gsap.set(badge, { x: 0, y: 0 })
           return
         }
 
@@ -53,9 +67,8 @@ export default function SiteChrome() {
           delay: INTRO.letters,
         })
 
-        // Značka uklizne s lijeve strane, a marquee iz dna, dok se hero okvir širi.
+        // Značka uklizne s lijeve strane dok se hero scena kreće.
         // Trigger je element, ne selektor: useGSAP sa `scope` sužava selektore na svoj kontejner.
-        const hero = document.getElementById('hero')!
         const trigger = () => ({
           trigger: hero,
           start: 'top top',
@@ -63,9 +76,8 @@ export default function SiteChrome() {
           scrub: 1,
           invalidateOnRefresh: true,
         })
-        gsap.fromTo(badge, { x: -180 }, { x: 0, ease: 'none', scrollTrigger: trigger() })
         // Pikseli, ne procenti: GSAP početni CSS transform čita kao piksele i procenti se ne poklope.
-        gsap.fromTo(marquee, { y: 200 }, { y: 0, ease: 'none', scrollTrigger: trigger() })
+        gsap.fromTo(badge, { x: -180 }, { x: 0, ease: 'none', scrollTrigger: trigger() })
       })
 
       // Čeka se učitavanje fonta, inače se širina mjeri na rezervnom fontu.
@@ -81,8 +93,12 @@ export default function SiteChrome() {
 
   return (
     <div ref={root}>
-      {/* Wordmark: fiksan iza sadržaja (z-5). Slike i hero prolaze preko njega. */}
-      <div className="pointer-events-none fixed left-0 top-4 z-[5] w-full select-none text-center">
+      {/* Wordmark: fiksan iza sadržaja (z-5). Klase slika i hero prolaze preko njega. */}
+      <div
+        data-brand-band
+        className="pointer-events-none fixed inset-x-0 top-0 z-[5] select-none pt-4 text-center transition-colors duration-300"
+        style={{ height: 'var(--story-header)' }}
+      >
         <h1
           data-wordmark
           className="invisible inline-block whitespace-nowrap font-bold uppercase leading-none text-ink"
@@ -92,36 +108,13 @@ export default function SiteChrome() {
         </h1>
       </div>
 
-      {/* Značka: uklizne tek kad hero počne da se širi. */}
+      {/* Značka: uklizne tek kad hero počne da se kreće. */}
       <div
         data-badge
         className="pointer-events-none fixed left-[34px] top-1/2 z-[500] w-[44px] -translate-y-1/2 mix-blend-difference"
         style={{ transform: 'translateX(-180px)', color: DIFF }}
       >
         <BadgeMark />
-      </div>
-
-      {/* Marquee: mix-blend-difference pa je taman na svijetloj, a svijetao na tamnoj pozadini. */}
-      <div
-        data-marquee
-        className="pointer-events-none fixed bottom-0 left-0 z-[200] h-[100px] w-full overflow-hidden mix-blend-difference"
-        style={{ transform: 'translateY(200px)', color: DIFF }}
-        aria-hidden
-      >
-        <div className="absolute bottom-5 left-0 flex w-full">
-          <div className="animate-marquee inline-flex shrink-0 whitespace-nowrap text-base leading-none">
-            {[0, 1].map((copy) => (
-              <div key={copy} className="inline-flex shrink-0 items-center">
-                {Array.from({ length: 5 }, (_, i) => (
-                  <span key={i} className="inline-flex items-center">
-                    <span>{MARQUEE_ITEM}</span>
-                    <span className="mx-[35px] inline-block h-[2px] w-[52px] bg-current" />
-                  </span>
-                ))}
-              </div>
-            ))}
-          </div>
-        </div>
       </div>
     </div>
   )

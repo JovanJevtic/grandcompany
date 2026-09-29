@@ -1,5 +1,5 @@
 import Footer from "@/components/Footer";
-import Hero from "@/components/Hero";
+import CraneHero from "@/components/CraneHero";
 import Manifest from "@/components/Manifest";
 import Projects from "@/components/Projects";
 import Services from "@/components/Services";
@@ -11,7 +11,7 @@ export default function Home() {
     <>
       <SiteChrome />
       <main>
-        <Hero />
+        <CraneHero />
         <Services />
         <Manifest />
         <Projects />

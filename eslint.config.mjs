@@ -12,6 +12,9 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Three.js i crane moduli su preuzeti kao gotovi fajlovi (public/crane, public/vendor);
+    // minifikovani kod se ne lintuje.
+    "public/**",
   ]),
 ]);
 

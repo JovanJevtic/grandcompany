@@ -1,0 +1,491 @@
+/* ——— 3D priča: kran na početnoj ———
+   Scena je tamna i sticky; tekst prolazi pored nje dok se skrola (kao na grandcompany
+   sajtu), ali je prekucan na maison tipografiju: Inter Tight, uppercase i mnogo manje. */
+
+/* Gornja ivica scene je dno fiksnog wordmarka; --story-header se računa u :root
+   (globals.css) jer ga koristi i prazan pojas iznad sekcije, a ne samo sekcija. */
+.construction-story {
+  --story-gutter: 20px;
+  --story-ink: #f1eee7;
+  --story-muted: rgba(241, 238, 231, 0.72);
+  --story-line: rgba(255, 255, 255, 0.14);
+  --story-sand: #d8a783;
+  --scene-base: 24 25 26;
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  color: var(--story-ink);
+  background: rgb(var(--scene-base));
+}
+
+@media (min-width: 768px) {
+  .construction-story {
+    --story-gutter: 8.33vw;
+  }
+}
+
+/* Wordmark je fiksiran, pa se ispod njega ostavlja prazan pojas u toku dokumenta.
+   Bez njega bi scena krenula odmah uz vrh i prvi kadar bi bio "preskočen". */
+.story-spacer {
+  height: var(--story-header);
+  background: var(--bg);
+}
+
+/* Wordmark pojas (wordmark je fiksiran u SiteChrome): krem podloga dok je tamna 3D
+   scena u kadru, poslije providan da ne prekriva sadržaj ispod sebe. */
+.band-solid {
+  background: var(--bg);
+}
+
+/* ——— Scena ——— */
+
+.crane-stage {
+  position: sticky;
+  top: var(--story-header);
+  height: calc(100svh - var(--story-header));
+  /* Negativna margina: sticky scena ne zauzima dodatnu visinu u toku dokumenta. */
+  margin-bottom: calc(var(--story-header) - 100svh);
+  overflow: hidden;
+  pointer-events: none;
+  background: rgb(var(--scene-base));
+}
+
+.scene-ambience {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ambience-layer {
+  position: absolute;
+  inset: -12%;
+  will-change: transform, opacity;
+  transform: translate3d(-4%, 4%, 0) rotate(-8deg) scale(1.12);
+}
+.ambience-indigo {
+  background:
+    radial-gradient(ellipse 30% 62% at 58% 42%, #a7a8a1 0%, #727673 25%, #383e3e 57%, transparent 85%),
+    radial-gradient(ellipse 60% 35% at 40% 100%, #51443a 0%, transparent 80%),
+    linear-gradient(115deg, #161819, #24282a 55%, #1a1b1c);
+}
+.ambience-cobalt {
+  opacity: 0;
+  background:
+    radial-gradient(ellipse 38% 62% at 51% 47%, #929fa5 0%, #5b6b75 28%, #303e47 59%, transparent 88%),
+    radial-gradient(ellipse 50% 55% at 84% 20%, #424e52 0%, transparent 80%),
+    linear-gradient(120deg, #181d21, #2e363b 60%, #1b2228);
+}
+.ambience-champagne {
+  opacity: 0;
+  background:
+    radial-gradient(ellipse 40% 65% at 55% 42%, #b6a48c 0%, #81715e 28%, #50463c 59%, transparent 85%),
+    radial-gradient(ellipse 60% 40% at 15% 90%, #5b5146 0%, transparent 85%),
+    linear-gradient(120deg, #242323, #3f342b 65%, #23282b);
+}
+
+.crane-viewport {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  z-index: 1;
+}
+.crane-viewport canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+}
+.construction-story.crane-ready .crane-viewport canvas {
+  opacity: 1;
+}
+
+/* Dok se WebGL ne učita (ili je isključen) stoji naša fotografija stovarišta. */
+.crane-poster {
+  position: absolute;
+  inset: 0;
+  background: url('/photos/stovariste-vazduh.jpg') center / cover no-repeat;
+}
+.crane-poster::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(24, 25, 26, 0.9), rgba(24, 25, 26, 0.35) 60%, rgba(24, 25, 26, 0.15));
+}
+.construction-story.crane-ready .crane-poster {
+  display: none;
+}
+
+.scene-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      to right,
+      rgba(14, 16, 18, 0.62) 0%,
+      rgba(14, 16, 18, 0.2) 21%,
+      rgba(14, 16, 18, 0) 38%,
+      rgba(14, 16, 18, 0) 62%,
+      rgba(14, 16, 18, 0.2) 79%,
+      rgba(14, 16, 18, 0.62) 100%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(14, 16, 18, 0.5) 0%,
+      rgba(14, 16, 18, 0) 16%,
+      rgba(14, 16, 18, 0) 74%,
+      rgba(14, 16, 18, 0.5) 100%
+    );
+}
+
+.scene-caption {
+  position: absolute;
+  z-index: 2;
+  bottom: 24px;
+  left: var(--story-gutter);
+  right: var(--story-gutter);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-size: clamp(9px, 0.8vw, 11px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(241, 238, 231, 0.72);
+}
+.scene-meter {
+  width: 140px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.scene-meter i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--story-sand);
+  transform: scaleX(var(--scene-progress, 0));
+  transform-origin: left;
+}
+
+/* ——— Tekst pored scene ——— */
+
+.story-content {
+  position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+.story-section {
+  display: grid;
+  grid-template-columns: minmax(0, 30%) minmax(0, 1fr) minmax(0, 21%);
+  column-gap: 32px;
+  align-items: center;
+  min-height: 85svh;
+  width: 100%;
+  max-width: 1800px;
+  margin-inline: auto;
+  padding: 80px var(--story-gutter);
+  /* Scena je mjestimično svijetla, pa tekst dobija blagu sjenku da ostane čitljiv. */
+  text-shadow: 0 1px 16px rgba(10, 12, 14, 0.55);
+}
+.story-opening {
+  position: relative;
+  min-height: calc(100svh - var(--story-header));
+  padding-top: 96px;
+  padding-bottom: 96px;
+}
+.story-materials {
+  min-height: 90svh;
+}
+.story-delivery {
+  min-height: 95svh;
+}
+.story-immersion {
+  height: 120svh;
+  pointer-events: none;
+}
+.construction-story:not(.crane-ready) .story-immersion,
+.construction-story.crane-reduced .story-immersion {
+  display: none;
+}
+
+.story-copy {
+  grid-column: 1;
+  min-width: 0;
+  pointer-events: auto;
+}
+.story-aside {
+  grid-column: 3;
+  min-width: 0;
+  pointer-events: auto;
+}
+.story-intro-note {
+  align-self: end;
+  padding-bottom: 40px;
+}
+
+.story-masthead {
+  position: absolute;
+  top: 28px;
+  left: var(--story-gutter);
+  right: var(--story-gutter);
+  display: flex;
+  justify-content: space-between;
+  font-size: clamp(9px, 0.78vw, 11px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(241, 238, 231, 0.55);
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--story-line);
+}
+.intro-index {
+  display: block;
+  font-size: clamp(9px, 0.78vw, 11px);
+  letter-spacing: 0.16em;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--story-line);
+  margin-bottom: 20px;
+  color: var(--story-sand);
+}
+
+.story-section .eyebrow {
+  font-size: clamp(9px, 0.8vw, 12px);
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--story-sand);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+.story-copy h1 {
+  font-size: clamp(24px, 2.6vw, 42px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 0.98;
+  text-transform: uppercase;
+}
+.story-copy h2 {
+  font-size: clamp(21px, 2.1vw, 34px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.story-aside h2,
+.story-aside h3 {
+  font-size: clamp(15px, 1.4vw, 22px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+  text-transform: uppercase;
+}
+.story-lead {
+  margin-top: 16px;
+  font-size: clamp(10px, 0.88vw, 14px);
+  line-height: 1.65;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: var(--story-muted);
+  max-width: 38ch;
+}
+.opening-lead {
+  margin-top: 20px;
+}
+.story-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+}
+.story-actions :is(a, button) {
+  display: inline-block;
+  padding: 13px 16px;
+  font-size: clamp(10px, 0.85vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-shadow: none;
+  transition: opacity 0.3s, background-color 0.3s, color 0.3s;
+}
+.story-actions .action-solid {
+  background: var(--story-ink);
+  color: #1a1c1f;
+}
+.story-actions .action-solid:hover {
+  opacity: 0.85;
+}
+.story-actions .action-outline {
+  border: 1px solid rgba(241, 238, 231, 0.45);
+}
+.story-actions .action-outline:hover {
+  background: var(--story-ink);
+  color: #1a1c1f;
+}
+
+.story-round-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--story-line);
+  font-size: clamp(10px, 0.85vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: left;
+  line-height: 1.4;
+}
+.story-round-link b {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  border: 1px solid rgba(241, 238, 231, 0.4);
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: 400;
+  transition: background-color 0.25s, color 0.25s;
+}
+.story-round-link:hover b {
+  background: var(--story-sand);
+  color: #201e1b;
+}
+
+.story-list {
+  margin-top: 20px;
+  border-top: 1px solid var(--story-line);
+  font-size: clamp(10px, 0.85vw, 13px);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.story-list li {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding-block: 14px;
+  border-bottom: 1px solid var(--story-line);
+  line-height: 1.5;
+}
+.story-list span {
+  flex: none;
+  font-size: clamp(9px, 0.75vw, 11px);
+  color: var(--story-sand);
+}
+
+/* ——— Bez scene (WebGL nedostupan ili reduced motion): običan baner i kompaktan tekst ——— */
+
+.construction-story:not(.crane-ready) .crane-stage,
+.construction-story.crane-reduced .crane-stage {
+  position: relative;
+  top: 0;
+  margin-bottom: 0;
+  height: 60svh;
+}
+.construction-story:not(.crane-ready) .story-section,
+.construction-story.crane-reduced .story-section {
+  min-height: auto;
+  padding-block: 56px;
+}
+.construction-story:not(.crane-ready) .story-masthead,
+.construction-story.crane-reduced .story-masthead {
+  display: none;
+}
+
+/* ——— Manji ekrani ——— */
+
+@media (max-width: 1023px) {
+  .crane-stage {
+    z-index: 2;
+    height: 43svh;
+    margin-bottom: 0;
+    border-bottom: 1px solid var(--story-line);
+  }
+  .story-immersion {
+    display: none;
+  }
+  .scene-caption {
+    bottom: 16px;
+    gap: 8px;
+  }
+  .scene-meter {
+    width: 80px;
+  }
+  .story-section {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    min-height: 70svh;
+    padding: 48px var(--story-gutter);
+    align-items: start;
+  }
+  .story-aside {
+    grid-column: 2;
+  }
+  .story-intro-note {
+    align-self: start;
+    padding-bottom: 0;
+  }
+  .story-masthead {
+    display: none;
+  }
+  .story-opening {
+    min-height: calc(57svh - var(--story-header));
+  }
+  .story-copy h1 {
+    font-size: clamp(25px, 4vw, 38px);
+  }
+  .story-copy h2 {
+    font-size: clamp(20px, 3.2vw, 30px);
+  }
+}
+
+@media (max-width: 599px) {
+  .crane-stage {
+    height: 38svh;
+  }
+  .story-section {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 28px var(--story-gutter) 48px;
+    min-height: 0;
+  }
+  .story-opening {
+    padding-top: 28px;
+  }
+  .story-aside {
+    grid-column: 1;
+  }
+  .story-copy h1 {
+    font-size: 26px;
+  }
+  .story-copy h2 {
+    font-size: 24px;
+  }
+  .story-intro-note {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--story-line);
+  }
+  .intro-index {
+    display: none;
+  }
+  .story-lead {
+    font-size: 11px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .crane-stage {
+    position: relative;
+    top: 0;
+  }
+  .ambience-layer {
+    will-change: auto;
+  }
+}
