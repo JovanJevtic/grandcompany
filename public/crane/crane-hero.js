@@ -9,7 +9,7 @@ import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
 import {createCraneRenderer} from './crane-renderer.js?v=18';
 import {craneQuality} from './crane-quality.js?v=17';
-import {createCraneScene, clamp, smooth} from './crane-scene.js?v=18';
+import {createCraneScene, clamp, smooth} from './crane-scene.js?v=19';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');

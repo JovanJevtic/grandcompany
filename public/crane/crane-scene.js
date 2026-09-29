@@ -42,8 +42,8 @@ export function createCraneScene() {
     concrete:mat('#aaa99f',.95), slab:mat('#c9c5ba',.92), brick:mat('#ad6547',.9),
     timber:mat('#b99459',.85), pale:mat('#e8e3d4',.85), white:mat('#e4e3d8',.4),
     glass:mat('#36545a',.23,.55), rubber:mat('#262826'), ground:mat('#d8cfba',1),
-    line:mat('#f1deb1'), blue:mat('#596e78'), darkWood:mat('#816640'),
-    skin:mat('#bf9279',.85), net:mat('#778a73',.95), red:mat('#ae4935',.55,.25), joint:mat('#807a6f',.95), hazard:mat('#efb724',.5,.15), lamp:mat('#fff6d9',.3),
+    line:mat('#f7fafd'), blue:mat('#596e78'), darkWood:mat('#816640'),
+    skin:mat('#bf9279',.85), net:mat('#778a73',.95), red:mat('#ae4935',.55,.25), joint:mat('#a9bccf',.95), hazard:mat('#efb724',.5,.15), lamp:mat('#fff6d9',.3),
   };
   Object.assign(m,{earth:mat('#806d4f',1),facade:mat('#d7d4c5',.8),frame:mat('#34484d',.4,.45),formwork:mat('#ba682e',.8),asphalt:mat('#727970',.95)});
   m.galvanized=mat('#89908f',.51,.68);
@@ -53,10 +53,10 @@ export function createCraneScene() {
   m.edge.color.set('#726042');
   m.red.color.set('#69473e');m.blue.color.set('#515e62');
   m.concrete.color.set('#92908a');m.slab.color.set('#aaa59c');
-  m.brick.color.set('#856c59');m.ground.color.set('#35363c');
-  m.ground.roughness=.78;m.ground.metalness=.12;
-  m.paving=mat('#5b5b62',.8,.06);
-  m.earth.color.set('#49484b');m.asphalt.color.set('#292c33');m.white.color.set('#b5b8af');m.pale.color.set('#bfc0b4');m.timber.color.set('#857964');m.facade.color.set('#a6aaa1');
+  m.brick.color.set('#856c59');m.ground.color.set('#cbd9e8');
+  m.ground.roughness=.88;m.ground.metalness=.03;
+  m.paving=mat('#dee9f4',.82,.03);
+  m.earth.color.set('#b6c8da');m.asphalt.color.set('#bccfe1');m.white.color.set('#b5b8af');m.pale.color.set('#bfc0b4');m.timber.color.set('#857964');m.facade.color.set('#a6aaa1');
   m.net.transparent=true;m.net.opacity=.42;m.net.side=THREE.DoubleSide;
   m.glass=new THREE.MeshPhysicalMaterial({color:'#273d42',metalness:.28,roughness:.08,transparent:true,opacity:.87,clearcoat:1});
   if(typeof document!=='undefined') {
