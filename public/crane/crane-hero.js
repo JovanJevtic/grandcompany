@@ -14,6 +14,7 @@ import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=25'
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
 const canvas=cover?.querySelector('canvas');
+const outro=cover?.querySelector('.story-outro');
 const wordmark=document.querySelector('[data-wordmark]');
 
 // Gornja ivica scene: dno wordmarka. Rezervna vrijednost dok se font ne učita.
@@ -59,7 +60,7 @@ function init() {
   studio.dispose();pmrem.dispose();
   const pipeline=createCraneRenderer(renderer,world,quality().contactSamples);
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let progress=0,targetProgress=0,frame=0,active=true,width=1,height=1,lastTime=0;
+  let progress=0,targetProgress=0,targetOutro=0,outroP=0,frame=0,active=true,width=1,height=1,lastTime=0;
   function measure() {
     width=Math.max(1,viewport.clientWidth);height=Math.max(1,viewport.clientHeight);
     const settings=quality();
@@ -75,8 +76,19 @@ function init() {
     // Native page distance drives the illustration only. Text stays in document flow.
     const rect=cover.getBoundingClientRect();
     const offset=topOffset();
-    const distance=Math.max(1,cover.offsetHeight-window.innerHeight+offset);
-    targetProgress=reduced.matches?0:clamp((offset-rect.top)/distance);
+    // Outro (kraj na nebu) je dodatni skrol iza animacije: scena ga ne troši, on vozi samo tekst.
+    const outroHeight=outro?outro.offsetHeight:0;
+    const distance=Math.max(1,cover.offsetHeight-window.innerHeight+offset-outroHeight);
+    const scrolled=offset-rect.top;
+    targetProgress=reduced.matches?0:clamp(scrolled/distance);
+    targetOutro=reduced.matches?1:clamp((scrolled-distance)/Math.max(1,outroHeight));
+    // U outru je skrol "teži": kotačić ide upola sporije da se rečenica ne preleti.
+    const lenis=window.__gcLenis;
+    if(lenis?.options){
+      const slow=targetOutro>0&&targetOutro<1;
+      lenis.options.wheelMultiplier=slow?.5:1;
+      lenis.options.lerp=slow?.06:.1;
+    }
     requestDraw();
   }
   function requestDraw() {if(!frame&&active&&!document.hidden)frame=requestAnimationFrame(draw);}
@@ -99,13 +111,15 @@ function init() {
     const state=world.update(progress,width/height,openingFrame+(1-openingFrame)*siteEntry);
     cover.dataset.siteEntry=siteEntry.toFixed(3);
     // Kucanje rečenice: počinje kad kamera izađe kroz prozor, a završi na dnu hero-a.
-    cover.style.setProperty('--type-p',(reduced.matches?1:smooth(.955,1,progress)).toFixed(4));
+    // Pisanje: prvih ~72% outra piše rečenicu, ostatak je mirovanje na gotovom tekstu.
+    outroP=Math.abs(targetOutro-outroP)<.0005?targetOutro:outroP+(targetOutro-outroP)*(1-Math.exp(-8*dt));
+    cover.style.setProperty('--type-p',(reduced.matches?1:clamp((outroP-.04)/.68)).toFixed(4));
     const siteDissolve=smooth(.43,.46,storyT)*(1-smooth(.57,.61,storyT));
     const districtDissolve=smooth(.70,.73,storyT)*(1-smooth(.82,.86,storyT));
     pipeline.render((1-siteDissolve)*(1-districtDissolve));
     cover.dataset.sceneChapter=String(state.chapter+1);
     cover.dataset.sceneProgress=progress.toFixed(3);
-    if(progress!==targetProgress)requestDraw();
+    if(progress!==targetProgress||outroP!==targetOutro)requestDraw();
   }
   const observer=new ResizeObserver(measure);observer.observe(viewport);observer.observe(cover);
   if(wordmark)observer.observe(wordmark);

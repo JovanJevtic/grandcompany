@@ -175,63 +175,46 @@
   transform-origin: left;
 }
 
-/* ——— Rečenica koja se na kraju ispisuje kao na pisacoj mašini ———
-   Skrol je vozi preko `--type-p` (0..1) koji postavlja scena; svako slovo ima svoj prag
-   `--th`, pa se pojavljuje tačno kad do njega stigne. Layout je fiksan — ništa ne skače. */
+/* ——— Završna rečenica na nebu: polako se ispisuje kao potpis ———
+   Skrol je vozi preko `--type-p` (0..1) koji postavlja scena (samo u outru, kad je kamera
+   opet vani i vidi se nebo). Svako slovo ima prag `--th` i mekano "iscuri" (opacity + blur
+   + malo podizanje), pa izgleda kao rukopis a ne kao kucanje. Layout je fiksan. */
 .story-type {
   position: absolute;
   z-index: 3;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  width: min(88vw, 1180px);
+  width: min(88vw, 1100px);
   margin: 0;
   text-align: center;
   text-wrap: balance;
-  font-family: var(--font-display), Georgia, "Times New Roman", serif;
-  font-style: italic;
-  font-weight: 600;
-  font-size: clamp(26px, 4.3vw, 72px);
-  line-height: 1.14;
-  letter-spacing: 0.004em;
+  font-family: var(--font-signature), "Snell Roundhand", cursive;
+  font-weight: 400;
+  font-size: clamp(44px, 7.4vw, 124px);
+  line-height: 1.12;
   color: var(--story-ink);
   pointer-events: none;
 }
-.story-type span {
-  /* Diskretno po slovo: *240 čini da se svako pojavi gotovo u trenutku. */
-  opacity: clamp(0, calc((var(--type-p, 0) - var(--th, 0)) * 240), 1);
-}
-.story-type-caret {
+.story-word {
   display: inline-block;
-  width: 0.045em;
-  height: 0.9em;
-  margin-left: 0.06em;
-  vertical-align: -0.08em;
-  background: currentColor;
-  opacity: clamp(0, calc((var(--type-p, 0) - 0.985) * 60), 1);
-  animation: story-caret 1s steps(1, end) infinite;
+  white-space: nowrap;
 }
-@keyframes story-caret {
-  0%,
-  50% {
-    visibility: visible;
-  }
-  50.01%,
-  100% {
-    visibility: hidden;
-  }
+.story-word > span {
+  --k: clamp(0, calc((var(--type-p, 0) - var(--th, 0)) * 16), 1);
+  opacity: var(--k);
+  filter: blur(calc((1 - var(--k)) * 5px));
+  display: inline-block;
+  transform: translateY(calc((1 - var(--k)) * 0.12em));
 }
 
 @media (max-width: 767px) {
   .story-type {
-    width: min(90vw, 640px);
-    line-height: 1.2;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .story-type-caret {
-    animation: none;
+    width: min(92vw, 640px);
+    /* Iznad fiksnog GC znaka sa leve strane, da se ne preklope. */
+    top: 34%;
+    font-size: clamp(40px, 12.5vw, 72px);
+    line-height: 1.15;
   }
 }
 
@@ -259,6 +242,12 @@
   height: 380svh;
   pointer-events: none;
 }
+/* Kraj na nebu: scena je i dalje pinovana; prvi dio skrola ispisuje rečenicu, a ostatak
+   je mirovanje na gotovom tekstu da se ne proleti pored njega. Ne ulazi u animaciju krana. */
+.story-outro {
+  height: 300svh;
+  pointer-events: none;
+}
 
 .story-masthead {
   position: absolute;
@@ -279,7 +268,9 @@
    Izgled na vrhu strane ostaje isti kao sa scenom, samo nema praznog skrola za animaciju.
    Tako nema vidljivog skoka kad scena javi `crane-ready` — ranije je splash taj skok krio. */
 .construction-story:not(.crane-ready) .story-immersion,
-.construction-story.crane-reduced .story-immersion {
+.construction-story:not(.crane-ready) .story-outro,
+.construction-story.crane-reduced .story-immersion,
+.construction-story.crane-reduced .story-outro {
   display: none;
 }
 
@@ -297,6 +288,9 @@
      da se animacija krana odigra (bez njega je sekcija kraća od ekrana). */
   .story-immersion {
     height: 320svh;
+  }
+  .story-outro {
+    height: 260svh;
   }
   .scene-caption {
     bottom: 16px;

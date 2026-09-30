@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { Fragment, useEffect, useRef } from 'react'
 import { COMPANY } from '@/gc/gc'
 
 declare global {
@@ -17,11 +17,19 @@ declare global {
 // iste relativne putanje do Three.js-a i ne ulaze u JS bundle ostatka sajta.
 const SCRIPT = '/crane/crane-hero.js'
 
-// Rečenica koja se na kraju hero-a (kad kamera izađe kroz prozor) ispisuje kao na
-// pisacoj mašini. Skrol je vozi: scena postavlja `--type-p` (0..1) na sekciju,
-// a svako slovo ima svoj prag `--th` i pojavi se tačno kad skrol stigne dotle.
-const PHRASE = 'GRADIMO, PRODAJEMO I KONSTRUISEMO ZA BUDUĆNOST.'
-const GLYPHS = [...PHRASE]
+// Rečenica koja se na kraju hero-a (kad kamera izađe kroz prozor i vidi se opet nebo)
+// polako ispisuje kao rukopis. Skrol je vozi: scena postavlja `--type-p` (0..1) na sekciju,
+// a svako slovo ima svoj prag `--th` i pojavi se (mekano) tačno kad skrol stigne dotle.
+const PHRASE = 'Gradimo, prodajemo i konstruišemo za budućnost.'
+// Slova se drže u rečima (nowrap), da se reč nikad ne prelomi usred slova na uskom ekranu.
+const WORDS = PHRASE.split(' ')
+const TOTAL = [...PHRASE].length
+let cursor = 0
+const WORD_GLYPHS = WORDS.map((word) => {
+  const glyphs = [...word].map((glyph) => ({ glyph, th: (cursor++ / TOTAL) * 0.94 }))
+  cursor++ // razmak iza reči
+  return glyphs
+})
 
 // Scena se pinuje, a preko nje je nebo: plavo-sivi gradijent, bijela skica grada uz dno i
 // razbacani oblaci. Skica se zamućuje i povlači dok kamera ulazi u kadar (`--scene-progress`).
@@ -71,16 +79,19 @@ export default function CraneHero() {
           </div>
 
           <p className="story-type">
-            {GLYPHS.map((glyph, i) => (
-              <span
-                key={i}
-                // Prag poslednjeg slova je malo ispod 1, da rečenica bude gotova prije kraja.
-                style={{ '--th': (((i + 1) / GLYPHS.length) * 0.98).toFixed(4) } as React.CSSProperties}
-              >
-                {glyph}
-              </span>
+            {WORD_GLYPHS.map((glyphs, w) => (
+              <Fragment key={w}>
+                {w > 0 ? ' ' : null}
+                <span className="story-word">
+                  {glyphs.map(({ glyph, th }, i) => (
+                    // Pragovi idu do 0.94; slovo se otkriva preko ~0.06, pa je sve gotovo do 1.
+                    <span key={i} style={{ '--th': th.toFixed(4) } as React.CSSProperties}>
+                      {glyph}
+                    </span>
+                  ))}
+                </span>
+              </Fragment>
             ))}
-            <i className="story-type-caret" />
           </p>
         </div>
 
@@ -95,6 +106,9 @@ export default function CraneHero() {
           </section>
 
           <div className="story-immersion" aria-hidden="true" />
+          {/* Dodatni skrol na kraju: scena ostaje pinovana na nebu dok se rečenica ispisuje,
+              pa još kratko miruje da se ne "proleti" pored nje. Scena ga isključuje iz svog računa. */}
+          <div className="story-outro" aria-hidden="true" />
         </div>
       </section>
     </>

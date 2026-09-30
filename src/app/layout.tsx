@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight } from "next/font/google";
+import { Allura, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -13,6 +13,13 @@ const interTight = Inter_Tight({
 
 // Display serif (italic) za kratke rečenice preko scene. Bodoni Moda je OFL —
 // slobodna i za komercijalnu upotrebu; 72pt rez je namijenjen velikim veličinama.
+// Potpisni rukopis za završnu rečenicu na nebu (latin-ext zbog ć, š, đ).
+const signature = Allura({
+  variable: "--font-signature",
+  weight: "400",
+  subsets: ["latin", "latin-ext"],
+});
+
 const displaySerif = localFont({
   src: [{ path: "./fonts/BodoniModa-SemiBoldItalic.ttf", weight: "600", style: "italic" }],
   variable: "--font-display",
@@ -28,7 +35,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${interTight.variable} ${displaySerif.variable} antialiased`}>
+    <html lang="bs" className={`${interTight.variable} ${displaySerif.variable} ${signature.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}
