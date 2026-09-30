@@ -5,6 +5,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
 import Pricing from "@/components/shop/Pricing";
+import BrandsSplit from "@/components/landing/BrandsSplit";
 import CraneBand from "@/components/landing/CraneBand";
 import Featured from "@/components/landing/Featured";
 import PostsTeaser from "@/components/landing/PostsTeaser";
@@ -29,6 +30,7 @@ export default function Home() {
         <Featured />
         <CraneBand />
         <WallBuilder />
+        <BrandsSplit />
         <PostsTeaser />
         <div className="relative z-20 bg-bg">
           <Pricing />

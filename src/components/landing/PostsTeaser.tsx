@@ -44,7 +44,7 @@ export default function PostsTeaser() {
       <StepBand id="objave" profile="valley" steps={9} aria-label="Objave">
         <div className="px-5 pb-[10dvh] pt-[6dvh] md:px-[3.05vw]">
           <p className="flex justify-between border-t border-bg/40 pt-3 font-mono text-micro uppercase tracking-wider">
-            <span>06 — Objave</span>
+            <span>07 — Objave</span>
             <span>Vodiči i sistemi</span>
           </p>
           <div className="mt-[6dvh] flex flex-wrap items-end justify-between gap-8">
