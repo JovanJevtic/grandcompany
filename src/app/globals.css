@@ -190,3 +190,60 @@ button:not(:disabled),
     scroll-behavior: auto !important;
   }
 }
+
+/* ——— Landing ——— */
+
+/* Outline crteži: linija ostaje iste debljine bez obzira na veličinu crteža. */
+.art :is(path, line, circle, ellipse, rect, polyline, polygon) {
+  vector-effect: non-scaling-stroke;
+}
+
+/* Bijeli list se podvlači pod zadnji ekran herosa (dok je scena još pinovana na nebu),
+   pa kolone koje rastu odozdo "brišu" nebo. Bez scene (reduced motion, bez WebGL-a) nema ni prelaza. */
+.sky-swipe {
+  margin-top: -100svh;
+}
+#hero.crane-reduced + .sky-swipe,
+#hero.crane-failed + .sky-swipe {
+  display: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .sky-swipe {
+    display: none;
+  }
+}
+
+/* JetBrains Mono je učitan u 400 i 500; bez ovoga bi naslijedio bold (700) sa body-ja i browser bi ga lažno podebljao. */
+.font-mono {
+  font-weight: 500;
+}
+
+/* Klizač u kalkulatoru: tanka linija i kvadratna ručka (bez zaobljenja, kao ostatak sajta). */
+.range {
+  appearance: none;
+  background: transparent;
+}
+.range::-webkit-slider-runnable-track {
+  height: 2px;
+  background: var(--ink);
+}
+.range::-moz-range-track {
+  height: 2px;
+  background: var(--ink);
+}
+.range::-webkit-slider-thumb {
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -8px;
+  background: var(--ink);
+  border: 3px solid var(--bg);
+  outline: 2px solid var(--ink);
+}
+.range::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  background: var(--ink);
+  border: 3px solid var(--bg);
+  border-radius: 0;
+}

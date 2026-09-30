@@ -77,6 +77,44 @@ export default function SiteChrome() {
         // pa se i GSAP triggeri moraju ponovo izmjeriti.
         window.addEventListener('gc:crane-ready', onCraneReady, { once: true })
 
+        // Wordmark i značka pripadaju herosu. Kad bijeli list prekrije nebo (vrh sekcije #radovi
+        // uđe u ekran), slova odlaze naviše kroz masku, a gore lijevo ostaje mali znak. Nazad — obrnuto.
+        const after = document.getElementById('radovi')
+        const mini = el.querySelector<HTMLElement>('[data-mini]')!
+        // Dok su slova sklonjena, uvodna animacija (i njen sigurnosni tajmer) ih ne smije vratiti.
+        let gone = false
+        if (after) {
+          const leave = (out: boolean) => {
+            gone = out
+            const chars = gsap.utils.toArray<HTMLElement>('.ch', wm)
+            if (reduce) {
+              gsap.set(chars, { yPercent: out ? -130 : 0 })
+              gsap.set(badge, { autoAlpha: out ? 0 : 1 })
+              gsap.set(mini, { autoAlpha: out ? 1 : 0 })
+              return
+            }
+            gsap.to(chars, {
+              yPercent: out ? -130 : 0,
+              duration: out ? 0.6 : 0.9,
+              ease: out ? 'power3.in' : EASE.quint,
+              stagger: { each: 0.03, from: out ? 'start' : 'end' },
+              overwrite: true,
+            })
+            gsap.to(badge, { autoAlpha: out ? 0 : 1, duration: 0.4, overwrite: 'auto' })
+            gsap.fromTo(
+              mini,
+              { autoAlpha: out ? 0 : 1, yPercent: out ? 100 : 0 },
+              { autoAlpha: out ? 1 : 0, yPercent: out ? 0 : -100, duration: 0.6, delay: out ? 0.35 : 0, ease: EASE.quint, overwrite: true },
+            )
+          }
+          ScrollTrigger.create({
+            trigger: after,
+            start: 'top 92%',
+            onEnter: () => leave(true),
+            onLeaveBack: () => leave(false),
+          })
+        }
+
         if (reduce) {
           gsap.set(badge, { x: 0, y: 0 })
           return
@@ -92,7 +130,10 @@ export default function SiteChrome() {
           if (!chars.length) return
           // Na kraju se transformacija sklanja, pa slova ostaju čista i ako je animaciju
           // prekinuo zastoj glavne niti ili ponovno montiranje komponente.
-          const clear = () => gsap.set(chars, { clearProps: 'transform' })
+          const clear = () => {
+            if (!gone) gsap.set(chars, { clearProps: 'transform' })
+          }
+          if (gone) return
           gsap.fromTo(
             chars,
             { yPercent: 160 },
@@ -154,6 +195,18 @@ export default function SiteChrome() {
           {BRAND}
         </h1>
       </div>
+
+      {/* Mali znak gore lijevo: zamjenjuje veliki wordmark kad se pređe hero. `difference` ga drži
+          čitljivim i na bijelom i na tamno plavom. */}
+      <button
+        type="button"
+        data-mini
+        onClick={() => window.__gcLenis?.scrollTo(0)}
+        className="invisible fixed left-5 top-4 z-[150] text-[15px] font-bold uppercase leading-none tracking-[-0.01em] text-white mix-blend-difference md:left-[3.05vw] md:top-5 md:text-[17px]"
+        aria-label="Na vrh stranice"
+      >
+        {BRAND}
+      </button>
 
       {/* Značka: uklizne tek kad hero počne da se kreće. */}
       <div
