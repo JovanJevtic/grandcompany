@@ -4,6 +4,16 @@ import { ReactLenis, type LenisRef } from 'lenis/react'
 import { useEffect, useRef } from 'react'
 import { gsap, ScrollTrigger } from '@/lib/gsap'
 
+declare global {
+  interface Window {
+    /** Lenis instanca koju SmoothScroll ostavlja za programsko skrolovanje (hero, mali znak, testovi). */
+    __gcLenis?: {
+      scrollTo: (y: number, o?: Record<string, unknown>) => void
+      options?: Record<string, unknown>
+    } | null
+  }
+}
+
 // Lenis mora da vozi GSAP-ov ticker, inače animacije "kasne" za skrolom.
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<LenisRef>(null)
