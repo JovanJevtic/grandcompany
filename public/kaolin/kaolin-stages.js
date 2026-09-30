@@ -4,6 +4,9 @@
 // zamuti i raširi, nova izranja iz zamućenja u oštrinu. Između prelaza svaka forma kratko
 // stoji potpuno oštra (HOLD), da se vidi detalj. Slike su unaprijed poravnate na isto
 // težište i isti pod, pa objekat nikad ne skače. Skrol i scrubber linija voze `p` (0..1).
+//
+// Ako postoje kadrovi iz Runway klipova (public/kaolin/frames/manifest.json), sekcija umjesto
+// pretapanja premotava njih (kaolin-frames.js) — to je "pravi" prelaz, bez ikakvog trika.
 
 const clamp01=n=>Math.min(1,Math.max(0,n));
 const ss=(a,b,x)=>{const t=clamp01((x-a)/(b-a));return t*t*(3-2*t);};
@@ -29,7 +32,7 @@ function bootKaolin(){
   const segments=layers.length-1;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const forced=new URLSearchParams(location.search).get('p');
-  let progress=-1,dragging=false,visible=false,pending=false;
+  let progress=-1,dragging=false,visible=false,pending=false,player=null,disposed=false;
 
   const setKnob=p=>{
     section.style.setProperty('--p',p.toFixed(4));
@@ -37,6 +40,7 @@ function bootKaolin(){
   };
 
   function render(p){
+    if(player){player.draw(p);return;}
     const x=p*segments;
     const i=Math.min(segments-1,Math.floor(x));
     // m: 0 = forma i oštra, 1 = forma i+1 oštra. Prelaz je samo u sredini segmenta.
@@ -113,7 +117,7 @@ function bootKaolin(){
   // Slike se učitavaju tek kad se sekcija približi (loading=lazy + ovaj signal).
   const io=new IntersectionObserver(([e])=>{
     visible=e.isIntersecting;
-    if(visible){section.classList.add('is-near');schedule();}
+    if(visible){section.classList.add('is-near');player?.start();schedule();}
   },{rootMargin:'120% 0px'});
   io.observe(section);
   const ro=new ResizeObserver(schedule);
@@ -126,12 +130,29 @@ function bootKaolin(){
   track.addEventListener('pointercancel',onUp);
   track.addEventListener('keydown',onKey);
 
+  // Kadrovi iz klipova, ako su generisani. Bez njih ostaje pretapanje slika.
+  const FRAMES='/kaolin/frames';
+  fetch(`${FRAMES}/manifest.json`,{cache:'no-cache'})
+    .then(r=>r.ok?r.json():null)
+    .then(async manifest=>{
+      if(!manifest?.count||disposed)return;
+      const {createFramePlayer}=await import('./kaolin-frames.js');
+      if(disposed)return;
+      player=createFramePlayer(section.querySelector('.kaolin-object'),manifest,FRAMES);
+      section.classList.add('is-frames');
+      if(manifest.bg)section.style.setProperty('--kaolin-bg',manifest.bg);
+      if(visible)player.start();
+      const p=progress<0?0:progress;progress=-1;apply(p);
+    })
+    .catch(()=>{});
+
   if(forced!==null)apply(clamp01(Number(forced)));
   else if(reduced)apply(1);
   else apply(scrollProgress());
 
   window.__gcKaolin={
     dispose(){
+      disposed=true;player?.dispose();
       io.disconnect();ro.disconnect();
       window.removeEventListener('scroll',onScroll);
       track.removeEventListener('pointerdown',onDown);

@@ -5,7 +5,8 @@
 
 .kaolin {
   position: relative;
-  background: var(--bg);
+  /* U režimu kadrova boja dolazi iz samih kadrova (manifest), da nema šava oko videa. */
+  background: var(--kaolin-bg, var(--bg));
   height: 520vh;
   margin-block: 16dvh;
 }
@@ -54,6 +55,32 @@
   border-radius: 50%;
   background: radial-gradient(closest-side, rgba(30, 42, 54, 0.26), rgba(30, 42, 54, 0.1) 55%, rgba(30, 42, 54, 0));
   filter: blur(6px);
+}
+
+/* ——— Režim kadrova (Runway klipovi): 16:9 kadar u istom prostoru kao slike; sjenka je već u kadru ——— */
+.kaolin.is-frames .kaolin-object {
+  width: min(100vw, calc(80dvh * 16 / 9));
+  aspect-ratio: 16 / 9;
+  transform: translateY(-3dvh);
+}
+@media (max-width: 767px) {
+  /* Objekat je u srednjoj trećini kadra, pa se prazne strane smiju odsjeći — objekat ostaje krupan. */
+  .kaolin.is-frames .kaolin-object {
+    width: 190vw;
+    /* Širi od ekrana: negativne margine ga drže centriranog (grid ga inače gura udesno). */
+    margin-inline: -45vw;
+  }
+}
+.kaolin.is-frames .kaolin-stack,
+.kaolin.is-frames .kaolin-shadow {
+  display: none;
+}
+.kaolin-frames {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 /* ——— Linija za modeliranje ——— */
@@ -124,6 +151,7 @@
   .kaolin-object {
     /* Kadar je providan oko objekta, pa smije biti širi od ekrana — objekat ostaje krupan. */
     width: 122vw;
+    margin-inline: -11vw;
     transform: translateY(-6dvh);
   }
   .kaolin-bar {
