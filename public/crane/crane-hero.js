@@ -9,7 +9,7 @@ import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
 import {createCraneRenderer} from './crane-renderer.js?v=18';
 import {craneQuality} from './crane-quality.js?v=17';
-import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=25';
+import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=27';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -98,7 +98,7 @@ function init() {
     progress=Math.abs(targetProgress-progress)<.00015?targetProgress:progress+(targetProgress-progress)*(1-Math.exp(-14*dt));
     // Postojeća priča se mjeri u "story vremenu"; posle STORY_END ide ulazak u enterijer.
     const storyT=clamp(progress/STORY_END);
-    const interiorT=smooth(STORY_END,.78,progress);
+    const interiorT=smooth(STORY_END,STORY_END+.08,progress);
     const ambience=updateAmbience(storyT);
     // U enterijeru se toplo svetlo povlači — soba treba da ostane svetla i vazdušasta.
     world.lighting.fill.color.copy(coolFill).lerp(warmFill,ambience.warm*(1-interiorT));

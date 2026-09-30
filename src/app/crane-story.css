@@ -237,9 +237,9 @@
   min-height: calc(100svh - var(--story-header));
 }
 .story-immersion {
-  /* Prazan prostor kroz koji se scena odigrava: prvo kran i dostava, pa ulazak u sprat
-     i prolaz kroz kupatilo do prozora. Duže je nego ranije da nova chapter dobije skrol. */
-  height: 380svh;
+  /* Prazan prostor kroz koji se scena odigrava: kran i dostava (~58%), pa dovršavanje
+     zgrade, ulazak kroz balkonska vrata u kupatilo i izlazak kroz prozor u nebo. */
+  height: 460svh;
   pointer-events: none;
 }
 /* Kraj na nebu: scena je i dalje pinovana; prvi dio skrola ispisuje rečenicu, a ostatak
@@ -287,7 +287,7 @@
   /* Na mobilnom je sadržaj kratak, pa prazan prostor drži scenu u kadru dovoljno dugo
      da se animacija krana odigra (bez njega je sekcija kraća od ekrana). */
   .story-immersion {
-    height: 320svh;
+    height: 390svh;
   }
   .story-outro {
     height: 260svh;

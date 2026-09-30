@@ -7,16 +7,18 @@ import {detailKit} from './crane-details.js?v=18';
 
 import {architectureKit} from './crane-architecture.js?v=14';
 import {createSiteActivity} from './crane-activity.js?v=11';
-import {buildInterior} from './crane-interior.js?v=3';
+import {buildTowerBath} from './crane-interior.js?v=4';
+import {buildFinish,ENTRY} from './crane-finish.js?v=1';
 
 export const clamp = (n, a = 0, b = 1) => Math.min(b, Math.max(a, n));
 export const smooth = (a, b, p) => { const t = clamp((p-a)/(b-a)); return t*t*(3-2*t); };
 const mix = THREE.MathUtils.lerp;
 
 // Do ovde traje postojeća priča (kran, dostava, gradilište). Ostatak skrola je nova
-// chapter-a: ulazak u sprat, kroz hodnik i kupatilo, do prozora. Sve staro se zato
-// računa u "story vremenu" (progress / STORY_END), a ulazak koristi sirovi progress.
-export const STORY_END = .7;
+// chapter-a: zgrada sa paletom se dovrši sprat po sprat, kamera uđe kroz balkonska vrata
+// u kupatilo i izađe kroz prozor u nebo. Sve staro se računa u "story vremenu"
+// (progress / STORY_END), a završna chapter-a koristi sirovi progress.
+export const STORY_END = .58;
 
 // One world, one anchored mast, one payload. All keyframes are reversible.
 export function choreography(progress) {
@@ -324,17 +326,24 @@ export function createCraneScene() {
   }
   batch(offices);
   const floors=[];
-  function building(x,z,w,d,n,offset,brick=true,style=null,parent=site) {
+  function building(x,z,w,d,n,offset,brick=true,style=null,parent=site,opts={}) {
+    // opts.perimeter: stubovi samo po obodu (sredina sprata prohodna); opts.open: spratovi bez cigle.
+    const open=opts.open||[];
     const base=group(parent,x,0,z);
     for(let f=0;f<=n;f++) {
       const level=group(base,0,f*2.35,0);
       box(level,m.slab,0,.1,0,w,.2,d);
       if(f<n) {
-        for(let px=-w/2+.3;px<=w/2;px+=w/3)for(let pz=-d/2+.3;pz<=d/2;pz+=d/2) {
+        if(opts.perimeter) {
+          for(const px of [-w/2+.3,0,w/2-.3]) {
+            for(const pz of [-d/2+.15,d/2-.15])box(level,m.concrete,px,1.22,pz,.3,2.3,.3);
+            box(level,m.concrete,px,2.15,0,.26,.35,d);
+          }
+        } else for(let px=-w/2+.3;px<=w/2;px+=w/3)for(let pz=-d/2+.3;pz<=d/2;pz+=d/2) {
           box(level,m.concrete,px,1.22,pz,.3,2.3,.3);
           box(level,m.concrete,px,2.15,0,.26,.35,d);
         }
-        if(brick&&f<n-1) {
+        if(brick&&f<n-1&&!open.includes(f)) {
           for(let px=-w/2+.75;px<w/2;px+=1.9)for(const side of [-1,1]) {
             box(level,m.brick,px,.57,side*(d/2-.2),1.7,.95,.18);
             box(level,m.brick,px-.68,1.57,side*(d/2-.2),.34,1.1,.18);
@@ -353,7 +362,7 @@ export function createCraneScene() {
         for(let px=-w/2;px<=w/2;px+=1.5)rod(level,m.galvanized,[px,.2,side*d/2],[px,1.2,side*d/2],.025);
         for(const h of [.7,1.15])box(level,m.timber,0,h,side*d/2,w,.08,.06);
       }
-      details.floor(level,{w,d,f,n,brick});
+      details.floor(level,{w,d,f,n,brick:brick&&!open.includes(f)});
       architecture.floor(level,{w,d,f,n,style});
       if(style==='residential'&&f>=n-1){level.scale.x=.8;level.scale.z=.8;}
       // `at` = trenutak u kome sprat počinje da niče; viši spratovi malo kasnije.
@@ -361,7 +370,9 @@ export function createCraneScene() {
     }
     return base;
   }
-  building(9,0,7,6,4,0,true); // Receiving slab top = 9.6; pallet bottom = 9.64.
+  // Receiving slab top = 9.6; pallet bottom = 9.64. U ovu zgradu kamera na kraju ulazi,
+  // pa su joj stubovi po obodu, a ulazni sprat je bez cigle (fasada dolazi u završnoj fazi).
+  building(9,0,7,6,4,0,true,null,site,{perimeter:true,open:[ENTRY]});
   building(-7,-8,6,6,6,.005,false,'frame');
   building(1,-10,6,6,7,.02,false,'office');
   building(12,-10,7,6,9,.035,true,'residential');
@@ -454,38 +465,50 @@ export function createCraneScene() {
   const siteFade=architecturalFade(finishedSite);
   const districtFade=architecturalFade(finishedDistrict);
 
-  // ——— Enterijer završne chapter-e: hodnik -> kupatilo -> prozor u nebo ———
-  // Stoji na spratu 1 kulisа zgrade (27,13), a vidljiv je tek kad kamera priđe.
+  // ——— Završna chapter-a: fasada zgrade sa paletom, pa kupatilo na ulaznom spratu ———
+  // Fasada je van `site` (koji je spojen u instance) da bi mogla da raste nezavisno.
+  const finishRoot=group(scene,9,0,0);
+  const finish=buildFinish({parent:finishRoot,box,rod,group,batch,m,pallet});
+  finishRoot.visible=false;
+  const ENTRY_Y=ENTRY*2.35+.2;
   const interiorRoot=new THREE.Group();
-  interiorRoot.position.set(27,2.35,13);
-  buildInterior({parent:interiorRoot,box,rod,m});
+  interiorRoot.position.set(9,ENTRY_Y,0);
+  buildTowerBath({parent:interiorRoot,box,rod,m});
   scene.add(interiorRoot);
   const interiorFade=architecturalFade(interiorRoot);
   // Mekano, toplo svetlo u sobi — spoljno svetlo ne dopire ispod ploče sprata iznad.
-  const interiorLight=new THREE.PointLight('#fff4e6',0,16,2);
-  interiorLight.position.set(27,4.35,13);scene.add(interiorLight);
+  const interiorLight=new THREE.PointLight('#fff4e6',0,10,2);
+  interiorLight.position.set(10.2,ENTRY_Y+2.0,0);scene.add(interiorLight);
   interiorRoot.visible=false;interiorFade(0);
 
-  // Putanja kamere kroz enterijer, u sirovom progresu (od STORY_END do 1): spust sa
-  // sprata dostave, pa ravan let kroz otvorenu stranu, hodnik i kupatilo do prozora.
-  const INTERIOR_KEYS=[
-    [.72, 20.3,14.5,10.8,  8.7,11.2,-.5],  // nastavak na kraj postojeće priče
-    [.78, 15.0,9.0,14.5,   24,5.5,13.5],   // spust i skretanje ka zgradi
-    [.83, 17.5,4.4,13.2,   28,4.0,13.0],   // u ravni sprata, ispred otvorene strane
-    [.88, 22.5,3.9,13.0,   32,4.1,13.0],   // ulaz kroz otvorenu stranu
-    [.93, 26.0,3.8,13.0,   34,4.15,13.0],  // kroz hodnik u kupatilo
-    [.965,29.2,3.82,13.0,  37,4.15,13.0],  // pred prozorom
-    [.99, 32.6,3.85,13.0,  41,4.6,13.0],   // izlazak kroz prozor
-    [1.0,  35.0,3.9,13.0,  45,7.4,13.0],   // napolju — ostaje samo nebo
+  // Putanja kamere u sirovom progresu (od STORY_END do 1). Tačke idu kroz glatku krivu
+  // (Catmull-Rom), pa kamera nigdje ne staje između ključeva: odmak da se vidi zgrada kako
+  // raste, spust ispred balkonskih vrata, ulaz, pogled na umivaonik, okret ka prozoru, izlaz.
+  const EYE=ENTRY_Y+1.5;
+  const CAMERA_KEYS=[
+    // p      pozicija                 pogled
+    [STORY_END, [20.3,14.5,10.8],      [8.7,11.2,-.5]],   // kraj dostave (isto kao orbita)
+    [.68,       [22.5,11.0,18.5],      [9.0,5.2,0]],      // odmak: cijela zgrada dok raste
+    [.76,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
+    [.82,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
+    [.87,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
+    [.91,       [10.3,EYE,0],          [14.5,EYE,0]],     // pred prozorom
+    [.96,       [13.8,EYE+.05,0],      [18,EYE+.45,0]],   // kroz prozor
+    [1,         [17.0,EYE+.3,0],       [22,EYE+3.4,0]],   // napolju — ostaje samo nebo
   ];
+  const cameraCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[1])),false,'centripetal');
+  const lookCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[2])),false,'centripetal');
   const _interiorPos=new THREE.Vector3(),_interiorLook=new THREE.Vector3();
   function interiorPath(p) {
-    const k=INTERIOR_KEYS;
-    let i=k.length-2;
-    for(let j=0;j<k.length-1;j++)if(p<k[j+1][0]){i=j;break;}
-    const a=k[i],b=k[i+1],tt=smooth(a[0],b[0],p);
-    _interiorPos.set(mix(a[1],b[1],tt),mix(a[2],b[2],tt),mix(a[3],b[3],tt));
-    _interiorLook.set(mix(a[4],b[4],tt),mix(a[5],b[5],tt),mix(a[6],b[6],tt));
+    const k=CAMERA_KEYS,last=k.length-1;
+    let i=last-1;
+    for(let j=0;j<last;j++)if(p<k[j+1][0]){i=j;break;}
+    let f=clamp((p-k[i][0])/(k[i+1][0]-k[i][0]));
+    // Samo prvi i poslednji segment se ublaže — kamera kreće i staje mekano.
+    if(i===0)f=f*f*(3-2*f)*.5+f*.5;
+    if(i===last-1)f=1-(1-f)*(1-f);
+    const u=(i+f)/last;
+    cameraCurve.getPoint(u,_interiorPos);lookCurve.getPoint(u,_interiorLook);
     return {position:_interiorPos,look:_interiorLook};
   }
   const ambient=new THREE.HemisphereLight('#f2f4f5','#cbc7bf',.5);scene.add(ambient);
@@ -566,10 +589,12 @@ export function createCraneScene() {
     const assembled=true;
     growingParts.forEach(part=>{part.visible=!assembled&&(part!==scaffold||t>.60);});
     finishedSite.visible=assembled;
-    // Enterijer se pojavljuje (i blago izranja) tek pred ulazak kamere.
-    interiorRoot.visible=p>STORY_END-.02;
-    interiorFade(smooth(STORY_END-.02,STORY_END+.04,p));
-    interiorLight.intensity=9*smooth(STORY_END-.02,STORY_END+.06,p);
+    // Fasada raste sprat po sprat odmah posle dostave; kupatilo se pojavljuje pred ulazak.
+    finishRoot.visible=p>STORY_END;
+    finish.update(p,STORY_END+.005,.03,.07);
+    interiorRoot.visible=p>.68;
+    interiorFade(smooth(.68,.74,p));
+    interiorLight.intensity=7*smooth(.72,.8,p);
     target.set(...s.target);
     // Portrait framing is wider so the jib never falls off the screen.
     let distance=s.distance*Math.max(1,1.0/aspect)*framing;
@@ -595,12 +620,15 @@ export function createCraneScene() {
     }
     camera.position.set(target.x+Math.sin(s.azimuth)*Math.cos(s.elevation)*distance,target.y+Math.sin(s.elevation)*distance,target.z+Math.cos(s.azimuth)*Math.cos(s.elevation)*distance);
     // Završna chapter-a preuzima kameru: glatko se spoji sa orbitom pa ide kroz enterijer.
-    const interiorT=smooth(STORY_END,STORY_END+.1,p);
+    const interiorT=smooth(STORY_END,STORY_END+.08,p);
     if(interiorT>0) {
       const path=interiorPath(p);
       camera.position.lerp(path.position,interiorT);
       target.lerp(path.look,interiorT);
     }
+    // U sobi je objektiv širi (naročito na uskom ekranu), da kupatilo stane u kadar.
+    const inside=smooth(.74,.8,p)*(1-smooth(.94,.99,p));
+    camera.fov=37+(aspect<1?24:9)*inside;
     camera.aspect=aspect;camera.lookAt(target);camera.updateProjectionMatrix();
     if(p>=STORY_END)s.chapter=4;
 
