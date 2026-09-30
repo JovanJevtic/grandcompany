@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="bs">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Kaolin preview</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #f8fafc; font-family: system-ui, sans-serif; }
+      .kaolin-stage { position: relative; height: 100vh; overflow: clip; }
+      .kaolin-stage canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+      .kaolin-bar {
+        position: absolute; z-index: 2; left: 50%; bottom: 40px; transform: translateX(-50%);
+        display: flex; align-items: center; gap: 16px; width: min(58vw, 720px);
+      }
+      .kaolin-play { width: 30px; height: 30px; border: 1px solid rgba(30,42,54,.26); border-radius: 999px; background: transparent; display: grid; place-items: center; padding: 0; }
+      .kaolin-play span { width: 0; height: 0; border-style: solid; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent #1e2a36; margin-left: 2px; }
+      .kaolin-track { position: relative; flex: 1 1 auto; height: 30px; display: flex; align-items: center; }
+      .kaolin-track::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: rgba(30,42,54,.22); }
+      .kaolin-knob { position: absolute; top: 50%; left: calc(var(--p, 0) * 100%); width: 13px; height: 13px; margin: -6.5px 0 0 -6.5px; border-radius: 999px; background: #1e2a36; }
+      #err { position: absolute; z-index: 9; left: 12px; top: 12px; right: 12px; color: #b00020; font: 14px/1.4 monospace; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <section data-kaolin class="kaolin">
+      <div class="kaolin-stage">
+        <canvas data-kaolin-canvas></canvas>
+        <div class="kaolin-bar">
+          <button type="button" class="kaolin-play" data-kaolin-play><span></span></button>
+          <div class="kaolin-track" data-kaolin-track><span class="kaolin-knob" data-kaolin-knob></span></div>
+        </div>
+        <div id="err"></div>
+      </div>
+    </section>
+    <script>
+      window.addEventListener('error', (e) => {
+        document.getElementById('err').textContent += 'ERROR: ' + (e.message || e.error) + '\n';
+      });
+      window.addEventListener('unhandledrejection', (e) => {
+        document.getElementById('err').textContent += 'REJECT: ' + (e.reason && e.reason.message ? e.reason.message : e.reason) + '\n';
+      });
+      setInterval(() => {
+        const sec = document.querySelector('[data-kaolin]');
+        document.getElementById('err').textContent =
+          'search=' + location.search + '\napplied p=' + (sec && sec.dataset.kaolinP) + '\n';
+      }, 500);
+      // Keš-busting: modul se uvijek učitava svjež u pregledu.
+      const s = document.createElement('script');
+      s.type = 'module';
+      s.src = '/kaolin/kaolin-object.js?cb=' + Date.now();
+      document.body.appendChild(s);
+    </script>
+  </body>
+</html>

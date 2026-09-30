@@ -1,72 +1,132 @@
-/* ——— Kaolin: jedan objekat koji se na skrol transformiše kroz deset stanja ———
-   Nema 3D-a: radi se o nizu providnih WebP slika koje se preklapaju (crossfade),
-   uz blagi zum, pomak i jedva primjetnu rotaciju cijelog objekta. Sekcija je visoka,
-   a scena je zalepljena na ekran, pa skrol "skrubuje" transformaciju. */
+/* ——— Kaolin: JEDAN 3D objekat koji se deformiše kroz faze ———
+   Nema smene slika: ista lopta mijenja hrapavost, kristalnost i udubljenje, pa je
+   uvijek iste veličine i na istom mjestu. Skrol (ili scrubber linija) vozi transformaciju.
+   Pod i horizont crta sama scena, a nebo iza je boja stranice (canvas je providan). */
 
 .kaolin {
-  /* visina objekta u kadru; ista za sva stanja (svaka slika dobija svoj odnos) */
-  --object-h: min(42vh, 45vw, 460px);
   position: relative;
   background: var(--bg);
-  height: 480vh;
-  margin-block: 18dvh;
+  height: 440vh;
+  margin-block: 16dvh;
 }
 
 .kaolin-stage {
   position: sticky;
   top: 0;
   height: 100dvh;
-  display: grid;
-  place-items: center;
   overflow: clip;
 }
 
-/* Kontejner cijelog objekta: GSAP ga lagano skalira i naginje kroz sekciju. */
-.kaolin-object {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  display: grid;
-  place-items: center;
-  will-change: transform;
-}
-
-/* Jedno stanje (jedna slika). Slike su naslagane jedna preko druge. */
-.kaolin-state {
+.kaolin-stage canvas {
   position: absolute;
   inset: 0;
-  display: grid;
-  place-items: center;
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
-/* Puna visina objekta: `--ratio` je odnos visine slike i visine samog objekta,
-   pa sva stanja izgledaju jednako velika iako su na slikama različito krupna. */
-.kaolin-shape {
+/* ——— Linija za modeliranje ——— */
+.kaolin-bar {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  bottom: clamp(18px, 5vh, 52px);
+  transform: translateX(-50%);
   display: flex;
-  height: calc(var(--object-h) * var(--ratio, 1));
-  will-change: transform;
+  align-items: center;
+  gap: 16px;
+  width: min(58vw, 720px);
 }
-.kaolin-shape img {
-  display: block;
-  height: 100%;
-  width: auto;
+
+.kaolin-play {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid rgba(30, 42, 54, 0.26);
+  border-radius: 999px;
+  background: transparent;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, background-color 0.25s ease;
+}
+.kaolin-play:hover {
+  border-color: rgba(30, 42, 54, 0.5);
+}
+/* Trokutić (pusti) -> kvadratić (pauza). */
+.kaolin-play span {
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 5px 0 5px 8px;
+  border-color: transparent transparent transparent var(--ink);
+  margin-left: 2px;
+}
+.kaolin-play.is-on span {
+  width: 8px;
+  height: 8px;
+  border: 0;
+  margin: 0;
+  border-radius: 1px;
+  background: var(--ink);
+}
+
+.kaolin-track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  cursor: grab;
+  touch-action: none;
+}
+.kaolin-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: rgba(30, 42, 54, 0.22);
+}
+.kaolin-track:active {
+  cursor: grabbing;
+}
+.kaolin-knob {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--p, 0) * 100%);
+  width: 13px;
+  height: 13px;
+  margin: -6.5px 0 0 -6.5px;
+  border-radius: 999px;
+  background: var(--ink);
+  transition: transform 0.15s ease;
+}
+.kaolin-track:active .kaolin-knob {
+  transform: scale(1.3);
 }
 
 @media (max-width: 767px) {
   .kaolin {
-    height: 340vh;
+    height: 320vh;
     margin-block: 10dvh;
+  }
+  .kaolin-bar {
+    width: min(80vw, 520px);
+    gap: 12px;
   }
 }
 
-/* Bez animacije: samo završno stanje, u normalnom toku stranice (bez dugog skrola). */
+/* Bez animacije: statično završno stanje, bez dugog skrola. Scrubber ostaje upotrebljiv. */
 @media (prefers-reduced-motion: reduce) {
   .kaolin {
-    height: auto;
+    height: 78dvh;
     margin-block: 6dvh;
   }
   .kaolin-stage {
     position: relative;
-    height: 80dvh;
+    height: 78dvh;
   }
 }
