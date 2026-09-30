@@ -17,6 +17,12 @@ declare global {
 // iste relativne putanje do Three.js-a i ne ulaze u JS bundle ostatka sajta.
 const SCRIPT = '/crane/crane-hero.js'
 
+// Rečenica koja se na kraju hero-a (kad kamera izađe kroz prozor) ispisuje kao na
+// pisacoj mašini. Skrol je vozi: scena postavlja `--type-p` (0..1) na sekciju,
+// a svako slovo ima svoj prag `--th` i pojavi se tačno kad skrol stigne dotle.
+const PHRASE = 'GRADIMO, PRODAJEMO I KONSTRUISEMO ZA BUDUĆNOST.'
+const GLYPHS = [...PHRASE]
+
 // Scena se pinuje, a preko nje je nebo: plavo-sivi gradijent, bijela skica grada uz dno i
 // razbacani oblaci. Skica se zamućuje i povlači dok kamera ulazi u kadar (`--scene-progress`).
 // Ostatak visine je prazan prostor (story-immersion) kroz koji se animacija krana odigra.
@@ -63,9 +69,24 @@ export default function CraneHero() {
               <i />
             </span>
           </div>
+
+          <p className="story-type">
+            {GLYPHS.map((glyph, i) => (
+              <span
+                key={i}
+                // Prag poslednjeg slova je malo ispod 1, da rečenica bude gotova prije kraja.
+                style={{ '--th': (((i + 1) / GLYPHS.length) * 0.98).toFixed(4) } as React.CSSProperties}
+              >
+                {glyph}
+              </span>
+            ))}
+            <i className="story-type-caret" />
+          </p>
         </div>
 
         <div className="story-content">
+          {/* Scena je aria-hidden, pa rečenicu iznosimo i kao pravi tekst za čitače ekrana. */}
+          <p className="sr-only">{PHRASE}</p>
           <section className="story-section story-opening">
             <div className="story-masthead">
               <span>Građevinski materijali &amp; logistika</span>

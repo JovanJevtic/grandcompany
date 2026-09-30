@@ -9,7 +9,7 @@ import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
 import {createCraneRenderer} from './crane-renderer.js?v=18';
 import {craneQuality} from './crane-quality.js?v=17';
-import {createCraneScene, clamp, smooth} from './crane-scene.js?v=19';
+import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=25';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -39,7 +39,7 @@ function init() {
   const quality=()=>craneQuality(viewport.clientWidth,viewport.clientHeight,window.devicePixelRatio,window.innerWidth<768,renderer.capabilities.maxTextureSize);
   renderer.setPixelRatio(quality().pixelRatio);
   renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=.92;
+  renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;
   const world=createCraneScene();
   world.lighting.key.shadow.mapSize.setScalar(quality().shadowSize);
   const textures=new Set();
@@ -49,13 +49,13 @@ function init() {
   });
   for(const texture of textures){texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());texture.needsUpdate=true;}
   const updateAmbience=createScrollAmbience(cover);
-  const coolFill=new THREE.Color('#dbe5eb'),warmFill=new THREE.Color('#f0d7b6');
+  const coolFill=new THREE.Color('#e2eaef'),warmFill=new THREE.Color('#f2e6d2');
   updateAmbience(0);
   const pmrem=new THREE.PMREMGenerator(renderer);
   const studio=new RoomEnvironment();
   const environment=pmrem.fromScene(studio,.055);
   world.scene.environment=environment.texture;
-  world.scene.environmentIntensity=.38;
+  world.scene.environmentIntensity=.7;
   studio.dispose();pmrem.dispose();
   const pipeline=createCraneRenderer(renderer,world,quality().contactSamples);
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
@@ -84,18 +84,24 @@ function init() {
     frame=0;
     const dt=Math.min(.1,(now-lastTime)/1000||1/60);lastTime=now;
     progress=Math.abs(targetProgress-progress)<.00015?targetProgress:progress+(targetProgress-progress)*(1-Math.exp(-14*dt));
-    const ambience=updateAmbience(progress);
-    world.lighting.fill.color.copy(coolFill).lerp(warmFill,ambience.warm);
+    // Postojeća priča se mjeri u "story vremenu"; posle STORY_END ide ulazak u enterijer.
+    const storyT=clamp(progress/STORY_END);
+    const interiorT=smooth(STORY_END,.78,progress);
+    const ambience=updateAmbience(storyT);
+    // U enterijeru se toplo svetlo povlači — soba treba da ostane svetla i vazdušasta.
+    world.lighting.fill.color.copy(coolFill).lerp(warmFill,ambience.warm*(1-interiorT));
     // Full-width canvas throughout: lens framing holds the opening between columns.
     const middleWidth=Math.min(window.innerWidth,1680)*(window.innerWidth<1200?.45:.47);
     const framingCorrection=Math.max(1,height/middleWidth)/Math.max(1,height/width);
-    const framing=window.innerWidth<1024?1+.13*smooth(.32,.62,progress):framingCorrection*(1+.22*smooth(.28,.58,progress));
+    const framing=window.innerWidth<1024?1+.13*smooth(.32,.62,storyT):framingCorrection*(1+.22*smooth(.28,.58,storyT));
     const openingFrame=framing;
-    const siteEntry=smooth(.68,.88,progress);
+    const siteEntry=smooth(.68,.88,storyT);
     const state=world.update(progress,width/height,openingFrame+(1-openingFrame)*siteEntry);
     cover.dataset.siteEntry=siteEntry.toFixed(3);
-    const siteDissolve=smooth(.43,.46,progress)*(1-smooth(.57,.61,progress));
-    const districtDissolve=smooth(.70,.73,progress)*(1-smooth(.82,.86,progress));
+    // Kucanje rečenice: počinje kad kamera izađe kroz prozor, a završi na dnu hero-a.
+    cover.style.setProperty('--type-p',(reduced.matches?1:smooth(.955,1,progress)).toFixed(4));
+    const siteDissolve=smooth(.43,.46,storyT)*(1-smooth(.57,.61,storyT));
+    const districtDissolve=smooth(.70,.73,storyT)*(1-smooth(.82,.86,storyT));
     pipeline.render((1-siteDissolve)*(1-districtDissolve));
     cover.dataset.sceneChapter=String(state.chapter+1);
     cover.dataset.sceneProgress=progress.toFixed(3);

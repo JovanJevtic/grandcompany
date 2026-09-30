@@ -2,15 +2,21 @@ import * as THREE from '../vendor/three.module.min.js';
 import {craneRigKit} from './crane-rig.js?v=18';
 import {applyConstructionSurfaces} from './crane-surfaces.js?v=18';
 import {RoundedBoxGeometry} from '../vendor/three-addons/geometries/RoundedBoxGeometry.js';
-import {createDeliveryEffects} from './crane-effects.js?v=6';
+import {createDeliveryEffects} from './crane-effects.js?v=7';
 import {detailKit} from './crane-details.js?v=18';
 
 import {architectureKit} from './crane-architecture.js?v=14';
 import {createSiteActivity} from './crane-activity.js?v=11';
+import {buildInterior} from './crane-interior.js?v=3';
 
 export const clamp = (n, a = 0, b = 1) => Math.min(b, Math.max(a, n));
 export const smooth = (a, b, p) => { const t = clamp((p-a)/(b-a)); return t*t*(3-2*t); };
 const mix = THREE.MathUtils.lerp;
+
+// Do ovde traje postojeća priča (kran, dostava, gradilište). Ostatak skrola je nova
+// chapter-a: ulazak u sprat, kroz hodnik i kupatilo, do prozora. Sve staro se zato
+// računa u "story vremenu" (progress / STORY_END), a ulazak koristi sirovi progress.
+export const STORY_END = .7;
 
 // One world, one anchored mast, one payload. All keyframes are reversible.
 export function choreography(progress) {
@@ -36,45 +42,78 @@ export function choreography(progress) {
 
 export function createCraneScene() {
   const scene = new THREE.Scene();
-  const mat = (color, roughness=.65, metalness=0) => new THREE.MeshStandardMaterial({color,roughness,metalness});
-  const m = {
-    yellow:mat('#eaaa19',.34,.45), edge:mat('#be7c08',.4,.45), steel:mat('#353b3c',.5,.65),
-    concrete:mat('#aaa99f',.95), slab:mat('#c9c5ba',.92), brick:mat('#ad6547',.9),
-    timber:mat('#b99459',.85), pale:mat('#e8e3d4',.85), white:mat('#e4e3d8',.4),
-    glass:mat('#36545a',.23,.55), rubber:mat('#262826'), ground:mat('#d8cfba',1),
-    line:mat('#f7fafd'), blue:mat('#596e78'), darkWood:mat('#816640'),
-    skin:mat('#bf9279',.85), net:mat('#778a73',.95), red:mat('#ae4935',.55,.25), joint:mat('#a9bccf',.95), hazard:mat('#efb724',.5,.15), lamp:mat('#fff6d9',.3),
+  const mat = (color, roughness=.85, metalness=0) => new THREE.MeshStandardMaterial({color,roughness,metalness});
+  // ——— Paleta: visoki ključ, gotovo bijeli arhitektonski render ———
+  // Sve boje su namjerno svijetle i desaturirane. Scena je 80–90% bijela/ivory;
+  // grafit ide samo na kablove, čelične šipke i sitne konstruktivne detalje.
+  // Sve je mat (visok roughness, nizak metalness) — bez sjaja i "igračkastog" PBR-a.
+  const PALETTE = {
+    crane: '#d1c4ae',      // topla bež — konstrukcija krana (nekada mustard žuta)
+    craneEdge: '#bfb29a',  // malo dublja bež — ivice, prirubnice, zupčanici
+    steel: '#62676b',      // grafit — kablovi, šipke, sitni čelik
+    galvanized: '#c9c8c2', // svijetli pocinkovani čelik
+    frame: '#6e7377',      // grafitni ramovi (prozori, konzole, rešetka)
+    concrete: '#e2e0da',   // vrlo svijetli beton
+    slab: '#e8e5de',       // ploče, stepenice, ivičnjaci
+    brick: '#d9cfc3',      // blijeda, prigušena cigla
+    facade: '#e4e1d8',     // fasada
+    pale: '#e8e5de',       // palete / građevinski materijal
+    white: '#f1efea',      // kabina, kontejneri, kamion, rampe
+    timber: '#e6dfd0',     // svijetlo drvo
+    darkWood: '#cfc6b4',   // noge palete
+    formwork: '#e0d6c4',   // svijetla oplata
+    earth: '#ded8ce',      // iskop — svijetla zemlja
+    asphalt: '#d9dcde',    // svijetli asfalt
+    paving: '#e4e7e9',     // popločanje
+    ground: '#e4e9ec',     // plato — stapa se sa nebom
+    line: '#fbfcfd',       // horizontalna signalizacija
+    joint: '#c9cdd1',      // dilatacije i fuge
+    blue: '#aeb8bd',       // prigušena plavo-siva (vrata, ograde, rukovalac)
+    red: '#c0a79e',        // prigušena glina (zaštitne noge, rampe)
+    rubber: '#6e7276',     // guma i crijeva
+    skin: '#dcc7b8',       // rukovalac
+    cargo: '#d9cfc3',      // keramički blokovi
+    sling: '#62676b',      // trake za vezivanje
+    hazard: '#ffffff',     // rampe bez crno-žutih pruga (samo tih ton-na-ton)
+    lamp: '#fff9ee',       // stakla lampi
+    glass: '#ccd7db',      // staklo (kabina, kamion)
+    window: '#c8d2d6',     // staklo na zgradama
+    net: '#d6dad8',        // zaštitna mreža skele
   };
-  Object.assign(m,{earth:mat('#806d4f',1),facade:mat('#d7d4c5',.8),frame:mat('#34484d',.4,.45),formwork:mat('#ba682e',.8),asphalt:mat('#727970',.95)});
-  m.galvanized=mat('#89908f',.51,.68);
-  m.cargo=mat('#94684d',.95);m.sling=mat('#50535c',.92);
-  m.window=new THREE.MeshPhysicalMaterial({color:'#253537',roughness:.09,metalness:.32,clearcoat:1,ior:1.5});
-  m.yellow=new THREE.MeshPhysicalMaterial({color:'#aa8a3b',roughness:.56,metalness:.3,clearcoat:.18,clearcoatRoughness:.5});
-  m.edge.color.set('#726042');
-  m.red.color.set('#69473e');m.blue.color.set('#515e62');
-  m.concrete.color.set('#92908a');m.slab.color.set('#aaa59c');
-  m.brick.color.set('#856c59');m.ground.color.set('#cbd9e8');
-  m.ground.roughness=.88;m.ground.metalness=.03;
-  m.paving=mat('#dee9f4',.82,.03);
-  m.earth.color.set('#b6c8da');m.asphalt.color.set('#bccfe1');m.white.color.set('#b5b8af');m.pale.color.set('#bfc0b4');m.timber.color.set('#857964');m.facade.color.set('#a6aaa1');
-  m.net.transparent=true;m.net.opacity=.42;m.net.side=THREE.DoubleSide;
-  m.glass=new THREE.MeshPhysicalMaterial({color:'#273d42',metalness:.28,roughness:.08,transparent:true,opacity:.87,clearcoat:1});
+  const m = {
+    yellow:mat(PALETTE.crane,.84,.02), edge:mat(PALETTE.craneEdge,.86,.02),
+    steel:mat(PALETTE.steel,.7,.2), concrete:mat(PALETTE.concrete,.96),
+    slab:mat(PALETTE.slab,.95), brick:mat(PALETTE.brick,.95),
+    timber:mat(PALETTE.timber,.9), pale:mat(PALETTE.pale,.9),
+    white:mat(PALETTE.white,.86), glass:mat(PALETTE.glass,.38,.06),
+    rubber:mat(PALETTE.rubber,.85), ground:mat(PALETTE.ground,.92,.02),
+    line:mat(PALETTE.line,.9), blue:mat(PALETTE.blue,.85), darkWood:mat(PALETTE.darkWood,.9),
+    skin:mat(PALETTE.skin,.9), net:mat(PALETTE.net,1), red:mat(PALETTE.red,.85),
+    joint:mat(PALETTE.joint,.95), hazard:mat(PALETTE.hazard,.9), lamp:mat(PALETTE.lamp,.4),
+    earth:mat(PALETTE.earth,1), facade:mat(PALETTE.facade,.88),
+    frame:mat(PALETTE.frame,.6,.28), formwork:mat(PALETTE.formwork,.9),
+    asphalt:mat(PALETTE.asphalt,.95), galvanized:mat(PALETTE.galvanized,.8,.1),
+    cargo:mat(PALETTE.cargo,.95), sling:mat(PALETTE.sling,.85),
+    paving:mat(PALETTE.paving,.9), window:mat(PALETTE.window,.38,.07),
+  };
+  m.glass.transparent=true;m.glass.opacity=.78;
+  m.net.transparent=true;m.net.opacity=.35;m.net.side=THREE.DoubleSide;
   if(typeof document!=='undefined') {
     // Fine surface relief keeps the model an illustration with tangible materials.
     let seed=711;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
     const surface=document.createElement('canvas');surface.width=surface.height=512;
     const ctx=surface.getContext('2d'),pixels=ctx.createImageData(512,512);
-    for(let i=0;i<pixels.data.length;i+=4) {const shade=150+random()*80;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=shade;pixels.data[i+3]=255;}
+    for(let i=0;i<pixels.data.length;i+=4) {const shade=182+random()*58;pixels.data[i]=pixels.data[i+1]=pixels.data[i+2]=shade;pixels.data[i+3]=255;}
     ctx.putImageData(pixels,0,0);
     const grain=new THREE.CanvasTexture(surface);grain.wrapS=grain.wrapT=THREE.RepeatWrapping;grain.repeat.set(3,3);
     for(const name of ['concrete','slab','pale','brick']) {m[name].bumpMap=grain;m[name].bumpScale=.012;m[name].roughnessMap=grain;}
     // Broad color variation reads as cast concrete; the fine grain provides relief.
-    const stone=surface.cloneNode();stone.width=stone.height=1024;const sc=stone.getContext('2d');sc.scale(4,4);sc.fillStyle='#ddd9ce';sc.fillRect(0,0,256,256);
-    for(let i=0;i<2600;i++){const value=110+random()*80;sc.fillStyle=`rgba(${value},${value},${value},.08)`;sc.fillRect(random()*256,random()*256,random()*5+1,random()*2+1);}
-    for(let y=0;y<256;y+=64){sc.fillStyle='rgba(80,70,50,.08)';sc.fillRect(0,y,256,1);}
+    const stone=surface.cloneNode();stone.width=stone.height=1024;const sc=stone.getContext('2d');sc.scale(4,4);sc.fillStyle='#f0eeea';sc.fillRect(0,0,256,256);
+    for(let i=0;i<2600;i++){const value=168+random()*72;sc.fillStyle=`rgba(${value},${value},${value},.05)`;sc.fillRect(random()*256,random()*256,random()*5+1,random()*2+1);}
+    for(let y=0;y<256;y+=64){sc.fillStyle='rgba(150,144,132,.035)';sc.fillRect(0,y,256,1);}
     const stoneMap=new THREE.CanvasTexture(stone);stoneMap.colorSpace=THREE.SRGBColorSpace;
     for(const name of ['concrete','slab'])m[name].map=stoneMap;
-    const stripes=surface.cloneNode();stripes.width=stripes.height=1024;const hc=stripes.getContext('2d');hc.scale(4,4);hc.fillStyle='#edac16';hc.fillRect(0,0,256,256);hc.strokeStyle='#262b2a';hc.lineWidth=32;
+    const stripes=surface.cloneNode();stripes.width=stripes.height=1024;const hc=stripes.getContext('2d');hc.scale(4,4);hc.fillStyle='#efede7';hc.fillRect(0,0,256,256);hc.strokeStyle='#dedad1';hc.lineWidth=30;
     for(let x=-256;x<512;x+=80){hc.beginPath();hc.moveTo(x,0);hc.lineTo(x+256,256);hc.stroke();}
     m.hazard.map=new THREE.CanvasTexture(stripes);m.hazard.map.colorSpace=THREE.SRGBColorSpace;m.hazard.color.set('#ffffff');
     const netCanvas=document.createElement('canvas');netCanvas.width=netCanvas.height=64;
@@ -121,21 +160,30 @@ export function createCraneScene() {
     }
   }
   // Once assembled, the entire site can share a handful of instanced draws.
-  function flatten(root) {
+  // `floorList` povezuje svaku instancu sa spratom iz kog je došla: tako spratovi mogu
+  // da rastu i posle spajanja (instanced) — čuvamo im osnovnu matricu i trenutak `at`.
+  function flatten(root,floorList) {
+    const floorOf=new Map();
+    for(const f of floorList||[])f.group.traverse(o=>{if(o.isMesh)floorOf.set(o,f);});
     root.updateWorldMatrix(true,true);
     const inverse=root.matrixWorld.clone().invert(),buckets=new Map(),matrix=new THREE.Matrix4();
     root.traverse(o=>{
       if(!o.isMesh)return;
       const key=o.geometry.uuid+o.material.uuid;
-      if(!buckets.has(key))buckets.set(key,{geometry:o.geometry,material:o.material,matrices:[]});
-      const local=inverse.clone().multiply(o.matrixWorld);
-      if(o.isInstancedMesh)for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);buckets.get(key).matrices.push(local.clone().multiply(matrix));}
-      else buckets.get(key).matrices.push(local);
+      if(!buckets.has(key))buckets.set(key,{geometry:o.geometry,material:o.material,matrices:[],growth:[]});
+      const info=floorOf.get(o)||null,local=inverse.clone().multiply(o.matrixWorld);
+      const bucket=buckets.get(key);
+      if(o.isInstancedMesh)for(let i=0;i<o.count;i++){o.getMatrixAt(i,matrix);bucket.matrices.push(local.clone().multiply(matrix));bucket.growth.push(info);}
+      else {bucket.matrices.push(local);bucket.growth.push(info);}
     });
     const result=new THREE.Group();
     for(const b of buckets.values()){
       const inst=new THREE.InstancedMesh(b.geometry,b.material,b.matrices.length);
-      b.matrices.forEach((matrix,i)=>inst.setMatrixAt(i,matrix));inst.castShadow=![m.ground,m.asphalt,m.paving].includes(inst.material);inst.receiveShadow=true;result.add(inst);
+      b.matrices.forEach((matrix,i)=>inst.setMatrixAt(i,matrix));inst.castShadow=![m.ground,m.asphalt,m.paving].includes(inst.material);inst.receiveShadow=true;
+      // Sav materijal ide u iste draw pozive kao i pre; samo instance sa spratom dobijaju
+      // mogućnost da rastu (osnovna matrica + visina osnove + `at`).
+      if(b.growth.some(Boolean)){inst.instanceMatrix.setUsage(THREE.DynamicDrawUsage);inst.userData.growthBase=new Float32Array(inst.instanceMatrix.array);inst.userData.growthInfo=b.growth.map(v=>v?{y:v.height,at:v.at}:null);}
+      result.add(inst);
     }
     return result;
   }
@@ -191,9 +239,9 @@ export function createCraneScene() {
   // Real signage connects the crane to the storefront identity.
   if(typeof document!=='undefined') {
     const sign=document.createElement('canvas');sign.width=1024;sign.height=192;
-    const sc=sign.getContext('2d');sc.fillStyle='#f5f5f0';sc.fillRect(0,0,1024,192);
-    sc.fillStyle='#edc54b';sc.fillRect(0,0,180,192);
-    sc.fillStyle='#222722';sc.font='bold 140px sans-serif';sc.fillText('G',30,149);
+    const sc=sign.getContext('2d');sc.fillStyle='#f7f6f2';sc.fillRect(0,0,1024,192);
+    sc.fillStyle='#d6cbb6';sc.fillRect(0,0,180,192);
+    sc.fillStyle='#4c5155';sc.font='bold 140px sans-serif';sc.fillText('G',30,149);
     sc.font='bold 92px sans-serif';sc.fillText('GRAND',210,108);
     sc.font='26px sans-serif';sc.fillText('C O M P A N Y',218,155);
     const signTexture=new THREE.CanvasTexture(sign);signTexture.colorSpace=THREE.SRGBColorSpace;
@@ -236,7 +284,7 @@ export function createCraneScene() {
     for(const side of [0,1]) {
       const tag=new THREE.Mesh(new THREE.PlaneGeometry(.72,.45),paper);tag.position.set(side?.837:0,.89,side?0:.627);tag.rotation.y=side?Math.PI/2:0;load.add(tag);
     }
-    const wrap=new THREE.MeshPhysicalMaterial({color:'#d8dfdd',roughness:.3,metalness:0,transparent:true,opacity:.09,depthWrite:false,clearcoat:.8});
+    const wrap=new THREE.MeshStandardMaterial({color:'#e6ebe9',roughness:.55,metalness:0,transparent:true,opacity:.07,depthWrite:false});
     const film=new THREE.Mesh(new THREE.BoxGeometry(1.67,.84,1.24),wrap);film.position.y=.82;load.add(film);
   }
   const hook=group(load,0,2.8,0);
@@ -255,7 +303,8 @@ export function createCraneScene() {
   for(let x=-50;x<52;x+=2)box(site,m.line,x,.03,8,.8,.012,.07);
   for(let x=-50;x<52;x+=1.5)box(site,m.paving,x,.12,5.8,1.4,.24,.2);
   for(let x=-32;x<=40;x+=2) {
-    if(x>=-4&&x<2)continue;
+    // Otvori: glavni ulaz i prolaz do kulisа zgrade na ivici.
+    if(x>=-4&&x<2)continue;if(x>=20&&x<36)continue;
     rod(site,m.steel,[x,0,13.5],[x,1.7,13.5],.035);
     box(site,m.slab,x+1,.85,13.5,1.95,1.6,.06);
   }
@@ -307,7 +356,8 @@ export function createCraneScene() {
       details.floor(level,{w,d,f,n,brick});
       architecture.floor(level,{w,d,f,n,style});
       if(style==='residential'&&f>=n-1){level.scale.x=.8;level.scale.z=.8;}
-      batch(level);floors.push({group:level,height:f*2.35,at:.47+offset+f*.016});
+      // `at` = trenutak u kome sprat počinje da niče; viši spratovi malo kasnije.
+      batch(level);floors.push({group:level,height:f*2.35,at:.46+offset+f*.019});
     }
     return base;
   }
@@ -315,6 +365,26 @@ export function createCraneScene() {
   building(-7,-8,6,6,6,.005,false,'frame');
   building(1,-10,6,6,7,.02,false,'office');
   building(12,-10,7,6,9,.035,true,'residential');
+  // ——— Kulisа zgrada: otvoren betonski skelet na ivici gradilišta ———
+  // U nju kamera ulazi u završnoj chapter-i. Namjerno je bez zidova na ±X stranama i bez
+  // cigle na spratu u koji se ulazi, pa je prolaz i prozor otvoren. Raste kao i ostale.
+  const SW=10,SD=6,SN=3,studio=group(site,27,0,13);
+  for(let f=0;f<=SN;f++) {
+    const level=group(studio,0,f*2.35,0);
+    box(level,m.slab,0,.1,0,SW,.2,SD);
+    if(f<SN) {
+      // Stubovi samo po ivicama (±Z), da sredina ostane prohodna za kameru.
+      for(const px of [-4.7,0,4.7])for(const pz of [-2.7,2.7])box(level,m.concrete,px,1.22,pz,.32,2.3,.32);
+      for(const pz of [-2.7,2.7])box(level,m.concrete,0,2.17,pz,SW,.34,.3);
+      for(const px of [-4.7,4.7])box(level,m.concrete,px,2.17,0,.3,.34,SD);
+      // Cigla samo na donja dva sprata i samo na ±Z stranama; +X i -X ostaju otvoreni.
+      if(f<SN-1)for(let px=-4.2;px<4.5;px+=1.9)for(const side of [-1,1]) {
+        box(level,m.brick,px,.6,side*(SD/2-.2),1.7,.9,.18);
+        for(let row=0;row<4;row++)box(level,m.slab,px,.2+row*.19,side*(SD/2-.11),1.68,.013,.012);
+      }
+    }
+    batch(level);floors.push({group:level,height:f*2.35,at:.46+f*.02});
+  }
   // Neighbouring work zones fill the periphery as the camera enters the site.
   const district=group(scene),districtFloorStart=floors.length;
   building(-23,-13,10,9,5,.015,false,'frame',district);
@@ -361,7 +431,10 @@ export function createCraneScene() {
   }
   pallet(truck,-.8,1,0);details.truck(truck);batch(truck);details.site(site);batch(site);
   const growingParts=[...site.children];
-  const finishedSite=flatten(site);site.add(finishedSite);
+  const finishedSite=flatten(site,floors);site.add(finishedSite);
+  // Instanced mesh-evi u kojima ima spratova koji rastu.
+  const growthMeshes=[];
+  finishedSite.traverse(o=>{if(o.isInstancedMesh&&o.userData.growthBase)growthMeshes.push(o);});
   function architecturalFade(root) {
     const copies=new Map();
     root.traverse(object=>{
@@ -380,25 +453,89 @@ export function createCraneScene() {
   }
   const siteFade=architecturalFade(finishedSite);
   const districtFade=architecturalFade(finishedDistrict);
-  const ambient=new THREE.HemisphereLight('#e9eced','#403d38',.3);scene.add(ambient);
-  const key=new THREE.DirectionalLight('#fff4e5',3.2);key.position.set(-22,29,12);key.castShadow=true;
+
+  // ——— Enterijer završne chapter-e: hodnik -> kupatilo -> prozor u nebo ———
+  // Stoji na spratu 1 kulisа zgrade (27,13), a vidljiv je tek kad kamera priđe.
+  const interiorRoot=new THREE.Group();
+  interiorRoot.position.set(27,2.35,13);
+  buildInterior({parent:interiorRoot,box,rod,m});
+  scene.add(interiorRoot);
+  const interiorFade=architecturalFade(interiorRoot);
+  // Mekano, toplo svetlo u sobi — spoljno svetlo ne dopire ispod ploče sprata iznad.
+  const interiorLight=new THREE.PointLight('#fff4e6',0,16,2);
+  interiorLight.position.set(27,4.35,13);scene.add(interiorLight);
+  interiorRoot.visible=false;interiorFade(0);
+
+  // Putanja kamere kroz enterijer, u sirovom progresu (od STORY_END do 1): spust sa
+  // sprata dostave, pa ravan let kroz otvorenu stranu, hodnik i kupatilo do prozora.
+  const INTERIOR_KEYS=[
+    [.72, 20.3,14.5,10.8,  8.7,11.2,-.5],  // nastavak na kraj postojeće priče
+    [.78, 15.0,9.0,14.5,   24,5.5,13.5],   // spust i skretanje ka zgradi
+    [.83, 17.5,4.4,13.2,   28,4.0,13.0],   // u ravni sprata, ispred otvorene strane
+    [.88, 22.5,3.9,13.0,   32,4.1,13.0],   // ulaz kroz otvorenu stranu
+    [.93, 26.0,3.8,13.0,   34,4.15,13.0],  // kroz hodnik u kupatilo
+    [.965,29.2,3.82,13.0,  37,4.15,13.0],  // pred prozorom
+    [.99, 32.6,3.85,13.0,  41,4.6,13.0],   // izlazak kroz prozor
+    [1.0,  35.0,3.9,13.0,  45,7.4,13.0],   // napolju — ostaje samo nebo
+  ];
+  const _interiorPos=new THREE.Vector3(),_interiorLook=new THREE.Vector3();
+  function interiorPath(p) {
+    const k=INTERIOR_KEYS;
+    let i=k.length-2;
+    for(let j=0;j<k.length-1;j++)if(p<k[j+1][0]){i=j;break;}
+    const a=k[i],b=k[i+1],tt=smooth(a[0],b[0],p);
+    _interiorPos.set(mix(a[1],b[1],tt),mix(a[2],b[2],tt),mix(a[3],b[3],tt));
+    _interiorLook.set(mix(a[4],b[4],tt),mix(a[5],b[5],tt),mix(a[6],b[6],tt));
+    return {position:_interiorPos,look:_interiorLook};
+  }
+  const ambient=new THREE.HemisphereLight('#f2f4f5','#cbc7bf',.5);scene.add(ambient);
+  const key=new THREE.DirectionalLight('#fff8ef',2.9);key.position.set(-22,29,12);key.castShadow=true;
   key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-48,right:48,top:45,bottom:-40,near:1,far:150});key.shadow.radius=4;key.shadow.bias=-.0003;key.shadow.normalBias=.04;scene.add(key);
-  const fill=new THREE.DirectionalLight('#d6e1e8',.28);fill.position.set(20,15,-20);scene.add(fill);
-  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.ShadowMaterial({opacity:.34}));
+  const fill=new THREE.DirectionalLight('#e4ebef',.42);fill.position.set(20,15,-20);scene.add(fill);
+  const shadow=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.ShadowMaterial({opacity:.2}));
   shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.35;shadow.receiveShadow=true;scene.add(shadow);
   const deliveryEffects=createDeliveryEffects(scene);
   const camera=new THREE.PerspectiveCamera(37,1,.1,220);
   const target=new THREE.Vector3();
+  // ——— Rast gradilišta ———
+  // Svaki sprat niče (skalira se po visini oko svoje ploče) u trenutku `at`. Instanced
+  // matrice se vraćaju na osnovu pa se skalira samo Y-red — zato rast i dalje radi u
+  // istim draw pozivima (bez ponovnog instanciranja scene po spratu).
+  const GROW_DURATION=.11,GROW_LIMIT=.8;
+  let growthFinalized=false;
+  function applyGrowth(p) {
+    if(p>=GROW_LIMIT) {
+      if(growthFinalized)return;
+      for(const inst of growthMeshes){inst.instanceMatrix.array.set(inst.userData.growthBase);inst.instanceMatrix.needsUpdate=true;}
+      growthFinalized=true;return;
+    }
+    growthFinalized=false;
+    for(const inst of growthMeshes) {
+      const base=inst.userData.growthBase,info=inst.userData.growthInfo,a=inst.instanceMatrix.array;
+      for(let i=0;i<inst.count;i++) {
+        const o=i*16,meta=info[i];
+        const g=meta?clamp(smooth(meta.at,meta.at+GROW_DURATION,p)):1;
+        // Kolonski (column-major) zapis: Y koeficijenti su 1,5,9; translacija po Y je 13.
+        a[o]=base[o];a[o+1]=base[o+1]*g;a[o+2]=base[o+2];a[o+3]=base[o+3];
+        a[o+4]=base[o+4];a[o+5]=base[o+5]*g;a[o+6]=base[o+6];a[o+7]=base[o+7];
+        a[o+8]=base[o+8];a[o+9]=base[o+9]*g;a[o+10]=base[o+10];a[o+11]=base[o+11];
+        a[o+12]=base[o+12];a[o+13]=base[o+13]*g+(meta?meta.y:0)*(1-g);a[o+14]=base[o+14];a[o+15]=base[o+15];
+      }
+      inst.instanceMatrix.needsUpdate=true;
+    }
+  }
   function update(p,aspect=1,framing=1) {
-    const s=choreography(p);
-    deliveryEffects.update(p);
+    // `t` je "story vreme" (0..1) postojeće priče; `p` je sirovi progres preko celog skrola.
+    const t=clamp(p/STORY_END);
+    const s=choreography(t);
+    deliveryEffects.update(t);
     slew.rotation.y=s.slew;
     // Payload bottoms out exactly on the receiving slab, never through it.
-    const trolleyX=15+smooth(0,.45,p);
+    const trolleyX=15+smooth(0,.45,t);
     trolley.position.x=load.position.x=trolleyX;
     festoon.update(trolleyX);
     load.position.y=s.loadY-25;
-    load.rotation.y=Math.sin(p*Math.PI)*.035*(1-smooth(.65,.95,p));
+    load.rotation.y=Math.sin(t*Math.PI)*.035*(1-smooth(.65,.95,t));
     hook.position.y=2.8-s.slack*.23;
     const top=26, bottom=s.loadY+(hook.position.y+.45)*load.scale.y;
     hoists.forEach((hoist,i)=>{hoist.position.set(trolleyX,(top+bottom)/2-25,i===0?-.12:.12);hoist.scale.y=top-bottom;});
@@ -409,25 +546,30 @@ export function createCraneScene() {
         const delta=end.clone().sub(start),part=sling.parts[i];part.position.copy(start.clone().add(end).multiplyScalar(.5));part.scale.y=delta.length();part.quaternion.setFromUnitVectors(unitY,delta.normalize());
       });
     }
-    activityRoot.visible=p>.57;
-    activity.update(p);
-    const travel=11*smooth(.51,.72,p);truck.position.x=-10+travel;
+    activityRoot.visible=t>.57;
+    activity.update(t);
+    const travel=11*smooth(.51,.72,t);truck.position.x=-10+travel;
     wheels.forEach(wheel=>{wheel.rotation.z=-travel/.38;});
-    site.visible=p>.46;
+    site.visible=t>.46;
     // Keep the side copy clear until it has scrolled past the scene.
-    district.visible=p>.73;
+    district.visible=t>.73;
     district.scale.y=1;
-    districtFade(smooth(.73,.82,p));
+    districtFade(smooth(.73,.82,t));
     for(const f of floors) {f.group.visible=true;f.group.scale.y=1;f.group.position.y=f.height;}
-    siteFade(smooth(.46,.57,p));
-    key.shadow.intensity=smooth(.46,.6,p);
+    applyGrowth(t);
+    siteFade(smooth(.46,.57,t));
+    key.shadow.intensity=smooth(.46,.6,t);
     site.position.y=0;
     activityRoot.position.y=site.position.y;
     scaffold.visible=true;
     scaffold.scale.y=1;
     const assembled=true;
-    growingParts.forEach(part=>{part.visible=!assembled&&(part!==scaffold||p>.60);});
+    growingParts.forEach(part=>{part.visible=!assembled&&(part!==scaffold||t>.60);});
     finishedSite.visible=assembled;
+    // Enterijer se pojavljuje (i blago izranja) tek pred ulazak kamere.
+    interiorRoot.visible=p>STORY_END-.02;
+    interiorFade(smooth(STORY_END-.02,STORY_END+.04,p));
+    interiorLight.intensity=9*smooth(STORY_END-.02,STORY_END+.06,p);
     target.set(...s.target);
     // Portrait framing is wider so the jib never falls off the screen.
     let distance=s.distance*Math.max(1,1.0/aspect)*framing;
@@ -443,8 +585,8 @@ export function createCraneScene() {
       const offset=new THREE.Vector3(...point).sub(target),depth=offset.dot(forward);
       fit=Math.max(fit,depth+Math.abs(offset.dot(right))/(tangent*aspect*.94),depth+Math.abs(offset.dot(up))/(tangent*.92));
     }
-    distance=mix(distance,fit,smooth(.46,.68,p)*(1-smooth(.68,.86,p)));
-    if(p>.68) {
+    distance=mix(distance,fit,smooth(.46,.68,t)*(1-smooth(.68,.86,t)));
+    if(t>.68) {
       // Follow the delivery into the roof, while keeping the entire cargo visible.
       for(const x of [7.7,10.3])for(const y of [s.loadY,s.loadY+4.05])for(const z of [-1.05,1.05]) {
         const offset=new THREE.Vector3(x,y,z).sub(target),depth=offset.dot(forward);
@@ -452,7 +594,15 @@ export function createCraneScene() {
       }
     }
     camera.position.set(target.x+Math.sin(s.azimuth)*Math.cos(s.elevation)*distance,target.y+Math.sin(s.elevation)*distance,target.z+Math.cos(s.azimuth)*Math.cos(s.elevation)*distance);
+    // Završna chapter-a preuzima kameru: glatko se spoji sa orbitom pa ide kroz enterijer.
+    const interiorT=smooth(STORY_END,STORY_END+.1,p);
+    if(interiorT>0) {
+      const path=interiorPath(p);
+      camera.position.lerp(path.position,interiorT);
+      target.lerp(path.look,interiorT);
+    }
     camera.aspect=aspect;camera.lookAt(target);camera.updateProjectionMatrix();
+    if(p>=STORY_END)s.chapter=4;
 
     return s;
   }

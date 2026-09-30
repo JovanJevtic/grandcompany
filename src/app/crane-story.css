@@ -34,16 +34,17 @@
 }
 
 /* Wordmark pojas (wordmark je fiksiran u SiteChrome): providan je i "lebdi" iznad sadržaja.
-   Preko neba i preko krem sekcija je tamno plav; preko tamnog podnožja prelazi u bijelo.
-   Podloga postoji samo dok je ispod krem sekcija, i tada je iste boje kao sekcija — ne vidi se. */
+   Preko svijetlih sekcija je tamno plav; preko tamnog podnožja prelazi u bijelo.
+   Podloge NEMA — ni pravougaonika ni gradijenta; samo slova preko sadržaja. */
 [data-brand-band] {
   color: var(--ink);
+  background: none;
   transition: color 0.35s ease;
 }
 
 [data-brand-band].brand-dark {
   color: var(--ink);
-  background: linear-gradient(to bottom, var(--bg) 58%, rgba(248, 250, 252, 0));
+  background: none;
 }
 [data-brand-band].brand-light {
   color: #fff;
@@ -174,6 +175,66 @@
   transform-origin: left;
 }
 
+/* ——— Rečenica koja se na kraju ispisuje kao na pisacoj mašini ———
+   Skrol je vozi preko `--type-p` (0..1) koji postavlja scena; svako slovo ima svoj prag
+   `--th`, pa se pojavljuje tačno kad do njega stigne. Layout je fiksan — ništa ne skače. */
+.story-type {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: min(88vw, 1180px);
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+  font-family: var(--font-display), Georgia, "Times New Roman", serif;
+  font-style: italic;
+  font-weight: 600;
+  font-size: clamp(26px, 4.3vw, 72px);
+  line-height: 1.14;
+  letter-spacing: 0.004em;
+  color: var(--story-ink);
+  pointer-events: none;
+}
+.story-type span {
+  /* Diskretno po slovo: *240 čini da se svako pojavi gotovo u trenutku. */
+  opacity: clamp(0, calc((var(--type-p, 0) - var(--th, 0)) * 240), 1);
+}
+.story-type-caret {
+  display: inline-block;
+  width: 0.045em;
+  height: 0.9em;
+  margin-left: 0.06em;
+  vertical-align: -0.08em;
+  background: currentColor;
+  opacity: clamp(0, calc((var(--type-p, 0) - 0.985) * 60), 1);
+  animation: story-caret 1s steps(1, end) infinite;
+}
+@keyframes story-caret {
+  0%,
+  50% {
+    visibility: visible;
+  }
+  50.01%,
+  100% {
+    visibility: hidden;
+  }
+}
+
+@media (max-width: 767px) {
+  .story-type {
+    width: min(90vw, 640px);
+    line-height: 1.2;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-type-caret {
+    animation: none;
+  }
+}
+
 /* ——— Sadržaj preko scene ——— */
 
 .story-content {
@@ -193,8 +254,9 @@
   min-height: calc(100svh - var(--story-header));
 }
 .story-immersion {
-  /* Prazan prostor kroz koji se scena krana odigrava do kraja; teksta nema. */
-  height: 250svh;
+  /* Prazan prostor kroz koji se scena odigrava: prvo kran i dostava, pa ulazak u sprat
+     i prolaz kroz kupatilo do prozora. Duže je nego ranije da nova chapter dobije skrol. */
+  height: 380svh;
   pointer-events: none;
 }
 
@@ -234,7 +296,7 @@
   /* Na mobilnom je sadržaj kratak, pa prazan prostor drži scenu u kadru dovoljno dugo
      da se animacija krana odigra (bez njega je sekcija kraća od ekrana). */
   .story-immersion {
-    height: 200svh;
+    height: 320svh;
   }
   .scene-caption {
     bottom: 16px;

@@ -10,7 +10,10 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     function update(time: number) {
-      lenisRef.current?.lenis?.raf(time * 1000)
+      const lenis = lenisRef.current?.lenis
+      lenis?.raf(time * 1000)
+      // Ostavljamo ručku za programsko skrolovanje (npr. scrubber u Kaolin sekciji).
+      window.__gcLenis = lenis ?? null
     }
     gsap.ticker.add(update)
     gsap.ticker.lagSmoothing(0)

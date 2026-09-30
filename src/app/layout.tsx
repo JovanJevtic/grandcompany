@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Splash from "@/components/Splash";
@@ -10,6 +11,15 @@ const interTight = Inter_Tight({
   subsets: ["latin", "latin-ext"],
 });
 
+// Display serif (italic) za kratke rečenice preko scene. Bodoni Moda je OFL —
+// slobodna i za komercijalnu upotrebu; 72pt rez je namijenjen velikim veličinama.
+const displaySerif = localFont({
+  src: [{ path: "./fonts/BodoniModa-SemiBoldItalic.ttf", weight: "600", style: "italic" }],
+  variable: "--font-display",
+  display: "swap",
+  adjustFontFallback: "Times New Roman",
+});
+
 export const metadata: Metadata = {
   title: "GRAND COMPANY — Građevinski materijal, Banja Luka",
   description:
@@ -18,7 +28,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${interTight.variable} antialiased`}>
+    <html lang="bs" className={`${interTight.variable} ${displaySerif.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}
