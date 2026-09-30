@@ -110,11 +110,11 @@ function Elevation({ L, H, wool }: { L: number; H: number; wool: boolean }) {
       ))}
       {/* kote */}
       <path d={`M${x0} ${y0 + h + 18}H${x0 + w}M${x0} ${y0 + h + 12}v12M${x0 + w} ${y0 + h + 12}v12`} opacity={0.7} />
-      <text x={x0 + w / 2} y={y0 + h + 36} textAnchor="middle" stroke="none" fill="currentColor" className="font-mono text-[11px]">
+      <text x={x0 + w / 2} y={y0 + h + 36} textAnchor="middle" stroke="none" fill="currentColor" className="font-mono" fontSize={15}>
         {f1(L)} m
       </text>
       <path d={`M${x0 - 18} ${y0}V${y0 + h}M${x0 - 24} ${y0}h12M${x0 - 24} ${y0 + h}h12`} opacity={0.7} />
-      <text x={x0 - 26} y={y0 + h / 2} textAnchor="end" dominantBaseline="middle" stroke="none" fill="currentColor" className="font-mono text-[11px]">
+      <text x={x0 - 26} y={y0 + h / 2} textAnchor="end" dominantBaseline="middle" stroke="none" fill="currentColor" className="font-mono" fontSize={15}>
         {f1(H)} m
       </text>
     </svg>
@@ -145,7 +145,7 @@ function Section({ layers, stud, wool }: { layers: number; stud: number; wool: b
         <rect key={`b${y}`} x={x0} y={coreY + core + (y - y0)} width={len} height={board} fill="var(--bg)" />
       ))}
       <path d={`M${x0 + len + 12} ${y0}V${y0 + total}M${x0 + len + 6} ${y0}h12M${x0 + len + 6} ${y0 + total}h12`} opacity={0.7} />
-      <text x={x0 + len / 2} y={y0 + total + 26} textAnchor="middle" stroke="none" fill="currentColor" className="font-mono text-[11px]">
+      <text x={x0 + len / 2} y={y0 + total + 26} textAnchor="middle" stroke="none" fill="currentColor" className="font-mono" fontSize={15}>
         {Math.round(stud + layers * 2 * 12.5)} mm
       </text>
     </svg>
@@ -272,7 +272,7 @@ export default function WallBuilder() {
             </div>
             <div className="md:border-l md:border-ink/20 md:pl-6">
               <p className="mb-3 font-mono text-[11px] uppercase tracking-wider opacity-60">Presjek</p>
-              <Section layers={layers} stud={studMm} wool={wool} />
+              <div className="mx-auto max-w-[180px] md:max-w-none"><Section layers={layers} stud={studMm} wool={wool} /></div>
               <dl className="mt-4 grid gap-1 font-mono text-[11px] uppercase">
                 <div className="flex justify-between">
                   <dt className="opacity-60">Zvučna izolacija</dt>

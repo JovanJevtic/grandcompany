@@ -247,3 +247,13 @@ button:not(:disabled),
   border: 3px solid var(--bg);
   border-radius: 0;
 }
+
+/* Meni/korpa gore desno bi pali preko velikog wordmarka u herosu; pojavljuju se kad wordmark ode.
+   Na punoj vidljivosti nema opacity < 1, pa mix-blend-difference u headeru radi normalno. */
+[data-overlay-header] {
+  transition: opacity 0.5s var(--ease-out), visibility 0.5s;
+}
+html:not([data-past-hero]) [data-overlay-header] {
+  opacity: 0;
+  visibility: hidden;
+}

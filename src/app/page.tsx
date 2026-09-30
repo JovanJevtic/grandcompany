@@ -18,7 +18,10 @@ export default function Home() {
   return (
     <>
       <SiteChrome />
-      <SiteHeader variant="overlay" />
+      {/* Meni i korpa se pojavljuju tek kad veliki wordmark ode (vidi SiteChrome i globals.css). */}
+      <div data-overlay-header>
+        <SiteHeader variant="overlay" />
+      </div>
       <main>
         <CraneHero />
         <SkySwipe />

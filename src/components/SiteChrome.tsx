@@ -80,12 +80,15 @@ export default function SiteChrome() {
         // Wordmark i značka pripadaju herosu. Kad bijeli list prekrije nebo (vrh sekcije #radovi
         // uđe u ekran), slova odlaze naviše kroz masku, a gore lijevo ostaje mali znak. Nazad — obrnuto.
         const after = document.getElementById('radovi')
+        // Pri povratku na početnu (klijentska navigacija) kreće se od herosa.
+        document.documentElement.removeAttribute('data-past-hero')
         const mini = el.querySelector<HTMLElement>('[data-mini]')!
         // Dok su slova sklonjena, uvodna animacija (i njen sigurnosni tajmer) ih ne smije vratiti.
         let gone = false
         if (after) {
           const leave = (out: boolean) => {
             gone = out
+            document.documentElement.toggleAttribute('data-past-hero', out)
             const chars = gsap.utils.toArray<HTMLElement>('.ch', wm)
             if (reduce) {
               gsap.set(chars, { yPercent: out ? -130 : 0 })

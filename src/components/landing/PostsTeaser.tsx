@@ -12,7 +12,9 @@ import { POSTS } from '@/lib/posts'
 // Tri najnovije objave na tamno plavoj stepenastoj traci (profil "valley"). Kartica na hover
 // invertuje boje: bijela ploča izraste odozdo (stepenasto), a crtež i tekst postanu tamni.
 
-const date = (iso: string) => new Date(iso).toLocaleDateString('sr-Latn-BA', { day: '2-digit', month: '2-digit', year: 'numeric' })
+// Datum ručno (dd.mm.gggg.): Node i browser nemaju iste podatke za lokal sr-Latn-BA, pa bi
+// toLocaleDateString dao različit tekst na serveru i u browseru (greška pri hidrataciji).
+const date = (iso: string) => iso.split('-').reverse().join('.') + '.'
 
 export default function PostsTeaser() {
   const root = useRef<HTMLDivElement>(null)

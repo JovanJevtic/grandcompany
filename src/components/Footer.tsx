@@ -60,6 +60,30 @@ export default function Footer() {
         </h2>
       </div>
 
+      {/* Glavne stranice: veliki linkovi preko cijele širine, na hover strelica uđe s lijeva. */}
+      <nav aria-label="Stranice" className="mt-[8dvh] grid border-t-2 border-bg md:mx-[5.3vw] md:grid-cols-4">
+        {[
+          ['Prodavnica', '/prodavnica'],
+          ['Kalkulator', '/#kalkulator'],
+          ['Isporuka', '/#isporuka'],
+          ['Objave', '/objave'],
+        ].map(([label, href], i) => (
+          <Link
+            key={href}
+            href={href}
+            className="group flex items-center justify-between border-b border-bg/25 py-5 text-[clamp(22px,2.2vw,40px)] uppercase leading-none md:border-b-0 md:border-r md:px-5 md:last:border-r-0"
+          >
+            <span className="flex items-baseline gap-4">
+              <span className="font-mono text-[11px] text-accent">0{i + 1}</span>
+              {label}
+            </span>
+            <span aria-hidden className="-translate-x-3 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
+              →
+            </span>
+          </Link>
+        ))}
+      </nav>
+
       {/* Podaci firme i pravne stranice (iz grand-root), složeni u kolone sa linijama od 2px. */}
       <div className="my-[10dvh] grid gap-10 border-t-2 border-bg pt-6 text-micro uppercase sm:grid-cols-2 md:mx-[5.3vw] lg:grid-cols-4 lg:gap-[1.5vw]">
         <div>
