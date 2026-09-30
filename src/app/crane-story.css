@@ -15,7 +15,9 @@
   --sky-top: #eef4f9;
   position: relative;
   isolation: isolate;
-  overflow: clip;
+  /* Samo bočno sječenje: scena se naviše produžava iza wordmarka (vidi .crane-viewport). */
+  overflow-x: clip;
+  overflow-y: visible;
   color: var(--story-ink);
   background: var(--sky-top);
 }
@@ -30,7 +32,6 @@
    Bez njega bi scena krenula odmah uz vrh i prvi kadar bio "preskočen". */
 .story-spacer {
   height: var(--story-header);
-  background: #eef4f9;
 }
 
 /* Wordmark pojas (wordmark je fiksiran u SiteChrome): providan je i "lebdi" iznad sadržaja.
@@ -59,65 +60,93 @@
   height: calc(100svh - var(--story-header));
   /* Negativna margina: sticky scena ne zauzima dodatnu visinu u toku dokumenta. */
   margin-bottom: calc(var(--story-header) - 100svh);
-  overflow: hidden;
+  /* Nebo i platno vire naviše iza wordmarka (top: -header), pa ih ovdje ne sječemo. */
+  overflow: visible;
   pointer-events: none;
   background: var(--sky-top);
 }
 
-/* ——— Nebo ispod krana: tri sloja sa parallaxom ———
-   Slike su generisane (public/sky): meko nebo, oblaci sa providnom pozadinom i grad u
-   izmaglici. Pomjeraju se SAMO preko transform/opacity — to GPU slaže bez ponovnog crtanja,
-   pa skrol ostaje gladak (ranije je animirani blur preko cijelog ekrana kočio svaki kadar).
-   `--scene-progress` (0..1) postavlja scena. */
+/* ——— Nebo ispod krana ——— */
 
 .scene-sky {
   position: absolute;
   inset: 0;
+  /* Produženo naviše iza wordmarka: naslov nema nikakvu podlogu, iza njega je nebo. */
+  top: calc(-1 * var(--story-header));
   overflow: hidden;
   pointer-events: none;
-  background: var(--sky-top);
+  background:
+    radial-gradient(120% 44% at 50% 34%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%),
+    linear-gradient(180deg, #eef4f9 0%, #e8f0f7 22%, #d9e7f2 48%, #c8dae9 76%, #b8cce1 100%);
 }
-.sky-layer {
+
+/* Bijela skica grada uz dno kadra. Dok kran ulazi u kadar skica se zamućuje, blago
+   smanjuje i gubi na intenzitetu — tako ostaje "daleka" i ne takmiči se sa scenom.
+   Zamućenje se NE animira (to je ranije kočilo skrol — cijeli ekran se precrtavao svaki
+   kadar): postoje dvije kopije, oštra i unaprijed zamućena, i one se pretapaju preko
+   opacity. Izgled je isti, a GPU to slaže bez ponovnog crtanja. */
+.sky-line {
   position: absolute;
-  background-repeat: no-repeat;
-  will-change: transform;
-  backface-visibility: hidden;
+  inset: 0;
+  background: url('/hero/skyline.svg') center bottom / 100% auto no-repeat;
+  transform-origin: 50% 100%;
+  transform:
+    translate3d(0, calc(var(--scene-progress, 0) * 3%), 0)
+    scale(calc(1 - var(--scene-progress, 0) * 0.05));
+  opacity: calc((1 - var(--scene-progress, 0) * 0.4) * (1 - var(--scene-progress, 0)));
+  will-change: transform, opacity;
 }
-/* Nebo: najsporiji sloj. Vrh se utapa u boju pojasa sa wordmarkom, da nema šava. */
-.sky-base {
-  inset: -4% -3% -8%;
-  background-image:
-    linear-gradient(180deg, var(--sky-top) 0%, rgba(238, 244, 249, 0) 22%),
-    url('/sky/sky-base.webp');
-  background-size: cover, cover;
-  background-position: center, center top;
-  transform: translate3d(0, calc(var(--scene-progress, 0) * -3%), 0);
+.sky-line--soft {
+  filter: blur(10px);
+  opacity: calc((1 - var(--scene-progress, 0) * 0.4) * var(--scene-progress, 0));
 }
-/* Oblaci: klize brže i blago ulijevo — daju dubinu i ostaju iza rečenice na kraju. */
+
+/* Oblaci: sitni i razbacani, klize kao magla dok se skroluje. */
 .sky-clouds {
-  inset: -6% -12% 30% -6%;
-  background-image: url('/sky/sky-clouds.webp');
-  background-size: cover;
-  background-position: center top;
-  opacity: 0.88;
-  transform: translate3d(calc(var(--scene-progress, 0) * -7%), calc(var(--scene-progress, 0) * -9%), 0);
+  position: absolute;
+  inset: 0;
 }
-/* Grad u izmaglici: uz dno, meko i daleko. Tone i nestaje dok kamera ulazi u gradilište. */
-.sky-city {
-  left: -4%;
-  right: -4%;
-  bottom: -2%;
-  height: 72%;
-  background-image: url('/sky/city-haze.webp');
-  background-size: cover;
-  background-position: center bottom;
-  opacity: clamp(0, calc(0.72 - var(--scene-progress, 0) * 1.4), 0.72);
-  transform: translate3d(0, calc(var(--scene-progress, 0) * 12%), 0);
+.sky-cloud {
+  position: absolute;
+  display: block;
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  will-change: transform;
+  transform: translate3d(0, calc(var(--scene-progress, 0) * var(--drift, -8%)), 0);
+}
+.sky-cloud--a {
+  --drift: -13%;
+  width: 26%;
+  aspect-ratio: 400 / 176.8;
+  left: 2%;
+  top: 5%;
+  opacity: 0.9;
+  background-image: url('/hero/cloud-a.svg');
+}
+.sky-cloud--b {
+  --drift: -7%;
+  width: 20%;
+  aspect-ratio: 400 / 238.08;
+  right: 5%;
+  top: 14%;
+  opacity: 0.72;
+  background-image: url('/hero/cloud-b.svg');
+}
+.sky-cloud--c {
+  --drift: -19%;
+  width: 13%;
+  aspect-ratio: 1 / 1;
+  left: 29%;
+  top: 33%;
+  opacity: 0.5;
+  background-image: url('/hero/cloud-c.svg');
 }
 
 .crane-viewport {
   position: absolute;
   inset: 0;
+  /* Isto kao nebo: platno ide do vrha ekrana, a kamera kadrira kao ranije (setViewOffset). */
+  top: calc(-1 * var(--story-header));
   margin: 0;
   z-index: 1;
 }
@@ -172,16 +201,32 @@
   margin: 0;
   text-align: center;
   text-wrap: balance;
-  font-family: var(--font-signature), "Snell Roundhand", cursive;
-  font-weight: 400;
-  font-size: clamp(44px, 7.4vw, 124px);
-  line-height: 1.12;
+  font-family: var(--font-pretty), Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(34px, 5.4vw, 92px);
+  line-height: 1.06;
+  letter-spacing: -0.01em;
   color: var(--story-ink);
   pointer-events: none;
 }
 .story-word {
   display: inline-block;
   white-space: nowrap;
+}
+/* Kvačica/akcenat iznad slova (demo font ih nema): tanak znak centriran iznad osnovnog slova. */
+.story-word > .story-mark {
+  position: relative;
+}
+.story-word > .story-mark::after {
+  content: attr(data-mark);
+  position: absolute;
+  left: 50%;
+  top: 0.14em;
+  transform: translateX(-50%);
+  font-family: var(--font-inter-tight), sans-serif;
+  font-weight: 200;
+  font-size: 0.6em;
+  line-height: 1;
 }
 .story-word > span {
   --k: clamp(0, calc((var(--type-p, 0) - var(--th, 0)) * 16), 1);
@@ -196,8 +241,8 @@
     width: min(92vw, 640px);
     /* Iznad fiksnog GC znaka sa leve strane, da se ne preklope. */
     top: 34%;
-    font-size: clamp(40px, 12.5vw, 72px);
-    line-height: 1.15;
+    font-size: clamp(30px, 9.6vw, 56px);
+    line-height: 1.1;
   }
 }
 
@@ -281,9 +326,14 @@
   .scene-meter {
     width: 80px;
   }
-  /* Uski ekran: grad je širi od ekrana (cover), pa ga malo spustimo da tornjevi ne dominiraju. */
-  .sky-city {
-    height: 52%;
+  .sky-cloud--a {
+    width: 38%;
+  }
+  .sky-cloud--b {
+    width: 30%;
+  }
+  .sky-cloud--c {
+    width: 19%;
   }
   .story-section {
     min-height: 70svh;
@@ -307,6 +357,9 @@
   .story-opening {
     padding-top: 28px;
   }
+  .sky-cloud--c {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -314,7 +367,8 @@
     position: relative;
     top: 0;
   }
-  .sky-layer {
+  .sky-line,
+  .sky-cloud {
     will-change: auto;
   }
 }

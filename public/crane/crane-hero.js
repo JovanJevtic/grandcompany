@@ -9,7 +9,7 @@ import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
 import {createCraneRenderer} from './crane-renderer.js?v=22';
 import {craneQuality} from './crane-quality.js?v=17';
-import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=29';
+import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=30';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -98,7 +98,7 @@ async function init() {
     if(cancelled){pipeline.dispose();renderer.dispose();return;}
   }
   const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  let lastShadowKey='',skippedShadow=false,progress=0,targetProgress=0,targetOutro=0,outroP=0,frame=0,active=true,width=1,height=1,lastTime=0;
+  let extra=0,frameHeight=1,lastShadowKey='',skippedShadow=false,progress=0,targetProgress=0,targetOutro=0,outroP=0,frame=0,active=true,width=1,height=1,lastTime=0;
   // ——— Rezolucija po mjeri GPU-a ———
   // Najteži kadar (cijelo gradilište) se nacrta u rezoluciji 1 i u punoj, pa iz ta dva vremena
   // (trošak ≈ fiksni dio + dio po pikselu) izračunamo najveću rezoluciju koja staje u ~18 ms.
@@ -153,6 +153,13 @@ async function init() {
       renderer.setPixelRatio(settings.pixelRatio);
       renderer.setSize(width,height,false);pipeline.setSize(width,height);
     }
+    // Platno je produženo naviše iza wordmarka (CSS: top = -visina headera), da naslov nema
+    // traku ispod sebe. Kamera i dalje kadrira samo donji dio (visina `frameHeight`), a gornji
+    // pojas je "prozor" produžen naviše — kadar scene je isti kao prije, piksel za piksel.
+    extra=Math.max(0,-parseFloat(getComputedStyle(viewport).top)||0);
+    frameHeight=Math.max(1,height-extra);
+    if(extra>0)world.camera.setViewOffset(width,frameHeight,0,-extra,width,height);
+    else world.camera.clearViewOffset();
     cover.dataset.renderResolution=`${canvas.width}×${canvas.height}`;
     cover.dataset.shadowResolution=String(settings.shadowSize);
     onScroll();requestDraw();
@@ -190,11 +197,11 @@ async function init() {
     world.lighting.fill.color.copy(coolFill).lerp(warmFill,ambience.warm*(1-interiorT));
     // Full-width canvas throughout: lens framing holds the opening between columns.
     const middleWidth=Math.min(window.innerWidth,1680)*(window.innerWidth<1200?.45:.47);
-    const framingCorrection=Math.max(1,height/middleWidth)/Math.max(1,height/width);
+    const framingCorrection=Math.max(1,frameHeight/middleWidth)/Math.max(1,frameHeight/width);
     const framing=window.innerWidth<1024?1+.13*smooth(.32,.62,storyT):framingCorrection*(1+.22*smooth(.28,.58,storyT));
     const openingFrame=framing;
     const siteEntry=smooth(.68,.88,storyT);
-    const state=world.update(progress,width/height,openingFrame+(1-openingFrame)*siteEntry);
+    const state=world.update(progress,width/frameHeight,openingFrame+(1-openingFrame)*siteEntry);
     cover.dataset.siteEntry=siteEntry.toFixed(3);
     // Kucanje rečenice: počinje kad kamera izađe kroz prozor, a završi na dnu hero-a.
     // Pisanje: prvih ~72% outra piše rečenicu, ostatak je mirovanje na gotovom tekstu.

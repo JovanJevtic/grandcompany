@@ -8,7 +8,7 @@ import {detailKit} from './crane-details.js?v=18';
 import {architectureKit} from './crane-architecture.js?v=14';
 import {createSiteActivity} from './crane-activity.js?v=11';
 import {buildTowerBath} from './crane-interior.js?v=4';
-import {buildFinish,ENTRY} from './crane-finish.js?v=1';
+import {buildFinish,ENTRY} from './crane-finish.js?v=2';
 
 export const clamp = (n, a = 0, b = 1) => Math.min(b, Math.max(a, n));
 export const smooth = (a, b, p) => { const t = clamp((p-a)/(b-a)); return t*t*(3-2*t); };
