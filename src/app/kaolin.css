@@ -1,12 +1,12 @@
-/* ——— Kaolin: JEDAN 3D objekat koji se deformiše kroz faze ———
-   Nema smene slika: ista lopta mijenja hrapavost, kristalnost i udubljenje, pa je
-   uvijek iste veličine i na istom mjestu. Skrol (ili scrubber linija) vozi transformaciju.
-   Pod i horizont crta sama scena, a nebo iza je boja stranice (canvas je providan). */
+/* ——— Kaolin: od kamena do umivaonika, kroz 9 poravnatih rendera ———
+   Slike su složene jedna preko druge; skript (public/kaolin/kaolin-stages.js) na skrol
+   pretapa dvije susjedne (opacity + blur + blagi scale), pa forma "prelazi" u sljedeću.
+   Sve slike imaju isti kadar (1400×1000) i isti pod, pa objekat ne skače. */
 
 .kaolin {
   position: relative;
   background: var(--bg);
-  height: 440vh;
+  height: 520vh;
   margin-block: 16dvh;
 }
 
@@ -15,14 +15,45 @@
   top: 0;
   height: 100dvh;
   overflow: clip;
+  display: grid;
+  place-items: center;
 }
 
-.kaolin-stage canvas {
+.kaolin-object {
+  position: relative;
+  margin: 0;
+  width: min(94vw, calc(76dvh * 1.4));
+  aspect-ratio: 1400 / 1000;
+  transform: translateY(-4dvh);
+}
+
+.kaolin-stack,
+.kaolin-stack img {
   position: absolute;
   inset: 0;
-  display: block;
+}
+.kaolin-stack img {
   width: 100%;
   height: 100%;
+  object-fit: contain;
+  /* Skaliranje iz tačke gdje objekat dodiruje pod — forma "raste" iz poda, ne lebdi. */
+  transform-origin: 50% 93%;
+  will-change: opacity, filter, transform;
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Mekana sjenka na podu (pod objektom je na 93% visine kadra). Širinu joj daje skript. */
+.kaolin-shadow {
+  position: absolute;
+  left: 50%;
+  top: 93%;
+  width: calc(var(--sw, 0.56) * 100%);
+  height: 7%;
+  transform: translate(-50%, -55%) scaleX(var(--sb, 1));
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(30, 42, 54, 0.26), rgba(30, 42, 54, 0.1) 55%, rgba(30, 42, 54, 0));
+  filter: blur(6px);
 }
 
 /* ——— Linija za modeliranje ——— */
@@ -110,8 +141,13 @@
 
 @media (max-width: 767px) {
   .kaolin {
-    height: 320vh;
+    height: 400vh;
     margin-block: 10dvh;
+  }
+  .kaolin-object {
+    /* Kadar je providan oko objekta, pa smije biti širi od ekrana — objekat ostaje krupan. */
+    width: 122vw;
+    transform: translateY(-6dvh);
   }
   .kaolin-bar {
     width: min(80vw, 520px);
