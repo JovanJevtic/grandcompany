@@ -83,7 +83,7 @@ export default function Splash() {
       aria-hidden
       className="splash"
       // Isti stil i u markup-u, da splash prekrije stranu i prije nego stigne CSS.
-      style={{ background: '#222a36', position: 'fixed', inset: 0, zIndex: 900, overflow: 'hidden' }}
+      style={{ background: '#1a2331', position: 'fixed', inset: 0, zIndex: 900, overflow: 'hidden' }}
     >
       <div className="splash-frame">
         {([[-1, -1], [1, -1], [-1, 1], [1, 1]] as const).map(([sx, sy], i) => (
