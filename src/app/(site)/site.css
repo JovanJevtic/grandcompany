@@ -1,0 +1,9 @@
+.site-select { appearance:none; background:transparent; border:2px solid currentColor; min-height:42px; padding:.65rem 2rem .65rem .75rem; text-transform:uppercase; font:500 11px/1 var(--font-mono-src),monospace }
+.site-input { border:2px solid currentColor; min-height:42px; padding:.65rem .75rem; background:transparent; font:500 11px/1 var(--font-mono-src),monospace; text-transform:uppercase }
+.product-card:hover { border-width:4px; background:var(--navy); color:var(--bg) }
+.product-card:hover [data-glyph] { transform:translateY(-7px) }
+[data-glyph] { transition:transform .45s var(--ease-out) }
+.article-copy p,.article-copy li { font-size:clamp(18px,1.55vw,25px); line-height:1.5; font-weight:500 }
+.article-copy h2 { margin-top:4rem; font-size:clamp(28px,4vw,64px); line-height:.95; text-transform:uppercase }
+.article-copy ul { list-style:square; padding-left:1.25rem }
+.article-copy li::marker { color:var(--accent) }
