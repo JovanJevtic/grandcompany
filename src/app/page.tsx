@@ -4,6 +4,7 @@ import SiteChrome from "@/components/SiteChrome";
 import SiteHeader from "@/components/site/SiteHeader";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
+import Kaolin from "@/components/shop/Kaolin";
 import Pricing from "@/components/shop/Pricing";
 import BrandsSplit from "@/components/landing/BrandsSplit";
 import CraneBand from "@/components/landing/CraneBand";
@@ -26,6 +27,8 @@ export default function Home() {
       <main>
         <CraneHero />
         <SkySwipe />
+        {/* Od kaolina do umivaonika: video koji skrol pušta naprijed i nazad. */}
+        <Kaolin />
         <UsesSplit />
         <Featured />
         <CraneBand />

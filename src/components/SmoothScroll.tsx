@@ -8,6 +8,14 @@ import { gsap, ScrollTrigger } from '@/lib/gsap'
 export default function SmoothScroll({ children }: { children: React.ReactNode }) {
   const lenisRef = useRef<LenisRef>(null)
 
+  // Browser pri reload-u vraća staru poziciju skrola dok se 3D scena još učitava i visine sekcija
+  // se mijenjaju — triggeri se tada izmjere na pogrešnim mjestima (skokovi, sadržaj koji ne izroni).
+  // Scrollytelling uvijek kreće od vrha.
+  useEffect(() => {
+    if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    window.scrollTo(0, 0)
+  }, [])
+
   useEffect(() => {
     function update(time: number) {
       const lenis = lenisRef.current?.lenis

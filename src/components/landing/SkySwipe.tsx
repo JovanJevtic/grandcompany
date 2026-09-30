@@ -44,7 +44,7 @@ export default function SkySwipe() {
         <span
           key={i}
           data-col
-          className={`h-full flex-1 origin-bottom bg-bg will-change-transform ${i % 2 ? 'max-md:hidden' : ''}`}
+          className={`h-full flex-1 origin-bottom bg-bg ${i % 2 ? 'max-md:hidden' : ''}`}
           style={{ transform: 'scaleY(0)' }}
         />
       ))}

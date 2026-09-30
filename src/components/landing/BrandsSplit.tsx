@@ -162,7 +162,7 @@ export default function BrandsSplit() {
       <div className="flex flex-col justify-between bg-navy px-5 pb-12 pt-[14dvh] text-bg md:sticky md:top-0 md:h-dvh md:self-start md:px-[3.05vw] md:pb-[6dvh] md:pt-[11dvh]">
         <div>
           <p className="mb-[4dvh] flex justify-between border-t border-bg/40 pt-3 font-mono text-micro uppercase tracking-wider">
-            <span>06 — Brendovi</span>
+            <span>05 — Brendovi</span>
             <span>{BRAND_NOTES.length} proizvođača</span>
           </p>
           <h2 data-head className="invisible text-[clamp(48px,7.2vw,150px)] font-bold uppercase leading-[0.86] tracking-[-0.02em]">

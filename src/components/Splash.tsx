@@ -18,10 +18,11 @@ export default function Splash() {
   const lenis = useLenis()
   const lenisRef = useRef<typeof lenis>(undefined)
 
-  // Dok splash traje, strana se ne skrola.
+  // Dok splash traje, strana se ne skrola. Lenis zna da stigne tek POSLIJE kraja uvoda (teža
+  // hidratacija); tada se više ne zaključava, inače bi skrol ostao zauvijek zaustavljen.
   useEffect(() => {
     lenisRef.current = lenis
-    if (!lenis) return
+    if (!lenis || document.documentElement.dataset.gcSplash === 'done') return
     lenis.stop()
     return () => lenis.start()
   }, [lenis])

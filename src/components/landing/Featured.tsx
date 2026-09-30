@@ -70,7 +70,7 @@ export default function Featured() {
     <section ref={root} id="najcesce" className="relative z-20 bg-bg pb-[14dvh] pt-[18dvh]">
       <div className="gutter">
         <p className="flex justify-between border-t-2 border-ink pt-3 font-mono text-micro uppercase tracking-wider">
-          <span>03 — Najčešće birano</span>
+          <span>02 — Najčešće birano</span>
           <span className="tabular-nums">{artikala(list.length)}</span>
         </p>
 

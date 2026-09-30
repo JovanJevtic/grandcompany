@@ -6,7 +6,7 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { drawOnScroll } from '@/lib/draw'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars, revealLines } from '@/lib/reveal'
-import { CATEGORIES, PRODUCTS, USES, artikala, type UseId } from '@/lib/shop'
+import { PRODUCTS, USES, artikala, type UseId } from '@/lib/shop'
 import { axisShift } from './iso'
 import UseArt from './UseArt'
 
@@ -100,10 +100,6 @@ export default function UsesSplit() {
       {/* Lijevo: naslov stoji dok se desno skrola. */}
       <div className="flex flex-col justify-between px-5 pb-12 pt-[14dvh] md:sticky md:top-0 md:h-dvh md:self-start md:px-[2.2vw] md:pb-[5dvh] md:pt-[11dvh]">
         <div>
-          <p className="mb-[4dvh] flex justify-between border-t-2 border-ink pt-3 font-mono text-micro font-medium uppercase tracking-wider">
-            <span>01 — Kategorije</span>
-            <span>{CATEGORIES.length} grupe</span>
-          </p>
           <h2 data-head className="invisible text-[clamp(52px,8.4vw,168px)] font-bold uppercase leading-[0.86] tracking-[-0.02em]">
             <span className="block">Materijal</span>
             <span className="block text-right">za svaki</span>
@@ -116,23 +112,6 @@ export default function UsesSplit() {
             Knauf sistemi suhe gradnje, izolacija, veziva i pribor, na veliko i malo. Izaberite vrstu radova, a mi
             složimo sistem od profila i vijaka do mase za spojeve, i spustimo ga kranom na etažu.
           </p>
-
-          <ul className="border-b border-ink/20 font-mono text-micro uppercase">
-            {CATEGORIES.map((c) => (
-              <li key={c.id} className="border-t border-ink/20">
-                <Link
-                  href={`/prodavnica?kategorija=${c.id}`}
-                  className="group flex items-center justify-between py-2.5 transition-[padding] duration-300 hover:pl-2"
-                >
-                  <span className="flex items-center gap-3">
-                    <i className="size-2 bg-ink transition-colors group-hover:bg-accent" />
-                    {c.name}
-                  </span>
-                  <span className="tabular-nums opacity-60">{PRODUCTS.filter((p) => p.category === c.id).length}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
 
           <div className="flex items-center justify-between gap-6">
             <Link
@@ -165,7 +144,7 @@ export default function UsesSplit() {
       {/* Desno: tamno plava kolona, pet vrsta radova. */}
       <div className="bg-navy text-bg [--art-fill:var(--navy)]">
         <p className="flex justify-between border-b border-bg/15 px-5 pb-4 pt-[14dvh] font-mono text-micro font-medium uppercase tracking-wider md:px-[3vw] md:pt-[11dvh]">
-          <span>05 — Po namjeni</span>
+          <span>01 — Po namjeni</span>
           <span>{USES.length} vrsta radova</span>
         </p>
 

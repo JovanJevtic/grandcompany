@@ -219,7 +219,7 @@ export default function WallBuilder() {
     <section ref={root} id="kalkulator" className="relative z-20 bg-bg pb-[16dvh] pt-[12dvh]">
       <div className="gutter">
         <p className="flex justify-between border-t-2 border-ink pt-3 font-mono text-micro uppercase tracking-wider">
-          <span>05 — Kalkulator zida</span>
+          <span>04 — Kalkulator zida</span>
           <span>Norma W111 · W112</span>
         </p>
         <h2 data-head className="invisible mt-[6dvh] max-w-[14ch] text-[clamp(44px,6.6vw,128px)] font-bold uppercase leading-[0.88] tracking-[-0.02em]">

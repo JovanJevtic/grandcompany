@@ -115,7 +115,7 @@ export default function StepBand({
     { scope: root },
   )
 
-  const col = 'flex-1 will-change-transform'
+  const col = 'flex-1'
   return (
     <Tag
       ref={root as React.Ref<HTMLElement & HTMLDivElement>}

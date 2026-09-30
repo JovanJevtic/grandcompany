@@ -174,7 +174,7 @@ export default function CraneBand() {
         <div data-stage className="flex min-h-dvh flex-col justify-center gap-[5dvh] px-5 py-[8dvh] md:grid md:grid-cols-12 md:items-center md:gap-[2vw] md:px-[3.05vw]">
           <div className="md:col-span-4">
             <p className="flex justify-between border-t border-bg/40 pt-3 font-mono text-micro uppercase tracking-wider">
-              <span>04 — Isporuka</span>
+              <span>03 — Isporuka</span>
               <span>Vlastiti kamioni</span>
             </p>
             <h2 data-head className="invisible mt-[4dvh] text-[clamp(40px,5vw,96px)] font-bold uppercase leading-[0.88] tracking-[-0.02em]">

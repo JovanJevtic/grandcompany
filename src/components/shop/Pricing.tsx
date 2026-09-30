@@ -48,7 +48,8 @@ export default function Pricing() {
           })
         }
 
-        ScrollTrigger.create({ start: 0, end: 'max', onUpdate: update, invalidateOnRefresh: true })
+        // Mjeri se samo dok je lista u ekranu — ranije je radilo na svakom skrolu cijele strane (i kroz hero).
+        ScrollTrigger.create({ trigger: el, start: 'top bottom', end: 'bottom top', onUpdate: update, invalidateOnRefresh: true })
         update()
       })
     },
@@ -58,7 +59,7 @@ export default function Pricing() {
   return (
     <section id="cijene" className="overflow-x-clip pb-[16dvh] pt-[16dvh]">
       <div className="gutter">
-        <SectionHead no="08" label="Partneri" meta={`${PARTNER_TIERS.length} nivoa`} />
+        <SectionHead no="07" label="Partneri" meta={`${PARTNER_TIERS.length} nivoa`} />
       </div>
 
       <ul
