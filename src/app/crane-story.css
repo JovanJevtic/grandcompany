@@ -64,73 +64,55 @@
   background: var(--sky-top);
 }
 
-/* ——— Nebo ispod krana ——— */
+/* ——— Nebo ispod krana: tri sloja sa parallaxom ———
+   Slike su generisane (public/sky): meko nebo, oblaci sa providnom pozadinom i grad u
+   izmaglici. Pomjeraju se SAMO preko transform/opacity — to GPU slaže bez ponovnog crtanja,
+   pa skrol ostaje gladak (ranije je animirani blur preko cijelog ekrana kočio svaki kadar).
+   `--scene-progress` (0..1) postavlja scena. */
 
 .scene-sky {
   position: absolute;
   inset: 0;
   overflow: hidden;
   pointer-events: none;
-  background:
-    radial-gradient(120% 44% at 50% 34%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%),
-    linear-gradient(180deg, #eef4f9 0%, #e8f0f7 22%, #d9e7f2 48%, #c8dae9 76%, #b8cce1 100%);
+  background: var(--sky-top);
 }
-
-/* Bijela skica grada uz dno kadra. Dok kran ulazi u kadar skica se zamućuje, blago
-   smanjuje i gubi na intenzitetu — tako ostaje "daleka" i ne takmiči se sa scenom. */
-.sky-line {
+.sky-layer {
   position: absolute;
-  inset: 0;
-  background: url('/hero/skyline.svg') center bottom / 100% auto no-repeat;
-  transform-origin: 50% 100%;
-  transform:
-    translateY(calc(var(--scene-progress, 0) * 3%))
-    scale(calc(1 - var(--scene-progress, 0) * 0.05));
-  filter: blur(calc(var(--scene-progress, 0) * 10px));
-  opacity: calc(1 - var(--scene-progress, 0) * 0.4);
-  will-change: transform, filter, opacity;
-}
-
-/* Oblaci: sitni i razbacani, klize kao magla dok se skroluje. */
-.sky-clouds {
-  position: absolute;
-  inset: 0;
-}
-.sky-cloud {
-  position: absolute;
-  display: block;
   background-repeat: no-repeat;
-  background-size: 100% 100%;
-  will-change: transform, opacity;
-  transform: translateY(calc(var(--scene-progress, 0) * var(--drift, -8%)));
-  filter: blur(calc(var(--scene-progress, 0) * 2px));
+  will-change: transform;
+  backface-visibility: hidden;
 }
-.sky-cloud--a {
-  --drift: -13%;
-  width: 26%;
-  aspect-ratio: 400 / 176.8;
-  left: 2%;
-  top: 5%;
-  opacity: 0.9;
-  background-image: url('/hero/cloud-a.svg');
+/* Nebo: najsporiji sloj. Vrh se utapa u boju pojasa sa wordmarkom, da nema šava. */
+.sky-base {
+  inset: -4% -3% -8%;
+  background-image:
+    linear-gradient(180deg, var(--sky-top) 0%, rgba(238, 244, 249, 0) 22%),
+    url('/sky/sky-base.webp');
+  background-size: cover, cover;
+  background-position: center, center top;
+  transform: translate3d(0, calc(var(--scene-progress, 0) * -3%), 0);
 }
-.sky-cloud--b {
-  --drift: -7%;
-  width: 20%;
-  aspect-ratio: 400 / 238.08;
-  right: 5%;
-  top: 14%;
-  opacity: 0.72;
-  background-image: url('/hero/cloud-b.svg');
+/* Oblaci: klize brže i blago ulijevo — daju dubinu i ostaju iza rečenice na kraju. */
+.sky-clouds {
+  inset: -6% -12% 30% -6%;
+  background-image: url('/sky/sky-clouds.webp');
+  background-size: cover;
+  background-position: center top;
+  opacity: 0.88;
+  transform: translate3d(calc(var(--scene-progress, 0) * -7%), calc(var(--scene-progress, 0) * -9%), 0);
 }
-.sky-cloud--c {
-  --drift: -19%;
-  width: 13%;
-  aspect-ratio: 1 / 1;
-  left: 29%;
-  top: 33%;
-  opacity: 0.5;
-  background-image: url('/hero/cloud-c.svg');
+/* Grad u izmaglici: uz dno, meko i daleko. Tone i nestaje dok kamera ulazi u gradilište. */
+.sky-city {
+  left: -4%;
+  right: -4%;
+  bottom: -2%;
+  height: 72%;
+  background-image: url('/sky/city-haze.webp');
+  background-size: cover;
+  background-position: center bottom;
+  opacity: clamp(0, calc(0.72 - var(--scene-progress, 0) * 1.4), 0.72);
+  transform: translate3d(0, calc(var(--scene-progress, 0) * 12%), 0);
 }
 
 .crane-viewport {
@@ -144,6 +126,7 @@
   width: 100%;
   height: 100%;
   opacity: 0;
+  transition: opacity 0.8s ease;
 }
 .construction-story.crane-ready .crane-viewport canvas {
   opacity: 1;
@@ -264,11 +247,11 @@
   border-bottom: 1px solid var(--story-line);
 }
 
-/* ——— Bez scene (WebGL se još diže ili nije dostupan) ———
-   Izgled na vrhu strane ostaje isti kao sa scenom, samo nema praznog skrola za animaciju.
-   Tako nema vidljivog skoka kad scena javi `crane-ready` — ranije je splash taj skok krio. */
-.construction-story:not(.crane-ready) .story-immersion,
-.construction-story:not(.crane-ready) .story-outro,
+/* ——— Bez scene (WebGL nije dostupan) ———
+   Prostor za skrol je rezervisan od prvog trenutka, pa se stranica ne "produži" kad scena
+   postane spremna (to je bio skok usred skrola). Skriva se samo ako WebGL ne radi. */
+.construction-story.crane-failed .story-immersion,
+.construction-story.crane-failed .story-outro,
 .construction-story.crane-reduced .story-immersion,
 .construction-story.crane-reduced .story-outro {
   display: none;
@@ -298,14 +281,9 @@
   .scene-meter {
     width: 80px;
   }
-  .sky-cloud--a {
-    width: 38%;
-  }
-  .sky-cloud--b {
-    width: 30%;
-  }
-  .sky-cloud--c {
-    width: 19%;
+  /* Uski ekran: grad je širi od ekrana (cover), pa ga malo spustimo da tornjevi ne dominiraju. */
+  .sky-city {
+    height: 52%;
   }
   .story-section {
     min-height: 70svh;
@@ -329,9 +307,6 @@
   .story-opening {
     padding-top: 28px;
   }
-  .sky-cloud--c {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -339,9 +314,7 @@
     position: relative;
     top: 0;
   }
-  .sky-line,
-  .sky-cloud {
-    filter: none;
+  .sky-layer {
     will-change: auto;
   }
 }

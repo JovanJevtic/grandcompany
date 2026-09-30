@@ -129,16 +129,22 @@ export function createCraneScene() {
   applyConstructionSurfaces(m);
   const boxGeo = new THREE.BoxGeometry(1,1,1);
   const roundedBoxGeo = new RoundedBoxGeometry(1,1,1,1,.009);
+  // Šipke: broj strana prema debljini. Tanki kablovi, armatura i ograde (većina od ~5000 šipki)
+  // se na ovoj udaljenosti ne razlikuju sa 8 ili 20 strana, a koštaju 2.5x manje trouglova.
+  // Debele šipke i sve u enterijeru (vidi se izbliza) ostaju glatke.
   const rodGeo = new THREE.CylinderGeometry(1,1,1,20);
+  const rodGeoMid = new THREE.CylinderGeometry(1,1,1,12);
+  const rodGeoThin = new THREE.CylinderGeometry(1,1,1,8);
   const unitY = new THREE.Vector3(0,1,0);
   function group(parent,x=0,y=0,z=0) { const g=new THREE.Group();g.position.set(x,y,z);parent.add(g);return g; }
   function mesh(parent,geo,material,x,y,z,sx,sy,sz) {
     const o=new THREE.Mesh(geo,material);o.position.set(x,y,z);o.scale.set(sx,sy,sz);o.castShadow=![m.ground,m.asphalt,m.paving].includes(material);o.receiveShadow=true;parent.add(o);return o;
   }
   const box=(g,material,x,y,z,w,h,d)=>mesh(g,[m.pale,m.yellow,m.white].includes(material)?roundedBoxGeo:boxGeo,material,x,y,z,w,h,d);
-  function rod(g,material,a,b,r=.045) {
+  function rod(g,material,a,b,r=.045,fine=false) {
     const av=new THREE.Vector3(...a),bv=new THREE.Vector3(...b),delta=bv.clone().sub(av);
-    const o=mesh(g,rodGeo,material,...av.add(bv).multiplyScalar(.5).toArray(),r,delta.length(),r);
+    const geo=fine||r>=.12?rodGeo:r>=.035?rodGeoMid:rodGeoThin;
+    const o=mesh(g,geo,material,...av.add(bv).multiplyScalar(.5).toArray(),r,delta.length(),r);
     o.quaternion.setFromUnitVectors(unitY,delta.normalize());return o;
   }
   function profile(g,material,a,b,width=.12) {
@@ -473,7 +479,7 @@ export function createCraneScene() {
   const ENTRY_Y=ENTRY*2.35+.2;
   const interiorRoot=new THREE.Group();
   interiorRoot.position.set(9,ENTRY_Y,0);
-  buildTowerBath({parent:interiorRoot,box,rod,m});
+  buildTowerBath({parent:interiorRoot,box,rod:(g,material,a,b,r)=>rod(g,material,a,b,r,true),m});
   scene.add(interiorRoot);
   const interiorFade=architecturalFade(interiorRoot);
   // Mekano, toplo svetlo u sobi — spoljno svetlo ne dopire ispod ploče sprata iznad.
@@ -538,6 +544,9 @@ export function createCraneScene() {
       for(let i=0;i<inst.count;i++) {
         const o=i*16,meta=info[i];
         const g=meta?clamp(smooth(meta.at,meta.at+GROW_DURATION,p)):1;
+        // Sprat koji još nije počeo da raste se ne crta. Sa visinom tačno 0 šejder dijeli
+        // nulom pri računanju normala, pa se ploča pojavi kao crni kvadrat (to je bio glitch).
+        if(g<1e-4){a.fill(0,o,o+16);continue;}
         // Kolonski (column-major) zapis: Y koeficijenti su 1,5,9; translacija po Y je 13.
         a[o]=base[o];a[o+1]=base[o+1]*g;a[o+2]=base[o+2];a[o+3]=base[o+3];
         a[o+4]=base[o+4];a[o+5]=base[o+5]*g;a[o+6]=base[o+6];a[o+7]=base[o+7];

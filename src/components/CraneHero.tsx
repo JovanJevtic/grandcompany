@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment, useEffect, useRef } from 'react'
+import { preloadModule } from 'react-dom'
 import { COMPANY } from '@/gc/gc'
 
 declare global {
@@ -31,11 +32,16 @@ const WORD_GLYPHS = WORDS.map((word) => {
   return glyphs
 })
 
-// Scena se pinuje, a preko nje je nebo: plavo-sivi gradijent, bijela skica grada uz dno i
-// razbacani oblaci. Skica se zamućuje i povlači dok kamera ulazi u kadar (`--scene-progress`).
+// Scena se pinuje, a iza nje je nebo u tri sloja: meko nebo, oblaci i grad u izmaglici.
+// Slojevi se na skrol pomjeraju različitom brzinom (parallax, `--scene-progress`), a grad tone
+// i nestaje dok kamera ulazi u gradilište.
 // Ostatak visine je prazan prostor (story-immersion) kroz koji se animacija krana odigra.
 export default function CraneHero() {
   const root = useRef<HTMLElement>(null)
+  // Three.js (najveći fajl, ~680 KB) i scena se skidaju odmah sa HTML-om, a ne tek kad React
+  // pokrene efekat ispod. URL-ovi moraju biti isti kao u importima (uključujući ?v=).
+  preloadModule('/vendor/three.module.min.js')
+  preloadModule('/crane/crane-scene.js?v=29')
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -58,14 +64,11 @@ export default function CraneHero() {
 
       <section id="hero" ref={root} className="construction-story">
         <div className="crane-stage" aria-hidden="true">
-          {/* Nebo ispod krana: gradijent + bijele skice + oblaci. Sve je iza canvasa. */}
+          {/* Nebo ispod krana u tri sloja (nebo, oblaci, grad u izmaglici) sa parallaxom. Iza canvasa. */}
           <div className="scene-sky">
-            <div className="sky-line" />
-            <div className="sky-clouds">
-              <span className="sky-cloud sky-cloud--a" />
-              <span className="sky-cloud sky-cloud--b" />
-              <span className="sky-cloud sky-cloud--c" />
-            </div>
+            <div className="sky-layer sky-base" />
+            <div className="sky-layer sky-clouds" />
+            <div className="sky-layer sky-city" />
           </div>
 
           <figure className="crane-viewport">
