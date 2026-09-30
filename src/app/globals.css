@@ -15,6 +15,12 @@
   --splash-mark: #f3ecdf;
   /* svijetlo polje za crteže artikala (SVG packshot) */
   --well: #ffffff;
+  /* tamno plava za invertovane sekcije (stepenaste trake): bijel tekst na njoj */
+  --navy: #1b2436;
+  /* nebo iz herosa kao jedini akcenat: kvadratići u listama, aktivni filteri, linije na tamnom */
+  --accent: #a9c4e4;
+  /* tanka linija crteža (outline ilustracije) */
+  --hair: 1.25px;
   /* veličina wordmarka; postavlja se iz JS-a tako da tekst popuni širinu ekrana */
   --wm-fs: 10.6vw;
   /* dno wordmarka: ispod te linije počinje 3D scena krana i prazan pojas iznad nje */
@@ -25,7 +31,10 @@
   --color-bg: var(--bg);
   --color-ink: var(--ink);
   --color-well: var(--well);
+  --color-navy: var(--navy);
+  --color-accent: var(--accent);
   --font-sans: var(--font-inter-tight);
+  --font-mono: var(--font-mono-src), ui-monospace, monospace;
 
   /* Tipografska skala prodavnice: ista veličina kao u landingu (label, tekst, izjava), plus naslov sekcije. */
   --text-micro: clamp(11px, 0.97vw, 16px);

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter_Tight } from "next/font/google";
+import { Inter_Tight, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -9,6 +9,13 @@ import Splash from "@/components/Splash";
 const interTight = Inter_Tight({
   variable: "--font-inter-tight",
   subsets: ["latin", "latin-ext"],
+});
+
+// Mono za tehničke liste i oznake (SKU, sastav sistema, brojači), kao etikete na paleti.
+const mono = JetBrains_Mono({
+  variable: "--font-mono-src",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500"],
 });
 
 // Display serif (italic) za kratke rečenice preko scene. Bodoni Moda je OFL —
@@ -38,7 +45,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${interTight.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${interTight.variable} ${mono.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}

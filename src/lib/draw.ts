@@ -1,0 +1,46 @@
+import { gsap } from './gsap'
+import { EASE } from './motion'
+
+// Outline crteži (SVG, stroke="currentColor", fill="none") se iscrtavaju liniju po liniju.
+// Crtaju se svi elementi sa `data-d`; vrijednost atributa je redoslijed (0, 1, 2...) —
+// isti broj crta se zajedno. Crtež bez `data-d` elemenata crta sve path/line/circle/rect/polyline.
+//
+// scrub: true → crtež prati skrol (i vraća se kad se skrola nazad);
+// scrub: false → jednom se iscrta kad uđe u ekran.
+
+const SHAPES = 'path, line, circle, ellipse, rect, polyline, polygon'
+
+export function drawOnScroll(
+  svg: Element,
+  reduce: boolean,
+  { scrub = false, start = 'top 80%', end = 'bottom 40%', trigger = svg as Element, duration = 1.6 } = {},
+) {
+  const marked = svg.querySelectorAll<SVGElement>('[data-d]')
+  const parts = marked.length ? Array.from(marked) : Array.from(svg.querySelectorAll<SVGElement>(SHAPES))
+  if (!parts.length) return null
+  if (reduce) {
+    gsap.set(parts, { drawSVG: '0% 100%' })
+    return null
+  }
+
+  const groups = new Map<number, SVGElement[]>()
+  parts.forEach((p) => {
+    const k = Number(p.getAttribute('data-d') ?? 0)
+    groups.set(k, [...(groups.get(k) ?? []), p])
+  })
+
+  const tl = gsap.timeline({
+    scrollTrigger: scrub ? { trigger, start, end, scrub: 0.8 } : { trigger, start },
+  })
+  ;[...groups.keys()]
+    .sort((a, b) => a - b)
+    .forEach((k, i) => {
+      tl.fromTo(
+        groups.get(k)!,
+        { drawSVG: '0% 0%' },
+        { drawSVG: '0% 100%', duration, ease: scrub ? 'none' : EASE.inOut, stagger: 0.04 },
+        i === 0 ? 0 : `<${duration * 0.45}`,
+      )
+    })
+  return tl
+}
