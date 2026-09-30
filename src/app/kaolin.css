@@ -66,47 +66,24 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  width: min(58vw, 720px);
+  width: min(76vw, 920px);
 }
 
-.kaolin-play {
+/* Natpisi na krajevima linije: od sirovine do proizvoda. */
+.kaolin-label {
   flex: 0 0 auto;
-  width: 30px;
-  height: 30px;
-  padding: 0;
-  border: 1px solid rgba(30, 42, 54, 0.26);
-  border-radius: 999px;
-  background: transparent;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  transition: border-color 0.25s ease, background-color 0.25s ease;
-}
-.kaolin-play:hover {
-  border-color: rgba(30, 42, 54, 0.5);
-}
-/* Trokutić (pusti) -> kvadratić (pauza). */
-.kaolin-play span {
-  width: 0;
-  height: 0;
-  border-style: solid;
-  border-width: 5px 0 5px 8px;
-  border-color: transparent transparent transparent var(--ink);
-  margin-left: 2px;
-}
-.kaolin-play.is-on span {
-  width: 8px;
-  height: 8px;
-  border: 0;
-  margin: 0;
-  border-radius: 1px;
-  background: var(--ink);
+  font-size: clamp(9px, 0.78vw, 11px);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(30, 42, 54, 0.68);
+  white-space: nowrap;
+  user-select: none;
 }
 
 .kaolin-track {
   position: relative;
   flex: 1 1 auto;
-  height: 30px;
+  height: 44px;
   display: flex;
   align-items: center;
   cursor: grab;
@@ -150,8 +127,12 @@
     transform: translateY(-6dvh);
   }
   .kaolin-bar {
-    width: min(80vw, 520px);
-    gap: 12px;
+    width: calc(100vw - 32px);
+    gap: 10px;
+  }
+  .kaolin-label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
   }
 }
 

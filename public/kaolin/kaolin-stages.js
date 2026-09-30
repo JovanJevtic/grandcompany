@@ -3,7 +3,7 @@
 // Nema 3D-a ni šuma: dvije susjedne slike se "pretapaju" kao morph — stara forma se blago
 // zamuti i raširi, nova izranja iz zamućenja u oštrinu. Između prelaza svaka forma kratko
 // stoji potpuno oštra (HOLD), da se vidi detalj. Slike su unaprijed poravnate na isto
-// težište i isti pod, pa objekat nikad ne skače. Skrol, scrubber linija i dugme voze `p` (0..1).
+// težište i isti pod, pa objekat nikad ne skače. Skrol i scrubber linija voze `p` (0..1).
 
 const clamp01=n=>Math.min(1,Math.max(0,n));
 const ss=(a,b,x)=>{const t=clamp01((x-a)/(b-a));return t*t*(3-2*t);};
@@ -20,7 +20,6 @@ function bootKaolin(){
   const shadow=section?.querySelector('[data-kaolin-shadow]');
   const track=section?.querySelector('[data-kaolin-track]');
   const knob=section?.querySelector('[data-kaolin-knob]');
-  const play=section?.querySelector('[data-kaolin-play]');
   if(!section||!stack||!track||!knob)return;
   window.__gcKaolin?.dispose?.();
 
@@ -30,7 +29,7 @@ function bootKaolin(){
   const segments=layers.length-1;
   const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const forced=new URLSearchParams(location.search).get('p');
-  let progress=-1,auto=false,autoP=0,dragging=false,frame=0,visible=false,pending=false;
+  let progress=-1,dragging=false,visible=false,pending=false;
 
   const setKnob=p=>{
     section.style.setProperty('--p',p.toFixed(4));
@@ -74,9 +73,9 @@ function bootKaolin(){
     return clamp01(-r.top/total);
   }
   function schedule(){
-    if(forced!==null||auto||pending)return;
+    if(forced!==null||pending)return;
     pending=true;
-    requestAnimationFrame(()=>{pending=false;if(!auto)apply(scrollProgress());});
+    requestAnimationFrame(()=>{pending=false;apply(scrollProgress());});
   }
   const onScroll=()=>{if(!dragging)schedule();};
 
@@ -90,35 +89,26 @@ function bootKaolin(){
     const ratio=clamp01((e.clientX-r.left)/Math.max(1,r.width));
     const total=Math.max(1,section.offsetHeight-innerHeight);
     const top=section.getBoundingClientRect().top+window.scrollY;
-    setKnob(ratio);
+    // Model se mijenja odmah (uživo), a stranica se skroluje na isto mjesto da ostane usklađena.
+    apply(ratio);
     scrollToY(top+ratio*total);
   }
-  const onDown=e=>{auto=false;setPlayState(false);dragging=true;track.setPointerCapture?.(e.pointerId);scrub(e);};
+  const onDown=e=>{dragging=true;track.setPointerCapture?.(e.pointerId);scrub(e);};
   const onMove=e=>{if(dragging){e.preventDefault();scrub(e);}};
   const onUp=e=>{
     if(!dragging)return;dragging=false;
     try{track.releasePointerCapture?.(e.pointerId);}catch{}
     schedule();
   };
-  function setPlayState(on){play?.classList.toggle('is-on',on);play?.setAttribute('aria-pressed',on?'true':'false');}
-  function toggleAuto(){
-    auto=!auto;setPlayState(auto);
-    if(auto){autoP=progress>.98?0:Math.max(0,progress);apply(autoP);loop();}
-    else apply(scrollProgress());
-  }
-
-  // Automatski hod (dugme): ~2.2 s po formi, sa istim zadržavanjem kao na skrolu.
-  let last=0;
-  function tick(now){
-    frame=0;
-    const dt=Math.min(.05,(now-last)/1000||1/60);last=now;
-    if(!auto)return;
-    autoP+=dt/(2.2*segments);
-    if(autoP>=1){apply(1);auto=false;setPlayState(false);return;}
-    apply(autoP);
-    frame=requestAnimationFrame(tick);
-  }
-  function loop(){if(!frame){last=performance.now();frame=requestAnimationFrame(tick);}}
+  // Tastatura: strelice pomjeraju po jednu formu (za one koji ne vuku mišem).
+  const onKey=e=>{
+    const d={ArrowRight:1,ArrowUp:1,ArrowLeft:-1,ArrowDown:-1}[e.key];
+    if(!d)return;
+    e.preventDefault();
+    const next=clamp01(Math.round(progress*segments+d)/segments);
+    const total=Math.max(1,section.offsetHeight-innerHeight);
+    scrollToY(section.getBoundingClientRect().top+window.scrollY+next*total);
+  };
 
   // Slike se učitavaju tek kad se sekcija približi (loading=lazy + ovaj signal).
   const io=new IntersectionObserver(([e])=>{
@@ -134,7 +124,7 @@ function bootKaolin(){
   track.addEventListener('pointermove',onMove,{passive:false});
   track.addEventListener('pointerup',onUp);
   track.addEventListener('pointercancel',onUp);
-  play?.addEventListener('click',toggleAuto);
+  track.addEventListener('keydown',onKey);
 
   if(forced!==null)apply(clamp01(Number(forced)));
   else if(reduced)apply(1);
@@ -148,8 +138,7 @@ function bootKaolin(){
       track.removeEventListener('pointermove',onMove);
       track.removeEventListener('pointerup',onUp);
       track.removeEventListener('pointercancel',onUp);
-      play?.removeEventListener('click',toggleAuto);
-      if(frame)cancelAnimationFrame(frame);frame=0;
+      track.removeEventListener('keydown',onKey);
       window.__gcKaolin=null;
     },
   };

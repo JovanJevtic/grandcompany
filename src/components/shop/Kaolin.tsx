@@ -84,28 +84,22 @@ export default function Kaolin() {
         {/* Za čitače ekrana: šta sekcija pokazuje, bez oslanjanja na slike. */}
         <p className="sr-only">{STAGES.map((s) => s.alt).join(' → ')}</p>
 
-        {/* Linija za modeliranje: povlačenjem se prolazi kroz faze; dugme pušta automatski hod. */}
+        {/* Linija za modeliranje: vuče se kao skrol — model se mijenja uživo dok se prevlači. */}
         <div className="kaolin-bar">
-          <button
-            type="button"
-            className="kaolin-play"
-            data-kaolin-play
-            aria-pressed="false"
-            aria-label="Pusti transformaciju"
-          >
-            <span />
-          </button>
+          <span className="kaolin-label">Od materijala</span>
           <div
             className="kaolin-track"
             data-kaolin-track
             role="slider"
-            aria-label="Faza materijala"
+            aria-label="Od materijala do gotovih proizvoda"
+            tabIndex={0}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-valuenow={0}
           >
             <span className="kaolin-knob" data-kaolin-knob />
           </div>
+          <span className="kaolin-label">Do gotovih proizvoda</span>
         </div>
       </div>
     </section>
