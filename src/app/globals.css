@@ -647,13 +647,6 @@ html:not([data-past-hero]) [data-overlay-header] {
   }
 }
 
-/* Kaolin video: dok traje, stranica se ne skrola (ni dodirom) */
-html.scroll-held,
-html.scroll-held body {
-  overflow: hidden;
-  touch-action: none;
-}
-
 /* Iskra (četvorokraka zvijezda iz logotipa) — SAMO za kursor. Rombovi/iskre se ne koriste kao
    ukras na stranici (posebno ne na fotografijama: liče na vodeni žig AI generatora). */
 .spark {

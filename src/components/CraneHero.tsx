@@ -1,8 +1,8 @@
 'use client'
 
+import Link from 'next/link'
 import { Fragment, useEffect, useRef } from 'react'
 import { preloadModule } from 'react-dom'
-import { COMPANY } from '@/gc/gc'
 
 declare global {
   interface Window {
@@ -151,10 +151,21 @@ export default function CraneHero() {
           {/* Scena je aria-hidden, pa rečenicu iznosimo i kao pravi tekst za čitače ekrana. */}
           <p className="sr-only">{PHRASE}</p>
           <section className="story-section story-opening">
-            <div className="story-masthead">
-              <span>Građevinski materijali &amp; logistika</span>
-              <span>Banja Luka, BiH / od {COMPANY.founded}.</span>
-            </div>
+            {/* Navigacija kao dio linije ispod wordmarka: dvije horizontalne linije čine traku,
+                linkovi su razdvojeni malim vertikalnim crticama, a u sredini je crveni romb "Kupuj". */}
+            <nav className="story-masthead" aria-label="Glavna navigacija">
+              <ul className="masthead-links">
+                <li className="mh-desk"><Link href="/prodavnica">Prodavnica</Link></li>
+                <li className="mh-desk"><Link href="/prodavnica#kalkulator">Kalkulator</Link></li>
+                <li><Link href="/dostava">Isporuka</Link></li>
+              </ul>
+              <Link href="/prodavnica" className="masthead-buy">Kupuj</Link>
+              <ul className="masthead-links masthead-links--end">
+                <li><Link href="/objave">Objave</Link></li>
+                <li className="mh-desk"><Link href="/upit-za-izvodjace">Partneri</Link></li>
+                <li className="mh-desk"><Link href="/#kontakt">Kontakt</Link></li>
+              </ul>
+            </nav>
           </section>
 
           <div className="story-immersion" aria-hidden="true" />
