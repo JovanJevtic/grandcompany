@@ -205,7 +205,10 @@ export function createCraneScene() {
   const details=detailKit({box,rod,group,batch,m});
   const rig=craneRigKit({box,rod,group,batch,m});
   const architecture=architectureKit({box,rod,group,batch,m});
+  const SIMPLE_CRANE=true;
   const crane=group(scene,-7,0,0);
+  // Štampa: kran se crta samo linijama (obrisi), bez tačaka i punog mastila — vidi crane-print.
+  crane.userData.printLine=true;
   box(crane,m.concrete,0,.23,0,3.8,.46,3.8);
   for(const x of [-1.3,1.3]) for(const z of [-1.3,1.3]) {
     box(crane,m.steel,x,.5,z,.7,.1,.7);
@@ -224,9 +227,12 @@ export function createCraneScene() {
       rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,y,.68],.065);
     }
   }
-  for(let y=1;y<25;y+=.38)rod(crane,m.steel,[-.2,y,.78],[.2,y,.78],.018);
-  for(const x of [-.22,.22])rod(crane,m.steel,[x,.5,.78],[x,25,.78],.025);
-  details.mast(crane);
+  // Kran kao crtež u linijama: bez merdevina, prirubnica, platformi i staze (SIMPLE_CRANE = false vraća ih).
+  if(!SIMPLE_CRANE) {
+    for(let y=1;y<25;y+=.38)rod(crane,m.steel,[-.2,y,.78],[.2,y,.78],.018);
+    for(const x of [-.22,.22])rod(crane,m.steel,[x,.5,.78],[x,25,.78],.025);
+    details.mast(crane);
+  }
   batch(crane);
   const slew=group(crane,0,25,0);
   mesh(slew,rodGeo,m.steel,0,0,0,1.05,.4,1.05);
@@ -250,7 +256,8 @@ export function createCraneScene() {
     rod(slew,m.yellow,[x,1,.9],[x,2,.9],.025);
     rod(slew,m.yellow,[x,2,.9],[x+1,2,.9],.025);
   }
-  details.upper(slew);rig.upper(slew);
+  if(!SIMPLE_CRANE)details.upper(slew);
+  rig.upper(slew);
   // Real signage connects the crane to the storefront identity.
   if(typeof document!=='undefined') {
     const sign=document.createElement('canvas');sign.width=1024;sign.height=192;
@@ -335,6 +342,7 @@ export function createCraneScene() {
   }
   // Kuka (kolotur + ušica) visi sa kolica; dok nosi teret, sjedi tačno iznad kaveza.
   const hook=group(scene,0,0,0);
+  hook.userData.printLine=true;
   hook.scale.setScalar(LOAD_SCALE);
   details.hook(hook);
   batch(hook);

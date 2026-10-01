@@ -91,6 +91,7 @@ const PRINT_FRAG = /* glsl */ `
   uniform float shadeK;
   uniform vec4 radial;   // xz centar, r0, r1: ton se gasi od r0 do r1 (tlo); r1 = 0 znači bez toga
   uniform float edgeW;   // 1 = crta obris; manje = bez obrisa prema papiru (tlo)
+  uniform float lineOnly; // 1 = samo linije: površina je papir, crtaju se samo obrisi (kran)
   varying float vDepth;
   varying vec3 vWorld;
   #ifdef PRINT_MAP
@@ -133,7 +134,9 @@ const PRINT_FRAG = /* glsl */ `
     if (radial.w > 0.0) tone *= 1.0 - smoothstep(radial.z, radial.w, length(vWorld.xz - radial.xy));
     // vazdušna perspektiva: daleko = manje mastila (stapa se sa papirom)
     tone *= 1.0 - .92 * smoothstep(fog.x, fog.y, vDepth);
-    gl_FragColor = vec4(n.xy * .5 + .5, tone, edgeW);
+    tone *= 1.0 - lineOnly;
+    // Linijski objekti (kran) pišu pokrivenost .95 umjesto 1, da ih završni shader prepozna.
+    gl_FragColor = vec4(n.xy * .5 + .5, tone, lineOnly > .5 ? .95 : edgeW);
   }
 `;
 
@@ -212,6 +215,16 @@ const POST_FRAG = /* glsl */ `
     vec2 cuv = clamp(buv, .001, .999);
     float bgTone = (1.0 - mix(texture2D(tSky, cuv).r, texture2D(tBg, cuv).r, city)) * bgS;
     bgTone = flo + (1.0 - flo) * bgTone;
+    // Oko krana (linijski objekti) čist papir: pozadinske tačke se ne lijepe uz linije, kroz
+    // rešetku se ne vidi raster, pa kran čita kao crtež. Obilazak u dva prstena (~3 i ~7 px).
+    float nearLine = 0.0;
+    for (int i = 0; i < 12; i++) {
+      float an = float(i) * .5236;
+      vec2 dir = vec2(cos(an), sin(an)) * dpr / resolution;
+      float a1 = texture2D(tG, vUv + dir * 3.0).a, a2 = texture2D(tG, vUv + dir * 7.0).a;
+      nearLine = max(nearLine, max(step(.9, a1) * step(a1, .97), step(.9, a2) * step(a2, .97)));
+    }
+    bgTone *= 1.0 - nearLine * fill;
 
     // ——— ivice ———
     vec2 px = max(1.0, 1.1 * dpr) / resolution;
@@ -227,7 +240,10 @@ const POST_FRAG = /* glsl */ `
       solidN = max(solidN, c * smoothstep(.78, .86, tn));
       // obris prema papiru samo za objekte sa punom težinom ivice (tlo je nema)
       aEdge = max(aEdge, abs(c - c0) * smoothstep(.3, .9, max(a, a0)));
-      if (c > .5 && c0 > .5) {
+      // Piksel koji je IZA krana (kroz rupe rešetke se vidi tlo/zgrada) ne crta ivicu prema njemu —
+      // liniju crta samo kran, inače se tanke rupe popune mastilom.
+      float behindLine = step(.9, a) * step(a, .97) * step(d * 1.001, d0);
+      if (c > .5 && c0 > .5 && behindLine < .5) {
         nEdge = max(nEdge, 1.0 - dot(n0, n));
         dEdge = max(dEdge, abs(d - d0) / max(d0, .001));
         farEdge = max(farEdge, (d0 - d) / max(d, .001)); // > 0: ovaj piksel je IZA susjeda
@@ -289,35 +305,46 @@ export function createCraneRenderer(renderer, world) {
     const lum = .2126 * tmp.r + .7152 * tmp.g + .0722 * tmp.b;
     return Math.min(1, Math.max(0, (.965 - lum) * 1.9));
   }
-  function printFor(src) {
-    let pm = cache.get(src);
+  // Isti materijal može biti i na kranu (samo linije) i na zgradi, pa su to dva print materijala.
+  const lineCache = new Map();
+  function printFor(src, line) {
+    const store = line ? lineCache : cache;
+    let pm = store.get(src);
     if (pm) return pm;
     const defines = {};
     if (src.map) defines.PRINT_MAP = '';
     pm = new THREE.ShaderMaterial({
-      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, map: { value: src.map || null } },
+      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, map: { value: src.map || null } },
       defines,
       side: src.side,
       vertexShader: PRINT_VERT,
       fragmentShader: PRINT_FRAG,
     });
-    cache.set(src, pm);
+    store.set(src, pm);
     return pm;
   }
   // Zamjena materijala samo za vrijeme crtanja G-buffera (original ostaje za pretapanja i sl.).
   const swapped = [];
   function swapIn(root) {
-    root.traverseVisible((o) => {
-      if (!o.isMesh || !o.material || Array.isArray(o.material)) return;
-      const src = o.material;
-      const pm = printFor(src);
-      pm.uniforms.opacity.value = src.opacity;
-      // Providno staklo koje ne piše dubinu (ograde, tuš, folija) se ne štampa: rasterizovano
-      // bi dalo šum ivica. Ostala providnost (pretapanje sobe) ide kroz raster tačaka.
-      pm.visible = src.visible && !(src.transparent && src.depthWrite === false);
-      swapped.push(o, src);
-      o.material = pm;
-    });
+    walk(root, false);
+  }
+  // Kao traverseVisible, uz nasljeđivanje oznake `printLine` od roditelja (cijela grupa krana).
+  function walk(o, line) {
+    if (!o.visible) return;
+    line = line || !!o.userData.printLine;
+    swapOne(o, line);
+    for (const c of o.children) walk(c, line);
+  }
+  function swapOne(o, line) {
+    if (!o.isMesh || !o.material || Array.isArray(o.material)) return;
+    const src = o.material;
+    const pm = printFor(src, line);
+    pm.uniforms.opacity.value = src.opacity;
+    // Providno staklo koje ne piše dubinu (ograde, tuš, folija) se ne štampa: rasterizovano
+    // bi dalo šum ivica. Ostala providnost (pretapanje sobe) ide kroz raster tačaka.
+    pm.visible = src.visible && !(src.transparent && src.depthWrite === false);
+    swapped.push(o, src);
+    o.material = pm;
   }
   function swapOut() {
     for (let i = 0; i < swapped.length; i += 2) swapped[i].material = swapped[i + 1];
@@ -446,6 +473,7 @@ export function createCraneRenderer(renderer, world) {
       disposed = true;
       target?.dispose();
       for (const pm of cache.values()) pm.dispose();
+      for (const pm of lineCache.values()) pm.dispose();
       quad.geometry.dispose();
       quad.material.dispose();
       uniforms.tBg.value?.dispose?.();
