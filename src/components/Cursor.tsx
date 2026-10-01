@@ -31,6 +31,9 @@ export default function Cursor() {
       yTo(e.clientY)
       // <html> nosi data-cursor (sakriva sistemski kursor), zato se on preskače.
       const target = (e.target as Element | null)?.closest?.('[data-cursor]:not(html)')
+      // Preko tamnih i plavih površina (footer, tamne kartice, plave sekcije) kursor postaje bijel.
+      const dark = (e.target as Element | null)?.closest?.('footer, .bg-ink, .bg-char, .bg-navy, .bg-cobalt, [data-step-band="navy"]')
+      el.toggleAttribute('data-on-dark', !!dark)
       const text = target?.getAttribute('data-cursor')
       if (text) label.current!.textContent = text
       el.toggleAttribute('data-big', !!text)

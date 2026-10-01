@@ -86,7 +86,7 @@ export default function Bento() {
         </Link>
 
         {/* Tamna kartica: kreditni limit i valuta */}
-        <Link href="/portal" data-bento className="group flex min-h-[340px] flex-col bg-[#1e1e1e] p-7 text-white md:min-h-[460px]" data-cursor="Portal">
+        <Link href="/portal" data-bento className="group flex min-h-[340px] flex-col bg-char p-7 text-white md:min-h-[460px]" data-cursor="Portal">
           <span className="label">Kreditni limit</span>
           <span className="display mt-auto text-[clamp(34px,3vw,52px)]">30/60/90</span>
           <span className="mt-4 flex flex-wrap gap-1.5">

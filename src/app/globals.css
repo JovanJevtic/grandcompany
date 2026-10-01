@@ -1401,3 +1401,12 @@ html.menu-open .nav--home {
     padding-inline: 6px;
   }
 }
+
+/* Kursor na tamnoj/plavoj podlozi: bijela tačka i bijela oznaka sa tamnim tekstom */
+.cursor[data-on-dark] .cursor-spark {
+  background: #fff !important;
+}
+.cursor[data-on-dark] .cursor-tag {
+  background: #fff;
+  color: var(--ink);
+}
