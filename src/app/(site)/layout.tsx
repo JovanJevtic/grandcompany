@@ -9,7 +9,7 @@ export default function SiteLayout({ children }: LayoutProps<'/'>) {
   return (
     <>
       <SiteHeader variant="inner" />
-      <main className="pt-16">{children}</main>
+      <main className="pt-[calc(var(--nav-h)+var(--nav-inset)+8px)]">{children}</main>
       <Footer />
       <CartDrawer />
       {/* Obavijest "dodato u korpu" i bočni paneli (isto kao na početnoj) */}
