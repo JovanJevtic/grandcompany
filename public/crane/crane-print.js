@@ -301,6 +301,7 @@ const POST_FRAG = /* glsl */ `
   uniform float floorC[${N}];
   uniform float cityC[${N}];
   uniform float room; // 1 = kamera je u sobi: sve van sobe se crta kao završni plavi grad
+  uniform float lineFade; // 0 = kran se ne vidi (zum na tablu sa logom), 1 = puni crtež
   uniform float wipe[${N}];
   varying vec2 vUv;
 
@@ -374,7 +375,7 @@ const POST_FRAG = /* glsl */ `
       float a1 = texture2D(tG, vUv + dir * 3.0).a, a2 = texture2D(tG, vUv + dir * 7.0).a;
       nearLine = max(nearLine, max(step(.875, a1) * step(a1, .985), step(.875, a2) * step(a2, .985)));
     }
-    bgTone *= 1.0 - nearLine * fill * (1.0 - outside);
+    bgTone *= 1.0 - nearLine * fill * (1.0 - outside) * lineFade;
 
     // ——— ivice ———
     vec2 px = max(1.0, 1.1 * dpr) / resolution;
@@ -390,7 +391,9 @@ const POST_FRAG = /* glsl */ `
       float nGeo = max(step(.965, a) * step(a, .985), step(.875, a) * step(a, .905));
       solidN = max(solidN, c * smoothstep(.78, .86, tn) * (1.0 - nGeo));
       // obris prema papiru samo za objekte sa punom težinom ivice (tlo je nema)
-      aEdge = max(aEdge, abs(c - c0) * smoothstep(.3, .9, max(a, a0)));
+      // obris prema linijskim objektima (kran) se gasi zajedno sa njima (lineFade)
+      float lineN = max(step(.875, a) * step(a, .985), step(.875, a0) * step(a0, .985));
+      aEdge = max(aEdge, abs(c - c0) * smoothstep(.3, .9, max(a, a0)) * mix(1.0, lineFade, lineN));
       // Piksel koji je IZA krana (kroz rupe rešetke se vidi tlo/zgrada) ne crta ivicu prema njemu —
       // liniju crta samo kran, inače se tanke rupe popune mastilom.
       float behindLine = step(.9, a) * step(a, .97) * step(d * 1.001, d0);
@@ -411,7 +414,8 @@ const POST_FRAG = /* glsl */ `
     // ——— ton ———
     float objTone = g0.b;
     float solid = a0 * smoothstep(.78, .86, objTone);
-    float t = mix(bgTone, mix(bgTone, objTone, a0 * (1.0 - outside)), fill);
+    // Dok se kran ne vidi (lineFade 0), njegove površine propuštaju pozadinu — ostaje samo tabla.
+    float t = mix(bgTone, mix(bgTone, objTone, a0 * (1.0 - outside) * (1.0 - max(lineSurf, geoLine) * (1.0 - lineFade))), fill);
 
     // ——— AM raster: tačka po ćeliji rotirane mreže, poluprečnik ~ sqrt(ton) ———
     float ca = cos(radians(ang)), sn = sin(radians(ang));
@@ -428,14 +432,14 @@ const POST_FRAG = /* glsl */ `
 
     // ——— sklapanje ———
     // Linijski objekti nemaju ivice iz piksela (nazubljene, isprekidane) — samo geometrijske linije.
-    float edgeF = fill * (1.0 - outside) * (1.0 - lineSurf) * (1.0 - geoLine);
+    float edgeF = fill * (1.0 - outside) * (1.0 - lineSurf) * (1.0 - geoLine) * mix(1.0, lineFade, step(.5, a0) * (1.0 - navyF));
     // linije mastila na svijetlim površinama; na punom mastilu linije su "izbijene" (boja papira)
     float inkLine = max(inner * (1.0 - solid), silhouette * a0) * edgeF;
     float knock = knockLine * solid * edgeF;
     // puno mastilo se razlije ~1px (deblja, štamparska linija; tanke šipke krana ne pucaju)
     float amount = max(max(dotInk, inkLine), solidN * edgeF);
     amount = mix(amount, 0.0, knock * .92);
-    amount = max(amount, geoLine * fill * (1.0 - outside));
+    amount = max(amount, geoLine * fill * (1.0 - outside) * lineFade);
     if (navyF > .5) amount = smoothstep(.45, .55, objTone);
     // istrošena štampa: sitne mrlje papira u mastilu i poneka mrlja mastila na papiru
     float fleck = smoothstep(.84, .9, grain * vnoise(frag / (5.0 * dpr) + 7.0) * 1.7);
@@ -539,6 +543,7 @@ export function createCraneRenderer(renderer, world) {
     bgC: { value: STAGES.map((s) => s.bg) },
     floorC: { value: STAGES.map((s) => s.floor) },
     room: { value: 0 },
+    lineFade: { value: 1 },
     cityC: { value: STAGES.map((s) => s.city) },
     wipe: { value: STAGES.map(() => 0) },
   };
@@ -614,6 +619,9 @@ export function createCraneRenderer(renderer, world) {
       const inside = Math.min(1, Math.max(0, (p - .62) / .1));
       // Kamera je u sobi (vidi crane-scene: širi objektiv od .74–.8): kroz prozor se vidi plavi grad.
       uniforms.room.value = p > .76 ? 1 : 0;
+      // Kran se pojavljuje dok se kamera odmiče od table (vidi CAMERA_KEYS: .0 → .07).
+      const lf = Math.min(1, Math.max(0, (p - .012) / .04));
+      uniforms.lineFade.value = lf * lf * (3 - 2 * lf);
       shadeK.value = .78 - .45 * inside * inside * (3 - 2 * inside);
     },
     onBackground(fn) { onBg = fn; if (pending === 0) fn(); },

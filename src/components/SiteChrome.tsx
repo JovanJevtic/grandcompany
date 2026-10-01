@@ -45,6 +45,9 @@ export default function SiteChrome() {
         fit()
         onResize = fit
         window.addEventListener('resize', fit)
+        // Slova su odmah ispod maske: naslov se ne smije vidjeti prije pozadine.
+        if (!reduce) gsap.set(gsap.utils.toArray<HTMLElement>('.ch', wm), { yPercent: 160 })
+        document.documentElement.removeAttribute('data-intro-done')
         gsap.set(wm, { visibility: 'visible' })
 
         // Wordmark lebdi iznad svega i mijenja boju prema sadržaju ispod sebe:
@@ -138,7 +141,13 @@ export default function SiteChrome() {
           })
         }
 
-        if (reduce) return
+        const html = document.documentElement
+        // Navbar se pokaže tek posle naslova (redosljed: pozadina → naslov → navbar; vidi globals.css).
+        const navIn = () => html.setAttribute('data-intro-done', '')
+        if (reduce) {
+          navIn()
+          return
+        }
 
         // Slova wordmarka izranjaju tek kad se uvodni splash skloni — inače se animacija
         // potroši za zavjesom. Ako splasha nema (ili je već gotov), ide odmah.
@@ -153,7 +162,11 @@ export default function SiteChrome() {
           const clear = () => {
             if (!gone) gsap.set(chars, { clearProps: 'transform' })
           }
-          if (gone) return
+          if (gone) {
+            navIn()
+            return
+          }
+          window.setTimeout(navIn, (INTRO.letters + 0.9) * 1000)
           gsap.fromTo(
             chars,
             { yPercent: 160 },
@@ -169,9 +182,23 @@ export default function SiteChrome() {
           // Sigurnosna mreža: slova se pokažu i ako tween iz bilo kog razloga ne stigne do kraja.
           window.setTimeout(clear, (INTRO.letters + 1.2 + 0.5) * 1000)
         }
-        if (!document.querySelector('[data-splash]') || document.documentElement.dataset.gcSplash === 'done')
+        // Slova kreću tek kad su i splash i 3D scena gotovi (pozadina se vidi prva). Ako se scena
+        // ne digne za 3,5 s posle splasha, slova ipak krenu.
+        let started = false
+        const go = () => {
+          if (started) return
+          started = true
           letters()
-        else window.addEventListener('gc:splash-done', letters, { once: true })
+        }
+        const afterSplash = () => {
+          if (window.__gcCraneReady) go()
+          else {
+            window.addEventListener('gc:crane-ready', () => window.setTimeout(go, 250), { once: true })
+            window.setTimeout(go, 3500)
+          }
+        }
+        if (!document.querySelector('[data-splash]') || html.dataset.gcSplash === 'done') afterSplash()
+        else window.addEventListener('gc:splash-done', afterSplash, { once: true })
       })
 
       // Čeka se učitavanje fonta, inače se širina mjeri na rezervnom fontu.

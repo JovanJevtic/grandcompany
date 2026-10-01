@@ -225,7 +225,7 @@ export function createCraneScene() {
     for(const s of [-1,1]) {
       rod(crane,m.yellow,[-.68,y,s*.68],[.68,top,s*.68],.045);
       if(!SIMPLE_CRANE)rod(crane,m.yellow,[.68,y,s*.68],[-.68,top,s*.68],.045);
-      rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,top,.68],.045);
+      if(!SIMPLE_CRANE)rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,top,.68],.045);
       if(!SIMPLE_CRANE)rod(crane,m.yellow,[s*.68,y,.68],[s*.68,top,-.68],.045);
       rod(crane,m.yellow,[-.68,y,s*.68],[.68,y,s*.68],.065);
       rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,y,.68],.065);
@@ -248,13 +248,13 @@ export function createCraneScene() {
     for(const z of [-.6,.6]) {
       rod(slew,m.yellow,[x,1,z],[end,1,z],.07);
       rod(slew,m.yellow,[x,1,z],[end,2.25,0],.047);
-      rod(slew,m.yellow,[x,2.25,0],[end,1,z],.047);
+      if(!SIMPLE_CRANE)rod(slew,m.yellow,[x,2.25,0],[end,1,z],.047);
     }
     rod(slew,m.yellow,[x,2.25,0],[end,2.25,0],.07);
     if(!SIMPLE_CRANE)rod(slew,m.yellow,[x,1,-.6],[x,1,.6],.045);
   }
   for(const z of [-.6,.6])rod(slew,m.yellow,[0,.4,z],[0,5.5,0],.09);
-  for(const x of [-6.5,8,17])rod(slew,m.steel,[0,5.5,0],[x,2.2,0],.026);
+  for(const x of SIMPLE_CRANE?[-6.5,17]:[-6.5,8,17])rod(slew,m.steel,[0,5.5,0],[x,2.2,0],.026);
   if(SIMPLE_CRANE)box(slew,m.edge,-5.66,.9,0,3.1,2.8,1.6); // kontrateg: jedan blok
   if(typeof document!=='undefined') {
     // Kvadratna tabla: svijetla podloga, znak i GRAND COMPANY u tamno plavoj (štampa: oznaka `navy`).

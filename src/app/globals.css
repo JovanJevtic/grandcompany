@@ -1675,3 +1675,18 @@ footer li + li {
   margin-top: calc(-1 * clamp(90px, 16vh, 200px));
   padding-top: calc(clamp(90px, 16vh, 200px) + 6vh);
 }
+
+/* Početna: navbar se pojavi tek posle naslova (data-intro-done postavlja SiteChrome). */
+html:not([data-intro-done]) .nav--home .nav__bar {
+  opacity: 0;
+  translate: 0 -10px;
+  pointer-events: none;
+}
+.nav--home .nav__bar {
+  transition:
+    opacity 0.6s var(--ease-out),
+    translate 0.6s var(--ease-out),
+    background-color 0.35s,
+    border-color 0.35s,
+    color 0.35s;
+}
