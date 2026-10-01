@@ -493,8 +493,8 @@ export function createCraneScene() {
   const EYE=ENTRY_Y+1.5;
   const CAMERA_KEYS=[
     // p      pozicija                 pogled
-    [STORY_END, [20.3,14.5,10.8],      [8.7,11.2,-.5]],   // kraj dostave (isto kao orbita)
-    [.68,       [22.5,11.0,18.5],      [9.0,5.2,0]],      // odmak: cijela zgrada dok raste
+    [STORY_END, [13.5,12.6,7.5],       [9,9.62,0]],       // kutija je sletjela na krov (isto kao praćenje)
+    [.68,       [15.2,7.6,10.2],       [8.6,6.0,0]],      // klizi niz fasadu ka balkonu sprata ENTRY
     [.76,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
     [.82,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
     [.87,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
@@ -523,7 +523,11 @@ export function createCraneScene() {
   const fill=new THREE.DirectionalLight('#e4ebef',.42);fill.position.set(20,15,-20);scene.add(fill);
   const shadow=new THREE.Mesh(new THREE.PlaneGeometry(180,180),new THREE.ShadowMaterial({opacity:.2}));
   shadow.rotation.x=-Math.PI/2;shadow.position.y=-1.35;shadow.receiveShadow=true;scene.add(shadow);
+  const childrenBeforeEffects=scene.children.length;
   const deliveryEffects=createDeliveryEffects(scene);
+  // Linijski crtež: prašina i čestice dostave se ne prikazuju.
+  scene.children.slice(childrenBeforeEffects).forEach(o=>{o.visible=false;});
+  shadow.visible=false;
   const camera=new THREE.PerspectiveCamera(37,1,.1,220);
   const target=new THREE.Vector3();
   // ——— Rast gradilišta ———
@@ -556,11 +560,28 @@ export function createCraneScene() {
       inst.instanceMatrix.needsUpdate=true;
     }
   }
+  // Ključevi praćenja kutije: [p, pomak kamere, pomak pogleda] u odnosu na kutiju (svijet).
+  const FOLLOW=[
+    [0,   [7.5,4.5,10.5], [-3.0,3.2,0]],  // glava krana: kolica, kuka i kutija
+    [.10, [4.2,1.8,5.8],  [-.4,1.4,0]],   // primicanje kutiji
+    [.20, [2.8,.9,3.9],   [0,.9,0]],      // ekstremno blizu kutije
+    [.42, [3.2,.4,4.6],   [0,.5,0]],      // spuštamo se zajedno; ispod raste zgrada
+    [STORY_END, [4.5,3.0,7.5], [0,0,0]],  // kutija na krovu
+  ];
+  const _loadW=new THREE.Vector3(),_camOff=new THREE.Vector3(),_lookOff=new THREE.Vector3();
+  function followPose(p,cam,look) {
+    let i=FOLLOW.length-2;
+    for(let j=0;j<FOLLOW.length-1;j++)if(p<FOLLOW[j+1][0]){i=j;break;}
+    const a=FOLLOW[i],b=FOLLOW[i+1],k=smooth(a[0],b[0],p);
+    cam.set(...a[1]).lerp(_tmpV.set(...b[1]),k);
+    look.set(...a[2]).lerp(_tmpV.set(...b[2]),k);
+  }
+  const _tmpV=new THREE.Vector3();
   function update(p,aspect=1,framing=1) {
     // `t` je "story vreme" (0..1) postojeće priče; `p` je sirovi progres preko celog skrola.
     const t=clamp(p/STORY_END);
     const s=choreography(t);
-    deliveryEffects.update(t);
+    // (linijski crtež: bez efekata dostave)
     slew.rotation.y=s.slew;
     // Payload bottoms out exactly on the receiving slab, never through it.
     const trolleyX=15+smooth(0,.45,t);
@@ -578,13 +599,13 @@ export function createCraneScene() {
         const delta=end.clone().sub(start),part=sling.parts[i];part.position.copy(start.clone().add(end).multiplyScalar(.5));part.scale.y=delta.length();part.quaternion.setFromUnitVectors(unitY,delta.normalize());
       });
     }
-    activityRoot.visible=t>.57;
+    activityRoot.visible=false; // bez gradilišta okolo — samo kran, kutija i zgrada
     activity.update(t);
     const travel=11*smooth(.51,.72,t);truck.position.x=-10+travel;
     wheels.forEach(wheel=>{wheel.rotation.z=-travel/.38;});
-    site.visible=t>.46;
+    site.visible=false;
     // Keep the side copy clear until it has scrolled past the scene.
-    district.visible=t>.73;
+    district.visible=false;
     district.scale.y=1;
     districtFade(smooth(.73,.82,t));
     for(const f of floors) {f.group.visible=true;f.group.scale.y=1;f.group.position.y=f.height;}
@@ -599,8 +620,9 @@ export function createCraneScene() {
     growingParts.forEach(part=>{part.visible=!assembled&&(part!==scaffold||t>.60);});
     finishedSite.visible=assembled;
     // Fasada raste sprat po sprat odmah posle dostave; kupatilo se pojavljuje pred ulazak.
-    finishRoot.visible=p>STORY_END;
-    finish.update(p,STORY_END+.005,.03,.07);
+    // Zgrada raste sprat po sprat DOK se kutija spušta, i završi se kad kutija sleti na krov.
+    finishRoot.visible=true;
+    finish.update(p,.12,.08,.1);
     interiorRoot.visible=p>.68;
     interiorFade(smooth(.68,.74,p));
     interiorLight.intensity=7*smooth(.72,.8,p);
@@ -628,8 +650,18 @@ export function createCraneScene() {
       }
     }
     camera.position.set(target.x+Math.sin(s.azimuth)*Math.cos(s.elevation)*distance,target.y+Math.sin(s.elevation)*distance,target.z+Math.cos(s.azimuth)*Math.cos(s.elevation)*distance);
-    // Završna chapter-a preuzima kameru: glatko se spoji sa orbitom pa ide kroz enterijer.
-    const interiorT=smooth(STORY_END,STORY_END+.08,p);
+    // ——— Nova kamera: krupni plan krana, zoom na kutiju i spuštanje zajedno sa njom ———
+    // Kamera nikad ne ide u širok plan: pomak (offset) je vezan za kutiju u svijetu, pa je
+    // kutija stalno u kadru dok se kran okreće i spušta je na krov zgrade.
+    slew.updateMatrixWorld(true);
+    load.getWorldPosition(_loadW);
+    followPose(p,_camOff,_lookOff);
+    // Uspravan (uzak) ekran: kamera se odmakne srazmjerno, da kutija i zgrada stanu u širinu.
+    _camOff.multiplyScalar(Math.max(1,.95/aspect));
+    camera.position.copy(_loadW).add(_camOff);
+    target.copy(_loadW).add(_lookOff);
+    // Završna chapter-a preuzima kameru: glatko se spoji sa praćenjem pa ide kroz enterijer.
+    const interiorT=smooth(STORY_END,STORY_END+.04,p);
     if(interiorT>0) {
       const path=interiorPath(p);
       camera.position.lerp(path.position,interiorT);

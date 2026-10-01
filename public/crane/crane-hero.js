@@ -7,9 +7,9 @@
 import * as THREE from '../vendor/three.module.min.js';
 import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
-import {createCraneRenderer} from './crane-renderer.js?v=24';
+import {createCraneRenderer} from './crane-renderer.js?v=25';
 import {craneQuality} from './crane-quality.js?v=19';
-import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=30';
+import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=32';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -48,7 +48,7 @@ async function init() {
     return q;
   };
   renderer.setPixelRatio(quality().pixelRatio);
-  renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+  renderer.shadowMap.enabled=false; // linijski crtež: bez sjenki
   // Mapa sjenki se ne obnavlja svaki kadar, nego samo kad se geometrija pomjeri (vidi draw).
   renderer.shadowMap.autoUpdate=false;
   renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.04;
@@ -254,7 +254,8 @@ async function init() {
     } else if(shadowKey!==lastShadowKey)skippedShadow=false;
     const siteDissolve=smooth(.43,.46,storyT)*(1-smooth(.57,.61,storyT));
     const districtDissolve=smooth(.70,.73,storyT)*(1-smooth(.82,.86,storyT));
-    pipeline.render(contactEnabled?(1-siteDissolve)*(1-districtDissolve):0);
+    // Linijski crtež; na samom kraju (izlaz kroz prozor u nebo) scena se rastvori u ravnu 2D sliku.
+    pipeline.render(1,1-smooth(.95,.995,progress));
     cover.dataset.sceneChapter=String(state.chapter+1);
     cover.dataset.sceneProgress=progress.toFixed(3);
     if(progress!==targetProgress||outroP!==targetOutro)requestDraw();
