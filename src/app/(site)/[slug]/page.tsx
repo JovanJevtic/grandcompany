@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import LegalPage, { PoliciesIndex } from "@/components/legal/LegalPage";
+import LegalPage, { PoliciesCombined } from "@/components/legal/LegalPage";
 import { LEGAL_DOCS, legalBySlug } from "@/lib/legal";
 
 // Pravne i servisne stranice (dostava, povrat, uslovi, privatnost...). Sve se generišu pri buildu;
@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  if (slug === "sve-politike") return <PoliciesIndex />;
+  if (slug === "sve-politike") return <PoliciesCombined />;
   const doc = legalBySlug(slug);
   if (!doc) notFound();
   return <LegalPage doc={doc} />;

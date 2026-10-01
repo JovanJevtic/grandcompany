@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { SITE } from '@/lib/company'
-import { GROUP_LABEL, type LegalBlock, type LegalDoc, type LegalGroup } from '@/lib/legal-types'
-import { LEGAL_DOCS } from '@/lib/legal'
+import { GROUP_LABEL, type LegalBlock, type LegalDoc } from '@/lib/legal-types'
+import { LEGAL_DOCS, legalBySlug } from '@/lib/legal'
 import Cta from '@/components/ui/Cta'
 import { T } from './LegalText'
 import Pw, { pw } from '@/components/ui/Pw'
@@ -139,48 +139,106 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
   )
 }
 
-// /sve-politike: pregled svih stranica, grupisan — tihi spisak sa hover stanjem.
-export function PoliciesIndex() {
-  const groups = (['kupovina', 'pravno', 'usluge'] as LegalGroup[])
-    .map((g) => ({ g, docs: LEGAL_DOCS.filter((d) => d.group === g) }))
-    .filter(({ docs }) => docs.length)
+// /sve-politike: sve politike na jednoj stranici, jedna ispod druge — dostava na vrhu,
+// pa povrat robe, načini plaćanja, uslovi kupovine i privatnost. Ostale pravne stranice
+// ostaju dostupne preko pojedinačnih adresa i spiska na dnu.
+const STACK = ['dostava', 'povrat-robe', 'nacini-placanja', 'uslovi-kupovine', 'politika-privatnosti']
+
+export function PoliciesCombined() {
+  const docs = STACK.map((s) => legalBySlug(s)).filter((d): d is LegalDoc => Boolean(d))
+  const rest = LEGAL_DOCS.filter((d) => !STACK.includes(d.slug))
+  const num = (i: number) => String(i + 1).padStart(2, '0')
 
   return (
     <div className="px-5 pb-[18dvh] pt-[16dvh] md:px-10 md:pt-[20dvh]">
       <header className="text-center">
-        <h1 className="display text-[clamp(52px,9vw,150px)]"><Pw>
-          Sve <em>politike</em>
-        </Pw></h1>
-        <p className="mx-auto mt-8 max-w-[40ch] text-[13px] text-ink/70">
-          Dostava, povrat, plaćanje i uslovi — na jednom mjestu.
+        <p className="label text-ink/50">Informacije</p>
+        <h1 className="display mx-auto mt-6 max-w-[14ch] text-[clamp(44px,7vw,120px)]">
+          <Pw>Sve politike</Pw>
+        </h1>
+        <p className="mx-auto mt-8 max-w-[46ch] text-[13px] leading-[1.5] text-ink/75">
+          Dostava, povrat robe, načini plaćanja, uslovi kupovine i privatnost — na jednom mjestu, jedna ispod druge.
         </p>
       </header>
 
-      <div className="mx-auto mt-[12dvh] max-w-[860px] space-y-20">
-        {groups.map(({ g, docs }) => (
-          <section key={g}>
-            <h2 className="label text-center text-ink/45">{GROUP_LABEL[g]}</h2>
-            <ul className="mt-6 border-t border-ink/15">
-              {docs.map((d) => (
-                <li key={d.slug} className="border-b border-ink/15">
-                  <Link
-                    href={`/${d.slug}`}
-                    className="group flex items-baseline justify-between gap-6 py-5 transition-[padding] duration-500 ease-[var(--ease-out)] hover:pl-3"
-                  >
-                    <span className="font-pretty text-[clamp(26px,2.8vw,44px)] leading-[1.05] transition-colors duration-500 group-hover:text-signal">
-                      {pw(d.title)}
-                    </span>
-                    <span
-                      aria-hidden
-                      className="size-2 shrink-0 self-center rounded-full bg-signal opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                    />
+      <nav aria-label="Na ovoj stranici" className="mx-auto mt-14 flex max-w-[860px] flex-wrap justify-center gap-x-7 gap-y-3 px-2">
+        {docs.map((d, i) => (
+          <a
+            key={d.slug}
+            href={`#${d.slug}`}
+            className="ulink text-[13px] tracking-[0.02em] text-ink/70 transition-colors hover:text-ink"
+          >
+            <span className="mr-1.5 inline-block w-5 text-right tabular-nums text-signal">{num(i)}</span>
+            {d.title}
+          </a>
+        ))}
+      </nav>
+
+      <main className="mt-[14vh]">
+        {docs.map((d, i) => (
+          <section
+            key={d.slug}
+            id={d.slug}
+            aria-labelledby={`${d.slug}-title`}
+            className={`scroll-mt-24 ${i > 0 ? 'mt-[16vh] border-t border-ink/10 pt-[10vh]' : ''}`}
+          >
+            <header className="text-center">
+              <p className="label text-ink/50">{GROUP_LABEL[d.group]}</p>
+              <h2 id={`${d.slug}-title`} className="display mx-auto mt-5 max-w-[14ch] text-[clamp(40px,6vw,96px)] [hyphens:auto]">
+                <Pw>{d.title}</Pw>
+              </h2>
+              <p className="mx-auto mt-6 max-w-[46ch] text-[13px] leading-[1.45] text-ink/75">
+                <T s={d.lead} />
+              </p>
+              <p className="mt-4 text-[11px] tracking-[0.08em] text-ink/40">Ažurirano {d.updated}</p>
+            </header>
+
+            <div className="legal-copy relative mt-[8vh] md:grid md:grid-cols-[1fr_minmax(0,62ch)_1fr] md:gap-x-12">
+              <nav
+                aria-label={`Sadržaj: ${d.title}`}
+                className="hidden self-start text-[13px] md:sticky md:top-28 md:col-start-1 md:block md:max-w-[220px]"
+              >
+                <p className="label text-ink/45">Sadržaj</p>
+                <ul className="mt-4 space-y-2.5 text-ink/70">
+                  {d.sections.map((s) => (
+                    <li key={s.id}>
+                      <a href={`#${d.slug}__${s.id}`} className="ulink leading-[1.35] transition-colors hover:text-ink">
+                        {s.title}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+
+              <div className={`${MEASURE} md:col-start-2`}>
+                {d.sections.map((s) => (
+                  <section key={s.id} id={`${d.slug}__${s.id}`} className="scroll-mt-28 pt-12 first:pt-0">
+                    <h3 className="font-pretty text-[clamp(26px,2.2vw,36px)] leading-[1.15]">{pw(s.title)}</h3>
+                    {s.blocks.map((b, j) => (
+                      <Block key={j} b={b} />
+                    ))}
+                  </section>
+                ))}
+              </div>
+            </div>
+          </section>
+        ))}
+
+        {rest.length > 0 && (
+          <section id="ostalo" className="mt-[16vh] border-t border-ink/10 pt-[10vh]">
+            <h2 className="label text-center text-ink/45">Ostale stranice</h2>
+            <ul className="mx-auto mt-6 max-w-[520px] space-y-3 text-center text-[15px]">
+              {rest.map((d) => (
+                <li key={d.slug}>
+                  <Link href={`/${d.slug}`} className="ulink text-ink/75 transition-colors hover:text-ink">
+                    {d.title}
                   </Link>
                 </li>
               ))}
             </ul>
           </section>
-        ))}
-      </div>
+        )}
+      </main>
     </div>
   )
 }
