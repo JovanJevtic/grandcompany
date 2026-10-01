@@ -10,7 +10,7 @@ import { revealChars } from '@/lib/reveal'
 import { POSTS } from '@/lib/posts'
 import Pw, { pw } from '@/components/ui/Pw'
 
-// Tri najnovije objave. Kartice zadržavaju linijske crteže (jedino mjesto na sajtu, uz
+// Tri najnovija vodiča (ranije "objave"). Kartice zadržavaju linijske crteže (jedino mjesto na sajtu, uz
 // "Po namjeni" i brendove, gdje su ilustracije umjesto fotografija). Na hover se crtež podigne.
 
 // Datum ručno (dd.mm.gggg.): Node i browser nemaju iste podatke za lokal sr-Latn-BA, pa bi
@@ -41,14 +41,14 @@ export default function PostsTeaser() {
   )
 
   return (
-    <section ref={root} id="objave" className="relative z-20 bg-bg py-[20vh]" aria-label="Objave">
+    <section ref={root} id="vodici" className="relative z-20 bg-bg py-[20vh]" aria-label="Vodiči">
       <h2 data-head className="display invisible mx-auto px-5 text-center text-title"><Pw>
         Znanje sa <em>gradilišta</em>
       </Pw></h2>
 
       <div data-grid className="mx-auto mt-[10vh] grid w-[calc(100%-40px)] gap-x-[2vw] gap-y-16 md:w-[88vw] md:grid-cols-3">
         {latest.map((p, i) => (
-          <Link key={p.slug} href={`/objave/${p.slug}`} data-post data-cursor="Čitaj" className={`group flex flex-col ${i === 1 ? 'md:mt-[10vh]' : ''}`}>
+          <Link key={p.slug} href={`/vodici/${p.slug}`} data-post data-cursor="Čitaj" className={`group flex flex-col ${i === 1 ? 'md:mt-[10vh]' : ''}`}>
             <span className="flex aspect-[4/5] items-center justify-center bg-plate px-[12%] [--art-fill:var(--plate)]">
               <PostArtDraw kind={p.art} className="w-full text-ink/80 transition-transform duration-700 ease-[var(--ease-out)] group-hover:-translate-y-3" />
             </span>
@@ -64,7 +64,7 @@ export default function PostsTeaser() {
       </div>
 
       <div className="mt-[10vh] flex justify-center">
-        <Cta href="/objave">Objave</Cta>
+        <Cta href="/vodici">Vodiči</Cta>
       </div>
     </section>
   )

@@ -47,7 +47,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
       <div className="mt-[8dvh] grid gap-x-8 gap-y-20 px-5 md:grid-cols-2 md:px-10 xl:grid-cols-3">
         {shown.map((post) => (
           <article key={post.slug} className="group">
-            <Link href={`/objave/${post.slug}`} className="block" data-cursor="Čitaj">
+            <Link href={`/vodici/${post.slug}`} className="block" data-cursor="Čitaj">
               <div className="ed-art aspect-[4/3] bg-plate p-[9%]">
                 <PostArtDraw kind={post.art} className="h-full transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.04]" />
               </div>

@@ -82,33 +82,54 @@ export default function SiteChrome() {
         const after = document.getElementById('radovi')
         // Pri povratku na početnu (klijentska navigacija) kreće se od herosa.
         document.documentElement.removeAttribute('data-past-hero')
-        const mini = el.querySelector<HTMLElement>('[data-mini]')!
         // Dok su slova sklonjena, uvodna animacija (i njen sigurnosni tajmer) ih ne smije vratiti.
         let gone = false
         if (after) {
+          const html = document.documentElement
+          // Veliki wordmark ne nestaje: smanji se i "sleti" tačno na mjesto logotipa u sredini
+          // navbara (FLIP: izmjeri početak i cilj, pa animiraj transform). Navbar u istom trenutku
+          // klizne na vrh, pa se cilj računa za njegov krajnji položaj (top = 0).
           const leave = (out: boolean) => {
             gone = out
-            document.documentElement.toggleAttribute('data-past-hero', out)
-            const chars = gsap.utils.toArray<HTMLElement>('.ch', wm)
-            if (reduce) {
-              gsap.set(chars, { yPercent: out ? -130 : 0 })
-              gsap.set(badge, { autoAlpha: out ? 0 : 1 })
-              gsap.set(mini, { autoAlpha: out ? 1 : 0 })
+            html.toggleAttribute('data-past-hero', out)
+            const target = document.querySelector<HTMLElement>('.nav--home [data-nav-word]')
+            const nav = document.querySelector<HTMLElement>('.nav--home')
+            gsap.killTweensOf(wm)
+            if (!out) html.removeAttribute('data-wm-docked')
+            if (!target || !nav) {
+              gsap.to(wm, { autoAlpha: out ? 0 : 1, duration: 0.4 })
               return
             }
-            gsap.to(chars, {
-              yPercent: out ? -130 : 0,
-              duration: out ? 0.6 : 0.9,
-              ease: out ? 'power3.in' : EASE.quint,
-              stagger: { each: 0.03, from: out ? 'start' : 'end' },
-              overwrite: true,
+            const dock = () => {
+              html.setAttribute('data-wm-docked', '')
+              gsap.set(wm, { autoAlpha: 0 })
+            }
+            // izmjeri wordmark bez trenutnog transforma (pa vrati — isti kadar, ništa ne trepne)
+            const cur = { x: gsap.getProperty(wm, 'x'), y: gsap.getProperty(wm, 'y'), scale: gsap.getProperty(wm, 'scale') }
+            gsap.set(wm, { x: 0, y: 0, scale: 1 })
+            const w = wm.getBoundingClientRect()
+            gsap.set(wm, cur)
+            const t = target.getBoundingClientRect()
+            const n = nav.getBoundingClientRect()
+            const to = {
+              x: t.left + t.width / 2 - (w.left + w.width / 2),
+              y: t.top - n.top + t.height / 2 - (w.top + w.height / 2),
+              scale: t.width / w.width,
+            }
+            gsap.set(wm, { autoAlpha: 1, transformOrigin: '50% 50%' })
+            if (reduce) {
+              if (out) dock()
+              else gsap.set(wm, { x: 0, y: 0, scale: 1 })
+              gsap.set(badge, { autoAlpha: out ? 0 : 1 })
+              return
+            }
+            gsap.to(wm, {
+              ...(out ? to : { x: 0, y: 0, scale: 1 }),
+              duration: 0.9,
+              ease: 'power3.inOut',
+              onComplete: out ? dock : undefined,
             })
             gsap.to(badge, { autoAlpha: out ? 0 : 1, duration: 0.4, overwrite: 'auto' })
-            gsap.fromTo(
-              mini,
-              { autoAlpha: out ? 0 : 1, yPercent: out ? 100 : 0 },
-              { autoAlpha: out ? 1 : 0, yPercent: out ? 0 : -100, duration: 0.6, delay: out ? 0.35 : 0, ease: EASE.quint, overwrite: true },
-            )
           }
           ScrollTrigger.create({
             trigger: after,
@@ -187,7 +208,7 @@ export default function SiteChrome() {
           i preko sadržaja dok se skrola. Boju mijenja skrol (bijel / tamno smeđ). */}
       <div
         data-brand-band
-        className="pointer-events-none fixed inset-x-0 top-0 z-[150] select-none pt-4 text-center"
+        className="pointer-events-none fixed inset-x-0 top-0 z-[340] select-none pt-4 text-center"
         style={{ height: 'var(--story-header)' }}
       >
         <h1

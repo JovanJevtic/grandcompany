@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import CraneHero from "@/components/CraneHero";
 import SiteChrome from "@/components/SiteChrome";
-import HeroNav from "@/components/site/HeroNav";
+import SiteHeader from "@/components/site/SiteHeader";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
 import Kaolin from "@/components/shop/Kaolin";
@@ -22,8 +22,9 @@ export default function Home() {
   return (
     <>
       <SiteChrome />
-      {/* Traka-navigacija: ispod wordmarka tokom herosa, poslije zalijepljena za vrh. */}
-      <HeroNav />
+      {/* Navbar: tokom herosa ispod velikog wordmarka; kad se hero pređe, wordmark se smanji u logo
+          u sredini navbara, a navbar ostaje zalijepljen za vrh. */}
+      <SiteHeader variant="home" />
       <main>
         <CraneHero />
         <SkySwipe />

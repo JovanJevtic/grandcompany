@@ -55,7 +55,7 @@ export default function BrandStory() {
         </div>
 
         <div className="flex flex-col justify-between gap-14 px-5 py-10 md:px-[4vw] md:py-[4vw]">
-          <BladeOutline label="Pročitaj" href="/objave" className="self-end" />
+          <BladeOutline label="Pročitaj" href="/vodici" className="self-end" />
           <div>
             <h2 data-up className="display text-[clamp(44px,4.8vw,84px)]">
               <Pw>Naš brend</Pw>

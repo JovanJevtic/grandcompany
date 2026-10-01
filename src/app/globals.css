@@ -742,108 +742,284 @@ input::placeholder {
   }
 }
 
-/* ——— Navigaciona traka početne (HeroNav) ——— */
+/* ——— Navbar (SiteHeader) ——— */
 :root {
-  --nav-h: 52px;
-  /* razmak između dna slova wordmarka i gornje linije trake */
+  --nav-h: 64px;
+  /* razmak između dna slova velikog wordmarka i trake (samo početna, tokom herosa) */
   --nav-gap: 14px;
 }
-.hero-nav {
+.nav {
   position: fixed;
   left: 0;
   right: 0;
   top: 0;
   z-index: 320;
-  /* tokom herosa: odmah ispod velikog wordmarka; poslije: na vrhu (samo transform → GPU) */
-  transform: translate3d(0, calc(var(--story-header) + var(--nav-gap)), 0);
+  color: var(--ink);
   transition:
     transform 0.8s var(--ease-io),
     background-color 0.5s,
     backdrop-filter 0.5s;
-  color: var(--ink);
 }
-html[data-past-hero] .hero-nav {
-  transform: translate3d(0, 0, 0);
-  background: color-mix(in srgb, var(--bg) 88%, transparent);
+.nav__bar {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  height: var(--nav-h);
+  padding-inline: clamp(16px, 2.6vw, 40px);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+}
+/* unutrašnje stranice: traka na vrhu, svijetla podloga */
+.nav--inner {
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
-.hero-nav__row {
-  display: grid;
-  grid-template-columns: repeat(7, minmax(0, 1fr));
-  align-items: stretch;
-  height: var(--nav-h);
-  /* dvije linije preko cijele širine */
-  border-top: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
-  border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+/* početna: tokom herosa ispod velikog wordmarka (prozirna), poslije na vrhu sa podlogom */
+.nav--home {
+  transform: translate3d(0, calc(var(--story-header) + var(--nav-gap)), 0);
 }
-.hero-nav__cell {
+.nav--home .nav__bar {
+  border-top: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+}
+html[data-past-hero] .nav--home {
+  transform: translate3d(0, 0, 0);
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+html[data-past-hero] .nav--home .nav__bar {
+  border-top-color: transparent;
+}
+.nav__side {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.2vw, 34px);
+}
+.nav__side--end {
+  justify-content: flex-end;
+  gap: clamp(14px, 1.6vw, 24px);
+}
+.nav__links {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.2vw, 34px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.nav__link {
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: center;
   height: var(--nav-h);
-  font-family: var(--font-grotesk), Arial, sans-serif;
   font-size: 11.5px;
-  font-weight: 700;
-  line-height: 1;
+  font-weight: 500;
   letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+.nav__link span {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  padding-bottom: 3px;
+  transition: background-size 0.5s var(--ease-io);
+}
+.nav__link:hover span,
+.nav__link.is-active span {
+  background-size: 100% 1px;
+}
+/* logo u sredini: znak + GRAND COMPANY (isti font i razmak slova kao veliki wordmark,
+   pa se veliki wordmark tačno "uklopi" u njega kad se smanji) */
+.nav__logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+}
+.nav__mark {
+  width: 30px;
+  height: auto;
+  transition: opacity 0.6s var(--ease-out) 0.15s, transform 0.6s var(--ease-out) 0.15s;
+}
+.nav__word {
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.01em;
   text-transform: uppercase;
   white-space: nowrap;
 }
-/* kratka vertikalna crtica između ćelija (ne oko romba) */
-.hero-nav__cell + .hero-nav__cell:not(.hero-nav__cell--buy)::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 1px;
-  height: 14px;
-  translate: 0 -50%;
-  background: color-mix(in srgb, var(--ink) 25%, transparent);
+/* početna: logo se pokaže tek kad veliki wordmark "sleti" u traku */
+html:not([data-wm-docked]) .nav--home .nav__word {
+  opacity: 0;
 }
-.hero-nav__cell--buy + .hero-nav__cell::before {
-  display: none;
+html:not([data-wm-docked]) .nav--home .nav__mark {
+  opacity: 0;
+  transform: translateX(10px);
 }
-.hero-nav__label {
-  background: linear-gradient(currentColor, currentColor) 0 calc(100% + 5px) / 0 1px no-repeat;
-  padding-bottom: 5px;
-  margin-bottom: -5px;
-  transition: background-size 0.5s var(--ease-io);
-}
-.hero-nav__cell:hover .hero-nav__label {
-  background-size: 100% 1px;
-}
-/* crveni romb (isti oblik kao CTA), malo viši od trake, centriran u svojoj ćeliji */
-.hero-nav__buy {
+/* crveni "Kupuj" (isti oblik kao CTA dugmad) */
+.nav__buy {
   display: grid;
   place-items: center;
-  width: min(100%, 190px);
-  height: calc(var(--nav-h) + 16px);
+  height: 46px;
+  padding-inline: 34px;
   background: var(--signal);
   color: #fff;
   -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
   mask: var(--shape-blade) center / 100% 100% no-repeat;
-  font-weight: 800;
+  font-size: 11px;
+  font-weight: 700;
   letter-spacing: 0.14em;
   transition: background-color 0.4s;
 }
-.hero-nav__buy:hover {
+.nav__buy:hover {
   background: var(--ink);
 }
-@media (max-width: 767px) {
+/* korpa: ikonica; na hover iza nje izraste crveni romb, a ikonica pobijeli */
+.nav__cart {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  color: var(--ink);
+  transition: color 0.35s;
+}
+.nav__cart-bg {
+  position: absolute;
+  inset: 4px;
+  background: var(--signal);
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  transform: scale(0) rotate(-45deg);
+  transition: transform 0.5s var(--ease-out);
+}
+.nav__cart:hover .nav__cart-bg,
+.nav__cart:focus-visible .nav__cart-bg {
+  transform: scale(1) rotate(0deg);
+}
+.nav__cart:hover,
+.nav__cart:focus-visible {
+  color: #fff;
+}
+.nav__cart-icon {
+  position: relative;
+  width: 22px;
+  height: 22px;
+}
+.nav__cart-count {
+  position: absolute;
+  top: 4px;
+  right: 2px;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding-inline: 4px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* tri crte (samo telefon) */
+.nav__burger {
+  display: none;
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+.nav__burger i {
+  position: absolute;
+  left: 11px;
+  width: 22px;
+  height: 1.5px;
+  background: currentColor;
+  transition: transform 0.5s var(--ease-io), opacity 0.3s;
+}
+.nav__burger i:nth-child(1) { top: 15px; }
+.nav__burger i:nth-child(2) { top: 21px; }
+.nav__burger i:nth-child(3) { top: 27px; }
+.nav.is-open .nav__burger i:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.nav.is-open .nav__burger i:nth-child(2) { opacity: 0; }
+.nav.is-open .nav__burger i:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+/* meni preko cijelog ekrana */
+.menu {
+  position: fixed;
+  inset: 0;
+  z-index: 310;
+  pointer-events: none;
+}
+.menu.is-open {
+  pointer-events: auto;
+}
+.menu__panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  padding: calc(var(--nav-h) + 24px) 24px 40px;
+  background: var(--bg);
+}
+.menu__list {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+}
+.menu__item {
+  display: block;
+  padding: 18px 0 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  text-align: center;
+  font-family: var(--font-pretty), Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(30px, 9vw, 44px);
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+.menu__foot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  margin-top: 36px;
+}
+.nav__buy--big {
+  height: 60px;
+  padding-inline: 56px;
+  font-size: 12px;
+}
+.menu__tel {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  opacity: 0.6;
+}
+html.menu-open {
+  overflow: hidden;
+}
+html.menu-open .nav--home {
+  background: var(--bg);
+}
+@media (max-width: 899px) {
   :root {
-    --nav-h: 46px;
+    --nav-h: 56px;
     --nav-gap: 8px;
   }
-  .hero-nav__row {
-    grid-template-columns: 1fr 1.2fr 1fr;
-  }
-  .hero-nav__desk {
+  .nav__links,
+  .nav__link--desk,
+  .nav__side--end .nav__buy {
     display: none;
   }
-  .hero-nav__cell {
-    font-size: 10.5px;
+  .nav__burger {
+    display: block;
+    margin-left: -10px;
+  }
+  .nav__mark {
+    width: 24px;
+  }
+  .nav__word {
+    font-size: 17px;
+  }
+  .nav__cart {
+    margin-right: -6px;
   }
 }
 

@@ -6,11 +6,11 @@ import { POSTS, postDate } from '@/lib/posts'
 import Pw, { pw } from '@/components/ui/Pw'
 
 export const metadata = {
-  title: 'Objave | Grand Company',
+  title: 'Vodiči | Grand Company',
   description: 'Praktični vodiči o suhoj gradnji, izolaciji, fasadi i isporuci.',
 }
 
-// Objave: naslov u sredini, jedna istaknuta objava preko cijele širine (crtež lijevo, tekst desno),
+// Vodiči (ranije "Objave"): naslov u sredini, jedna istaknuta objava preko cijele širine (crtež lijevo, tekst desno),
 // pa mirna mreža ostalih. Crteži ostaju — to je jedino mjesto uz "Po namjeni" i brendove gdje ih ima.
 export default function PostsPage() {
   const [featured, ...rest] = POSTS
@@ -26,7 +26,7 @@ export default function PostsPage() {
       </header>
 
       <Link
-        href={`/objave/${featured.slug}`}
+        href={`/vodici/${featured.slug}`}
         className="group mx-5 grid items-center gap-10 md:mx-10 md:grid-cols-[1.25fr_1fr] md:gap-[6vw]"
         data-cursor="Čitaj"
       >

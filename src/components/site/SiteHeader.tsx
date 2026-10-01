@@ -2,22 +2,42 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useRef, useState } from 'react'
-import { pw } from '@/components/ui/Pw'
+import { useEffect, useRef, useState } from 'react'
 import { cartCount, openCart, useShop } from '@/lib/cart'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
+import { pw } from '@/components/ui/Pw'
+import LogoMark from './LogoMark'
 
-const NAV = [
+// Navbar cijelog sajta: linkovi lijevo, logo (znak + GRAND COMPANY) u sredini, desno crveni
+// "Kupuj" i korpa kao ikonica (na hover iza nje izraste crveni romb). Na telefonu: tri crte
+// lijevo (meni preko cijelog ekrana), logo u sredini, korpa desno.
+//
+// variant="home": tokom herosa traka stoji ispod velikog wordmarka, a logo u sredini je prazan.
+// Kad se pređe hero, SiteChrome "spusti" veliki wordmark u sredinu trake (smanji ga tačno na
+// mjesto ovog logotipa) i postavi html[data-wm-docked] — tek tada se logo ovdje pokaže.
+// variant="inner": traka je na vrhu i logo se vidi odmah.
+
+const LINKS = [
   ['Prodavnica', '/prodavnica'],
-  ['Objave', '/objave'],
-  ['Kontakt', '/#kontakt'],
+  ['Kalkulator', '/prodavnica#kalkulator'],
+  ['Isporuka', '/dostava'],
+  ['Vodiči', '/vodici'],
 ] as const
 
-// Header: logo lijevo, tri linka u sredini, korpa desno. Bez mix-blend efekata (oni su pravili
-// "prljave" boje preko slika). Sakrije se kad se skrola nadolje, vrati kad se krene nagore.
-// Na početnoj (variant="overlay") se pojavljuje tek kad veliki wordmark iz herosa ode (globals.css).
-export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }) {
+const MENU = [['Početna', '/'], ...LINKS, ['Kontakt', '/#kontakt']] as const
+
+function CartIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="nav__cart-icon" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden>
+      <path d="M5 8h14l-1.2 12H6.2L5 8Z" />
+      <path d="M9 8V6.5a3 3 0 0 1 6 0V8" />
+    </svg>
+  )
+}
+
+export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' | 'home' }) {
+  const home = variant !== 'inner'
   const header = useRef<HTMLElement>(null)
   const menu = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
@@ -25,8 +45,17 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
   const { cart } = useShop()
   const count = cartCount(cart)
 
+  // Zaključaj skrol dok je meni otvoren
+  useEffect(() => {
+    document.documentElement.classList.toggle('menu-open', open)
+    if (open) window.__gcLenis?.stop?.()
+    else window.__gcLenis?.start?.()
+  }, [open])
+
+  // Unutrašnje stranice: traka se sakrije kad se skrola nadolje, vrati kad se krene nagore.
   useGSAP(
     () => {
+      if (home) return
       let last = window.scrollY
       const mm = gsap.matchMedia()
       mm.add(MQ, (context) => {
@@ -36,94 +65,109 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
           if (Math.abs(y - last) < 6) return
           const hidden = !open && y > last && y > 160
           gsap.to(header.current, { yPercent: hidden ? -100 : 0, duration: reduce ? 0 : 0.6, ease: EASE.quint, overwrite: 'auto' })
-          header.current?.toggleAttribute('data-solid', y > 40)
           last = y
         }
         window.addEventListener('scroll', onScroll, { passive: true })
         return () => window.removeEventListener('scroll', onScroll)
       })
     },
-    { scope: header, dependencies: [open] },
+    { scope: header, dependencies: [open, home] },
   )
 
+  // Meni preko cijelog ekrana: zavjesa odozgo, stavke izranjaju jedna za drugom.
   useGSAP(
     () => {
       const panel = menu.current?.querySelector('[data-panel]')
-      const links = menu.current?.querySelectorAll('[data-menu-link]')
-      if (!panel || !links) return
+      const items = menu.current?.querySelectorAll('[data-item]')
+      if (!panel || !items) return
       const mm = gsap.matchMedia()
       mm.add(MQ, (context) => {
         const { reduce } = context.conditions as { reduce: boolean }
-        gsap.to(panel, { clipPath: open ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)', duration: reduce ? 0 : 0.9, ease: EASE.quintInOut })
+        gsap.to(panel, { clipPath: open ? 'inset(0% 0% 0% 0%)' : 'inset(0% 0% 100% 0%)', duration: reduce ? 0 : 0.8, ease: EASE.quintInOut })
         gsap.fromTo(
-          links,
-          { yPercent: open ? 110 : 0 },
-          { yPercent: open ? 0 : 110, duration: reduce ? 0 : 0.9, ease: EASE.quint, stagger: 0.06, delay: open && !reduce ? 0.25 : 0 },
+          items,
+          { yPercent: open ? 60 : 0, autoAlpha: open ? 0 : 1 },
+          { yPercent: open ? 0 : 30, autoAlpha: open ? 1 : 0, duration: reduce ? 0 : 0.7, ease: EASE.quint, stagger: 0.05, delay: open && !reduce ? 0.25 : 0 },
         )
       })
     },
     { scope: menu, dependencies: [open] },
   )
 
-  const active = (href: string) => !href.includes('#') && (pathname === href || pathname.startsWith(`${href}/`))
+  const active = (href: string) => !href.includes('#') && href !== '/' && (pathname === href || pathname.startsWith(`${href}/`))
 
   return (
     <>
-      <header
-        ref={header}
-        data-variant={variant}
-        className={`site-header fixed inset-x-0 top-0 z-[300] ${open ? 'is-open' : ''}`}
-      >
-        <div className="grid h-[72px] grid-cols-[1fr_auto_1fr] items-center px-5 md:px-10">
-          <Link href="/" className="font-pretty justify-self-start whitespace-nowrap text-[15px] uppercase leading-none tracking-[0.06em] md:text-[17px]" aria-label="Grand Company, početna">
-            Grand Company
-          </Link>
-
-          <nav className="hidden items-center gap-10 text-[12.5px] md:flex" aria-label="Glavni meni">
-            {NAV.map(([label, href]) => (
-              <Link key={href} href={href} className="relative flex items-center gap-2">
-                <span className={`absolute -left-3.5 size-1.5 rounded-full bg-signal transition-transform duration-500 ${active(href) ? 'scale-100' : 'scale-0'}`} />
-                <span className="ulink">{label}</span>
-              </Link>
-            ))}
-          </nav>
-
-          <div className="flex items-center gap-6 justify-self-end text-[12.5px]">
-            <button onClick={openCart} className="flex items-center gap-2 max-md:min-h-11 max-md:min-w-11 max-md:justify-center" aria-label={`Korpa, ${count} artikala`}>
-              <span className="ulink hidden sm:inline">Korpa</span>
-              <span
-                className={`grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[12px] tabular-nums transition-colors ${
-                  count ? 'bg-signal text-bg' : 'border border-ink/25'
-                }`}
-              >
-                {count}
-              </span>
-            </button>
+      <header ref={header} className={`nav ${home ? 'nav--home' : 'nav--inner'} ${open ? 'is-open' : ''}`}>
+        <div className="nav__bar">
+          {/* lijevo: linkovi (desktop) / tri crte (telefon) */}
+          <div className="nav__side">
+            <ul className="nav__links">
+              {LINKS.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href} className={`nav__link ${active(href) ? 'is-active' : ''}`}>
+                    <span>{label}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
             <button
+              type="button"
+              className="nav__burger"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls="site-menu"
-              className="flex h-11 min-w-11 items-center justify-center gap-2 md:hidden"
+              aria-label={open ? 'Zatvori meni' : 'Otvori meni'}
             >
-              <span className="relative block h-2.5 w-6" aria-hidden>
-                <i className={`absolute left-0 h-px w-full bg-current transition-transform duration-500 ${open ? 'top-1/2 rotate-45' : 'top-0'}`} />
-                <i className={`absolute left-0 h-px w-full bg-current transition-transform duration-500 ${open ? 'top-1/2 -rotate-45' : 'bottom-0'}`} />
-              </span>
-              <span className="sr-only">{open ? 'Zatvori meni' : 'Meni'}</span>
+              <i />
+              <i />
+              <i />
+            </button>
+          </div>
+
+          {/* sredina: logo */}
+          <Link href="/" className="nav__logo" aria-label="Grand Company, početna" onClick={() => setOpen(false)}>
+            <LogoMark className="nav__mark" />
+            <span data-nav-word className="nav__word font-pretty">
+              Grand Company
+            </span>
+          </Link>
+
+          {/* desno: Kupuj + korpa */}
+          <div className="nav__side nav__side--end">
+            <Link href="/#kontakt" className="nav__link nav__link--desk">
+              <span>Kontakt</span>
+            </Link>
+            <Link href="/prodavnica" className="nav__buy">
+              Kupuj
+            </Link>
+            <button type="button" onClick={openCart} className="nav__cart" aria-label={`Korpa, ${count} artikala`}>
+              <span className="nav__cart-bg" aria-hidden />
+              <CartIcon />
+              {count > 0 && <span className="nav__cart-count">{count}</span>}
             </button>
           </div>
         </div>
       </header>
 
-      <div ref={menu} id="site-menu" className={`fixed inset-0 z-[290] md:hidden ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
-        <div data-panel className="flex h-full flex-col justify-end bg-ink px-5 pb-12 text-bg" style={{ clipPath: 'inset(0% 0% 100% 0%)' }}>
-          {[['Početna', '/'] as const, ...NAV].map(([label, href]) => (
-            <span key={href} className="block overflow-hidden">
-              <Link data-menu-link href={href} onClick={() => setOpen(false)} className="font-pretty block py-1 text-[15vw] leading-[1.05] tracking-[-0.01em]">
+      {/* Meni preko cijelog ekrana (tri crte): sekcije centrirane, odvojene linijama */}
+      <div ref={menu} id="site-menu" className={`menu ${open ? 'is-open' : ''}`} aria-hidden={!open}>
+        <div data-panel className="menu__panel" style={{ clipPath: 'inset(0% 0% 100% 0%)' }}>
+          <nav className="menu__list" aria-label="Meni">
+            {MENU.map(([label, href]) => (
+              <Link key={href} data-item href={href} onClick={() => setOpen(false)} className="menu__item">
                 {pw(label)}
               </Link>
-            </span>
-          ))}
+            ))}
+          </nav>
+          <div data-item className="menu__foot">
+            <Link href="/prodavnica" onClick={() => setOpen(false)} className="nav__buy nav__buy--big">
+              Kupuj
+            </Link>
+            <a href="tel:+38765516696" className="menu__tel">
+              065 516-696
+            </a>
+          </div>
         </div>
       </div>
     </>

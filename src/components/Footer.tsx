@@ -13,7 +13,7 @@ import { EASE, MQ, fitFontSize } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 
 const COLS: { title: string; links: [string, string][] }[] = [
-  { title: 'Prodavnica', links: [['Katalog', '/prodavnica'], ['Kalkulator zida', '/prodavnica#kalkulator'], ['Objave', '/objave']] },
+  { title: 'Prodavnica', links: [['Katalog', '/prodavnica'], ['Kalkulator zida', '/prodavnica#kalkulator'], ['Vodiči', '/vodici']] },
   { title: 'Kupovina', links: [['Dostava', '/dostava'], ['Povrat robe', '/povrat-robe'], ['Načini plaćanja', '/nacini-placanja']] },
   { title: 'Pravno', links: [['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']] },
 ]

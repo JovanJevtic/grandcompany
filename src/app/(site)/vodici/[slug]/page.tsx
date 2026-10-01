@@ -21,7 +21,7 @@ export function generateStaticParams() {
   return POSTS.map((post) => ({ slug: post.slug }))
 }
 
-export async function generateMetadata({ params }: PageProps<'/objave/[slug]'>): Promise<Metadata> {
+export async function generateMetadata({ params }: PageProps<'/vodici/[slug]'>): Promise<Metadata> {
   const { slug } = await params
   const post = postBySlug(slug)
   return post
@@ -62,7 +62,7 @@ function BodyBlock({ block, index }: { block: Block; index: number }) {
 
 // Članak: naslov u sredini, crtež kao naslovna "fotografija", pa jedan centriran stub teksta.
 // Sadržaj (lijevo, sitno) samo na širokom ekranu. Na kraju artikli iz teksta i sljedeća objava.
-export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'>) {
+export default async function ArticlePage({ params }: PageProps<'/vodici/[slug]'>) {
   const { slug } = await params
   const post = postBySlug(slug)
   if (!post) notFound()
@@ -126,7 +126,7 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
       )}
 
       {next && next !== post && (
-        <Link href={`/objave/${next.slug}`} className="group mt-[18dvh] block px-5 text-center" data-cursor="Čitaj">
+        <Link href={`/vodici/${next.slug}`} className="group mt-[18dvh] block px-5 text-center" data-cursor="Čitaj">
           <p className="text-[14px] text-ink/50">Sljedeća objava</p>
           <p className="display mx-auto mt-5 max-w-[18ch] text-[clamp(36px,5vw,88px)] transition-colors duration-500 group-hover:text-signal"><Pw>
             {next.title}
