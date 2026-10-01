@@ -13,7 +13,7 @@ import { EASE, MQ, fitFontSize } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 
 const COLS: { title: string; links: [string, string][] }[] = [
-  { title: 'Prodavnica', links: [['Katalog', '/prodavnica'], ['Kalkulator zida', '/prodavnica#kalkulator'], ['Vodiči', '/vodici']] },
+  { title: 'Platforma', links: [['B2B portal', '/portal'], ['Katalog', '/prodavnica'], ['Kalkulator', '/prodavnica#kalkulator'], ['Vodiči', '/vodici']] },
   { title: 'Kupovina', links: [['Dostava', '/dostava'], ['Povrat robe', '/povrat-robe'], ['Načini plaćanja', '/nacini-placanja']] },
   { title: 'Pravno', links: [['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']] },
 ]
@@ -87,7 +87,7 @@ export default function Footer() {
           </h2>
           <div className="flex flex-col gap-8">
             <p className="max-w-[44ch] text-[12.5px] leading-[1.7] opacity-70">
-              Upit za veći projekat, partnerski račun ili samo savjet o sistemu — javite se.
+              Upit za veći projekat, otvaranje B2B partnerskog računa ili savjet o sistemu suhe gradnje — javite se.
             </p>
             <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
               <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
@@ -105,23 +105,43 @@ export default function Footer() {
       </div>
 
       {/* 2. Kontakt i linkovi: ćelije sa tankim linijama */}
-      <div className="grid grid-cols-2 text-[12px] md:grid-cols-4 [&>*]:border-b [&>*]:border-bg/15 [&>*:nth-child(odd)]:border-r md:[&>*:not(:last-child)]:border-r">
+      <div className="grid grid-cols-2 text-[11.5px] md:grid-cols-5 [&>*]:border-b [&>*]:border-bg/15 [&>*:nth-child(odd)]:border-r md:[&>*:not(:last-child)]:border-r [&>*:last-child]:col-span-2 [&>*:last-child]:border-r-0 md:[&>*:last-child]:col-span-1">
         <div className="px-5 py-10 md:px-10 md:py-12">
-          <p className="mb-6 opacity-45">Stovarište</p>
+          <p className="mb-6 opacity-45">Sjedište i stovarište</p>
           <address className="not-italic leading-[1.9]">
             {COMPANY.address.split(', ').map((l) => (
               <span key={l} className="block">
                 {l}
               </span>
             ))}
-            <a href={COMPANY.phoneLandlineHref} className="ulink tabular-nums">
-              {COMPANY.phoneLandline}
-            </a>
-            <br />
-            <a href={`mailto:${COMPANY.emailInfo}`} className="ulink">
+            <span className="block opacity-60">Zalužani / Lazarevo</span>
+            <a href={`mailto:${COMPANY.emailInfo}`} className="ulink break-all">
               {COMPANY.emailInfo}
             </a>
+            <br />
+            <a href={`mailto:${COMPANY.emailSales}`} className="ulink break-all">
+              {COMPANY.emailSales}
+            </a>
           </address>
+        </div>
+        <div className="px-5 py-10 md:px-10 md:py-12">
+          <p className="mb-6 opacity-45">Telefoni i radno vrijeme</p>
+          <dl className="grid gap-1 leading-[1.6]">
+            <dt className="opacity-60">Veleprodaja / skladište</dt>
+            <dd>
+              <a href={COMPANY.phoneLandlineHref} className="ulink tabular-nums">
+                {COMPANY.phoneLandline}
+              </a>
+            </dd>
+            <dt className="mt-2 opacity-60">Mobilni / Viber / WhatsApp</dt>
+            <dd>
+              <a href={COMPANY.phoneMobileHref} className="ulink tabular-nums">
+                {COMPANY.phoneMobile}
+              </a>
+            </dd>
+            <dt className="mt-2 opacity-60">Pon–Pet · Sub · Ned</dt>
+            <dd className="tabular-nums">07–17 · 07–14 · neradna</dd>
+          </dl>
         </div>
         {COLS.map((c) => (
           <div key={c.title} className="px-5 py-10 md:px-10 md:py-12">
@@ -148,7 +168,7 @@ export default function Footer() {
 
       <div className="flex flex-col items-center justify-between gap-2 border-t border-bg/15 px-5 py-5 text-[10.5px] opacity-50 md:flex-row md:px-10">
         <p>
-          © {COMPANY.founded}–2026 {COMPANY.name} · JIB {COMPANY.jib} ·{' '}
+          © {COMPANY.founded}–2026 {COMPANY.name} · JIB {COMPANY.jib} · PIB {COMPANY.pib} · MBS {COMPANY.mbs} ·{' '}
           <Link href="/o-prodavcu" className="ulink">
             Podaci o prodavcu
           </Link>

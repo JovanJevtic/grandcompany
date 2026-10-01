@@ -6,7 +6,6 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
-import Pw from '@/components/ui/Pw'
 
 // Isporuka: jedna velika fotografija. Sekcija je visoka 240vh, a unutra stoji "sticky" ekran.
 // Dok se skrola, okvir (transform: scale) raste iz malog prozora do punog ekrana, slika se smiruje sa zuma,
@@ -52,24 +51,27 @@ export default function Delivery() {
         </div>
 
         <div className="relative flex h-full flex-col items-center justify-center px-5 text-center text-bg">
-          <h2 className="display text-display"><Pw>
+          <h2 className="display text-[clamp(44px,8.4vw,150px)]">
             <span className="block overflow-hidden pb-[0.08em]">
               <span data-line className="block">
-                Spuštamo je
+                Istovar
               </span>
             </span>
             <span className="block overflow-hidden pb-[0.08em]">
               <span data-line className="block">
-                <em>na etažu.</em>
+                na sprat
               </span>
             </span>
-          </Pw></h2>
+          </h2>
           <p data-foot className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-[12.5px] md:bottom-14">
             <span className="flex items-center gap-3">
-              <span className="opacity-85">Vlastiti kamioni sa kranom, Banja Luka i okolina</span>
+              <span className="max-w-[52ch] opacity-90">
+                Vlastiti kamioni sa hidrauličnom dizalicom — paletirani materijal istovaramo direktno na spratove i visoke
+                etaže gradilišta u regiji Banja Luke i šire.
+              </span>
             </span>
             <Link href="/dostava" className="ulink">
-              Kako isporučujemo
+              Dostava i kran-transport
             </Link>
           </p>
         </div>

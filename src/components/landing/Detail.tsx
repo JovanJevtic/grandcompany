@@ -1,56 +1,95 @@
 'use client'
 
-/* eslint-disable @next/next/no-img-element -- editorijalne fotografije iz /public, već u WebP */
+/* eslint-disable @next/next/no-img-element -- vlastita fotografija stovarišta iz /public */
 
 import { useRef } from 'react'
+import Cta from '@/components/ui/Cta'
+import { COMPANY } from '@/gc/gc'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { useMediaMotion } from '@/lib/media'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
-import Pw from '@/components/ui/Pw'
 
-// Predah između prodaje i brendova: jedna rečenica i dvije portretne fotografije materijala.
-// Lijeva slika ide uz stranicu, desna (niže postavljena) brže naviše — kolaž "diše" dok se skrola.
+// Stovarište: sjedište i centralno skladište, radno vrijeme i kontakt telefoni (PDF, tačka 1).
+// Lijevo vlastita fotografija stovarišta iz vazduha, desno podaci u tankim redovima.
+// (Fajl je ranije bio sekcija "Detail" sa fotografijama materijala.)
+
+const HOURS: [string, string][] = [
+  ['Ponedjeljak – petak', '07:00 – 17:00'],
+  ['Subota', '07:00 – 14:00'],
+  ['Nedjelja', 'Neradna'],
+]
+
 export default function Detail() {
   const root = useRef<HTMLElement>(null)
   useMediaMotion(root)
 
   useGSAP(
     () => {
-      const el = root.current!
       const mm = gsap.matchMedia()
       mm.add(MQ, (ctx) => {
-        const { reduce, mobile } = ctx.conditions as { reduce: boolean; mobile: boolean }
-        revealChars(el.querySelector('[data-head]')!, reduce, 'top 80%')
-        if (reduce || mobile) return
-        gsap.fromTo(
-          el.querySelector('[data-fast]'),
-          { y: 160 },
-          { y: -160, ease: 'none', scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true } },
-        )
+        const { reduce } = ctx.conditions as { reduce: boolean }
+        revealChars(root.current!.querySelector('[data-head]')!, reduce, 'top 80%')
       })
     },
     { scope: root },
   )
 
-  return (
-    <section ref={root} className="relative z-20 overflow-hidden bg-bg py-[22vh]" aria-label="Materijal">
-      <h2 data-head className="display invisible mx-auto max-w-[16ch] px-5 text-center text-title"><Pw>
-        Materijal koji se <em>ne vidi</em> kad je zid gotov.
-      </Pw></h2>
+  const [street, city] = COMPANY.address.split(', ')
 
-      <div className="mx-auto mt-[14vh] grid w-[calc(100%-40px)] grid-cols-2 gap-4 md:w-[72vw] md:gap-[6vw]">
-        <figure data-curtain data-parallax="10" className="aspect-[2/3] overflow-hidden bg-ink">
-          <img src="/editorial/powder.webp" alt="Gipsani prah koji pada u tankom mlazu" className="h-full w-full object-cover" />
+  return (
+    <section ref={root} id="stovariste" className="relative z-20 bg-bg py-[16vh]" aria-label="Stovarište i radno vrijeme">
+      <div className="mx-auto grid w-[calc(100%-40px)] max-w-[1400px] gap-10 md:grid-cols-[1.25fr_1fr] md:gap-[5vw]">
+        <figure data-curtain data-parallax="6" className="relative aspect-[16/10] overflow-hidden bg-plate">
+          <img src="/photos/stovariste-vazduh.jpg" alt="Stovarište Grand Company iz vazduha" className="absolute inset-0 h-full w-full object-cover" />
         </figure>
-        <figure data-fast className="mt-[18vh] md:mt-[26vh]">
-          <div data-curtain data-parallax="10" className="aspect-[2/3] overflow-hidden bg-plate">
-            <img src="/editorial/boards-light.webp" alt="Ivica naslaganih gips-kartonskih ploča na suncu" className="h-full w-full object-cover" />
+
+        <div className="flex flex-col justify-center">
+          <p className="label opacity-60">Sjedište i centralno stovarište</p>
+          <h2 data-head className="display invisible mt-5 text-[clamp(40px,4.6vw,84px)]">
+            Stovarište
+          </h2>
+          <address data-up className="mt-8 not-italic text-[12.5px] leading-[1.7]">
+            {street}
+            <br />
+            {city} · Zalužani / Lazarevo
+          </address>
+
+          <dl data-up className="mt-8 border-t border-ink/20 text-[12px]">
+            {HOURS.map(([d, h]) => (
+              <div key={d} className="flex justify-between gap-6 border-b border-ink/20 py-3.5">
+                <dt className="opacity-60">{d}</dt>
+                <dd className="tabular-nums">{h}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <dl data-up className="mt-8 grid gap-1.5 text-[12px]">
+            <div className="flex justify-between gap-6">
+              <dt className="opacity-60">Veleprodaja / skladište</dt>
+              <dd>
+                <a href={COMPANY.phoneLandlineHref} className="ulink tabular-nums">
+                  {COMPANY.phoneLandline}
+                </a>
+              </dd>
+            </div>
+            <div className="flex justify-between gap-6">
+              <dt className="opacity-60">Mobilni / Viber / WhatsApp</dt>
+              <dd>
+                <a href={COMPANY.phoneMobileHref} className="ulink tabular-nums">
+                  {COMPANY.phoneMobile}
+                </a>
+              </dd>
+            </div>
+          </dl>
+
+          <div data-up className="mt-10 flex flex-wrap gap-3">
+            <Cta href={COMPANY.phoneLandlineHref} solid>
+              Pozovite
+            </Cta>
+            <Cta href={`mailto:${COMPANY.emailSales}`}>Pišite</Cta>
           </div>
-          <figcaption className="mt-5 flex items-center gap-3 text-[14px]">
-            <span className="opacity-60">Gips, vuna, čelik.</span>
-          </figcaption>
-        </figure>
+        </div>
       </div>
     </section>
   )

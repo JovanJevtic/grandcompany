@@ -10,7 +10,8 @@ import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import Pw from '@/components/ui/Pw'
 
-// Prvi ekran poslije herosa: centriran naslov, jedna rečenica i kolaž od dvije fotografije.
+// Prvi ekran poslije herosa: ko smo (B2B veleprodaja, Knauf distributer), dva ulaza — B2B portal
+// i maloprodaja — i kolaž od dvije fotografije.
 // Velika slika se otvara odozdo i klizi sporije od stranice, mala portretna preko nje brže —
 // razlika u brzini daje dubinu. id="radovi" je okidač za odlazak velikog wordmarka (SiteChrome).
 export default function Intro() {
@@ -37,18 +38,19 @@ export default function Intro() {
 
   return (
     <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[18vh] pt-[24vh] text-center">
-      <h2 data-head className="display invisible mx-auto px-5 text-display"><Pw>
-        Materijal za
-        <br />
-        <em>svaki</em> sloj
-      </Pw></h2>
-      <p data-up className="mx-auto mt-10 max-w-[46ch] px-5 text-lead opacity-80">
-        Knauf sistemi, izolacija i veziva — spušteni kranom na vašu etažu.
+      <p data-up className="label mb-8 opacity-60">Veleprodaja i maloprodaja · Banja Luka</p>
+      <h2 data-head className="display invisible mx-auto max-w-[14ch] px-5 text-[clamp(40px,7.4vw,128px)]">
+        <Pw>Građevinski materijal za izvođače</Pw>
+      </h2>
+      <p data-up className="mx-auto mt-10 max-w-[56ch] px-5 text-lead opacity-80">
+        Knauf ovlašteni distributer za suhu gradnju. Izolacija, veziva i oprema za montažu — za građevinske firme,
+        izvođače radova i investitore, sa dostavom kamionom sa kranom.
       </p>
-      <div data-up data-delay="0.1" className="mt-12 flex justify-center">
-        <Cta href="/prodavnica" solid>
-          Prodavnica
+      <div data-up data-delay="0.1" className="mt-12 flex flex-wrap justify-center gap-3">
+        <Cta href="/portal" solid>
+          B2B portal
         </Cta>
+        <Cta href="/prodavnica">Maloprodaja</Cta>
       </div>
 
       <div data-collage className="relative mx-auto mt-[16vh] w-[calc(100%-40px)] md:w-[78vw]">
@@ -64,8 +66,7 @@ export default function Intro() {
           </div>
         </figure>
         <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[12.5px] md:mt-8">
-          <span className="opacity-70">
-          Ploča, profil, vuna — jedan sistem.</span>
+          <span className="opacity-70">Ploče, profili, vuna, veziva i spojnice — na jednom mjestu.</span>
         </figcaption>
       </div>
     </section>

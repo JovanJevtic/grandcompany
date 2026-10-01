@@ -10,7 +10,8 @@ import ShopHero from '@/components/shop/ShopHero'
 import { addToCart } from '@/lib/cart'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE } from '@/lib/motion'
-import { CATEGORIES, PRODUCTS, USES, defaultQty, money, shotOf, type CategoryId, type UseId } from '@/lib/shop'
+import { CATEGORIES, PRODUCTS, USES, defaultQty, shotOf, type CategoryId, type UseId } from '@/lib/shop'
+import Price from '@/components/b2b/Price'
 
 // Prodavnica poslije naslova: četiri grupe kao okrugle fotografije, podijeljeni uvod (ShopHero),
 // pa "Najprodavanije" — mreža od osam ćelija odvojenih tankim linijama (po referenci). Dugme ispod
@@ -180,7 +181,7 @@ export default function CatalogClient() {
                 </span>
                 <span className="mt-5 max-w-[30ch] text-[11px] leading-[1.45]">{p.name}</span>
                 <span className="mt-1.5 text-[12px] tabular-nums transition-colors group-hover:text-signal">
-                  {money(p.price)} <span className="opacity-50">/ {p.unit}</span>
+                  <Price value={p.price} unit={p.unit} />
                 </span>
               </Link>
               <button

@@ -1098,3 +1098,127 @@ html.scroll-held body {
     display: none;
   }
 }
+
+/* ——— calc (fork B) ——— */
+.calc-tabs {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.calc-tabs__opt {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 112px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  line-height: 1.1;
+  transition: background-color 0.35s, color 0.35s;
+}
+.calc-tabs__opt[aria-selected='true'] {
+  background: var(--ink);
+  color: var(--bg);
+}
+.calc-tabs__opt:not([aria-selected='true']):hover {
+  background: var(--btn);
+}
+.calc-seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.calc-seg__opt {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  font-size: 10.5px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+.calc-seg__opt[aria-checked='true'] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+.calc-seg__opt:not([aria-checked='true']):hover {
+  border-color: var(--ink);
+}
+.calc-select {
+  min-height: 40px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 20%, transparent);
+  background: var(--bg);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+}
+@media (max-width: 767px) {
+  .calc-tabs__opt {
+    min-width: 0;
+    padding: 8px 14px;
+  }
+}
+
+/* ——— b2b (fork A) ——— */
+.b2b-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--btn-ink);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.b2b-input {
+  min-height: 46px;
+  width: 100%;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+.b2b-input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+/* Štampa predračuna: samo list predračuna, bez navbara, footera i dugmadi */
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .quote-sheet,
+  .quote-sheet * {
+    visibility: visible !important;
+  }
+  .quote-sheet {
+    position: absolute;
+    inset: 0 0 auto 0;
+    max-width: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+  .quote-actions,
+  .grain,
+  .cursor {
+    display: none !important;
+  }
+  html,
+  body {
+    background: #fff !important;
+  }
+}

@@ -5,7 +5,8 @@
 import Link from 'next/link'
 import { pw } from '@/components/ui/Pw'
 import { addToCart, toggleSaved, useShop } from '@/lib/cart'
-import { categoryName, defaultQty, money, type Product } from '@/lib/shop'
+import Price from '@/components/b2b/Price'
+import { categoryName, defaultQty, type Product } from '@/lib/shop'
 
 type Props = { product: Product; view?: 'grid' | 'list'; size?: 'md' | 'lg'; priority?: boolean; stacked?: boolean }
 
@@ -29,8 +30,8 @@ export default function ProductCard({ product, view = 'grid', priority, stacked 
           </Link>
         </div>
         <div className="flex items-center gap-5">
-          <p className="tabular-nums">
-            {money(product.price)} <span className="opacity-50">/ {product.unit}</span>
+          <p>
+            <Price value={product.price} unit={product.unit} />
           </p>
           <button
             type="button"
@@ -81,7 +82,9 @@ export default function ProductCard({ product, view = 'grid', priority, stacked 
         <Link href={href} className="font-pretty text-[clamp(19px,1.45vw,24px)] leading-[1.1]">
           {pw(product.name)}
         </Link>
-        <p className="shrink-0 text-[14px] tabular-nums sm:pt-[2px] sm:text-[12.5px] transition-colors group-hover:text-signal">{money(product.price)}</p>
+        <p className="shrink-0 text-[14px] sm:pt-[2px] sm:text-[12.5px]">
+          <Price value={product.price} />
+        </p>
       </div>
     </article>
   )

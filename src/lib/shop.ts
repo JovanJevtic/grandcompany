@@ -159,6 +159,70 @@ export function calcW111({ L, H, cladding, plateSku, cwSku, woolSku, fillerSku, 
   return { P, items }
 }
 
+// ——— D112 spušteni plafon (orijentaciono) ———
+// Približne vrijednosti standardne Knauf D112 norme po m² plafona (zaokruženo naviše, konzervativno):
+//   ploča 1,05 m²/m² (5% otpada), CD 60/27 ≈ 4,5 m/m² (nosivi + montažni red), UD 28/27 = obim prostorije
+//   + 5%, direktni ovjes ≈ 1,3 kom/m², vijci TN 25 ≈ 17 kom/m², masa za spojeve ≈ 0,35 kg/m²,
+//   traka za spojeve ≈ 1,3 m/m². Nije zamjena za projekat — UI to prikazuje kao "orijentaciono".
+type D112Input = { L: number; W: number; plateSku: string }
+
+export function calcD112({ L, W, plateSku }: D112Input) {
+  const P = L * W
+  const items: BomItem[] = []
+
+  const plateM2 = P * 1.05
+  const boards = Math.ceil(plateM2 / 2.5)
+  items.push({ sku: plateSku, need: `${f2.format(plateM2)} m²`, qty: boards * 2.5, note: `${boards} ploča po 2,5 m²` })
+
+  const cdM = P * 4.5
+  const cdPieces = Math.ceil(cdM / 4)
+  items.push({ sku: 'PRF-CD60', need: `${f2.format(cdM)} m`, qty: cdPieces, note: `${cdPieces} komada po 4 m` })
+
+  const udM = 2 * (L + W) * 1.05
+  const udPieces = Math.ceil(udM / 3)
+  items.push({ sku: 'PRF-UD28', need: `${f2.format(udM)} m`, qty: udPieces, note: `${udPieces} komada po 3 m` })
+
+  const hangers = Math.ceil(P * 1.3)
+  const hangerPacks = Math.ceil(hangers / 100)
+  items.push({ sku: 'ACC-006', need: `${f0.format(hangers)} kom`, qty: hangerPacks, note: `${hangerPacks} pakovanja po 100 komada` })
+
+  const screws = Math.ceil(P * 17)
+  const boxes = Math.ceil(screws / 1000)
+  items.push({ sku: 'ACC-001', need: `${f0.format(screws)} kom`, qty: boxes, note: `${boxes} kutija po 1000 komada` })
+
+  const fillerKg = P * 0.35
+  const bags = Math.ceil(fillerKg / 5)
+  items.push({ sku: 'CHM-001', need: `${f2.format(fillerKg)} kg`, qty: bags, note: `${bags} vreća po 5 kg` })
+
+  const tapeM = P * 1.3
+  const rolls = Math.ceil(tapeM / 25)
+  items.push({ sku: 'ACC-003', need: `${f2.format(tapeM)} m`, qty: rolls, note: `${rolls} rola po 25 m` })
+
+  return { P, items }
+}
+
+// ——— DEMIT kontaktna fasada (orijentaciono) ———
+// Samo artikli iz kataloga: stiropor (EPS 70 ili grafitni Neopor), Ceresit CT 83 za lijepljenje ploča
+// i CT 85 za armirni sloj. Približni utrošci (konzervativno): EPS 1,05 m²/m², CT 83 ≈ 4,5 kg/m²,
+// CT 85 ≈ 4 kg/m². Mrežica, tiplovi i završni malter nisu u katalogu — UI to napominje.
+type DemitInput = { A: number; epsSku: string }
+
+export function calcDemit({ A, epsSku }: DemitInput) {
+  const items: BomItem[] = []
+  const epsM2 = Math.ceil(A * 1.05 * 2) / 2
+  items.push({ sku: epsSku, need: `${f2.format(epsM2)} m²`, qty: epsM2, note: `${f2.format(epsM2)} m² ploča` })
+
+  const glueKg = A * 4.5
+  const glueBags = Math.ceil(glueKg / 25)
+  items.push({ sku: 'CHM-003', need: `${f2.format(glueKg)} kg`, qty: glueBags, note: `${glueBags} vreća po 25 kg` })
+
+  const meshKg = A * 4
+  const meshBags = Math.ceil(meshKg / 25)
+  items.push({ sku: 'CHM-004', need: `${f2.format(meshKg)} kg`, qty: meshBags, note: `${meshBags} vreća po 25 kg` })
+
+  return { P: A, items }
+}
+
 export type Bundle = {
   id: string
   code: string

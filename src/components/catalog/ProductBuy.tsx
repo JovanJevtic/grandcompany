@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { STOCK_LABEL, stockLevel, type DeliveryZone } from '@/gc/gc'
 import { addToCart, toggleSaved, useShop } from '@/lib/cart'
 import { defaultQty, money, qtyLabel, type Product } from '@/lib/shop'
+import Price from '@/components/b2b/Price'
+import { useB2B, withDiscount } from '@/lib/b2b'
 import Cta from '@/components/ui/Cta'
 
 type Props = { product: Product; zones: DeliveryZone[] }
@@ -16,9 +18,17 @@ export default function ProductBuy({ product, zones }: Props) {
   const isSaved = saved.includes(product.id)
   const level = stockLevel(product)
   const cheapest = Math.min(...zones.map((zone) => zone.standard))
+  const { discount, partner } = useB2B()
 
   return (
     <div>
+      {discount > 0 && partner && (
+        <p className="mb-5 flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-[12px] border border-ink/15 px-4 py-3 text-[11.5px]">
+          <span className="opacity-60">Vaša B2B cijena</span>
+          <span className="num text-[20px]">{money(withDiscount(product.price, discount))}</span>
+          <span className="opacity-60">/ {product.unit} · rabat {Math.round(discount * 100)}% · {partner.name}</span>
+        </p>
+      )}
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex h-[52px] items-center rounded-full border border-ink/20">
           <button
@@ -44,8 +54,8 @@ export default function ProductBuy({ product, zones }: Props) {
         <Cta solid onClick={() => addToCart(product.id, qty)}>
           Dodaj
         </Cta>
-        <span className="text-[12.5px] tabular-nums opacity-70" aria-live="polite">
-          {money(qty * product.price)}
+        <span className="text-[12.5px] opacity-80" aria-live="polite">
+          <Price value={product.price} qty={qty} />
         </span>
       </div>
 
