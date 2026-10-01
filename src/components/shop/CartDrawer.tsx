@@ -129,12 +129,12 @@ export default function CartDrawer() {
                       </p>
                     </div>
                     <div className="flex items-center justify-between gap-3 text-[13px]">
-                      <div className="flex items-center rounded-full border border-ink/20">
+                      <div className="flex items-center border border-ink/20">
                         <button
                           type="button"
                           aria-label={`Smanji količinu: ${l.name}`}
                           onClick={() => setQty(l.key, l.qty - l.step)}
-                          className="grid size-8 place-items-center rounded-full transition-colors hover:text-signal"
+                          className="grid size-8 place-items-center transition-colors hover:text-signal"
                         >
                           −
                         </button>
@@ -143,7 +143,7 @@ export default function CartDrawer() {
                           type="button"
                           aria-label={`Povećaj količinu: ${l.name}`}
                           onClick={() => setQty(l.key, l.qty + l.step)}
-                          className="grid size-8 place-items-center rounded-full transition-colors hover:text-signal"
+                          className="grid size-8 place-items-center transition-colors hover:text-signal"
                         >
                           +
                         </button>

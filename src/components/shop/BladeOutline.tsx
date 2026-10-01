@@ -10,7 +10,7 @@ export default function BladeOutline({ label, href, onClick, dark, className = '
     <>
       <span
         aria-hidden
-        className={`absolute inset-0 rounded-full transition-colors duration-500 ${
+        className={`absolute inset-0 transition-colors duration-500 ${
           dark ? 'bg-ink' : 'border border-current group-hover:border-transparent group-hover:bg-[var(--btn)]'
         }`}
       />
@@ -23,7 +23,7 @@ export default function BladeOutline({ label, href, onClick, dark, className = '
       </span>
     </>
   )
-  const cls = `group relative grid aspect-square w-[min(220px,56vw)] place-items-center ${className}`
+  const cls = `group relative grid aspect-square w-[min(200px,52vw)] place-items-center ${className}`
   if (href)
     return (
       <Link href={href} className={cls}>

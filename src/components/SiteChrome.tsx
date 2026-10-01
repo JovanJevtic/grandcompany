@@ -129,6 +129,16 @@ export default function SiteChrome() {
               ease: 'power3.inOut',
               onComplete: out ? dock : undefined,
             })
+            // Debeli naslov u heroju i serifni logotip u navbaru su različiti fontovi: pred kraj
+            // spuštanja naslov se pretopi, a logo (data-wm-docked) se pojavi — meka zamjena.
+            if (out) {
+              gsap.to(wm, { autoAlpha: 0, duration: 0.35, delay: 0.6, ease: 'power1.out' })
+              gsap.delayedCall(0.55, () => {
+                if (gone) html.setAttribute('data-wm-docked', '')
+              })
+            } else {
+              gsap.fromTo(wm, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, ease: 'power1.out' })
+            }
             gsap.to(badge, { autoAlpha: out ? 0 : 1, duration: 0.4, overwrite: 'auto' })
           }
           ScrollTrigger.create({
@@ -213,7 +223,7 @@ export default function SiteChrome() {
       >
         <h1
           data-wordmark
-          className="font-logo invisible inline-block whitespace-nowrap uppercase leading-none tracking-[-0.01em]"
+          className="font-hero invisible inline-block whitespace-nowrap uppercase leading-none"
           style={{ fontSize: 'var(--wm-fs)' }}
         >
           {BRAND}

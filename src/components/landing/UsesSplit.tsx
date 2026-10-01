@@ -85,16 +85,22 @@ export default function UsesSplit() {
 
   return (
     <section ref={root} id="namjena" className="relative z-20 bg-bg md:grid md:grid-cols-2" aria-label="Materijal po vrsti radova">
-      {/* Lijevo: naslov stoji dok se desno skrola. */}
-      <div className="flex flex-col items-center justify-center gap-12 px-5 py-[16vh] text-center md:sticky md:top-0 md:h-dvh md:self-start">
-        <p className="label opacity-60">Kompletan sistemski asortiman</p>
-        <h2 data-head className="display invisible text-[clamp(48px,6.6vw,124px)]">
-          <Pw>Sistemi</Pw>
+      {/* Lijevo: raspored kao na referenci — naslov u stepenastim redovima gore, tekst dolje desno, dugme. */}
+      <div className="split-panel md:sticky md:top-0 md:h-dvh md:self-start">
+        <h2 data-head className="split-panel__head display invisible">
+          <span className="block">Sistemi</span>
+          <span className="block text-right">suhe</span>
+          <span className="block">gradnje</span>
         </h2>
-        <p className="max-w-[40ch] text-[13px] leading-[1.6] opacity-70">
-          Ploče, profili, veziva, spojnice, izolacija i zaptivne trake za svaki sistem — na jednom mjestu.
-        </p>
-        <Cta href="/prodavnica">Katalog</Cta>
+        <div className="split-panel__foot">
+          <p className="split-panel__lead">
+            Kompletan sistemski asortiman na jednom mjestu: ploče, profili, veziva, spojnice, izolacija i zaptivne trake —
+            za pregradne zidove, plafone, fasade, potkrovlja i podove.
+          </p>
+          <Cta href="/prodavnica" solid>
+            Katalog
+          </Cta>
+        </div>
       </div>
 
       {/* Desno: tamno plava kolona, pet vrsta radova. */}

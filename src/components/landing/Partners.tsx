@@ -26,7 +26,7 @@ export default function Partners() {
   )
 
   return (
-    <section ref={root} id="partneri" className="relative z-20 bg-bg py-[18vh]" aria-label="Za partnere">
+    <section ref={root} id="partneri" className="relative z-20 py-[14vh]" aria-label="Za partnere">
       <div className="px-5 text-center">
         <p className="label opacity-60">Za partnere · B2B</p>
         <h2 data-head className="display invisible mx-auto mt-6 max-w-[16ch] text-[clamp(40px,5.6vw,100px)]">
@@ -38,9 +38,9 @@ export default function Partners() {
         </p>
       </div>
 
-      <div data-up className="mx-auto mt-[9vh] w-[calc(100%-40px)] max-w-[1200px] border-t border-ink/20">
+      <div data-up className="mx-auto mt-[9vh] w-[calc(100%-40px)] max-w-[1200px] border-t border-current/25">
         {/* zaglavlje kolona (desktop) */}
-        <div className="hidden grid-cols-[1.1fr_1.6fr_0.8fr_1.1fr_1.2fr] gap-6 border-b border-ink/20 py-4 text-[10.5px] opacity-50 md:grid">
+        <div className="hidden grid-cols-[1.1fr_1.6fr_0.8fr_1.1fr_1.2fr] gap-6 border-b border-current/25 py-4 text-[10.5px] opacity-50 md:grid">
           <span>Nivo</span>
           <span>Za koga</span>
           <span>Rabat</span>
@@ -50,7 +50,7 @@ export default function Partners() {
         {PARTNER_TIERS.map((t, i) => (
           <div
             key={t.name}
-            className={`grid grid-cols-2 gap-x-6 gap-y-2 border-b border-ink/20 py-6 md:grid-cols-[1.1fr_1.6fr_0.8fr_1.1fr_1.2fr] md:items-baseline ${i === 0 ? 'opacity-70' : ''}`}
+            className={`grid grid-cols-2 gap-x-6 gap-y-2 border-b border-current/25 py-6 md:grid-cols-[1.1fr_1.6fr_0.8fr_1.1fr_1.2fr] md:items-baseline ${i === 0 ? 'opacity-70' : ''}`}
           >
             <span className="font-pretty text-[clamp(20px,1.8vw,28px)] leading-none">{t.name}</span>
             <span className="text-[12px] leading-[1.5] max-md:col-span-2 max-md:row-start-2">{t.who}</span>

@@ -13,7 +13,7 @@ import { EASE, MQ } from '@/lib/motion'
 // zalihe (fotografija). Podaci iz dokumentacije firme (PDF, tačke 3 i 5).
 
 const Arrow = ({ className = '' }: { className?: string }) => (
-  <span className={`grid size-[22px] place-items-center rounded-full transition-transform duration-500 group-hover:translate-x-1.5 ${className}`} aria-hidden>
+  <span className={`grid size-[26px] place-items-center transition-transform duration-500 group-hover:translate-x-1.5 ${className}`} aria-hidden>
     <svg viewBox="0 0 12 12" className="size-[11px]" fill="none" stroke="currentColor" strokeWidth="1.8">
       <path d="M2 6h8M6.5 2.5 10 6l-3.5 3.5" />
     </svg>

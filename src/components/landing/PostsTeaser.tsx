@@ -41,7 +41,7 @@ export default function PostsTeaser() {
   )
 
   return (
-    <section ref={root} id="vodici" className="relative z-20 bg-bg py-[20vh]" aria-label="Vodiči">
+    <section ref={root} id="vodici" className="relative z-20 py-[14vh]" aria-label="Vodiči">
       <h2 data-head className="display invisible mx-auto px-5 text-center text-title"><Pw>
         Znanje sa <em>gradilišta</em>
       </Pw></h2>

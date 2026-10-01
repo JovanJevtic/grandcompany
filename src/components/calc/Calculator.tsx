@@ -47,7 +47,7 @@ function useTween(target: Record<string, number>) {
 
 function Step({ label, value, min, max, step, unit = 'm', onChange }: { label: string; value: number; min: number; max: number; step: number; unit?: string; onChange: (v: number) => void }) {
   const set = (v: number) => onChange(Math.min(max, Math.max(min, Math.round(v * 10) / 10)))
-  const btn = 'grid size-9 shrink-0 place-items-center rounded-full border border-ink/25 text-lg transition-colors hover:border-ink disabled:opacity-30'
+  const btn = 'grid size-9 shrink-0 place-items-center rounded-none border border-ink/25 text-lg transition-colors hover:border-ink disabled:opacity-30'
   return (
     <div className="flex items-center justify-between gap-3 border-b border-ink/12 py-4">
       <span className="text-[10.5px] opacity-60">{label}</span>

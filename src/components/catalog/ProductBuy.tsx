@@ -30,7 +30,7 @@ export default function ProductBuy({ product, zones }: Props) {
         </p>
       )}
       <div className="flex flex-wrap items-center gap-3">
-        <div className="flex h-[52px] items-center rounded-full border border-ink/20">
+        <div className="flex h-[50px] items-center border border-ink/20">
           <button
             type="button"
             aria-label="Smanji količinu"

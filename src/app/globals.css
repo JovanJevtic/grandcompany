@@ -19,17 +19,19 @@
   --splash-mark: #f3ecdf;
   --well: #ffffff;
   /* Tamne sekcije: prigušena indigo plava (svjetlija od tinte, ali i dalje zagasita) */
-  --navy: #33467a;
+  --navy: #3156ea; /* vedrija plava (iz sekcije B2B/Logistika) — jedina plava u paleti */
   /* Električna plava sa reference (bento kartica) */
   --cobalt: #3156ea;
   /* Nebo iz herosa: tihi akcenat na tamnom */
   --accent: #a9c4e4;
   /* Kontrast: cinober (signal sa gradilišta). Samo kursor, cijena na hover-u, tačke, aktivno stanje. */
-  --signal: #e4472a;
+  --signal: #3156ea; /* akcenat = plava iz palete (crvene više nema) */
+  /* tamna sivo-crna (četvrta boja palete) */
+  --char: #1e1e1e;
   --hair: 1.25px;
-  /* veličina wordmarka: tačna mjera za Prettywise "GRAND COMPANY" preko 93,9% širine (JS je samo
-     potvrdi). Ranije je ovdje stajala mjera za stari font, pa je hero na startu "skakao". */
-  --wm-fs: 12.5169vw;
+  /* veličina wordmarka: tačna mjera za Montserrat 900 "GRAND COMPANY" preko 93,9% širine (JS je samo
+     potvrdi). Mora odgovarati fontu, inače hero na startu "skače". */
+  --wm-fs: 9.9917vw;
   --story-header: calc(16px + var(--wm-fs) * 0.862);
   /* Stari nazivi fontova (hero, kaolin) pokazuju na novi serif */
   --font-inter-tight: var(--font-text);
@@ -45,6 +47,7 @@
   --color-plate: var(--plate);
   --color-signal: var(--signal);
   --color-cobalt: var(--cobalt);
+  --color-char: var(--char);
   --font-grotesk: var(--font-grotesk), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-text), "Helvetica Neue", Arial, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
@@ -390,11 +393,12 @@ html:not([data-past-hero]) [data-overlay-header] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 52px;
-  padding: 0 2.2em;
+  gap: 2.4em;
+  min-height: 50px;
+  padding: 0 1.3em 0 1.4em;
   overflow: hidden;
   isolation: isolate;
-  border-radius: 999px;
+  border-radius: 0;
   background: var(--btn);
   color: var(--btn-ink);
   font-family: var(--font-text), Arial, sans-serif;
@@ -451,7 +455,10 @@ html:not([data-past-hero]) [data-overlay-header] {
 }
 /* "solid" je sada isti romb; ostavljen radi kompatibilnosti */
 .cta--solid {
-  --cta-fill: var(--ink);
+  background: var(--ink);
+  color: var(--bg);
+  --cta-fill: var(--navy);
+  --cta-ink: var(--bg);
 }
 
 /* Tekstualni link: linija se iscrta s lijeva na desno */
@@ -1220,5 +1227,104 @@ html.scroll-held body {
   html,
   body {
     background: #fff !important;
+  }
+}
+
+/* Veliki naslov u heroju (GRAND COMPANY): debeli sans, kao naslovi sekcija. U navbaru ostaje
+   serifni logotip (.font-logo) — na kraju "spuštanja" naslov se pretopi u njega (SiteChrome). */
+.font-hero {
+  font-family: var(--font-heavy), "Helvetica Neue", Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  font-synthesis: none;
+}
+.nav__word {
+  transition: opacity 0.45s var(--ease-out);
+}
+
+/* ——— Paleta + oštra dugmad + paneli (runda 4) ——— */
+.cta-arrow {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+  transition: transform 0.5s var(--ease-io);
+}
+.cta:hover .cta-arrow {
+  transform: translateX(4px);
+}
+/* kvadratna dugmad sa ikonicom */
+.btn-square {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid color-mix(in srgb, currentColor 30%, transparent);
+  border-radius: 0;
+  transition: background-color 0.35s, color 0.35s, border-color 0.35s;
+}
+.btn-square:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+}
+/* navbar: Kupuj, preklopnik i korpa — oštri pravougaonici/kvadrati */
+.nav__buy,
+.nav__buy--big {
+  border-radius: 0 !important;
+}
+.mode,
+.mode__opt,
+.mode__badge {
+  border-radius: 0 !important;
+}
+.nav__cart-bg {
+  border-radius: 0 !important;
+  inset: 3px !important;
+}
+.cursor-tag {
+  border-radius: 0 !important;
+}
+/* sve "pill" kapsule u aplikaciji (tagovi, količine, B2B oznake) postaju oštre */
+.b2b-pill,
+.rounded-full.border,
+button.rounded-full,
+a.rounded-full {
+  border-radius: 0 !important;
+}
+
+/* Lijevi panel (Sistemi, Četiri prednosti): veliki naslov u stepenastim redovima gore lijevo,
+   tekst dolje desno, dugme ispod — raspored sa reference. */
+.split-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 48px;
+  padding: calc(var(--nav-h) + 6vh) 20px 7vh;
+}
+.split-panel__head {
+  /* pola ekrana: najduža riječ (npr. "prednosti", 9 slova) mora stati cijela */
+  font-size: clamp(40px, 5.9vw, 112px);
+  line-height: 0.88;
+  letter-spacing: -0.035em;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  hyphens: none;
+}
+.split-panel__foot {
+  display: grid;
+  gap: 28px;
+  justify-items: start;
+}
+.split-panel__lead {
+  max-width: 44ch;
+  font-size: clamp(13px, 1.02vw, 15.5px);
+  line-height: 1.6;
+}
+@media (min-width: 768px) {
+  .split-panel {
+    padding-inline: 2.4vw;
+  }
+  .split-panel__foot {
+    margin-left: 42%;
   }
 }

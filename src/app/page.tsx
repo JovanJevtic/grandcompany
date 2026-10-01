@@ -11,6 +11,7 @@ import Delivery from "@/components/landing/Delivery";
 import Detail from "@/components/landing/Detail";
 import Featured from "@/components/landing/Featured";
 import Intro from "@/components/landing/Intro";
+import StepBand from "@/components/ui/StepBand";
 import Partners from "@/components/landing/Partners";
 import PostsTeaser from "@/components/landing/PostsTeaser";
 import SkySwipe from "@/components/landing/SkySwipe";
@@ -34,10 +35,15 @@ export default function Home() {
         <UsesSplit />
         <BrandsSplit />
         <Bento />
-        <Partners />
+        {/* Stepenasti prelaz (pravougaonici) u plavu sekciju i nazad */}
+        <StepBand tone="navy" profile="diag" steps={12} aria-label="Rabatna skala">
+          <Partners />
+        </StepBand>
         <Featured />
         <Delivery />
-        <PostsTeaser />
+        <StepBand tone="navy" profile="valley" steps={11} aria-label="Vodiči">
+          <PostsTeaser />
+        </StepBand>
         <Detail />
         <Footer />
       </main>
