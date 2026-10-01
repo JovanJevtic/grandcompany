@@ -618,7 +618,7 @@ export function createCraneRenderer(renderer, world) {
       // U sobi nema sunca: sjenčenje je mekše, pa enterijer ostane svijetao i čitljiv.
       const inside = Math.min(1, Math.max(0, (p - .62) / .1));
       // Kamera je u sobi (vidi crane-scene: širi objektiv od .74–.8): kroz prozor se vidi plavi grad.
-      uniforms.room.value = p > .76 ? 1 : 0;
+      uniforms.room.value = p > .805 ? 1 : 0; // tek kad kamera prođe kroz balkonska vrata (.76 ispred, .82 unutra)
       // Kran se pojavljuje dok se kamera odmiče od table (vidi CAMERA_KEYS: .0 → .07).
       const lf = Math.min(1, Math.max(0, (p - .012) / .04));
       uniforms.lineFade.value = lf * lf * (3 - 2 * lf);

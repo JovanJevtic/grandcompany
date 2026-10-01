@@ -49,7 +49,7 @@ export default function CraneHero() {
   // pokrene efekat ispod. URL-ovi moraju biti isti kao u importima (uključujući ?v=).
   preloadModule('/vendor/three.module.min.js')
   preloadModule('/crane/crane-scene.js?v=50')
-  preloadModule('/crane/crane-print.js?v=24')
+  preloadModule('/crane/crane-print.js?v=25')
 
   useEffect(() => {
     const script = document.createElement('script')
