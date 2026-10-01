@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { cartCount, openCart, useShop } from '@/lib/cart'
 import { setMode, useB2B } from '@/lib/b2b'
@@ -28,14 +28,31 @@ const LINKS = [
 
 const MENU = [['Početna', '/'], ...LINKS, ['Kontakt', '/#kontakt']] as const
 
-// Preklopnik načina: Maloprodaja (B2C) / B2B Partner Portal. B2B bez prijave otvara prijavu (lib/b2b).
+// Preklopnik načina: Maloprodaja (B2C) / B2B portal. Svaka strana uvijek nekud vodi:
+// Maloprodaja → asortiman artikala u prodavnici (/prodavnica#artikli), B2B portal → /portal
+// (bez prijave otvara prijavu, a ona posle vodi u portal — lib/b2b, LoginModal).
+// Aktivna strana prati stranicu: u portalu je B2B, u prodavnici Maloprodaja, inače izabrani način.
 function ModeSwitch({ mode, discount }: { mode: 'b2c' | 'b2b'; discount: number }) {
+  const pathname = usePathname()
+  const router = useRouter()
+  const { partner } = useB2B()
+  const active = pathname.startsWith('/portal') ? 'b2b' : pathname.startsWith('/prodavnica') ? 'b2c' : mode
+  const toShop = () => {
+    setMode('b2c')
+    const target = document.getElementById('artikli')
+    if (pathname.startsWith('/prodavnica') && target) window.__gcLenis?.scrollTo(target.getBoundingClientRect().top + window.scrollY - 90)
+    else router.push('/prodavnica#artikli')
+  }
+  const toPortal = () => {
+    setMode('b2b')
+    if (partner) router.push('/portal')
+  }
   return (
     <div className="mode" role="group" aria-label="Način kupovine">
-      <button type="button" aria-pressed={mode === 'b2c'} onClick={() => setMode('b2c')} className="mode__opt">
+      <button type="button" aria-pressed={active === 'b2c'} onClick={toShop} className="mode__opt">
         Maloprodaja
       </button>
-      <button type="button" aria-pressed={mode === 'b2b'} onClick={() => setMode('b2b')} className="mode__opt">
+      <button type="button" aria-pressed={active === 'b2b'} onClick={toPortal} className="mode__opt">
         B2B portal{discount > 0 && <span className="mode__badge">−{Math.round(discount * 100)}%</span>}
       </button>
     </div>
