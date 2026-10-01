@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- studijske fotografije iz /public, već optimizovane u WebP */
 
 import Link from 'next/link'
+import { pw } from '@/components/ui/Pw'
 import { addToCart, toggleSaved, useShop } from '@/lib/cart'
 import { categoryName, defaultQty, money, type Product } from '@/lib/shop'
 
@@ -23,8 +24,8 @@ export default function ProductCard({ product, view = 'grid', priority }: Props)
         </Link>
         <div>
           <p className="label opacity-50">{categoryName(product.category)}</p>
-          <Link href={href} className="mt-1 block text-[clamp(17px,1.4vw,22px)] leading-[1.15]">
-            {product.name}
+          <Link href={href} className="font-pretty mt-1 block text-[clamp(19px,1.5vw,24px)] leading-[1.1]">
+            {pw(product.name)}
           </Link>
         </div>
         <div className="flex items-center gap-5">
@@ -77,8 +78,8 @@ export default function ProductCard({ product, view = 'grid', priority }: Props)
       </div>
 
       <div className="flex flex-col gap-1 pt-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:pt-4">
-        <Link href={href} className="text-[clamp(16px,1.25vw,20px)] leading-[1.2]">
-          {product.name}
+        <Link href={href} className="font-pretty text-[clamp(19px,1.45vw,24px)] leading-[1.1]">
+          {pw(product.name)}
         </Link>
         <p className="shrink-0 text-[14px] tabular-nums sm:pt-[2px] sm:text-[15px] transition-colors group-hover:text-signal">{money(product.price)}</p>
       </div>

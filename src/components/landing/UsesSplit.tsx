@@ -10,6 +10,7 @@ import { revealChars } from '@/lib/reveal'
 import { PRODUCTS, USES, artikala, type UseId } from '@/lib/shop'
 import { axisShift } from './iso'
 import UseArt from './UseArt'
+import Pw from '@/components/ui/Pw'
 
 // Po namjeni: lijevo stoji naslov, desno (tamno plava kolona) se skrola pet vrsta radova.
 // Uz svaku ide rastavljeni presjek sistema koji se iscrtava i razmiče po slojevima dok red
@@ -65,9 +66,9 @@ export default function UsesSplit() {
     <section ref={root} id="namjena" className="relative z-20 bg-bg md:grid md:grid-cols-2" aria-label="Materijal po vrsti radova">
       {/* Lijevo: naslov stoji dok se desno skrola. */}
       <div className="flex flex-col items-center justify-center gap-12 px-5 py-[16vh] text-center md:sticky md:top-0 md:h-dvh md:self-start">
-        <h2 data-head className="display invisible text-[clamp(56px,8vw,150px)]">
+        <h2 data-head className="display invisible text-[clamp(56px,8vw,150px)]"><Pw>
           Po <em>namjeni</em>
-        </h2>
+        </Pw></h2>
         <Cta href="/prodavnica">Sve vrste radova</Cta>
       </div>
 
@@ -81,9 +82,9 @@ export default function UsesSplit() {
               data-use
               className="flex flex-col items-center gap-10 border-b border-bg/10 px-6 py-[14vh] text-center md:min-h-dvh md:justify-center md:px-[5vw]"
             >
-              <h3 data-title className="display invisible text-[clamp(40px,4.2vw,76px)]">
+              <h3 data-title className="display invisible text-[clamp(40px,4.2vw,76px)]"><Pw>
                 {u.name}
-              </h3>
+              </Pw></h3>
               <UseArt use={u.id} className="w-full max-w-[520px] text-bg/90" title={`Presjek sistema: ${u.name}`} />
               <p className="max-w-[34ch] text-[clamp(16px,1.25vw,20px)] italic leading-[1.4] opacity-80">{COPY[u.id]}</p>
               <Link href={`/prodavnica?namjena=${u.id}`} className="ulink text-[15px]">

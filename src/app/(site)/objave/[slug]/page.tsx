@@ -7,6 +7,7 @@ import ReadingProgress from '@/components/posts/ReadingProgress'
 import TitleReveal from '@/components/posts/TitleReveal'
 import { POSTS, postBySlug, postDate, type Block } from '@/lib/posts'
 import { PRODUCTS } from '@/lib/shop'
+import Pw from '@/components/ui/Pw'
 
 const headingId = (text: string) => text
   .toLowerCase()
@@ -81,7 +82,7 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
         <p className="text-[14px] text-ink/50">
           {post.tag} · {postDate(post.date)} · {post.read} min čitanja
         </p>
-        <TitleReveal className="display mx-auto mt-8 max-w-[16ch] text-[clamp(44px,7.4vw,128px)]">{post.title}</TitleReveal>
+        <TitleReveal className="display mx-auto mt-8 max-w-[16ch] text-[clamp(44px,7.4vw,128px)]"><Pw>{post.title}</Pw></TitleReveal>
         <p className="mx-auto mt-8 max-w-[42ch] text-[clamp(18px,1.5vw,23px)] italic leading-[1.45] text-ink/70">{post.lead}</p>
       </header>
 
@@ -113,9 +114,9 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
 
       {products.length > 0 && (
         <section className="mt-[18dvh] px-5 md:px-10">
-          <h2 className="display text-center text-[clamp(36px,4.6vw,80px)]">
+          <h2 className="display text-center text-[clamp(36px,4.6vw,80px)]"><Pw>
             Materijal za <em>ovaj posao</em>
-          </h2>
+          </Pw></h2>
           <div className="mx-auto mt-[8dvh] grid max-w-[1400px] grid-cols-2 gap-x-5 gap-y-12 md:grid-cols-3 md:gap-x-8">
             {products.slice(0, 6).map((product) => (
               <ProductCard key={product.id} product={product} view="grid" />
@@ -127,9 +128,9 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
       {next && next !== post && (
         <Link href={`/objave/${next.slug}`} className="group mt-[18dvh] block px-5 text-center" data-cursor="Čitaj">
           <p className="text-[14px] text-ink/50">Sljedeća objava</p>
-          <p className="display mx-auto mt-5 max-w-[18ch] text-[clamp(36px,5vw,88px)] transition-[font-style] group-hover:italic">
+          <p className="display mx-auto mt-5 max-w-[18ch] text-[clamp(36px,5vw,88px)] transition-colors duration-500 group-hover:text-signal"><Pw>
             {next.title}
-          </p>
+          </Pw></p>
           <span className="mt-8 inline-block size-2 rounded-full bg-signal transition-transform duration-500 group-hover:scale-150" aria-hidden />
         </Link>
       )}

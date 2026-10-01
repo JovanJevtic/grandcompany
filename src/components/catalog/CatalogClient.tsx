@@ -24,6 +24,7 @@ import {
 } from '@/lib/shop'
 import FilterDropdown from './FilterDropdown'
 import ProductCard from './ProductCard'
+import Pw from '@/components/ui/Pw'
 
 type Extra = { brand: string; stock: boolean; view: 'grid' | 'list' }
 type State = Filters & Extra
@@ -275,9 +276,9 @@ export default function CatalogClient() {
       {!shown.length && (
         <div className="gutter grid min-h-[50vh] place-items-center text-center">
           <div>
-            <h2 className="display text-[clamp(40px,5vw,80px)]">
+            <h2 className="display text-[clamp(40px,5vw,80px)]"><Pw>
               Ništa <em>ovdje.</em>
-            </h2>
+            </Pw></h2>
             <p className="mt-4 opacity-60">Promijenite filtere ili pretragu.</p>
             <button type="button" onClick={reset} className="cta mt-8">
               <span className="cta-dot" aria-hidden />

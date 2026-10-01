@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useRef, useState } from 'react'
+import { pw } from '@/components/ui/Pw'
 import { cartCount, openCart, useShop } from '@/lib/cart'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
@@ -74,8 +75,8 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
         className={`site-header fixed inset-x-0 top-0 z-[300] ${open ? 'is-open' : ''}`}
       >
         <div className="grid h-[72px] grid-cols-[1fr_auto_1fr] items-center px-5 md:px-10">
-          <Link href="/" className="justify-self-start whitespace-nowrap text-[17px] leading-none tracking-[-0.02em] md:text-[19px]" aria-label="Grand Company, početna">
-            Grand <em>Company</em>
+          <Link href="/" className="font-pretty justify-self-start whitespace-nowrap text-[15px] uppercase leading-none tracking-[0.06em] md:text-[17px]" aria-label="Grand Company, početna">
+            Grand Company
           </Link>
 
           <nav className="hidden items-center gap-10 text-[15px] md:flex" aria-label="Glavni meni">
@@ -118,8 +119,8 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
         <div data-panel className="flex h-full flex-col justify-end bg-ink px-5 pb-12 text-bg" style={{ clipPath: 'inset(0% 0% 100% 0%)' }}>
           {[['Početna', '/'] as const, ...NAV].map(([label, href]) => (
             <span key={href} className="block overflow-hidden">
-              <Link data-menu-link href={href} onClick={() => setOpen(false)} className="block py-1 text-[15vw] leading-[1.05] tracking-[-0.03em]">
-                {label}
+              <Link data-menu-link href={href} onClick={() => setOpen(false)} className="font-pretty block py-1 text-[15vw] leading-[1.05] tracking-[-0.01em]">
+                {pw(label)}
               </Link>
             </span>
           ))}

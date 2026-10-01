@@ -269,15 +269,79 @@ html:not([data-past-hero]) [data-overlay-header] {
 /* ——— Editorijalni sloj (redizajn) ——— */
 
 /* Naslovi: serif, normalan verzal/kurent, tanko na velikim veličinama (opsz to radi sam). */
+/* Naslovni font: Prettywise Light, isti kao rečenica "Gradimo, prodajemo..." u herou.
+   Nema kurziv — font-synthesis: none sprječava da browser napravi lažni (iskošeni) kurziv. */
+.display,
+.font-pretty {
+  font-family: var(--font-pretty), Georgia, serif;
+  font-weight: 300;
+  font-synthesis: none;
+}
 .display {
-  font-weight: 400;
-  letter-spacing: -0.035em;
-  line-height: 0.9;
+  letter-spacing: -0.015em;
+  line-height: 0.98;
   text-wrap: balance;
 }
-.display em {
-  font-style: italic;
-  letter-spacing: -0.02em;
+.display em,
+.font-pretty em {
+  font-style: normal;
+}
+
+/* Slova sa dijakriticima složena od osnovnog slova + znaka (vidi components/ui/Pw.tsx).
+   Znak je tanka SVG linija u boji teksta (mask), postavljena po metrici Prettywise fonta:
+   vrh "kutije" inline slova je 1.1em iznad osnovne linije, x-visina je 0.578em, verzal 0.702em. */
+.pw-w {
+  white-space: nowrap;
+}
+/* Cifre i interpunkcija koje demo font nema: Bodoni Moda, malo manja da se uklopi uz tanki Prettywise */
+.pw-alt {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 0.92em;
+  font-variant-numeric: lining-nums;
+}
+.pw-m {
+  position: relative;
+}
+.pw-m::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 0.3em; /* 1.1 − 0.593 (x-visina sa prebačajem) − 0.07 razmak − 0.14 visina znaka */
+  width: 0.3em;
+  height: 0.14em;
+  transform: translateX(-50%);
+  background: currentColor;
+  -webkit-mask: var(--pw-mark) center / 100% 100% no-repeat;
+  mask: var(--pw-mark) center / 100% 100% no-repeat;
+  pointer-events: none;
+}
+.pw-m[data-mark='ˇ'] {
+  --pw-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 14'%3E%3Cpath d='M3 2 L15 12 L27 2' fill='none' stroke='%23000' stroke-width='3.4'/%3E%3C/svg%3E");
+}
+.pw-m[data-mark='´'] {
+  --pw-mark: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 14'%3E%3Cpath d='M9 13 L21 1' fill='none' stroke='%23000' stroke-width='3.4'/%3E%3C/svg%3E");
+}
+.pw-up::after {
+  top: 0.17em; /* iznad verzala (0.718) */
+  height: 0.13em;
+}
+/* đ i Đ: tanka crtica preko stabla slova */
+.pw-dj::after,
+.pw-DJ::after {
+  height: 0.035em;
+  width: 0.24em;
+  -webkit-mask: none;
+  mask: none;
+}
+.pw-dj::after {
+  left: 82%;
+  top: 0.43em;
+}
+.pw-DJ::after {
+  left: 16%;
+  top: 0.72em;
 }
 /* Sitna oznaka u verzalu (zamjena za mono etikete) */
 .label {

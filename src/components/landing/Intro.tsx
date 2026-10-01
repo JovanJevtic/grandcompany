@@ -8,6 +8,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import { useMediaMotion } from '@/lib/media'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
+import Pw from '@/components/ui/Pw'
 
 // Prvi ekran poslije herosa: centriran naslov, jedna rečenica i kolaž od dvije fotografije.
 // Velika slika se otvara odozdo i klizi sporije od stranice, mala portretna preko nje brže —
@@ -36,11 +37,11 @@ export default function Intro() {
 
   return (
     <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[18vh] pt-[24vh] text-center">
-      <h2 data-head className="display invisible mx-auto px-5 text-display">
+      <h2 data-head className="display invisible mx-auto px-5 text-display"><Pw>
         Materijal za
         <br />
         <em>svaki</em> sloj
-      </h2>
+      </Pw></h2>
       <p data-up className="mx-auto mt-10 max-w-[30ch] px-5 text-lead opacity-80">
         Knauf sistemi, izolacija i veziva — spušteni kranom na vašu etažu.
       </p>

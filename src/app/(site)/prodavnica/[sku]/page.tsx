@@ -8,6 +8,7 @@ import ProductCard from '@/components/catalog/ProductCard'
 import MotionScope from '@/components/shop/MotionScope'
 import { DELIVERY_ZONES, WALL_SYSTEMS } from '@/gc/gc'
 import { PRODUCTS, USES, categoryName, money, qtyLabel } from '@/lib/shop'
+import Pw from '@/components/ui/Pw'
 
 export function generateStaticParams() {
   return PRODUCTS.map((product) => ({ sku: product.sku }))
@@ -65,9 +66,9 @@ export default async function ProductPage({ params }: PageProps<'/prodavnica/[sk
             </Link>
           </nav>
 
-          <h1 className="display fade-up mt-6 text-[clamp(38px,4.6vw,84px)] !leading-[1]" style={{ animationDelay: '0.08s' }}>
+          <h1 className="display fade-up mt-6 text-[clamp(38px,4.6vw,84px)] !leading-[1]" style={{ animationDelay: '0.08s' }}><Pw>
             {product.name}
-          </h1>
+          </Pw></h1>
 
           <p className="fade-up mt-6 text-[clamp(22px,1.8vw,30px)] tabular-nums" style={{ animationDelay: '0.16s' }}>
             {money(product.price)} <span className="text-[0.6em] opacity-50">/ {product.unit}, sa PDV-om</span>
@@ -105,7 +106,7 @@ export default async function ProductPage({ params }: PageProps<'/prodavnica/[sk
 
       {related.length > 0 && (
         <section className="gutter py-[18vh]">
-          <h2 className="display text-center text-[clamp(36px,4.4vw,80px)]" data-up>
+          <h2 className="display text-center text-[clamp(36px,4.4vw,80px)]" data-up><Pw>
             {systems.length ? (
               <>
                 Iz istog <em>sistema</em>
@@ -115,7 +116,7 @@ export default async function ProductPage({ params }: PageProps<'/prodavnica/[sk
                 Uz ovo <em>ide i</em>
               </>
             )}
-          </h2>
+          </Pw></h2>
           <div className="mt-[10vh] grid grid-cols-2 gap-x-4 gap-y-12 md:gap-x-[2vw] lg:grid-cols-4">
             {related.map((item) => (
               <ProductCard key={item.id} product={item} />

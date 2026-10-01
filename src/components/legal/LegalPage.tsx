@@ -4,6 +4,7 @@ import { GROUP_LABEL, type LegalBlock, type LegalDoc, type LegalGroup } from '@/
 import { LEGAL_DOCS } from '@/lib/legal'
 import Cta from '@/components/ui/Cta'
 import { T } from './LegalText'
+import Pw from '@/components/ui/Pw'
 
 // Pravne i servisne stranice: mirna stranica za čitanje. Naslov u sredini, jedna rečenica uvoda,
 // pa jedan centriran stub teksta (~62 znaka u redu). Sadržaj (lijevo, sitno) samo na desktopu i samo
@@ -80,7 +81,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
     <div className="legal-page px-5 pb-[18dvh] pt-[16dvh] md:px-10 md:pt-[20dvh]">
       <header className="text-center">
         <p className="label text-ink/50">{GROUP_LABEL[doc.group]}</p>
-        <h1 className="display mx-auto mt-6 max-w-[14ch] text-[clamp(44px,7vw,120px)] [hyphens:auto]">{doc.title}</h1>
+        <h1 className="display mx-auto mt-6 max-w-[14ch] text-[clamp(44px,7vw,120px)] [hyphens:auto]"><Pw>{doc.title}</Pw></h1>
       </header>
       <p className="mx-auto mt-8 max-w-[46ch] text-center text-[clamp(17px,1.35vw,21px)] italic leading-[1.45] text-ink/75">
         <T s={doc.lead} />
@@ -147,9 +148,9 @@ export function PoliciesIndex() {
   return (
     <div className="px-5 pb-[18dvh] pt-[16dvh] md:px-10 md:pt-[20dvh]">
       <header className="text-center">
-        <h1 className="display text-[clamp(52px,9vw,150px)]">
+        <h1 className="display text-[clamp(52px,9vw,150px)]"><Pw>
           Sve <em>politike</em>
-        </h1>
+        </Pw></h1>
         <p className="mx-auto mt-8 max-w-[40ch] text-[clamp(17px,1.35vw,21px)] italic text-ink/70">
           Dostava, povrat, plaćanje i uslovi — na jednom mjestu.
         </p>

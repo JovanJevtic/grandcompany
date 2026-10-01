@@ -8,6 +8,7 @@ import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import Cta from '@/components/ui/Cta'
 import { calcW111, money, qtyLabel } from '@/lib/shop'
+import Pw from '@/components/ui/Pw'
 
 // Kalkulator pregradnog zida po normi W111/W112 (dno prodavnice, #kalkulator): mjere i izbor
 // ploče, profila i mase daju spisak materijala sa cijenom, a tehnički crtež zida (pogled i presjek)
@@ -221,9 +222,9 @@ export default function WallCalculator() {
   return (
     <section ref={root} id="kalkulator" className="scroll-mt-20 py-[18vh]">
       <div className="gutter text-center">
-        <h2 data-head className="display invisible mx-auto max-w-[16ch] text-[clamp(44px,6vw,108px)]">
+        <h2 data-head className="display invisible mx-auto max-w-[16ch] text-[clamp(44px,6vw,108px)]"><Pw>
           Izmjerite zid. <em>Mi složimo spisak.</em>
-        </h2>
+        </Pw></h2>
       </div>
 
       <div className="gutter mx-auto mt-[10vh] grid max-w-[1400px] gap-14 md:grid-cols-12 md:gap-[3vw]">

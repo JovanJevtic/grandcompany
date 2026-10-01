@@ -7,6 +7,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import { useMediaMotion } from '@/lib/media'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
+import Pw from '@/components/ui/Pw'
 
 // Predah između prodaje i brendova: jedna rečenica i dvije portretne fotografije materijala.
 // Lijeva slika ide uz stranicu, desna (niže postavljena) brže naviše — kolaž "diše" dok se skrola.
@@ -34,9 +35,9 @@ export default function Detail() {
 
   return (
     <section ref={root} className="relative z-20 overflow-hidden bg-bg py-[22vh]" aria-label="Materijal">
-      <h2 data-head className="display invisible mx-auto max-w-[16ch] px-5 text-center text-title">
+      <h2 data-head className="display invisible mx-auto max-w-[16ch] px-5 text-center text-title"><Pw>
         Materijal koji se <em>ne vidi</em> kad je zid gotov.
-      </h2>
+      </Pw></h2>
 
       <div className="mx-auto mt-[14vh] grid w-[calc(100%-40px)] grid-cols-2 gap-4 md:w-[72vw] md:gap-[6vw]">
         <figure data-curtain data-parallax="10" className="aspect-[2/3] overflow-hidden bg-ink">

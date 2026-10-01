@@ -1,10 +1,10 @@
 'use client'
 
-import { useRef } from 'react'
+import { useRef, type ReactNode } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
-export default function TitleReveal({ children, className }: { children: string; className: string }) {
+export default function TitleReveal({ children, className }: { children: ReactNode; className: string }) {
   const ref = useRef<HTMLHeadingElement>(null)
   useGSAP(
     () => {

@@ -7,6 +7,7 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import { PRODUCTS, artikala } from '@/lib/shop'
+import Pw from '@/components/ui/Pw'
 
 // Brendovi: ogledalo sekcije "Po namjeni" (tamno plava kolona lijevo, svijetla desno). Uz svaki brend ide
 // generativni linijski crtež (zrake, torus, globus, zrnca) koji se okreće dok se skrola — crtež se
@@ -158,11 +159,11 @@ export default function BrandsSplit() {
   return (
     <section ref={root} id="brendovi" className="relative z-20 md:grid md:grid-cols-2" aria-label="Brendovi">
       <div className="flex flex-col items-center justify-center gap-12 bg-navy px-5 py-[16vh] text-center text-bg md:sticky md:top-0 md:h-dvh md:self-start">
-        <h2 data-head className="display invisible text-[clamp(56px,7.4vw,140px)]">
+        <h2 data-head className="display invisible text-[clamp(56px,7.4vw,140px)]"><Pw>
           Sistemi,
           <br />
           <em>ne samo</em> ploče
-        </h2>
+        </Pw></h2>
         <Cta href="/prodavnica" className="[--cta-fill:var(--bg)] [--cta-ink:var(--navy)]">
           Artikli po brendu
         </Cta>
@@ -180,9 +181,9 @@ export default function BrandsSplit() {
               <g data-gen />
               <circle r={3} fill="var(--signal)" stroke="none" />
             </svg>
-            <h3 data-title className="display invisible text-[clamp(40px,4.2vw,76px)]">
+            <h3 data-title className="display invisible text-[clamp(40px,4.2vw,76px)]"><Pw>
               {brand}
-            </h3>
+            </Pw></h3>
             <p className="max-w-[36ch] text-[clamp(16px,1.2vw,19px)] italic leading-[1.45] opacity-75">{note}</p>
             <p className="text-[14px] opacity-60">{count(brand) ? `${artikala(count(brand))} u katalogu` : 'Na upit'}</p>
           </article>

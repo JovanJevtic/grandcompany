@@ -7,6 +7,7 @@ import { COMPANY } from '@/gc/gc'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ, fitFontSize } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
+import Pw from '@/components/ui/Pw'
 
 const COLS: { title: string; links: [string, string][] }[] = [
   { title: 'Prodavnica', links: [['Katalog', '/prodavnica'], ['Kalkulator zida', '/prodavnica#kalkulator'], ['Objave', '/objave']] },
@@ -55,9 +56,9 @@ export default function Footer() {
   return (
     <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink pt-[20vh] text-bg">
       <div className="flex flex-col items-center px-5 text-center">
-        <h2 data-head className="display invisible text-title">
+        <h2 data-head className="display invisible text-title"><Pw>
           Gradimo <em>zajedno.</em>
-        </h2>
+        </Pw></h2>
         <p className="mt-8 max-w-[34ch] text-[17px] italic opacity-70">Upit za veći projekat, ponuda za partnere ili samo savjet — javite se.</p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
           <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
@@ -100,8 +101,8 @@ export default function Footer() {
       </div>
 
       <div className="mt-[14vh] overflow-x-clip px-5 pb-[1.5vw] text-center">
-        <p data-word className="inline-block whitespace-nowrap leading-[0.82] tracking-[-0.045em]" aria-label="Grand Company">
-          Grand <em>Company</em>
+        <p data-word className="font-pretty inline-block whitespace-nowrap leading-[0.9] tracking-[-0.02em]" aria-label="Grand Company">
+          Grand Company
         </p>
       </div>
 

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import PostArtDraw from '@/components/posts/PostArtDraw'
 import PostList from '@/components/posts/PostList'
 import { POSTS, postDate } from '@/lib/posts'
+import Pw from '@/components/ui/Pw'
 
 export const metadata = {
   title: 'Objave | Grand Company',
@@ -16,9 +17,9 @@ export default function PostsPage() {
   return (
     <div className="pb-[16dvh]">
       <header className="px-5 pb-[10dvh] pt-[18dvh] text-center md:pt-[22dvh]">
-        <h1 className="display text-[clamp(56px,11vw,190px)]">
+        <h1 className="display text-[clamp(56px,11vw,190px)]"><Pw>
           Znanje sa <em>gradilišta</em>
-        </h1>
+        </Pw></h1>
         <p className="mx-auto mt-12 max-w-[38ch] text-[clamp(17px,1.35vw,21px)] italic text-ink/70">
           Kratki vodiči za izbor, obračun i montažu materijala.
         </p>

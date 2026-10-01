@@ -8,6 +8,7 @@ import { Flip, gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import { CATEGORIES, PRODUCTS, type CategoryId } from '@/lib/shop'
+import Pw from '@/components/ui/Pw'
 
 // Najčešće birani artikli sa filterom po grupi. Promjena filtera ne "skače": Flip zapamti gdje je
 // svaka kartica bila, React složi novu listu, pa kartice kliznu na nova mjesta, a nove izrone.
@@ -71,9 +72,9 @@ export default function Featured() {
   return (
     <section ref={root} id="najcesce" className="relative z-20 bg-bg pb-[10vh] pt-[20vh]">
       <div className="px-5 text-center">
-        <h2 data-head className="display invisible text-title">
+        <h2 data-head className="display invisible text-title"><Pw>
           Najčešće <em>birano</em>
-        </h2>
+        </Pw></h2>
         <div role="tablist" aria-label="Grupa artikala" className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-3 text-[15px]">
           {chips.map((c) => {
             const on = c.id === cat

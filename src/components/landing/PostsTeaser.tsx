@@ -8,6 +8,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import { POSTS } from '@/lib/posts'
+import Pw from '@/components/ui/Pw'
 
 // Tri najnovije objave. Kartice zadržavaju linijske crteže (jedino mjesto na sajtu, uz
 // "Po namjeni" i brendove, gdje su ilustracije umjesto fotografija). Na hover se crtež podigne.
@@ -41,9 +42,9 @@ export default function PostsTeaser() {
 
   return (
     <section ref={root} id="objave" className="relative z-20 bg-bg py-[20vh]" aria-label="Objave">
-      <h2 data-head className="display invisible mx-auto px-5 text-center text-title">
+      <h2 data-head className="display invisible mx-auto px-5 text-center text-title"><Pw>
         Znanje sa <em>gradilišta</em>
-      </h2>
+      </Pw></h2>
 
       <div data-grid className="mx-auto mt-[10vh] grid w-[calc(100%-40px)] gap-x-[2vw] gap-y-16 md:w-[88vw] md:grid-cols-3">
         {latest.map((p, i) => (

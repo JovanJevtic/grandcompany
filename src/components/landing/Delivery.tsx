@@ -6,6 +6,7 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
+import Pw from '@/components/ui/Pw'
 
 // Isporuka: jedna velika fotografija. Sekcija je visoka 240vh, a unutra stoji "sticky" ekran.
 // Dok se skrola, okvir se širi iz malog prozora do punog ekrana, slika se smiruje sa zuma,
@@ -53,7 +54,7 @@ export default function Delivery() {
         </div>
 
         <div className="relative flex h-full flex-col items-center justify-center px-5 text-center text-bg">
-          <h2 className="display text-display">
+          <h2 className="display text-display"><Pw>
             <span className="block overflow-hidden pb-[0.08em]">
               <span data-line className="block">
                 Spuštamo je
@@ -64,7 +65,7 @@ export default function Delivery() {
                 <em>na etažu.</em>
               </span>
             </span>
-          </h2>
+          </Pw></h2>
           <p data-foot className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-[15px] md:bottom-14">
             <span className="italic opacity-85">Vlastiti kamioni sa kranom · Banja Luka i okolina</span>
             <Link href="/dostava" className="ulink">
