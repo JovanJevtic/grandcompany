@@ -305,85 +305,6 @@
   pointer-events: none;
 }
 
-.story-masthead {
-  /* Traka-navigacija ispod wordmarka: gornja i donja linija čine pravougaonik, linkovi su
-     razdvojeni kratkim vertikalnim crticama, a u sredini viri crveni romb "Kupuj". */
-  position: absolute;
-  top: 22px;
-  left: var(--story-gutter);
-  right: var(--story-gutter);
-  z-index: 5;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  height: 50px;
-  border-top: 1px solid var(--story-line);
-  border-bottom: 1px solid var(--story-line);
-  font-family: var(--font-grotesk), Arial, sans-serif;
-  font-weight: 700;
-  font-size: clamp(10px, 0.78vw, 12px);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--story-ink, var(--ink));
-  pointer-events: auto;
-}
-.masthead-links {
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-.masthead-links li {
-  position: relative;
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  height: 100%;
-}
-/* kratka vertikalna crtica između linkova */
-.masthead-links li + li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  width: 1px;
-  height: 14px;
-  translate: 0 -50%;
-  background: var(--story-line);
-}
-.masthead-links a {
-  display: flex;
-  align-items: center;
-  height: 100%;
-  padding-inline: 10px;
-  background: linear-gradient(currentColor, currentColor) 50% calc(50% + 0.95em) / 0 1px no-repeat;
-  transition: background-size 0.5s var(--ease-io), color 0.3s;
-}
-.masthead-links a:hover {
-  background-size: calc(100% - 20px) 1px;
-}
-/* crveni romb (isti oblik kao CTA dugmad), malo viši od trake */
-.masthead-buy {
-  display: grid;
-  place-items: center;
-  height: 66px;
-  padding-inline: 46px;
-  margin-inline: 18px;
-  background: var(--signal);
-  color: #fff;
-  -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
-  mask: var(--shape-blade) center / 100% 100% no-repeat;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  transition: background-color 0.4s, transform 0.5s var(--ease-io);
-}
-.masthead-buy:hover {
-  background: var(--ink);
-  transform: scaleX(1.06);
-}
 
 /* ——— Bez scene (WebGL nije dostupan) ———
    Prostor za skrol je rezervisan od prvog trenutka, pa se stranica ne "produži" kad scena
@@ -423,28 +344,6 @@
     min-height: 70svh;
     padding: 48px var(--story-gutter);
   }
-  .story-masthead {
-    height: 44px;
-  }
-  /* Na užim ekranima scena je u toku dokumenta (sadržaj ide ispod nje), pa uvodni blok sa
-     trakom-navigacijom podižemo preko vrha scene — traka stoji odmah ispod wordmarka, kao na desktopu. */
-  .story-opening {
-    position: absolute;
-    /* sadržaj počinje ispod scene (visina scene = 100svh − header), pa se vraćamo na vrh sekcije */
-    top: calc(var(--story-header) - 100svh);
-    left: 0;
-    right: 0;
-    pointer-events: none;
-  }
-  /* sloj sa sadržajem iznad scene: prazan je i ne hvata klikove, osim same trake */
-  .story-content {
-    z-index: 3;
-  }
-  .masthead-buy {
-    height: 56px;
-    padding-inline: 34px;
-    margin-inline: 8px;
-  }
   /* Teksta preko scene nema, pa uvodni dio ne drži visinu — banner sa kranom je cijeli hero. */
   .story-opening {
     min-height: 0;
@@ -469,15 +368,5 @@
   }
   .sky-layer {
     will-change: auto;
-  }
-}
-
-/* Traka na telefonu: samo Isporuka · Kupuj · Objave (ostali linkovi su u meniju) */
-@media (max-width: 767px) {
-  .masthead-links .mh-desk {
-    display: none;
-  }
-  .masthead-links li::before {
-    display: none;
   }
 }

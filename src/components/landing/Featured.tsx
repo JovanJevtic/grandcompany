@@ -57,12 +57,26 @@ export default function Featured() {
         const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth)
         const setters = cards.map((c) => gsap.quickSetter(c, 'y', 'px'))
         // Njihanje: zavisi od toga gdje je kartica u odnosu na sredinu ekrana.
-        const fan = () => {
-          const mid = window.innerWidth / 2
-          cards.forEach((c, i) => {
+        // Sredine kartica (u odnosu na ekran, kad je traka na x=0) mjere se samo pri osvježavanju;
+        // u toku skrola se računa iz pomaka trake — bez čitanja rasporeda u svakom kadru (to je trzalo).
+        let centers: number[] = []
+        let vw = window.innerWidth
+        let vh = window.innerHeight
+        const measure = () => {
+          const x = Number(gsap.getProperty(track, 'x')) || 0
+          vw = window.innerWidth
+          vh = window.innerHeight
+          centers = cards.map((c) => {
             const r = c.getBoundingClientRect()
-            const d = (r.left + r.width / 2 - mid) / mid // -1 lijevo … 1 desno
-            setters[i](Math.sin(d * Math.PI + i * 0.9) * window.innerHeight * 0.035 + Math.abs(d) * 24)
+            return r.left + r.width / 2 - x
+          })
+        }
+        const fan = () => {
+          const mid = vw / 2
+          const x = Number(gsap.getProperty(track, 'x')) || 0
+          centers.forEach((c, i) => {
+            const d = (c + x - mid) / mid // -1 lijevo … 1 desno
+            setters[i](Math.sin(d * Math.PI + i * 0.9) * vh * 0.035 + Math.abs(d) * 24)
           })
         }
         const tween = gsap.to(track, {
@@ -76,9 +90,13 @@ export default function Featured() {
             scrub: 0.8,
             invalidateOnRefresh: true,
             onUpdate: fan,
-            onRefresh: fan,
+            onRefresh: () => {
+              measure()
+              fan()
+            },
           },
         })
+        measure()
         fan()
         return () => {
           tween.scrollTrigger?.kill()

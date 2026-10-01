@@ -1,6 +1,5 @@
 'use client'
 
-import Link from 'next/link'
 import { Fragment, useEffect, useRef } from 'react'
 import { preloadModule } from 'react-dom'
 
@@ -68,7 +67,9 @@ export default function CraneHero() {
   // Parallax pozadine za mišem: --mx / --my (-1..1) se mekano približavaju poziciji kursora.
   useEffect(() => {
     const el = root.current
-    if (!el || !window.matchMedia('(pointer: fine)').matches) return
+    // Varijable idu na sam sloj neba (ne na cijeli hero), da promjena ne preračunava stilove cijele sekcije.
+    const sky = el?.querySelector<HTMLElement>('.scene-sky')
+    if (!el || !sky || !window.matchMedia('(pointer: fine)').matches) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const target = { x: 0, y: 0 }
     const cur = { x: 0, y: 0 }
@@ -76,12 +77,12 @@ export default function CraneHero() {
     const step = () => {
       cur.x += (target.x - cur.x) * 0.05
       cur.y += (target.y - cur.y) * 0.05
-      el.style.setProperty('--mx', cur.x.toFixed(4))
-      el.style.setProperty('--my', cur.y.toFixed(4))
+      sky.style.setProperty('--mx', cur.x.toFixed(4))
+      sky.style.setProperty('--my', cur.y.toFixed(4))
       raf = Math.abs(target.x - cur.x) + Math.abs(target.y - cur.y) > 0.001 ? requestAnimationFrame(step) : 0
     }
     const onMove = (e: PointerEvent) => {
-      if (window.scrollY > el.offsetHeight + window.innerHeight * 6) return
+      if (document.documentElement.hasAttribute('data-past-hero')) return
       target.x = (e.clientX / window.innerWidth) * 2 - 1
       target.y = (e.clientY / window.innerHeight) * 2 - 1
       if (!raf) raf = requestAnimationFrame(step)
@@ -151,21 +152,7 @@ export default function CraneHero() {
           {/* Scena je aria-hidden, pa rečenicu iznosimo i kao pravi tekst za čitače ekrana. */}
           <p className="sr-only">{PHRASE}</p>
           <section className="story-section story-opening">
-            {/* Navigacija kao dio linije ispod wordmarka: dvije horizontalne linije čine traku,
-                linkovi su razdvojeni malim vertikalnim crticama, a u sredini je crveni romb "Kupuj". */}
-            <nav className="story-masthead" aria-label="Glavna navigacija">
-              <ul className="masthead-links">
-                <li className="mh-desk"><Link href="/prodavnica">Prodavnica</Link></li>
-                <li className="mh-desk"><Link href="/prodavnica#kalkulator">Kalkulator</Link></li>
-                <li><Link href="/dostava">Isporuka</Link></li>
-              </ul>
-              <Link href="/prodavnica" className="masthead-buy">Kupuj</Link>
-              <ul className="masthead-links masthead-links--end">
-                <li><Link href="/objave">Objave</Link></li>
-                <li className="mh-desk"><Link href="/upit-za-izvodjace">Partneri</Link></li>
-                <li className="mh-desk"><Link href="/#kontakt">Kontakt</Link></li>
-              </ul>
-            </nav>
+
           </section>
 
           <div className="story-immersion" aria-hidden="true" />

@@ -1,7 +1,7 @@
 import Footer from "@/components/Footer";
 import CraneHero from "@/components/CraneHero";
 import SiteChrome from "@/components/SiteChrome";
-import SiteHeader from "@/components/site/SiteHeader";
+import HeroNav from "@/components/site/HeroNav";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
 import Kaolin from "@/components/shop/Kaolin";
@@ -22,10 +22,8 @@ export default function Home() {
   return (
     <>
       <SiteChrome />
-      {/* Header se pojavljuje tek kad veliki wordmark ode (vidi SiteChrome i globals.css). */}
-      <div data-overlay-header>
-        <SiteHeader variant="overlay" />
-      </div>
+      {/* Traka-navigacija: ispod wordmarka tokom herosa, poslije zalijepljena za vrh. */}
+      <HeroNav />
       <main>
         <CraneHero />
         <SkySwipe />

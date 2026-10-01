@@ -7,8 +7,8 @@
 import * as THREE from '../vendor/three.module.min.js';
 import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
-import {createCraneRenderer} from './crane-renderer.js?v=23';
-import {craneQuality} from './crane-quality.js?v=18';
+import {createCraneRenderer} from './crane-renderer.js?v=24';
+import {craneQuality} from './crane-quality.js?v=19';
 import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=30';
 
 const cover=document.querySelector('.construction-story');
@@ -140,12 +140,13 @@ async function init() {
   // Mjerenje na startu se radi dok se stranica još učitava (fontovi, slike, splash), pa ispadne
   // pesimistično i scena ostane zaključana na mutnih 1×. Zato: kreće se od pune rezolucije, ali
   // nikad ispod rezolucije ekrana (pod = devicePixelRatio), a dalje odlučuje regulator u draw().
+  // Kreće se od rezolucije ekrana (oštro, a ne 2× supersampling koji guši slabiji GPU). Mjerenja
+  // na startu više nema: radilo se dok se stranica učitava, kasnilo je prikaz scene i bilo netačno.
+  // Dalje odlučuje regulator u draw(): kad je sporo, PRVO se gase kontaktne sjenke, pa tek onda
+  // pada rezolucija (do 1×); kad je brzo, rezolucija raste ka punoj, pa se sjenke vraćaju.
   const native=Math.max(1,Math.min(2,window.devicePixelRatio||1));
-  const floorRatio=Math.min(quality().pixelRatio,native);
-  {
-    const startup=pickResolution();
-    resolutionCap=Math.max(floorRatio,startup);
-  }
+  const floorRatio=1;
+  resolutionCap=Math.min(quality().pixelRatio,native);
 
   let sizeKey='';
   function measure() {
@@ -203,14 +204,14 @@ async function init() {
     frameAvg+=(ms-frameAvg)*.1;
     if(frameAvg>24){slowRun++;fastRun=0;}else if(frameAvg<13){fastRun++;slowRun=0;}else{slowRun=0;fastRun=0;}
     const full=quality().pixelRatio;
-    if(slowRun>40){
+    if(slowRun>30){
       slowRun=0;
-      if(wantedCap>floorRatio+.01)wantedCap=Math.max(floorRatio,Math.min(wantedCap,full)-.15);
-      else if(contactEnabled&&frameAvg>32)contactEnabled=false; // posljednji korak: bez SSAO
-    } else if(fastRun>150){
+      if(contactEnabled)contactEnabled=false; // prvi korak: bez SSAO (najskuplji dio, slika ostaje oštra)
+      else if(wantedCap>floorRatio+.01)wantedCap=Math.max(floorRatio,Math.min(wantedCap,full)-.2);
+    } else if(fastRun>180){
       fastRun=0;
-      if(!contactEnabled)contactEnabled=true;
-      else wantedCap=Math.min(full,Math.max(wantedCap,floorRatio)+.1);
+      if(wantedCap<Math.min(full,native)-.01)wantedCap=Math.min(full,wantedCap+.15);
+      else if(!contactEnabled&&frameAvg<10)contactEnabled=true;
     }
   }
   function applyGovernor() {

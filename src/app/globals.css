@@ -741,3 +741,108 @@ input::placeholder {
     margin-top: -6px;
   }
 }
+
+/* ——— Navigaciona traka početne (HeroNav) ——— */
+:root {
+  --nav-h: 52px;
+  /* razmak između dna slova wordmarka i gornje linije trake */
+  --nav-gap: 14px;
+}
+.hero-nav {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 320;
+  /* tokom herosa: odmah ispod velikog wordmarka; poslije: na vrhu (samo transform → GPU) */
+  transform: translate3d(0, calc(var(--story-header) + var(--nav-gap)), 0);
+  transition:
+    transform 0.8s var(--ease-io),
+    background-color 0.5s,
+    backdrop-filter 0.5s;
+  color: var(--ink);
+}
+html[data-past-hero] .hero-nav {
+  transform: translate3d(0, 0, 0);
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.hero-nav__row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  align-items: stretch;
+  height: var(--nav-h);
+  /* dvije linije preko cijele širine */
+  border-top: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 22%, transparent);
+}
+.hero-nav__cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--nav-h);
+  font-family: var(--font-grotesk), Arial, sans-serif;
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* kratka vertikalna crtica između ćelija (ne oko romba) */
+.hero-nav__cell + .hero-nav__cell:not(.hero-nav__cell--buy)::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 1px;
+  height: 14px;
+  translate: 0 -50%;
+  background: color-mix(in srgb, var(--ink) 25%, transparent);
+}
+.hero-nav__cell--buy + .hero-nav__cell::before {
+  display: none;
+}
+.hero-nav__label {
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% + 5px) / 0 1px no-repeat;
+  padding-bottom: 5px;
+  margin-bottom: -5px;
+  transition: background-size 0.5s var(--ease-io);
+}
+.hero-nav__cell:hover .hero-nav__label {
+  background-size: 100% 1px;
+}
+/* crveni romb (isti oblik kao CTA), malo viši od trake, centriran u svojoj ćeliji */
+.hero-nav__buy {
+  display: grid;
+  place-items: center;
+  width: min(100%, 190px);
+  height: calc(var(--nav-h) + 16px);
+  background: var(--signal);
+  color: #fff;
+  -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
+  mask: var(--shape-blade) center / 100% 100% no-repeat;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  transition: background-color 0.4s;
+}
+.hero-nav__buy:hover {
+  background: var(--ink);
+}
+@media (max-width: 767px) {
+  :root {
+    --nav-h: 46px;
+    --nav-gap: 8px;
+  }
+  .hero-nav__row {
+    grid-template-columns: 1fr 1.2fr 1fr;
+  }
+  .hero-nav__desk {
+    display: none;
+  }
+  .hero-nav__cell {
+    font-size: 10.5px;
+  }
+}

@@ -69,7 +69,7 @@ export default function Kaolin() {
     <section
       ref={root}
       id="kaolin"
-      className="relative z-20 flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-bg pt-[var(--story-header)]"
+      className="relative z-20 flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-bg pt-[calc(var(--story-header)+var(--nav-h)+var(--nav-gap))]"
       aria-label="Od kamena kaolina do umivaonika od porcelana"
     >
       <div className="relative mx-auto aspect-video w-[min(100%,calc(78dvh*16/9))]" style={{ maskImage: MASK, WebkitMaskImage: MASK }}>

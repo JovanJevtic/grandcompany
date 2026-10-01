@@ -9,7 +9,7 @@ import { EASE, MQ } from '@/lib/motion'
 import Pw from '@/components/ui/Pw'
 
 // Isporuka: jedna velika fotografija. Sekcija je visoka 240vh, a unutra stoji "sticky" ekran.
-// Dok se skrola, okvir se širi iz malog prozora do punog ekrana, slika se smiruje sa zuma,
+// Dok se skrola, okvir (transform: scale) raste iz malog prozora do punog ekrana, slika se smiruje sa zuma,
 // a preko nje izroni rečenica. Na kraju ostaje jedan tihi link.
 export default function Delivery() {
   const root = useRef<HTMLElement>(null)
@@ -25,18 +25,16 @@ export default function Delivery() {
       mm.add(MQ, (ctx) => {
         const { reduce, mobile } = ctx.conditions as { reduce: boolean; mobile: boolean }
         if (reduce) {
-          gsap.set(frame, { clipPath: 'inset(0% 0% 0% 0%)' })
+          gsap.set(frame, { scale: 1 })
           gsap.set([lines, foot], { autoAlpha: 1, yPercent: 0 })
           return
         }
         const tl = gsap.timeline({
           scrollTrigger: { trigger: el, start: 'top top', end: 'bottom bottom', scrub: 0.8 },
         })
-        tl.fromTo(
-          frame,
-          { clipPath: mobile ? 'inset(22% 8% 22% 8%)' : 'inset(24% 30% 24% 30%)' },
-          { clipPath: 'inset(0% 0% 0% 0%)', ease: 'none', duration: 1 },
-        )
+        // Prozor raste preko transform: scale (radi ga GPU). Ranije je to bio clip-path preko
+        // cijelog ekrana, koji browser mora ponovo da iscrta u svakom kadru — to je trzalo.
+        tl.fromTo(frame, { scale: mobile ? 0.84 : 0.42 }, { scale: 1, ease: 'none', duration: 1, force3D: true })
           .fromTo(img, { scale: 1.35 }, { scale: 1, ease: 'none', duration: 1.2 }, 0)
           .fromTo(lines, { yPercent: 110 }, { yPercent: 0, ease: EASE.out, duration: 0.4, stagger: 0.12 }, 0.55)
           .fromTo(foot, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.3 }, 0.95)
@@ -48,7 +46,7 @@ export default function Delivery() {
   return (
     <section ref={root} id="isporuka" className="relative z-20 h-[240vh] bg-bg" aria-label="Isporuka kranom">
       <div className="sticky top-0 h-dvh overflow-hidden">
-        <div data-frame className="absolute inset-0 bg-ink" data-cursor="Isporuka">
+        <div data-frame className="absolute inset-0 overflow-hidden bg-ink will-change-transform" data-cursor="Isporuka">
           <img src="/editorial/delivery.webp" alt="Kamion sa kranom podiže paletu ploča na sprat zgrade u izgradnji" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-transparent" />
         </div>
