@@ -213,7 +213,7 @@ export default function SiteChrome() {
       >
         <h1
           data-wordmark
-          className="font-pretty invisible inline-block whitespace-nowrap uppercase leading-none tracking-[-0.01em]"
+          className="font-logo invisible inline-block whitespace-nowrap uppercase leading-none tracking-[-0.01em]"
           style={{ fontSize: 'var(--wm-fs)' }}
         >
           {BRAND}

@@ -4,7 +4,6 @@ import SiteChrome from "@/components/SiteChrome";
 import SiteHeader from "@/components/site/SiteHeader";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
-import Kaolin from "@/components/shop/Kaolin";
 import Bento from "@/components/landing/Bento";
 import BrandsSplit from "@/components/landing/BrandsSplit";
 import Delivery from "@/components/landing/Delivery";
@@ -28,7 +27,6 @@ export default function Home() {
       <main>
         <CraneHero />
         <SkySwipe />
-        <Kaolin />
         <Intro />
         <UsesSplit />
         <Featured />

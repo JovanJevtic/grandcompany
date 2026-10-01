@@ -57,7 +57,7 @@ export default function Cursor() {
 
   return (
     <div ref={root} className="cursor" aria-hidden>
-      <span className="cursor-spark spark spark--spin" />
+      <span className="cursor-spark" />
       <span className="cursor-tag">
         <span ref={label} />
       </span>

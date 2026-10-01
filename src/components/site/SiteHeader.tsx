@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
 import { cartCount, openCart, useShop } from '@/lib/cart'
+import { setMode, useB2B } from '@/lib/b2b'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { pw } from '@/components/ui/Pw'
@@ -27,6 +28,20 @@ const LINKS = [
 
 const MENU = [['Početna', '/'], ...LINKS, ['Kontakt', '/#kontakt']] as const
 
+// Preklopnik načina: Maloprodaja (B2C) / B2B Partner Portal. B2B bez prijave otvara prijavu (lib/b2b).
+function ModeSwitch({ mode, discount }: { mode: 'b2c' | 'b2b'; discount: number }) {
+  return (
+    <div className="mode" role="group" aria-label="Način kupovine">
+      <button type="button" aria-pressed={mode === 'b2c'} onClick={() => setMode('b2c')} className="mode__opt">
+        Maloprodaja
+      </button>
+      <button type="button" aria-pressed={mode === 'b2b'} onClick={() => setMode('b2b')} className="mode__opt">
+        B2B portal{discount > 0 && <span className="mode__badge">−{Math.round(discount * 100)}%</span>}
+      </button>
+    </div>
+  )
+}
+
 function CartIcon() {
   return (
     <svg viewBox="0 0 24 24" className="nav__cart-icon" fill="none" stroke="currentColor" strokeWidth={1.4} aria-hidden>
@@ -44,6 +59,7 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' |
   const pathname = usePathname()
   const { cart } = useShop()
   const count = cartCount(cart)
+  const { mode, partner, discount } = useB2B()
 
   // Zaključaj skrol dok je meni otvoren
   useEffect(() => {
@@ -128,16 +144,16 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' |
           {/* sredina: logo */}
           <Link href="/" className="nav__logo" aria-label="Grand Company, početna" onClick={() => setOpen(false)}>
             <LogoMark className="nav__mark" />
-            <span data-nav-word className="nav__word font-pretty">
+            <span data-nav-word className="nav__word font-logo">
               Grand Company
             </span>
           </Link>
 
           {/* desno: Kupuj + korpa */}
           <div className="nav__side nav__side--end">
-            <Link href="/#kontakt" className="nav__link nav__link--desk">
-              <span>Kontakt</span>
-            </Link>
+            <span className="nav__mode-desk">
+              <ModeSwitch mode={mode} discount={discount} />
+            </span>
             <Link href="/prodavnica" className="nav__buy">
               Kupuj
             </Link>
@@ -153,6 +169,10 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' |
       {/* Meni preko cijelog ekrana (tri crte): sekcije centrirane, odvojene linijama */}
       <div ref={menu} id="site-menu" className={`menu ${open ? 'is-open' : ''}`} aria-hidden={!open}>
         <div data-panel className="menu__panel" style={{ clipPath: 'inset(0% 0% 100% 0%)' }}>
+          <div data-item className="menu__mode">
+            <ModeSwitch mode={mode} discount={discount} />
+            {partner && <p className="menu__partner">{partner.name}</p>}
+          </div>
           <nav className="menu__list" aria-label="Meni">
             {MENU.map(([label, href]) => (
               <Link key={href} data-item href={href} onClick={() => setOpen(false)} className="menu__item">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, Inter, Inter_Tight } from "next/font/google";
+import { Bodoni_Moda, Inter, Inter_Tight, Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -22,6 +22,13 @@ const sans = Inter({
   variable: "--font-text",
   subsets: ["latin", "latin-ext"],
   weight: ["400", "500", "600"],
+});
+
+// Naslovi: debeli geometrijski sans (korporativni stil), uvijek verzal. Prettywise ostaje samo za logotip.
+const heavy = Montserrat({
+  variable: "--font-heavy",
+  subsets: ["latin", "latin-ext"],
+  weight: ["700", "800", "900"],
 });
 
 // Debeli grotesk za sitne oznake u verzalu (hero, bento kartice) — kontrast tankom Prettywise-u.
@@ -58,7 +65,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${serif.variable} ${sans.variable} ${grotesk.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${serif.variable} ${sans.variable} ${heavy.variable} ${grotesk.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}

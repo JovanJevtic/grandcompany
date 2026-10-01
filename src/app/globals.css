@@ -285,22 +285,33 @@ html:not([data-past-hero]) [data-overlay-header] {
 /* ——— Editorijalni sloj (redizajn) ——— */
 
 /* Naslovi: serif, normalan verzal/kurent, tanko na velikim veličinama (opsz to radi sam). */
-/* Naslovni font: Prettywise Light, isti kao rečenica "Gradimo, prodajemo..." u herou.
-   Nema kurziv — font-synthesis: none sprječava da browser napravi lažni (iskošeni) kurziv. */
+/* Naslovi: debeli geometrijski sans (Montserrat 800), uvijek verzal — korporativni stil.
+   .font-pretty je ime ostalo iz ranije (naslovi kartica, meni) — sada je isti sans, malo lakši (700).
+   .font-logo je JEDINO mjesto za Prettywise: logotip "GRAND COMPANY" (hero, navbar, footer). */
 .display,
 .font-pretty {
-  font-family: var(--font-pretty), Georgia, serif;
-  font-weight: 300;
+  font-family: var(--font-heavy), "Helvetica Neue", Arial, sans-serif;
   font-synthesis: none;
+  text-transform: uppercase;
 }
 .display {
-  letter-spacing: -0.015em;
-  line-height: 0.98;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 0.95;
   text-wrap: balance;
+}
+.font-pretty {
+  font-weight: 700;
+  letter-spacing: -0.005em;
 }
 .display em,
 .font-pretty em {
   font-style: normal;
+}
+.font-logo {
+  font-family: var(--font-pretty), Georgia, serif;
+  font-weight: 300;
+  font-synthesis: none;
 }
 
 /* Slova sa dijakriticima složena od osnovnog slova + znaka (vidi components/ui/Pw.tsx).
@@ -368,29 +379,31 @@ html:not([data-past-hero]) [data-overlay-header] {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* CTA: "sječivo" iz logotipa — širok romb konkavnih strana sa oštrim vrhovima, deblji u sredini
-   da stane tekst (jedna riječ). Oblik daje SVG maska koja se rasteže sa dugmetom. Boja = kursor.
-   Na hover se oblik napuni tamnom bojom odozdo, a riječ se zakotrlja. */
+/* CTA: kapsula (potpuno zaobljena) u neutralnoj sivo-bež boji — korporativno, bez apstraktnih oblika.
+   Na hover se napuni tamnom bojom odozdo, a riječ se zakotrlja. */
+:root {
+  --btn: #d6cfc3;
+  --btn-ink: var(--ink);
+}
 .cta {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 70px;
-  padding: 0 4.4em;
+  min-height: 52px;
+  padding: 0 2.2em;
   overflow: hidden;
   isolation: isolate;
-  -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
-  mask: var(--shape-blade) center / 100% 100% no-repeat;
-  background: var(--signal);
-  color: #fff;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--btn-ink);
   font-family: var(--font-text), Arial, sans-serif;
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
-  transition: color 0.6s var(--ease-io), transform 0.6s var(--ease-io);
+  transition: color 0.5s var(--ease-io);
 }
 .cta::before {
   content: '';
@@ -407,8 +420,7 @@ html:not([data-past-hero]) [data-overlay-header] {
 }
 .cta:hover,
 .cta:focus-visible {
-  color: var(--cta-ink, #fff);
-  transform: scaleX(1.04);
+  color: var(--cta-ink, var(--bg));
 }
 .cta:focus-visible {
   outline: none;
@@ -498,24 +510,28 @@ html:not([data-past-hero]) [data-overlay-header] {
 }
 .cursor-spark {
   position: absolute;
-  left: -9px;
-  top: -9px;
-  width: 18px;
-  height: 18px;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--ink);
+  -webkit-mask: none !important;
+  mask: none !important;
+  animation: none !important;
   transition: scale 0.4s var(--ease-out), opacity 0.3s;
 }
 .cursor-tag {
   position: absolute;
-  left: -72px;
-  top: -27px;
+  left: -58px;
+  top: -20px;
   display: grid;
   place-items: center;
-  width: 144px;
-  height: 54px;
-  background: var(--signal);
-  -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
-  mask: var(--shape-blade) center / 100% 100% no-repeat;
-  color: #fff;
+  width: 116px;
+  height: 40px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--bg);
   font-family: var(--font-text), Arial, sans-serif;
   font-size: 10px;
   font-weight: 600;
@@ -675,10 +691,8 @@ html:not([data-past-hero]) [data-overlay-header] {
 }
 
 /* ——— Tipografija: serif samo za naslove, sve ostalo sans u verzalu ——— */
-.display,
-.font-pretty {
-  text-transform: none;
-  letter-spacing: -0.015em;
+.font-logo {
+  letter-spacing: -0.01em;
 }
 /* Kurziv u sans tekstu ne postoji (izgleda jeftino): sve "italic" oznake postaju uspravne. */
 body .italic:not(.display):not(.font-pretty),
@@ -707,8 +721,8 @@ input::placeholder {
 /* Krupni brojevi (cijene, mjere): Bodoni cifre bez sopstvene veličine — veličinu daje text-* klasa.
    (.pw-alt ima 0.92em jer stoji UNUTAR Prettywise naslova; ovo je za samostalne brojeve.) */
 .num {
-  font-family: var(--font-serif), Georgia, serif;
-  font-weight: 400;
+  font-family: var(--font-heavy), Arial, sans-serif;
+  font-weight: 800;
   text-transform: none;
   letter-spacing: -0.01em;
   font-variant-numeric: lining-nums tabular-nums;
@@ -858,19 +872,19 @@ html:not([data-wm-docked]) .nav--home .nav__mark {
 .nav__buy {
   display: grid;
   place-items: center;
-  height: 46px;
-  padding-inline: 34px;
-  background: var(--signal);
-  color: #fff;
-  -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
-  mask: var(--shape-blade) center / 100% 100% no-repeat;
+  height: 40px;
+  padding-inline: 22px;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--btn-ink);
   font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  transition: background-color 0.4s;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  transition: background-color 0.4s, color 0.4s;
 }
 .nav__buy:hover {
   background: var(--ink);
+  color: var(--bg);
 }
 /* korpa: ikonica; na hover iza nje izraste crveni romb, a ikonica pobijeli */
 .nav__cart {
@@ -885,18 +899,14 @@ html:not([data-wm-docked]) .nav--home .nav__mark {
 .nav__cart-bg {
   position: absolute;
   inset: 4px;
-  background: var(--signal);
-  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
-  transform: scale(0) rotate(-45deg);
+  background: var(--btn);
+  border-radius: 999px;
+  transform: scale(0);
   transition: transform 0.5s var(--ease-out);
 }
 .nav__cart:hover .nav__cart-bg,
 .nav__cart:focus-visible .nav__cart-bg {
-  transform: scale(1) rotate(0deg);
-}
-.nav__cart:hover,
-.nav__cart:focus-visible {
-  color: #fff;
+  transform: scale(1);
 }
 .nav__cart-icon {
   position: relative;
@@ -968,12 +978,12 @@ html:not([data-wm-docked]) .nav--home .nav__mark {
   padding: 18px 0 14px;
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
   text-align: center;
-  font-family: var(--font-pretty), Georgia, serif;
-  font-weight: 300;
-  font-size: clamp(30px, 9vw, 44px);
+  font-family: var(--font-heavy), Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(24px, 7vw, 34px);
   line-height: 1;
-  letter-spacing: -0.01em;
-  text-transform: none;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
 }
 .menu__foot {
   display: flex;
@@ -983,8 +993,8 @@ html:not([data-wm-docked]) .nav--home .nav__mark {
   margin-top: 36px;
 }
 .nav__buy--big {
-  height: 60px;
-  padding-inline: 56px;
+  height: 54px;
+  padding-inline: 44px;
   font-size: 12px;
 }
 .menu__tel {
@@ -1028,4 +1038,63 @@ html.scroll-held,
 html.scroll-held body {
   overflow: hidden;
   touch-action: none;
+}
+
+/* Preklopnik Maloprodaja / B2B portal (navbar) */
+.mode {
+  display: inline-flex;
+  padding: 3px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.mode__opt {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 32px;
+  padding-inline: 14px;
+  border-radius: 999px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  opacity: 0.55;
+  transition: background-color 0.35s, color 0.35s, opacity 0.35s;
+}
+.mode__opt[aria-pressed='true'] {
+  background: var(--ink);
+  color: var(--bg);
+  opacity: 1;
+}
+.mode__opt:not([aria-pressed='true']):hover {
+  opacity: 1;
+}
+.mode__badge {
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--btn);
+  color: var(--ink);
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+}
+.menu__mode {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+.menu__partner {
+  font-size: 11px;
+  opacity: 0.6;
+}
+@media (max-width: 1180px) {
+  .nav__links li:nth-child(n + 4) {
+    display: none;
+  }
+}
+@media (max-width: 899px) {
+  .nav__mode-desk {
+    display: none;
+  }
 }

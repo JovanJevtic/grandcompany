@@ -5,7 +5,7 @@ import { Children, cloneElement, isValidElement, type ReactElement, type ReactNo
 // znaka iznad (kvačica, akcenat, crtica kod đ). Znak je pravi element, pa izranja zajedno sa slovom
 // kad SplitText animira naslov. Čitači ekrana dobijaju pravo slovo (sr-only).
 // Kad se kupi puna licenca fonta (sa latin-ext), postavi DEMO_FONT na false i sve ostaje isto, samo pravim slovima.
-const DEMO_FONT = true
+const DEMO_FONT = false // naslovi su sada Montserrat (ima č ć š đ ž); Prettywise je samo logotip bez dijakritika
 
 const MAP: Record<string, [base: string, mark: string, kind: string]> = {
   č: ['c', 'ˇ', 'lo'],
