@@ -339,14 +339,14 @@ html:not([data-past-hero]) [data-overlay-header] {
 /* đ i Đ: tanka crtica preko stabla slova */
 .pw-dj::after,
 .pw-DJ::after {
-  height: 0.035em;
-  width: 0.24em;
+  height: 0.05em;
+  width: 0.3em;
   -webkit-mask: none;
   mask: none;
 }
 .pw-dj::after {
-  left: 82%;
-  top: 0.43em;
+  left: 78%;
+  top: 0.47em; /* između x-visine (0.578) i vrha slova d (0.702) */
 }
 .pw-DJ::after {
   left: 16%;
@@ -639,8 +639,8 @@ html.scroll-held body {
   touch-action: none;
 }
 
-/* Iskra: sitni znak brenda (četvorokraka zvijezda) u boji kursora. Veličinu daje size-* klasa.
-   Za drugu boju: [--spark:var(--ink)]. */
+/* Iskra (četvorokraka zvijezda iz logotipa) — SAMO za kursor. Rombovi/iskre se ne koriste kao
+   ukras na stranici (posebno ne na fotografijama: liče na vodeni žig AI generatora). */
 .spark {
   display: inline-block;
   flex-shrink: 0;
@@ -656,8 +656,12 @@ html.scroll-held body {
   to { rotate: 360deg; }
 }
 
-/* Liste u tekstovima (pravne stranice, objave): marker je iskra brenda */
+/* Liste u tekstovima: okrugli marker u boji kursora (rombovi su samo CTA i kursor) */
 .prose-ed ul,
 .article-copy ul {
-  list-style-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 600 600'%3E%3Cpath fill='%23e4472a' d='M600 300C389.6 349.5 349.5 389.6 300 600 250.5 389.6 210.4 349.5 0 300 210.4 250.5 250.5 210.4 300 0 349.5 210.4 389.6 250.5 600 300Z'/%3E%3C/svg%3E");
+  list-style: disc;
+}
+.prose-ed li::marker,
+.article-copy li::marker {
+  color: var(--signal);
 }

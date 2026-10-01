@@ -131,7 +131,7 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
           <p className="display mx-auto mt-5 max-w-[18ch] text-[clamp(36px,5vw,88px)] transition-colors duration-500 group-hover:text-signal"><Pw>
             {next.title}
           </Pw></p>
-          <span className="spark spark--spin mt-8 size-3.5 transition-transform duration-500 group-hover:scale-150" aria-hidden />
+          <span className="mt-8 inline-block size-2 rounded-full bg-signal transition-transform duration-500 group-hover:scale-150" aria-hidden />
         </Link>
       )}
     </article>

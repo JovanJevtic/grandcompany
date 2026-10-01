@@ -35,7 +35,6 @@ export default function Detail() {
 
   return (
     <section ref={root} className="relative z-20 overflow-hidden bg-bg py-[22vh]" aria-label="Materijal">
-      <span className="spark spark--spin mx-auto mb-8 block size-4" aria-hidden />
       <h2 data-head className="display invisible mx-auto max-w-[16ch] px-5 text-center text-title"><Pw>
         Materijal koji se <em>ne vidi</em> kad je zid gotov.
       </Pw></h2>
@@ -49,7 +48,6 @@ export default function Detail() {
             <img src="/editorial/boards-light.webp" alt="Ivica naslaganih gips-kartonskih ploča na suncu" className="h-full w-full object-cover" />
           </div>
           <figcaption className="mt-5 flex items-center gap-3 text-[14px] italic">
-            <span className="spark size-2.5" aria-hidden />
             <span className="opacity-60">Gips, vuna, čelik.</span>
           </figcaption>
         </figure>

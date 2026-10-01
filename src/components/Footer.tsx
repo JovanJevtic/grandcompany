@@ -56,7 +56,6 @@ export default function Footer() {
   return (
     <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink pt-[20vh] text-bg">
       <div className="flex flex-col items-center px-5 text-center">
-        <span className="spark spark--spin mb-8 block size-4" aria-hidden />
         <h2 data-head className="display invisible text-title"><Pw>
           Gradimo <em>zajedno.</em>
         </Pw></h2>
@@ -74,7 +73,6 @@ export default function Footer() {
       <div className="mx-auto mt-[18vh] grid w-[calc(100%-40px)] grid-cols-2 gap-x-6 gap-y-12 border-t border-bg/15 pt-12 text-[15px] md:w-[88vw] md:grid-cols-4">
         <div>
           <p className="mb-4 flex items-center gap-2.5 italic">
-            <span className="spark size-2" aria-hidden />
             <span className="opacity-50">Stovarište</span>
           </p>
           <address className="not-italic leading-[1.6]">
@@ -91,7 +89,6 @@ export default function Footer() {
         {COLS.map((c) => (
           <div key={c.title}>
             <p className="mb-4 flex items-center gap-2.5 italic">
-              <span className="spark size-2" aria-hidden />
               <span className="opacity-50">{c.title}</span>
             </p>
             <ul className="flex flex-col gap-1.5">

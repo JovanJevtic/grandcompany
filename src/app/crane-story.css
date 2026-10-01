@@ -137,6 +137,19 @@
   from { translate: -2.5% 0; }
   to { translate: 2.5% 0; }
 }
+/* Završni kadar: kad kamera izađe kroz prozor i počne rečenica, preko slojeva se pretopi
+   čisto nebo (bez zamućenih nebodera koji su iza teksta djelovali prljavo). */
+.sky-clean {
+  position: absolute;
+  inset: -3%;
+  background: url('/hero/sky-clean.webp') 50% 45% / cover no-repeat;
+  opacity: max(clamp(0, (var(--scene-progress, 0) - 0.9) * 10, 1), clamp(0, var(--type-p, 0) * 8, 1));
+  transform: translate3d(calc(var(--mx, 0) * -0.6%), calc(var(--my, 0) * -0.4%), 0);
+  animation: sky-breathe 18s ease-in-out infinite alternate;
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
 /* Veo: zamućena kopija cijele slike preko slojeva dok se kran učitava. Ako scena iz bilo kog
    razloga ne javi da je spremna, veo se ipak skloni poslije 6 s (animacija). */
 .sky-veil {

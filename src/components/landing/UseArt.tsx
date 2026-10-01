@@ -7,7 +7,8 @@ import { axisShift, box, line, poly, prism, type Proj, type V3 } from './iso'
 // zaklanja dalji; linije se iscrtavaju u tri koraka (data-d 0/1/2: obris, ivice, detalji).
 // Gornje ivice obloga su stepenaste, kao stepenaste trake na sajtu.
 
-type Part = { sil?: string; edges?: string; detail?: string; open?: boolean }
+// accent: jedini dio crteža iscrtan crvenom linijom (boja kursora) — po jedan u svakom crtežu.
+type Part = { sil?: string; edges?: string; detail?: string; open?: boolean; accent?: boolean }
 type Layer = { parts: Part[] }
 export type Drawing = { axis: 'x' | 'y' | 'z'; gap: number; layers: Layer[] }
 
@@ -55,7 +56,7 @@ function wall(): Drawing {
       { parts: board(-8, [[0, 60, H], [60, 120, H], [120, L, H]]) },
       { parts: frame },
       { parts: wool },
-      { parts: board(26, [[60, 90, 70], [90, 120, 100], [120, 150, 128], [150, L, H]]) },
+      { parts: board(26, [[60, 90, 70], [90, 120, 100], [120, 150, 128], [150, L, H]]).map((part, i) => (i === 0 ? { ...part, accent: true } : part)) },
     ],
   }
 }
@@ -74,7 +75,7 @@ function ceiling(): Drawing {
     [150, W, 52],
   ].map(([x0, x1, d]) => {
     const b = box(x0, 0, 0, x1 - x0, d, 3, o)
-    return { sil: b.sil, edges: b.edges }
+    return { sil: b.sil, edges: b.edges, accent: x0 === 150 }
   })
   const secondary: Part[] = [8, 48, 88].map((y) => {
     const b = box(0, y, 6, W, 6, 5, o)
@@ -133,49 +134,34 @@ function facade(): Drawing {
       { parts: dabs },
       { parts: eps },
       { parts: [{ sil: meshBox.sil, edges: meshBox.edges, detail: mesh.join('') }] },
-      { parts: [{ sil: render.sil, edges: render.edges }] },
+      { parts: [{ sil: render.sil, edges: render.edges, accent: true }] },
     ],
   }
 }
 
-// ——— Potkrovlje: presjek krova izvučen u dubinu, kriške razmaknute: krov, vuna, CD, obloga ———
+// ——— Potkrovlje: presjek krova izvučen u dubinu, slojevi razmaknuti: rogovi, vuna, obloga ———
+// Namjerno jednostavno: tri roga, vuna i obloga bez dodatnih crtica (vlakna, spojevi, nazidnice).
 function attic(): Drawing {
   const o = { cx: 150, cy: 150, s: 1 }
   const D = 132
-  // Rogovi: pet A-okvira u nizu, sa nazidnicom (grednom podlogom) ispod.
-  const plate = box(0, 0, -8, 14, D, 8, o)
-  const plate2 = box(166, 0, -8, 14, D, 8, o)
   const frame: [number, number][] = [[0, 0], [90, 110], [180, 0], [166, 0], [90, 93], [14, 0]]
-  const trusses: Part[] = [{ sil: plate.sil, edges: plate.edges }, { sil: plate2.sil, edges: plate2.edges }]
-  ;[0, 31, 62, 93, 124].forEach((y) => {
+  const trusses: Part[] = []
+  ;[0, 62, 124].forEach((y) => {
     const p = prism(frame, y, 8, o)
     trusses.push({ sil: p.back }, { detail: p.links }, { sil: p.front })
   })
-  // Vuna uz lijevu kosinu (ispod rogova), pa obloga od ploča sa spojevima.
+  // Vuna uz lijevu kosinu (ispod rogova), pa obloga od ploča — obloga je crveni (akcentni) sloj.
   const slope = (t: number, inset: number): [number, number] => [14 + inset * 1.2 + t * (76 - inset * 1.2), t * (93 - inset)]
   const band = (a: number, b: number) => [slope(0, a), slope(1, a), slope(1, b), slope(0, b)]
   const wool = prism(band(0, 12), 0, D, o)
-  const fibres = [0.2, 0.4, 0.6, 0.8]
-    .map((t) => {
-      const [x, z] = slope(t, 6)
-      return line([x, 0, z], [x, D, z], o)
-    })
-    .join('')
   const boards = prism(band(13, 17), 0, D, o)
-  const seams = [44, 88]
-    .map((y) => {
-      const [xa, za] = slope(0, 17)
-      const [xb, zb] = slope(1, 17)
-      return line([xa, y, za], [xb, y, zb], o)
-    })
-    .join('')
   return {
     axis: 'x',
     gap: 22,
     layers: [
       { parts: trusses },
-      { parts: [{ sil: wool.back }, { detail: wool.links }, { sil: wool.front, detail: fibres }] },
-      { parts: [{ sil: boards.back }, { detail: boards.links }, { sil: boards.front, detail: seams }] },
+      { parts: [{ sil: wool.back }, { detail: wool.links }, { sil: wool.front }] },
+      { parts: [{ sil: boards.back, accent: true }, { detail: boards.links, accent: true }, { sil: boards.front, accent: true }] },
     ],
   }
 }
@@ -206,7 +192,7 @@ function floors(): Drawing {
     }
     if (s.ridges) for (let y = 8; y < D; y += 10) detail += line([0, y, top], [s.len, y, top], o)
     z += s.h
-    return { parts: [{ sil: b.sil, edges: b.edges, detail }] }
+    return { parts: [{ sil: b.sil, edges: b.edges, detail, accent: s.cells === 2 }] }
   })
   return { axis: 'z', gap: 12, layers }
 }
@@ -266,9 +252,9 @@ export default function UseArt({ use, className = '', title }: { use: UseId; cla
         <g key={k} data-layer={k}>
           {layer.parts.map((p, i) => (
             <g key={i}>
-              {p.sil && <path d={p.sil} data-d={0} fill={p.open ? 'none' : 'var(--art-fill)'} />}
-              {p.edges && <path d={p.edges} data-d={1} />}
-              {p.detail && <path d={p.detail} data-d={2} opacity={0.7} />}
+              {p.sil && <path d={p.sil} data-d={0} fill={p.open ? 'none' : 'var(--art-fill)'} stroke={p.accent ? 'var(--signal)' : undefined} />}
+              {p.edges && <path d={p.edges} data-d={1} stroke={p.accent ? 'var(--signal)' : undefined} />}
+              {p.detail && <path d={p.detail} data-d={2} opacity={0.7} stroke={p.accent ? 'var(--signal)' : undefined} />}
             </g>
           ))}
         </g>

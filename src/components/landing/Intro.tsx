@@ -37,7 +37,6 @@ export default function Intro() {
 
   return (
     <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[18vh] pt-[24vh] text-center">
-      <span className="spark spark--spin mx-auto mb-8 block size-4" aria-hidden />
       <h2 data-head className="display invisible mx-auto px-5 text-display"><Pw>
         Materijal za
         <br />
@@ -65,7 +64,6 @@ export default function Intro() {
           </div>
         </figure>
         <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[15px] italic md:mt-8">
-          <span className="spark size-2.5" aria-hidden />
           <span className="opacity-70">
           Ploča, profil, vuna — jedan sistem.</span>
         </figcaption>

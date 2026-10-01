@@ -68,9 +68,7 @@ export default function Delivery() {
           </Pw></h2>
           <p data-foot className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-[15px] md:bottom-14">
             <span className="flex items-center gap-3 italic">
-              <span className="spark size-2.5" aria-hidden />
               <span className="opacity-85">Vlastiti kamioni sa kranom, Banja Luka i okolina</span>
-              <span className="spark size-2.5" aria-hidden />
             </span>
             <Link href="/dostava" className="ulink">
               Kako isporučujemo

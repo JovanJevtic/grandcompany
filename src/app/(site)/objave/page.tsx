@@ -40,7 +40,7 @@ export default function PostsPage() {
           </h2>
           <p className="mt-6 max-w-[40ch] text-[17px] leading-[1.5] text-ink/70">{featured.lead}</p>
           <p className="mt-8 flex items-center gap-3 text-[14px] text-ink/55">
-            <span className="spark size-2.5" aria-hidden />
+            <span className="size-1.5 rounded-full bg-signal" aria-hidden />
             {postDate(featured.date)} · {featured.read} min čitanja
           </p>
         </div>

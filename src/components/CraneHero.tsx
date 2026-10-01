@@ -110,6 +110,8 @@ export default function CraneHero() {
               <div className="sky-layer sky-city sky-city--soft" />
               <div className="sky-layer sky-fog" />
             </div>
+            {/* Završni kadar (rečenica "Gradimo, prodajemo..."): čisto nebo bez grada i magle */}
+            <div className="sky-clean" />
             <div className="sky-veil" />
           </div>
 

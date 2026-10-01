@@ -42,7 +42,6 @@ export default function PostsTeaser() {
 
   return (
     <section ref={root} id="objave" className="relative z-20 bg-bg py-[20vh]" aria-label="Objave">
-      <span className="spark spark--spin mx-auto mb-8 block size-4" aria-hidden />
       <h2 data-head className="display invisible mx-auto px-5 text-center text-title"><Pw>
         Znanje sa <em>gradilišta</em>
       </Pw></h2>

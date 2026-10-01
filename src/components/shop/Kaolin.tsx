@@ -173,7 +173,7 @@ export default function Kaolin() {
           className="relative h-px flex-1 bg-ink/25"
         >
           <span data-fill className="absolute inset-0 origin-left bg-ink" style={{ transform: 'scaleX(0)' }} />
-          <span data-knob className="spark spark--spin absolute top-1/2 size-5 -translate-x-1/2 -translate-y-1/2" style={{ left: '0%' }} />
+          <span data-knob className="absolute top-1/2 size-3 rounded-full bg-signal -translate-x-1/2 -translate-y-1/2" style={{ left: '0%' }} />
         </div>
         <span className="shrink-0 text-right">Do gotovih proizvoda</span>
       </div>

@@ -172,7 +172,7 @@ export function PoliciesIndex() {
                     </span>
                     <span
                       aria-hidden
-                      className="spark size-3 self-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      className="size-2 shrink-0 self-center rounded-full bg-signal opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     />
                   </Link>
                 </li>

@@ -104,7 +104,7 @@ export default function Panels() {
       >
         {toast && (
           <div className="pointer-events-auto flex max-w-full items-center gap-4 rounded-full bg-ink py-2.5 pl-5 pr-2.5 text-[14px] text-bg shadow-[0_18px_40px_-18px_rgba(27,36,54,.6)]">
-            <span aria-hidden className="spark size-3" />
+            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-signal" />
             <span className="truncate">{toast.text}</span>
             {toast.action && (
               <button
