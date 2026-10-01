@@ -29,12 +29,12 @@ export default function Home() {
       <main>
         <CraneHero />
         <SkySwipe />
-        {/* B2B prvo: ko smo → sistemi → prednosti (kran, Knauf, Pantheon, atesti) → B2B portal →
+        {/* B2B prvo: ko smo → sistemi → B2B portal → prednosti (kran, Knauf, Pantheon, atesti) →
             rabatna skala → artikli na stanju → isporuka kranom → vodiči → stovarište i radno vrijeme */}
         <Intro />
         <UsesSplit />
-        <BrandsSplit />
         <Bento />
+        <BrandsSplit />
         {/* Stepenasti prelaz (pravougaonici) u plavu sekciju i nazad */}
         <StepBand tone="navy" profile="diag" steps={12} aria-label="Rabatna skala">
           <Partners />

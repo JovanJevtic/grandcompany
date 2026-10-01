@@ -8,7 +8,7 @@ import {detailKit} from './crane-details.js?v=18';
 import {architectureKit} from './crane-architecture.js?v=14';
 import {createSiteActivity} from './crane-activity.js?v=11';
 import {buildTowerBath} from './crane-interior.js?v=4';
-import {buildFinish,ENTRY} from './crane-finish.js?v=3';
+import {buildFinish,ENTRY} from './crane-finish.js?v=4';
 
 export const clamp = (n, a = 0, b = 1) => Math.min(b, Math.max(a, n));
 export const smooth = (a, b, p) => { const t = clamp((p-a)/(b-a)); return t*t*(3-2*t); };
@@ -102,6 +102,8 @@ export function createCraneScene() {
     paving:mat(PALETTE.paving,.9), window:mat(PALETTE.window,.38,.07),
   };
   m.glass.transparent=true;m.glass.opacity=.78;
+  // U linijskom crtežu zgrade dio prozora ostaje u tačkama (crane-print bira koje, po položaju).
+  m.window.userData.printDots=true;m.glass.userData.printDots=true;
   m.net.transparent=true;m.net.opacity=.35;m.net.side=THREE.DoubleSide;
   if(typeof document!=='undefined') {
     // Fine surface relief keeps the model an illustration with tangible materials.
@@ -220,9 +222,9 @@ export function createCraneScene() {
     for(const x of [-.68,.68])for(const z of [-.68,.68])profile(crane,m.yellow,[x,y,z],[x,y+2.45,z],.14);
     for(const s of [-1,1]) {
       rod(crane,m.yellow,[-.68,y,s*.68],[.68,y+2.45,s*.68],.045);
-      rod(crane,m.yellow,[.68,y,s*.68],[-.68,y+2.45,s*.68],.045);
+      if(!SIMPLE_CRANE)rod(crane,m.yellow,[.68,y,s*.68],[-.68,y+2.45,s*.68],.045);
       rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,y+2.45,.68],.045);
-      rod(crane,m.yellow,[s*.68,y,.68],[s*.68,y+2.45,-.68],.045);
+      if(!SIMPLE_CRANE)rod(crane,m.yellow,[s*.68,y,.68],[s*.68,y+2.45,-.68],.045);
       rod(crane,m.yellow,[-.68,y,s*.68],[.68,y,s*.68],.065);
       rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,y,.68],.065);
     }
@@ -252,14 +254,13 @@ export function createCraneScene() {
   for(const x of [-6.5,8,17])rod(slew,m.steel,[0,5.5,0],[x,2.2,0],.026);
   for(let x=-7;x<-4;x+=.64)box(slew,m.edge,x,.9,0,.58,2.8,1.6); // kontrateg (u štampi puno mastilo)
   box(slew,m.yellow,-3.5,1.1,0,1.5,.6,.85);
-  for(let x=-6;x<1;x+=1) {
+  if(!SIMPLE_CRANE)for(let x=-6;x<1;x+=1) {
     rod(slew,m.yellow,[x,1,.9],[x,2,.9],.025);
     rod(slew,m.yellow,[x,2,.9],[x+1,2,.9],.025);
   }
-  if(!SIMPLE_CRANE)details.upper(slew);
-  rig.upper(slew);
+  if(!SIMPLE_CRANE){details.upper(slew);rig.upper(slew);}
   // Real signage connects the crane to the storefront identity.
-  if(typeof document!=='undefined') {
+  if(!SIMPLE_CRANE&&typeof document!=='undefined') {
     const sign=document.createElement('canvas');sign.width=1024;sign.height=192;
     const sc=sign.getContext('2d');sc.fillStyle='#f7f6f2';sc.fillRect(0,0,1024,192);
     sc.fillStyle='#d6cbb6';sc.fillRect(0,0,180,192);
@@ -276,7 +277,9 @@ export function createCraneScene() {
   }
   batch(slew);
 
-  const festoon=rig.festoon(slew);
+  // Kablovi duž strijele: u jednostavnom kranu se ne crtaju (ali se i dalje ažuriraju).
+  const festoonRoot=group(slew);festoonRoot.visible=!SIMPLE_CRANE;
+  const festoon=rig.festoon(festoonRoot);
   const trolley=group(slew,16,0,0);
   box(trolley,m.yellow,0,.75,0,1.05,.26,1.45);
   for(const x of [-.38,.38])for(const z of [-.62,.62])rod(trolley,m.steel,[x,.94,z-.09],[x,.94,z+.09],.14);
@@ -285,6 +288,7 @@ export function createCraneScene() {
   // Teret, kuka i sajle više nisu djeca strijele: teret ostaje na krovu kad se kuka otkači,
   // a kuka nastavlja sa kranom. Njihov položaj u svijetu računa update() (vidi rigPose).
   const load=group(scene,0,0,0);
+  load.userData.printLine=true;
   load.scale.setScalar(LOAD_SCALE);
   function pallet(g,x,y,z,blocks=true,variant=0) {
     for(const px of [-.65,0,.65])box(g,m.darkWood,x+px,y+.12,z,.17,.24,1.3);
@@ -354,6 +358,7 @@ export function createCraneScene() {
   for(const x of [-.9,.9])for(const z of [-.69,.69])slings.push({x,z,parts:[rod(scene,m.steel,[0,0,0],[0,1,0],.023),rod(scene,m.steel,[0,0,0],[0,1,0],.023)]});
 
   const site=group(scene);
+  site.userData.printLine=true;
   architecture.excavation(site);
   // Access road and kerbs keep the complex legible.
   box(site,m.asphalt,0,.005,8,140,.035,4);
@@ -523,6 +528,7 @@ export function createCraneScene() {
   // ——— Završna chapter-a: fasada zgrade sa paletom, pa kupatilo na ulaznom spratu ———
   // Fasada je van `site` (koji je spojen u instance) da bi mogla da raste nezavisno.
   const finishRoot=group(scene,9,0,0);
+  finishRoot.userData.printLine=true;
   const finish=buildFinish({parent:finishRoot,box,rod,group,batch,m,pallet});
   finishRoot.visible=false;
   const ENTRY_Y=ENTRY*2.35+.2;

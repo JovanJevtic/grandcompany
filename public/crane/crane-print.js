@@ -19,8 +19,8 @@ import * as THREE from '../vendor/three.module.min.js';
 // bg: koliko se vidi pozadina (0..1); at: progres kad prelaz u ovo poglavlje počinje;
 // city: 0 = pozadina je samo nebo u oblacima, 1 = grad sa neboderima (tek kad se izađe kroz prozor).
 export const STAGES = [
-  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .32, floor: 0, city: 0 },  // kran se okreće
-  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
+  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .2, floor: 0, city: 0 },  // kran se okreće
+  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .24, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
   { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
   // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
   // grad se nazire samo kroz gustinu tačaka. Preko nje se ispisuje rečenica, svijetla i centrirana.
@@ -67,6 +67,7 @@ const PRINT_VERT = /* glsl */ `
   varying vec2 vUv;
   varying float vDepth;
   varying vec3 vWorld;
+  varying vec3 vInst;
   void main() {
     vUv = uv;
     #include <beginnormal_vertex>
@@ -80,6 +81,12 @@ const PRINT_VERT = /* glsl */ `
       wp = instanceMatrix * wp;
     #endif
     vWorld = (modelMatrix * wp).xyz;
+    // Položaj samog objekta (ili instance) — isti za cijeli prozor, za izbor "tačkastih" prozora.
+    #ifdef USE_INSTANCING
+      vInst = (modelMatrix * instanceMatrix[3]).xyz;
+    #else
+      vInst = modelMatrix[3].xyz;
+    #endif
     vWorldN = normalize((vec4(vViewN, 0.0) * viewMatrix).xyz);
   }
 `;
@@ -92,6 +99,8 @@ const PRINT_FRAG = /* glsl */ `
   uniform vec4 radial;   // xz centar, r0, r1: ton se gasi od r0 do r1 (tlo); r1 = 0 znači bez toga
   uniform float edgeW;   // 1 = crta obris; manje = bez obrisa prema papiru (tlo)
   uniform float lineOnly; // 1 = samo linije: površina je papir, crtaju se samo obrisi (kran)
+  uniform float someDots; // 1 = prozor u linijskom crtežu: otprilike svaki drugi ostaje u tačkama
+  varying vec3 vInst;
   varying float vDepth;
   varying vec3 vWorld;
   #ifdef PRINT_MAP
@@ -134,9 +143,11 @@ const PRINT_FRAG = /* glsl */ `
     if (radial.w > 0.0) tone *= 1.0 - smoothstep(radial.z, radial.w, length(vWorld.xz - radial.xy));
     // vazdušna perspektiva: daleko = manje mastila (stapa se sa papirom)
     tone *= 1.0 - .92 * smoothstep(fog.x, fog.y, vDepth);
-    tone *= 1.0 - lineOnly;
+    float lo = lineOnly;
+    if (someDots > .5 && fract(sin(dot(floor(vInst * 2.0), vec3(12.99, 78.23, 37.71))) * 43758.55) > .5) lo = 0.0;
+    tone *= 1.0 - lo;
     // Linijski objekti (kran) pišu pokrivenost .95 umjesto 1, da ih završni shader prepozna.
-    gl_FragColor = vec4(n.xy * .5 + .5, tone, lineOnly > .5 ? .95 : edgeW);
+    gl_FragColor = vec4(n.xy * .5 + .5, tone, lo > .5 ? .95 : edgeW);
   }
 `;
 
@@ -314,7 +325,7 @@ export function createCraneRenderer(renderer, world) {
     const defines = {};
     if (src.map) defines.PRINT_MAP = '';
     pm = new THREE.ShaderMaterial({
-      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, map: { value: src.map || null } },
+      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, map: { value: src.map || null } },
       defines,
       side: src.side,
       vertexShader: PRINT_VERT,

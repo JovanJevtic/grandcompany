@@ -21,6 +21,7 @@ export function buildFinish({parent,box,rod,group,batch,m,pallet,storeys=4}) {
   const brass=mat('#b89a6a',.34,.72);
   const frame=mat('#5f6468',.5,.35);
   const glass=mat('#c3d1da',.12,.2);        // odražava okruženje (scene.environment)
+  glass.userData.printDots=true;             // štampa: dio prozora ostaje u tačkama
   const curtain=mat('#f1ece3',.95);
   const planter=mat('#ddd6ca',.9);
   const green=mat('#b7c4ae',.9);
