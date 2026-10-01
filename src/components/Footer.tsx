@@ -3,32 +3,52 @@
 import { MAPS_URL } from '@/lib/company'
 import Link from 'next/link'
 import { useRef } from 'react'
-import UseArt from '@/components/landing/UseArt'
-import { axisShift } from '@/components/landing/iso'
-import Cta from '@/components/ui/Cta'
-import Pw from '@/components/ui/Pw'
-import LogoMark from '@/components/site/LogoMark'
+import FooterMaze from '@/components/FooterMaze'
 import { COMPANY } from '@/gc/gc'
-import { drawOnScroll } from '@/lib/draw'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ, fitFontSize } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 
-const COLS: { title: string; links: [string, string][] }[] = [
-  { title: 'Platforma', links: [['B2B portal', '/portal'], ['Katalog', '/prodavnica'], ['Kalkulator', '/prodavnica#kalkulator'], ['Vodiči', '/vodici']] },
+type Item = { label: string; href: string; external?: boolean }
+
+// Tri kolone krupnih linkova sa puno praznog prostora (kao na referenci).
+const COLS: { title: string; items: Item[] }[] = [
   {
-    title: 'Kupovina i pravno',
-    links: [['Dostava', '/dostava'], ['Povrat robe', '/povrat-robe'], ['Načini plaćanja', '/nacini-placanja'], ['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']],
+    title: 'Navigacija',
+    items: [
+      { label: 'Prodavnica', href: '/prodavnica' },
+      { label: 'Kalkulator', href: '/prodavnica#kalkulator' },
+      { label: 'Isporuka', href: '/dostava' },
+      { label: 'Vodiči', href: '/vodici' },
+      { label: 'B2B portal', href: '/portal' },
+    ],
+  },
+  {
+    title: 'Kupovina',
+    items: [
+      { label: 'Povrat robe', href: '/povrat-robe' },
+      { label: 'Načini plaćanja', href: '/nacini-placanja' },
+      { label: 'Uslovi kupovine', href: '/uslovi-kupovine' },
+      { label: 'Privatnost', href: '/politika-privatnosti' },
+      { label: 'Sve politike', href: '/sve-politike' },
+    ],
+  },
+  {
+    title: 'Kontakt',
+    items: [
+      { label: 'Pozovite', href: COMPANY.phoneLandlineHref, external: true },
+      { label: 'Pišite', href: `mailto:${COMPANY.emailSales}`, external: true },
+      { label: 'Viber / WhatsApp', href: COMPANY.phoneMobileHref, external: true },
+      { label: 'Stovarište na mapi', href: MAPS_URL, external: true },
+    ],
   },
 ]
-// Ćelija srednjeg pojasa: na telefonu dvije kolone (lijeva ima liniju desno), na desktopu pet u redu.
-const CELL = 'border-b border-bg/15 px-5 py-10 md:px-10 md:py-12'
 
-// Podnožje u tri pojasa, odvojena tankim linijama:
-// 1) poziv (serif naslov, rečenica, CTA) lijevo, a desno pregradni zid koji se SKLAPA dok footer ulazi
-//    u ekran — slojevi (ploča, profili, vuna, ploča) dolaze iz rastavljenog položaja na svoje mjesto;
-// 2) pet ćelija: kontakt, telefoni, ZNAK u sredini, platforma, kupovina i pravno;
-// 3) veliki wordmark koji izroni slovo po slovo + potpis studija.
+const BLINK_URL = 'https://studioblink.ba'
+
+// Minimalan footer: tamna podloga sa pikselizovanim plavim lavirintom koji se osvijetli oko miša
+// (FooterMaze), gore tri kolone linkova, pa veliki wordmark preko cijele širine, a dolje lijevo
+// podaci firme i desno polje sa potpisom studija Blink.
 export default function Footer() {
   const root = useRef<HTMLElement>(null)
 
@@ -36,37 +56,27 @@ export default function Footer() {
     (_, contextSafe) => {
       const el = root.current!
       const word = el.querySelector<HTMLElement>('[data-word]')!
-      const svg = el.querySelector<SVGSVGElement>('[data-build] svg')!
       let dead = false
       let onResize: (() => void) | null = null
 
       const boot = contextSafe!(() => {
         if (dead) return
         const fit = () => {
-          word.style.fontSize = `${fitFontSize(word, (el.clientWidth - 40) * 0.95)}px`
+          word.style.fontSize = `${fitFontSize(word, (el.clientWidth - 40) * 0.97)}px`
         }
         fit()
         onResize = fit
         window.addEventListener('resize', fit)
         gsap.matchMedia().add(MQ, (ctx) => {
           const { reduce } = ctx.conditions as { reduce: boolean }
-          revealChars(el.querySelector('[data-head]')!, reduce, 'top 85%')
           const split = revealChars(word, true)
-          drawOnScroll(svg, reduce, { trigger: svg, start: 'top 98%' })
           if (reduce) return
           gsap.fromTo(split.chars, { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: EASE.quint, stagger: 0.02, scrollTrigger: { trigger: word, start: 'top 98%' } })
-
-          // Sklapanje: svaki sloj kreće iz rastavljenog položaja (dalje što je bliži) i dolazi na 0.
-          const axis = svg.dataset.axis as 'x' | 'y' | 'z'
-          const gap = Number(svg.dataset.gap)
-          gsap.utils.toArray<SVGGElement>('[data-layer]', svg).forEach((layer, k) => {
-            const { x, y } = axisShift(axis, k * gap)
-            gsap.fromTo(
-              layer,
-              { x, y },
-              { x: 0, y: 0, ease: 'none', scrollTrigger: { trigger: svg, start: 'top 95%', end: 'bottom 55%', scrub: 0.8 } },
-            )
-          })
+          gsap.fromTo(
+            el.querySelectorAll('[data-col]'),
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0, duration: 0.55, ease: EASE.quint, stagger: 0.06, scrollTrigger: { trigger: el, start: 'top 85%' } },
+          )
         })
       })
 
@@ -80,109 +90,65 @@ export default function Footer() {
   )
 
   return (
-    <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink text-bg [--art-fill:var(--ink)]">
-      {/* 1. Poziv + zid koji se sklapa */}
-      <div className="grid border-b border-bg/15 md:grid-cols-2">
-        <div className="flex flex-col justify-between gap-12 px-5 pb-16 pt-[18vh] md:border-r md:border-bg/15 md:px-10 md:pb-14">
-          <h2 data-head className="display invisible text-[clamp(56px,7vw,128px)]">
-            <Pw>
-              Gradimo
-              <br />
-              zajedno.
-            </Pw>
-          </h2>
-          <div className="flex flex-col gap-8">
-            <p className="max-w-[44ch] text-[12.5px] leading-[1.7] opacity-70">
-              Upit za veći projekat, otvaranje B2B partnerskog računa ili savjet o sistemu suhe gradnje — javite se.
-            </p>
-            <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
-              <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
-                Pišite
-              </Cta>
-              <a href={COMPANY.phoneMobileHref} className="ulink text-[12.5px] tabular-nums">
-                {COMPANY.phoneMobile}
-              </a>
-            </div>
-          </div>
-        </div>
-        <div data-build className="flex items-center justify-center px-8 py-[10vh] md:px-[5vw]">
-          <UseArt use="pregradni-zid" className="w-full max-w-[560px] text-bg/90" title="Pregradni zid: ploča, profili, vuna, ploča" />
-        </div>
-      </div>
+    <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink text-bg">
+      <FooterMaze />
 
-      {/* 2. Kontakt i linkovi: ćelije sa tankim linijama */}
-      <div className="grid grid-cols-2 text-[11.5px] md:grid-cols-5">
-        <div className={`${CELL} border-r`}>
-          <p className="mb-6 opacity-45">Sjedište i stovarište</p>
-          <address className="not-italic leading-[1.9]">
-            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="group block" aria-label="Stovarište na Google mapi">
-              {COMPANY.address.split(', ').map((l) => (
-                <span key={l} className="block">
-                  <span className="ulink">{l}</span>
-                </span>
-              ))}
-              <span className="block opacity-60">Zalužani / Lazarevo · mapa ↗</span>
-            </a>
-            <a href={`mailto:${COMPANY.emailInfo}`} className="ulink break-all">
-              {COMPANY.emailInfo}
-            </a>
+      <div className="relative">
+        {/* Tri kolone linkova */}
+        <div className="grid gap-12 px-5 pt-[14vh] sm:grid-cols-2 md:grid-cols-12 md:px-8">
+          {COLS.map((c, i) => (
+            <nav key={c.title} data-col aria-label={c.title} className={i === 2 ? 'md:col-span-4 md:col-start-9' : 'md:col-span-4'}>
+              <p className="mb-5 text-[10.5px] tracking-[0.14em] opacity-45">({c.title})</p>
+              <ul className="flex flex-col">
+                {c.items.map((it) => (
+                  <li key={it.label}>
+                    {it.external ? (
+                      <a href={it.href} {...(it.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})} className="foot-link">
+                        {it.label}
+                      </a>
+                    ) : (
+                      <Link href={it.href} className="foot-link">
+                        {it.label}
+                      </Link>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))}
+        </div>
+
+        {/* Veliki wordmark preko cijele širine */}
+        <div className="mt-[16vh] overflow-x-clip px-5 text-center">
+          <p data-word className="font-hero inline-block whitespace-nowrap leading-[0.9] tracking-[-0.02em]" aria-label="Grand Company">
+            Grand Company
+          </p>
+        </div>
+
+        {/* Dno: podaci lijevo, potpis studija desno */}
+        <div className="flex flex-col gap-6 px-5 pb-6 pt-8 md:flex-row md:items-end md:justify-between md:px-8">
+          <p className="max-w-[78ch] text-[11px] leading-[1.8] opacity-55">
+            {COMPANY.address} · {COMPANY.phoneLandline} · {COMPANY.phoneMobile}
             <br />
-            <a href={`mailto:${COMPANY.emailSales}`} className="ulink break-all">
-              {COMPANY.emailSales}
-            </a>
-          </address>
-        </div>
-        <div className={`${CELL} md:border-r`}>
-          <p className="mb-6 opacity-45">Telefoni i radno vrijeme</p>
-          <dl className="grid gap-1 leading-[1.6]">
-            <dt className="opacity-60">Veleprodaja / skladište</dt>
-            <dd>
-              <a href={COMPANY.phoneLandlineHref} className="ulink tabular-nums">
-                {COMPANY.phoneLandline}
-              </a>
-            </dd>
-            <dt className="mt-2 opacity-60">Mobilni / Viber / WhatsApp</dt>
-            <dd>
-              <a href={COMPANY.phoneMobileHref} className="ulink tabular-nums">
-                {COMPANY.phoneMobile}
-              </a>
-            </dd>
-            <dt className="mt-2 opacity-60">Pon–Pet · Sub · Ned</dt>
-            <dd className="tabular-nums">07–17 · 07–14 · neradna</dd>
-          </dl>
-        </div>
-        {/* Znak u srednjoj ćeliji; na telefonu ide prvi, preko cijele širine */}
-        <div className={`${CELL} order-first col-span-2 flex items-center justify-center md:order-none md:col-span-1 md:border-r`}>
-          <Link href="/" aria-label="Grand Company — početna" className="block w-[96px] transition-opacity hover:opacity-70 md:w-[min(132px,70%)]">
-            <LogoMark className="block h-auto w-full" />
-          </Link>
-        </div>
-        {COLS.map((c, i) => (
-          <div key={c.title} className={`${CELL} ${i === 0 ? 'border-r' : ''}`}>
-            <p className="mb-6 opacity-45">{c.title}</p>
-            <ul className="flex flex-col gap-2.5">
-              {c.links.map(([label, href]) => (
-                <li key={href}>
-                  <Link href={href} className="ulink">
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
+            {COMPANY.emailInfo} · Pon–Pet 07–17 · Sub 07–14
+          </p>
 
-      {/* 3. Wordmark + red sa podacima firme */}
-      <div className="mt-[10vh] overflow-x-clip px-5 pb-[1.5vw] text-center">
-        <p data-word className="font-hero inline-block whitespace-nowrap leading-[0.9] tracking-[-0.02em]" aria-label="Grand Company">
-          Grand Company
-        </p>
+          <a href={BLINK_URL} target="_blank" rel="noopener noreferrer" className="blink-field group" aria-label="Studio Blink — studioblink.ba">
+            <span className="blink-field__text">
+              <span className="blink-field__label">Kreirano od studija Blink kao demo · oktobar 2026</span>
+              <span className="blink-field__input">
+                studioblink.ba<i aria-hidden className="blink-field__caret" />
+              </span>
+            </span>
+            <span className="blink-field__btn">
+              Posjeti
+              <svg viewBox="0 0 24 12" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+                <path d="M0 6h22M17 1l5 5-5 5" />
+              </svg>
+            </span>
+          </a>
+        </div>
       </div>
-
-      <p className="px-5 pb-8 pt-2 text-center text-[10.5px] tracking-[0.04em] opacity-50">
-        Kreirano od studija Blink kao demo · oktobar 2026.
-      </p>
     </footer>
   )
 }
