@@ -9,7 +9,7 @@ const CLOSED = 'inset(0% 50% 0% 50%)'
 
 // Otvaranje sive ploče: clip-path krene od srednje linije, a unutrašnjost se smiruje sa zuma 1.2 na 1.
 // Uvijek fromTo: browser sažima inset(a b a b) u inset(a b), pa bi `to` pročitao pogrešan broj vrijednosti.
-export function revealMedia(media: Element, reduce: boolean, start = 'top 96%') {
+export function revealMedia(media: Element, reduce: boolean, start = 'top bottom') {
   const scale = media.querySelector('[data-scale]')
   if (reduce) {
     gsap.set(media, { clipPath: OPEN })
@@ -20,7 +20,7 @@ export function revealMedia(media: Element, reduce: boolean, start = 'top 96%') 
     { clipPath: CLOSED },
     {
       clipPath: OPEN,
-      duration: 0.6,
+      duration: 0.35,
       ease: EASE.out,
       scrollTrigger: { trigger: media, start },
     },
@@ -28,8 +28,8 @@ export function revealMedia(media: Element, reduce: boolean, start = 'top 96%') 
   if (scale) {
     gsap.fromTo(
       scale,
-      { scale: 1.1 },
-      { scale: 1, duration: 0.8, ease: EASE.out, force3D: true, scrollTrigger: { trigger: media, start } },
+      { scale: 1.06 },
+      { scale: 1, duration: 0.5, ease: EASE.out, force3D: true, scrollTrigger: { trigger: media, start } },
     )
   }
 }

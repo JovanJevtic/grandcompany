@@ -13,7 +13,7 @@ const SHAPES = 'path, line, circle, ellipse, rect, polyline, polygon'
 export function drawOnScroll(
   svg: Element,
   reduce: boolean,
-  { scrub = false, start = 'top 92%', end = 'bottom 40%', trigger = svg as Element, duration = 0.5 } = {},
+  { scrub = false, start = 'top bottom', end = 'bottom 40%', trigger = svg as Element, duration = 0.3 } = {},
 ) {
   const marked = svg.querySelectorAll<SVGElement>('[data-d]')
   const parts = marked.length ? Array.from(marked) : Array.from(svg.querySelectorAll<SVGElement>(SHAPES))
@@ -39,8 +39,8 @@ export function drawOnScroll(
         groups.get(k)!,
         { drawSVG: '0% 0%' },
         { drawSVG: '0% 100%', duration, ease: scrub ? 'none' : EASE.out, stagger: 0.008 },
-        // grupe se skoro preklapaju: cijeli crtež je gotov za ~0.8 s
-        i === 0 ? 0 : `<${duration * 0.3}`,
+        // grupe skoro istovremeno: cijeli crtež je gotov za ~0.4 s
+        i === 0 ? 0 : `<0.05`,
       )
     })
   return tl

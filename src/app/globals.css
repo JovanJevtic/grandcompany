@@ -1741,3 +1741,8 @@ footer li + li {
     animation: none;
   }
 }
+
+/* Početna: puno praznog prostora između sekcija (od "Sistemi" nadalje; hero, prelaz i uvod ostaju spojeni) */
+.home-flow > :is(section, footer):nth-child(n + 5) {
+  margin-top: clamp(96px, 16vh, 220px);
+}

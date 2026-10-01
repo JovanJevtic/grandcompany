@@ -3,6 +3,7 @@ import { Barlow_Condensed, Bodoni_Moda, Inter, Inter_Tight, Montserrat } from "n
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
+import ImageWarmup from "@/components/ImageWarmup";
 import Splash from "@/components/Splash";
 import Cursor from "@/components/Cursor";
 
@@ -80,6 +81,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Splash />
           <Cursor />
         </SmoothScroll>
+        <ImageWarmup />
       </body>
     </html>
   );

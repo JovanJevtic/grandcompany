@@ -8,7 +8,6 @@ import LoginModal from "@/components/b2b/LoginModal";
 import Bento from "@/components/landing/Bento";
 import BrandsSplit from "@/components/landing/BrandsSplit";
 import Delivery from "@/components/landing/Delivery";
-import Detail from "@/components/landing/Detail";
 import Featured from "@/components/landing/Featured";
 import Intro from "@/components/landing/Intro";
 import StepBand from "@/components/ui/StepBand";
@@ -26,11 +25,12 @@ export default function Home() {
       {/* Navbar: tokom herosa ispod velikog wordmarka; kad se hero pređe, wordmark se smanji u logo
           u sredini navbara, a navbar ostaje zalijepljen za vrh. */}
       <SiteHeader variant="home" />
-      <main>
+      {/* home-flow: velik razmak između sekcija (globals.css) */}
+      <main className="home-flow">
         <CraneHero />
         <SkySwipe />
         {/* B2B prvo: ko smo → sistemi → B2B portal → prednosti (kran, Knauf, Pantheon, atesti) →
-            rabatna skala → artikli na stanju → isporuka kranom → vodiči → stovarište i radno vrijeme */}
+            rabatna skala → artikli na stanju → isporuka kranom → vodiči */}
         <Intro />
         <UsesSplit />
         <Bento />
@@ -44,7 +44,6 @@ export default function Home() {
         <StepBand tone="navy" profile="valley" steps={11} aria-label="Vodiči">
           <PostsTeaser />
         </StepBand>
-        <Detail />
         <Footer />
       </main>
       <CartDrawer />

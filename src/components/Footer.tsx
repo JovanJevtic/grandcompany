@@ -3,7 +3,7 @@
 import { MAPS_URL } from '@/lib/company'
 import Link from 'next/link'
 import { useRef } from 'react'
-import FooterMaze from '@/components/FooterMaze'
+import FooterDots from '@/components/FooterDots'
 import { COMPANY } from '@/gc/gc'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ, fitFontSize } from '@/lib/motion'
@@ -46,8 +46,8 @@ const COLS: { title: string; items: Item[] }[] = [
 
 const BLINK_URL = 'https://studioblink.ba'
 
-// Minimalan footer: tamna podloga sa pikselizovanim plavim lavirintom koji se osvijetli oko miša
-// (FooterMaze), gore tri kolone linkova, pa veliki wordmark preko cijele širine, a dolje lijevo
+// Minimalan footer: tamna podloga sa rasterom tačaka koje se oko miša upale u jarko plavu
+// (FooterDots), gore tri kolone linkova, pa veliki wordmark preko cijele širine, a dolje lijevo
 // podaci firme i desno polje sa potpisom studija Blink.
 export default function Footer() {
   const root = useRef<HTMLElement>(null)
@@ -91,7 +91,7 @@ export default function Footer() {
 
   return (
     <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink text-bg">
-      <FooterMaze />
+      <FooterDots />
 
       <div className="relative">
         {/* Tri kolone linkova */}

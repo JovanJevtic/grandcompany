@@ -2,25 +2,17 @@
 
 import { useEffect, useRef } from 'react'
 
-// Pozadina footera: "pikselizovani" lavirint od kratkih linija i kvadratića na mreži, u jarkoj
-// kobalt plavoj. Lavirint se nacrta JEDNOM u dvije verzije (prigušena i puna), a svaki frejm
-// samo složi prigušenu + punu u mekom krugu oko miša — zato je jeftin i na slabijem laptopu.
+// Pozadina footera: raster tačaka (halftone, kao štampa u heroju) na tamnoj podlozi. Tačke su
+// stalno prigušene; oko miša se u mekom krugu upale u jarku kobalt plavu (i malo porastu).
+// Raster se nacrta JEDNOM u dvije verzije (prigušena i jarka), a svaki frejm samo složi
+// prigušenu + jarku unutar kruga oko miša — jeftino i na slabijem laptopu.
 // Bez miša (dodir) ili uz prefers-reduced-motion ostaje samo statična prigušena verzija.
 
-const CELL = 12 // korak mreže u CSS pikselima
-const LINE = 2 // debljina linije
-const R = 200 // poluprečnik osvijetljenog kruga oko miša
+const STEP = 9 // razmak tačaka u CSS pikselima
+const DOT = 2.1 // najveći poluprečnik tačke
+const R = 190 // poluprečnik osvijetljenog kruga oko miša
 const INK = '61,99,255' // jarka plava (RGB)
 
-function rng(seed: number) {
-  return () => {
-    seed |= 0
-    seed = (seed + 0x6d2b79f5) | 0
-    let t = Math.imul(seed ^ (seed >>> 15), 1 | seed)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
 const hash = (x: number, y: number) => {
   const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453
   return s - Math.floor(s)
@@ -34,23 +26,23 @@ function noise(x: number, y: number) {
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v
 }
 
-function drawMaze(ctx: CanvasRenderingContext2D, cols: number, rows: number, s: number) {
-  const rand = rng(20261001)
-  const L = LINE * s, C = CELL * s
+// Veličina tačke prati blagi šum, pa raster ima "oblake" gušćih i rjeđih tačaka (kao štampa).
+function drawDots(ctx: CanvasRenderingContext2D, cols: number, rows: number, s: number, grow: number) {
+  ctx.beginPath()
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < cols; x++) {
-      const n = noise(x / 9, y / 9) * 0.65 + noise(x / 3.5 + 40, y / 3.5) * 0.35
-      const r = rand()
-      if (n < 0.5) continue
-      const px = x * C, py = y * C
-      if (r < 0.42) ctx.fillRect(px, py, C + L, L) // vodoravna
-      else if (r < 0.84) ctx.fillRect(px, py, L, C + L) // uspravna
-      else if (r < 0.9) ctx.strokeRect(px + C * 0.25, py + C * 0.25, C * 0.5, C * 0.5) // kvadratić
+      const n = noise(x / 14, y / 14) * 0.7 + noise(x / 5 + 30, y / 5) * 0.3
+      const r = DOT * (0.3 + 0.7 * n) * grow * s
+      if (r < 0.45 * s) continue
+      const px = (x * STEP + (y % 2) * STEP * 0.5) * s, py = y * STEP * s
+      ctx.moveTo(px + r, py)
+      ctx.arc(px, py, r, 0, Math.PI * 2)
     }
   }
+  ctx.fill()
 }
 
-export default function FooterMaze({ className = '' }: { className?: string }) {
+export default function FooterDots({ className = '' }: { className?: string }) {
   const ref = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -79,13 +71,11 @@ export default function FooterMaze({ className = '' }: { className?: string }) {
         c.width = W
         c.height = H
       }
-      const cols = Math.ceil(w / CELL) + 1, rows = Math.ceil(h / CELL) + 1
-      for (const [c, alpha] of [[dim, 0.16], [bright, 1]] as const) {
+      const cols = Math.ceil(w / STEP) + 2, rows = Math.ceil(h / STEP) + 2
+      for (const [c, alpha, grow] of [[dim, 0.2, 1], [bright, 1, 1.3]] as const) {
         const g = c.getContext('2d')!
         g.fillStyle = `rgba(${INK},${alpha})`
-        g.strokeStyle = `rgba(${INK},${alpha})`
-        g.lineWidth = LINE * dpr
-        drawMaze(g, cols, rows, dpr)
+        drawDots(g, cols, rows, dpr, grow)
       }
       spot.width = spot.height = Math.round(2 * R * dpr)
       draw()

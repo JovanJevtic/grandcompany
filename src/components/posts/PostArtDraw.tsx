@@ -14,7 +14,7 @@ export default function PostArtDraw({ kind, className = '', title }: { kind: Pos
       const mm = gsap.matchMedia()
       mm.add(MQ, (context) => drawOnScroll(svg, (context.conditions as { reduce: boolean }).reduce, {
         trigger: root.current!,
-        start: 'top 92%',
+        start: 'top bottom',
       }))
     },
     { scope: root },
