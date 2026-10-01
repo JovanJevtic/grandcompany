@@ -5,7 +5,7 @@
 // gornja ivica scene, pa se visina offseta mjeri iz njega, a ne iz headera.
 // Dodat je i dispose() da se scena ugasi ako se stranica montira ponovo.
 import * as THREE from '../vendor/three.module.min.js';
-import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=5';
+import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=6';
 import {craneQuality} from './crane-quality.js?v=20';
 import {createCraneScene, clamp, smooth} from './crane-scene.js?v=40';
 
@@ -228,7 +228,7 @@ async function init() {
     if(top!==wmStage){
       wmStage=top;
       const n=parseInt(top.paper.slice(1),16),lum=(.2126*(n>>16&255)+.7152*(n>>8&255)+.0722*(n&255))/255;
-      document.documentElement.style.setProperty('--hero-wm',lum<.5?top.ink:'var(--ink)');
+      document.documentElement.style.setProperty('--hero-wm',lum<.5?'#f4f1ec':'var(--ink)');
     }
     cover.style.setProperty('--scene-progress',progress.toFixed(4));
     // Kucanje rečenice: počinje kad kamera izađe kroz prozor, a završi na dnu hero-a.

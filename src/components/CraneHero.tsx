@@ -49,7 +49,7 @@ export default function CraneHero() {
   // pokrene efekat ispod. URL-ovi moraju biti isti kao u importima (uključujući ?v=).
   preloadModule('/vendor/three.module.min.js')
   preloadModule('/crane/crane-scene.js?v=40')
-  preloadModule('/crane/crane-print.js?v=5')
+  preloadModule('/crane/crane-print.js?v=6')
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -77,8 +77,6 @@ export default function CraneHero() {
           <figure className="crane-viewport">
             <canvas />
           </figure>
-          {/* Papir: vlakna, pregibi i izlizano mastilo po ivicama (Codex), preko štampe u `multiply`. */}
-          <div className="print-paper" />
 
           <div className="scene-caption">
             <span className="scene-meter">

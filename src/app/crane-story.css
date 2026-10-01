@@ -66,21 +66,6 @@
   background: var(--sky-top);
 }
 
-/* ——— Papir preko štampe ———
-   Sama slika je WebGL štampa u tačkama (crane-print.js) i pokriva cijelo platno, uključujući pojas
-   iza wordmarka. Preko nje ide tekstura papira u `multiply`: bijelo ne mijenja ništa, a vlakna,
-   pregibi i izlizano mastilo po ivicama "upiju" boju ispod — i na plavom bloku izgleda kao štampa. */
-.print-paper {
-  position: absolute;
-  inset: 0;
-  top: calc(-1 * var(--story-header));
-  z-index: 2;
-  background: url('/hero/paper-grunge.webp') 50% 50% / 100% 100% no-repeat;
-  mix-blend-mode: multiply;
-  opacity: 0.9;
-  pointer-events: none;
-}
-
 .crane-viewport {
   position: absolute;
   inset: 0;
@@ -134,7 +119,8 @@
   position: absolute;
   z-index: 3;
   left: 50%;
-  top: 50%;
+  /* Centar ekrana (a ne scene, koja počinje ispod wordmarka). */
+  top: calc(50svh - var(--story-header));
   transform: translate(-50%, -50%);
   width: min(88vw, 1100px);
   margin: 0;
@@ -146,8 +132,8 @@
   text-transform: none;
   letter-spacing: -0.01em;
   line-height: 1.06;
-  letter-spacing: -0.01em;
-  color: var(--story-ink);
+  /* Ispisuje se preko pune kobalt pozadine (poslednje poglavlje štampe). */
+  color: #f4f1ec;
   pointer-events: none;
 }
 .story-word {
@@ -180,8 +166,6 @@
 @media (max-width: 767px) {
   .story-type {
     width: min(92vw, 640px);
-    /* Iznad fiksnog GC znaka sa leve strane, da se ne preklope. */
-    top: 34%;
     font-size: clamp(30px, 9.6vw, 56px);
     line-height: 1.1;
   }

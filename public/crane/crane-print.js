@@ -18,11 +18,13 @@ import * as THREE from '../vendor/three.module.min.js';
 // paper/ink: sRGB hex; cell: veličina ćelije rastera u CSS pikselima; angle: ugao rastera;
 // bg: koliko se vidi grad u pozadini (0..1); at: progres kad prelaz u ovo poglavlje počinje.
 export const STAGES = [
-  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .32 },  // kran se okreće
-  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30 }, // zgrada niče — plavi blok (negativ, nacrt)
-  { at: .36, paper: '#a9c4e4', ink: '#142a8f', cell: 7.4, angle: 72, bg: .34 }, // spuštanje na krov, kuka se otkači
-  { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42 },   // enterijer — topao papir
-  { at: .925, paper: '#f4f1ec', ink: '#2a4fe0', cell: 6.0, angle: 30, bg: .5 }, // napolju, nebo i rečenica
+  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .32, floor: 0 },  // kran se okreće
+  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30, floor: 0 }, // zgrada niče — plavi blok (negativ, nacrt)
+  { at: .36, paper: '#a9c4e4', ink: '#142a8f', cell: 7.4, angle: 72, bg: .34, floor: 0 }, // spuštanje na krov, kuka se otkači
+  { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0 },   // enterijer — topao papir
+  // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
+  // grad se nazire samo kroz gustinu tačaka. Preko nje se ispisuje rečenica, svijetla i centrirana.
+  { at: .925, paper: '#2448e0', ink: '#13289c', cell: 6.0, angle: 30, bg: .55, floor: .2 },
 ];
 const WIPE = .045; // trajanje prelaza u progresu
 const COLS = 12;   // broj kolona stepenastog prelaza
@@ -150,6 +152,7 @@ const POST_FRAG = /* glsl */ `
   uniform float cellC[5];
   uniform float angleC[5];
   uniform float bgC[5];
+  uniform float floorC[5];
   uniform float wipe[5];
   varying vec2 vUv;
 
@@ -187,8 +190,8 @@ const POST_FRAG = /* glsl */ `
     int si = 0;
     for (int i = 1; i < 5; i++) if (switched(wipe[i], vUv, float(i))) si = i;
     vec3 paper = paperC[0], ink = inkC[0];
-    float cell = cellC[0], ang = angleC[0], bgS = bgC[0];
-    for (int i = 1; i < 5; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; }
+    float cell = cellC[0], ang = angleC[0], bgS = bgC[0], flo = floorC[0];
+    for (int i = 1; i < 5; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; flo = floorC[i]; }
     cell *= dpr;
 
     // ——— G-buffer ———
@@ -204,6 +207,7 @@ const POST_FRAG = /* glsl */ `
     if (sa > bgAspect) buv.y *= bgAspect / sa; else buv.x *= sa / bgAspect;
     buv = buv * bgScale + .5 + bgShift;
     float bgTone = (1.0 - texture2D(tBg, clamp(buv, .001, .999)).r) * bgS;
+    bgTone = flo + (1.0 - flo) * bgTone;
 
     // ——— ivice ———
     vec2 px = max(1.0, 1.1 * dpr) / resolution;
@@ -337,6 +341,7 @@ export function createCraneRenderer(renderer, world) {
     cellC: { value: STAGES.map((s) => s.cell) },
     angleC: { value: STAGES.map((s) => s.angle) },
     bgC: { value: STAGES.map((s) => s.bg) },
+    floorC: { value: STAGES.map((s) => s.floor) },
     wipe: { value: STAGES.map(() => 0) },
   };
   let disposed = false;
