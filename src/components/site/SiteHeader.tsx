@@ -144,7 +144,7 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' |
           {/* sredina: logo */}
           <Link href="/" className="nav__logo" aria-label="Grand Company, početna" onClick={() => setOpen(false)}>
             <LogoMark className="nav__mark" />
-            <span data-nav-word className="nav__word font-logo">
+            <span data-nav-word className="nav__word font-hero">
               Grand Company
             </span>
           </Link>

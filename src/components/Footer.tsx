@@ -161,7 +161,7 @@ export default function Footer() {
 
       {/* 3. Wordmark + red sa podacima firme */}
       <div className="mt-[10vh] overflow-x-clip px-5 pb-[1.5vw] text-center">
-        <p data-word className="font-logo inline-block whitespace-nowrap leading-[0.9] tracking-[-0.02em]" aria-label="Grand Company">
+        <p data-word className="font-hero inline-block whitespace-nowrap leading-[0.9] tracking-[-0.02em]" aria-label="Grand Company">
           Grand Company
         </p>
       </div>
