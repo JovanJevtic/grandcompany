@@ -7,9 +7,9 @@
 import * as THREE from '../vendor/three.module.min.js';
 import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
-import {createCraneRenderer} from './crane-renderer.js?v=25';
+import {createCraneRenderer} from './crane-renderer.js?v=27';
 import {craneQuality} from './crane-quality.js?v=19';
-import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=32';
+import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=35';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');

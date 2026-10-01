@@ -577,6 +577,9 @@ export function createCraneScene() {
     look.set(...a[2]).lerp(_tmpV.set(...b[2]),k);
   }
   const _tmpV=new THREE.Vector3();
+  // Kadar cijelog krana na početku (stub je na x=-7, strijela do x≈12, vrh na y≈27).
+  const MAST=new THREE.Vector3(-7,26,0);
+  const _wideCam=new THREE.Vector3(),_wideLook=new THREE.Vector3(),_jibEnd=new THREE.Vector3(),_jibDir=new THREE.Vector3(),_perp=new THREE.Vector3();
   function update(p,aspect=1,framing=1) {
     // `t` je "story vreme" (0..1) postojeće priče; `p` je sirovi progres preko celog skrola.
     const t=clamp(p/STORY_END);
@@ -660,6 +663,23 @@ export function createCraneScene() {
     _camOff.multiplyScalar(Math.max(1,.95/aspect));
     camera.position.copy(_loadW).add(_camOff);
     target.copy(_loadW).add(_lookOff);
+    // Sve počinje od krana: prvi kadar je cijeli kran (stub + strijela + kutija), pa kamera
+    // glatko uđe u krupni plan kutije (do p≈.16) i dalje je prati.
+    const intro=1-smooth(.015,.16,p);
+    if(intro>0) {
+      // Kamera stoji bočno na strijelu (okomito na njen pravac), pa se kran vidi cijelom dužinom
+      // bez obzira na to kako je okrenut.
+      trolley.getWorldPosition(_jibEnd);
+      _jibDir.set(_jibEnd.x-MAST.x,0,_jibEnd.z-MAST.z).normalize();
+      _perp.set(_jibDir.z,0,-_jibDir.x);
+      if(_perp.z<0)_perp.negate();
+      // Na širokom ekranu pogled ide više (kran sjeda niže u kadar, ispod velikog naslova).
+      _wideLook.set((MAST.x+_jibEnd.x)/2,aspect>1?20:15,(MAST.z+_jibEnd.z)/2);
+      const dist=(aspect>1?50:44)*Math.max(1,1.05/aspect);
+      _wideCam.copy(_wideLook).addScaledVector(_perp,dist).add(_tmpV.set(0,6,0));
+      camera.position.lerp(_wideCam,intro);
+      target.lerp(_wideLook,intro);
+    }
     // Završna chapter-a preuzima kameru: glatko se spoji sa praćenjem pa ide kroz enterijer.
     const interiorT=smooth(STORY_END,STORY_END+.04,p);
     if(interiorT>0) {

@@ -32,6 +32,7 @@ export function createCraneRenderer(renderer, world) {
         lineColor: { value: new THREE.Vector3(LINE.r, LINE.g, LINE.b) },
         fillColor: { value: new THREE.Vector3(FILL.r, FILL.g, FILL.b) },
         fillAlpha: { value: 1 },
+        dotSize: { value: 1.5 },
       },
       vertexShader: /* glsl */ `
         varying vec2 vUv;
@@ -42,7 +43,7 @@ export function createCraneRenderer(renderer, world) {
         uniform sampler2D tNormal;
         uniform sampler2D tDepth;
         uniform vec2 resolution;
-        uniform float thickness, near, far, fillAlpha;
+        uniform float thickness, near, far, fillAlpha, dotSize;
         uniform vec3 lineColor, fillColor;
         varying vec2 vUv;
         float lin(float d) { float z = d * 2.0 - 1.0; return (2.0 * near * far) / (far + near - z * (far - near)); }
@@ -74,9 +75,19 @@ export function createCraneRenderer(renderer, world) {
           float e = smoothstep(0.12, 0.32, nEdge);
           e = max(e, smoothstep(0.012 / facing, 0.03 / facing, dEdge));
           e = max(e, smoothstep(0.3, 0.9, aEdge));
+          // Zrnasta tačkasta tekstura (stipple): gustina tačaka prati sjenčenje — strane okrenute
+          // od svjetla su gušće (tamnije), osvijetljene rjeđe. Tačke su u boji linija (ink plava).
+          vec3 L = normalize(vec3(-0.45, 0.72, 0.55));
+          float lit = clamp(dot(n0, L) * 0.5 + 0.5, 0.0, 1.0);
+          float shade = 1.0 - lit;
+          vec2 cell = floor(gl_FragCoord.xy / dotSize);
+          float rnd = fract(sin(dot(cell, vec2(12.9898, 78.233))) * 43758.5453);
+          float density = 0.012 + pow(shade, 1.7) * 0.34;
+          float stipple = a0 * step(rnd, density) * 0.7;
+          float ink = max(e, stipple);
           float alpha = max(a0, e) * fillAlpha; // fillAlpha = rastvaranje cijele scene na kraju (2D)
           if (alpha < 0.002) discard;
-          vec3 col = mix(fillColor, lineColor, e);
+          vec3 col = mix(fillColor, lineColor, ink);
           gl_FragColor = vec4(col * alpha, alpha);
         }
       `,
@@ -98,6 +109,7 @@ export function createCraneRenderer(renderer, world) {
     quad.material.uniforms.tDepth.value = depth;
     quad.material.uniforms.resolution.value.set(w, h);
     quad.material.uniforms.thickness.value = 1.15 * Math.max(1, ratio);
+    quad.material.uniforms.dotSize.value = 1.4 * Math.max(1, ratio);
   }
 
   return {
