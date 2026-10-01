@@ -37,7 +37,7 @@ function downloadInvoice(inv: PartnerInvoice, p: FullPartner) {
 <p>${COMPANY.name}<br>${COMPANY.address}<br>JIB ${COMPANY.jib} · PIB ${COMPANY.pib}</p>
 <h1>Faktura ${inv.no}</h1><p>Kupac: ${p.name}<br>Izdata: ${dateAgo(inv.issuedDaysAgo)} · Valuta ${p.paymentDays} dana · Dospijeće ${dateAgo(inv.issuedDaysAgo - p.paymentDays)}</p>
 <table><tr><td>Osnovica</td><td>${money(base)}</td></tr><tr><td>PDV ${Math.round(VAT_RATE * 100)}%</td><td>${money(inv.amount - base)}</td></tr><tr><td class="t">Ukupno</td><td class="t">${money(inv.amount)}</td></tr></table>
-<p style="margin-top:32px;font-size:12px;color:#666">Demo dokument iz B2B portala — u radu se generiše iz Pantheon ERP-a.</p>`
+<p style="margin-top:32px;font-size:12px;color:#666">Demo dokument iz B2B portala.</p>`
   const url = URL.createObjectURL(new Blob([html], { type: 'text/html' }))
   const a = Object.assign(document.createElement('a'), { href: url, download: `${inv.no}.html` })
   a.click()

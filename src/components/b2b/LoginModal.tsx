@@ -74,7 +74,7 @@ export default function LoginModal() {
             demo gost
           </h2>
           <p className="mt-5 max-w-[46ch] text-[12px] leading-[1.6] opacity-70">
-            Ovo je prikaz portala za građevinske firme i izvođače. Podaci su ogledni — u radu dolaze direktno iz Pantheon ERP-a: rabat,
+            Ovo je prikaz portala za građevinske firme i izvođače. Podaci su ogledni — u radu vidite svoj rabat,
             kreditni limit, gradilišta, narudžbe i fakture.
           </p>
         </div>

@@ -64,8 +64,8 @@ export default function Bento() {
           </span>
         </h2>
         <p className="max-w-[340px] text-[12.5px] leading-[1.55] text-ink/75 md:mb-[1.2vw] md:mr-[2vw]">
-          Za građevinske firme, izvođače radova i subjekte visokogradnje: ugovoreni rabat, kreditni limit i stanje
-          zaliha, povučeni iz Pantheon ERP-a.
+          Za građevinske firme i izvođače: vaša ugovorena cijena, kreditni limit i stanje na stovarištu. Naručite
+          online — dovozimo na gradilište.
         </p>
       </div>
 
@@ -103,7 +103,7 @@ export default function Bento() {
         <Link href="/prodavnica" data-bento className="group flex min-h-[340px] flex-col overflow-hidden bg-[#d9d9d9] text-ink md:min-h-[460px]" data-cursor="Katalog">
           <div data-parallax="6" className="relative h-[260px] overflow-hidden bg-[#111] md:h-[54%]">
             <img decoding="async" src="/editorial/bento-mono.webp" alt="Pocinčani profili na regalima skladišta" className="absolute inset-0 h-full w-full object-cover" />
-            <span className="label absolute left-7 top-7 text-white">Pantheon ERP</span>
+            <span className="label absolute left-7 top-7 text-white">Stovarište</span>
             <span className="absolute right-6 top-6 flex gap-1.5 text-white max-md:left-7 max-md:right-auto max-md:top-14">
               <Tag tone="photo">Zalihe</Tag>
               <Tag tone="photo">Predračun</Tag>
@@ -112,7 +112,7 @@ export default function Bento() {
           </div>
           <div className="flex flex-1 flex-col p-7">
             <p className="font-pretty max-w-[600px] text-[clamp(20px,1.7vw,28px)] leading-[1.15]">
-              Stanje zaliha na skladištu Nenada Kostića 151 u realnom vremenu.
+              Vidite šta je na stanju — prije nego krenete na gradilište.
             </p>
             <Arrow className="mt-auto bg-ink pt-0 text-white" />
           </div>

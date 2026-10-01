@@ -37,7 +37,6 @@ export default function CatalogClient() {
   const grid = useRef<HTMLDivElement>(null)
   const [cat, setCat] = useState<Cat>(() => (search.get('kategorija') ?? 'sve') as Cat)
   const [use, setUse] = useState<UseId | 'sve'>(() => (search.get('namjena') ?? 'sve') as UseId | 'sve')
-  const [all, setAll] = useState(() => search.has('kategorija') || search.has('namjena'))
 
   // Browser back/forward vraća i lokalno stanje.
   useEffect(() => {
@@ -58,7 +57,7 @@ export default function CatalogClient() {
       ),
     [cat, use],
   )
-  const shown = all ? list : list.slice(0, FIRST)
+  const shown = list.slice(0, FIRST)
 
   // Nove ćelije izranjaju jedna za drugom (poslije promjene grupe ili "prikaži sve").
   useGSAP(
@@ -67,7 +66,7 @@ export default function CatalogClient() {
       if (!cells?.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
       gsap.fromTo(cells, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.quint, stagger: 0.025, scrollTrigger: { trigger: grid.current, start: 'top 85%' } })
     },
-    { scope: grid, dependencies: [cat, use, all], revertOnUpdate: true },
+    { scope: grid, dependencies: [cat, use], revertOnUpdate: true },
   )
 
   const sync = (nextCat: Cat, nextUse: UseId | 'sve') => {
@@ -91,9 +90,13 @@ export default function CatalogClient() {
     if (window.__gcLenis) window.__gcLenis.scrollTo(y)
     else window.scrollTo({ top: y, behavior: 'smooth' })
   }
+  // Svi artikli su u listi "Kompletan asortiman" ispod (#asortiman).
   const showAll = () => {
-    setAll(true)
-    toGrid()
+    const el = document.getElementById('asortiman')
+    if (!el) return
+    const y = el.getBoundingClientRect().top + window.scrollY - 60
+    if (window.__gcLenis) window.__gcLenis.scrollTo(y)
+    else window.scrollTo({ top: y, behavior: 'smooth' })
   }
 
   const tabs: { id: Cat; name: string }[] = [{ id: 'sve', name: 'Sve' }, ...CATEGORIES.map((c) => ({ id: c.id, name: c.name }))]
@@ -138,8 +141,8 @@ export default function CatalogClient() {
           <h2 className="display text-[clamp(30px,9.5vw,68px)] md:text-[clamp(40px,4vw,68px)]">
             <Pw>Najprodavanije</Pw>
           </h2>
-          <button type="button" onClick={() => setAll((v) => !v)} className="text-[11.5px] tracking-[0.1em] underline decoration-1 underline-offset-[5px] hover:text-signal">
-            {all ? 'Prvih osam' : 'Svi artikli'}
+          <button type="button" onClick={showAll} className="text-[11.5px] tracking-[0.1em] underline decoration-1 underline-offset-[5px] hover:text-signal">
+            Svi artikli ({PRODUCTS.length})
           </button>
         </div>
 
@@ -179,7 +182,9 @@ export default function CatalogClient() {
                     className="cell-shot absolute inset-0 h-full w-full object-contain transition-transform duration-700 ease-[var(--ease-out)] group-hover:-translate-y-2 group-hover:scale-[1.03]"
                   />
                 </span>
-                <span className="mt-5 max-w-[30ch] text-[11px] leading-[1.45]">{p.name}</span>
+                <span className="mt-5 text-[9.5px] tracking-[0.12em] opacity-50">{p.brand}</span>
+                <span className="mt-1 max-w-[30ch] text-[11px] leading-[1.45]">{p.name}</span>
+                <span className="mt-1 max-w-[34ch] text-[10px] normal-case leading-[1.4] tracking-normal opacity-55">{p.spec}</span>
                 <span className="mt-1.5 text-[12px] tabular-nums transition-colors group-hover:text-signal">
                   <Price value={p.price} unit={p.unit} />
                 </span>
@@ -212,17 +217,15 @@ export default function CatalogClient() {
           </div>
         )}
 
-        {list.length > FIRST && (
-          <div className="flex justify-center py-12">
-            <button
-              type="button"
-              onClick={() => setAll((v) => !v)}
-              className="text-[11.5px] tracking-[0.12em] underline decoration-1 underline-offset-[5px] hover:text-signal"
-            >
-              {all ? 'Prikaži manje' : `Prikaži sve (${list.length})`}
-            </button>
-          </div>
-        )}
+        <div className="flex justify-center py-12">
+          <button
+            type="button"
+            onClick={showAll}
+            className="text-[11.5px] tracking-[0.12em] underline decoration-1 underline-offset-[5px] hover:text-signal"
+          >
+            Kompletan asortiman — {PRODUCTS.length} artikala ↓
+          </button>
+        </div>
       </div>
     </section>
   )

@@ -65,7 +65,7 @@ function Done({ order, partner }: { order: PlacedOrder; partner: FullPartner }) 
           <p className="label">Narudžba je poslata · {dateOf(order.placedAt)}</p>
           <p className="display mt-6 text-[clamp(40px,6vw,104px)] !leading-[0.86]">{order.no}</p>
           <p className="mt-6 max-w-[46ch] text-[12px] leading-[1.65]">
-            Narudžba je evidentirana u Pantheon ERP-u. Potvrdu i termin isporuke šaljemo na {partner.email}.{' '}
+            Narudžba je primljena. Potvrdu i termin isporuke šaljemo na {partner.email}.{' '}
             {order.delivery === 'kran' ? 'Kamion sa kranom istovara direktno na sprat.' : ''}
           </p>
         </div>

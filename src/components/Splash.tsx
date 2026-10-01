@@ -59,11 +59,33 @@ export default function Splash() {
       if (e.target === el && e.animationName === 'splash-curtain') finish()
     }
     el.addEventListener('animationend', onEnd)
-    // Sigurnosna mreža: splash se skloni i ako `animationend` iz bilo kog razloga ne stigne.
-    const safety = window.setTimeout(finish, 2600)
+
+    // Zavjesa se podiže kad je strana spremna: najmanje 1,5 s (da se uvod odigra), a na početnoj i
+    // tek kad je 3D scena nacrtana. Najviše 6 s — spora mreža ne smije zadržati sajt iza zavjese.
+    const t0 = performance.now()
+    let lifted = false
+    let safety = 0
+    const lift = () => {
+      if (lifted) return
+      lifted = true
+      el.classList.add('lift')
+      window.dispatchEvent(new CustomEvent('gc:splash-lift'))
+      safety = window.setTimeout(finish, 1200)
+    }
+    const ready = () => !document.getElementById('hero') || !!window.__gcCraneReady
+    const check = () => {
+      if (lifted) return
+      const t = performance.now() - t0
+      if ((t >= 1500 && ready()) || t >= 6000) lift()
+    }
+    const timer = window.setInterval(check, 100)
+    window.addEventListener('gc:crane-ready', check)
+    check()
 
     return () => {
       el.removeEventListener('animationend', onEnd)
+      window.removeEventListener('gc:crane-ready', check)
+      window.clearInterval(timer)
       window.clearTimeout(safety)
     }
   }, [])

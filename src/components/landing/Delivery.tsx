@@ -44,6 +44,8 @@ export default function Delivery() {
 
   return (
     <section ref={root} id="isporuka" className="relative z-20 h-[240vh] bg-bg" aria-label="Isporuka kranom">
+      {/* Fotografija ostaje u kadru do samog kraja sekcije (sticky do dna), pa plave stepenice
+          sljedeće trake padaju direktno na nju — bez krem trake između. */}
       <div className="sticky top-0 h-dvh overflow-hidden">
         <div data-frame className="absolute inset-0 overflow-hidden bg-ink will-change-transform" data-cursor="Isporuka">
           <img decoding="async" src="/editorial/delivery.webp" alt="Kamion sa kranom podiže paletu ploča na sprat zgrade u izgradnji" className="h-full w-full object-cover" />

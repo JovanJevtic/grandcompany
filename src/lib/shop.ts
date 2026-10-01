@@ -35,7 +35,6 @@ export const USES: { id: UseId; name: string; hint: string }[] = [
   { id: 'spusteni-plafon', name: 'Spušteni plafon', hint: 'Ploče, CD i UD profili, ovjesi' },
   { id: 'fasada', name: 'Fasada i demit', hint: 'Stiropor, ljepilo, masa za armiranje' },
   { id: 'potkrovlje', name: 'Potkrovlje', hint: 'Vuna u rolni, ploče, CD profili' },
-  { id: 'podovi', name: 'Podovi', hint: 'Podni stiropor, XPS, cement, ljepilo' },
 ]
 
 // Za koju vrstu radova se artikal koristi. Izvedeno iz namjene artikla (opis u katalogu i sistemi zidova).

@@ -125,16 +125,16 @@ const USPS: { title: string; text: string }[] = [
     text: 'Vlastiti vozni park sa kamionima koji imaju ugrađene kranove. Paletirani materijal — gipsane ploče, vunu, ciglu — istovaramo direktno na spratove i visoke etaže gradilišta u regiji Banja Luke i šire.',
   },
   {
-    title: 'Knauf distributer',
-    text: 'Ovlašteni distributer i specijalista za suhu gradnju. Kompletan sistemski asortiman — ploče, profili, veziva, spojnice, izolacija i zaptivne trake — na jednom mjestu.',
+    title: 'Vaša cijena',
+    text: 'Firme i izvođači kupuju po ugovorenom rabatu do 22%, sa kreditnim limitom i plaćanjem na 30, 60 ili 90 dana.',
   },
   {
-    title: 'Pantheon ERP',
-    text: 'Portal je povezan sa Pantheon ERP-om: stanje zaliha na skladištu Nenada Kostića 151 u realnom vremenu, a B2B kupci vide ugovorene rabate, kreditne limite i odgođeno plaćanje.',
+    title: 'Na stanju',
+    text: 'Centralno stovarište u Banjoj Luci: ploče, vuna, profili i veziva spremni za utovar. Stanje vidite prije narudžbe.',
   },
   {
-    title: 'Atesti i deklaracije',
-    text: 'Kompletna dokumentacija za tehnički prijem objekata: protivpožarni atesti, zvučna izolovanost i CE znaci.',
+    title: 'Suha gradnja',
+    text: 'Ovlašteni Knauf distributer: kompletni sistemi za zidove, plafone i fasade — i savjet kako ih složiti.',
   },
 ]
 
@@ -182,8 +182,8 @@ export default function BrandsSplit() {
         </h2>
         <div className="split-panel__foot">
           <p data-lead className="split-panel__lead">
-            Grand Company je ovlašteni Knauf distributer i specijalista za suhu gradnju, sa vlastitim kamionima sa kranom,
-            Pantheon ERP portalom i kompletnom tehničkom dokumentacijom.
+            Grand Company snabdijeva gradilišta građevinskim materijalom: vlastiti kamioni sa kranom, B2B uslovi za firme
+            i specijalizacija za suhu gradnju.
           </p>
           <Cta href="/portal" className="[--cta-fill:var(--bg)] [--cta-ink:var(--navy)]">
             B2B portal

@@ -94,8 +94,8 @@ export default function UsesSplit() {
         </h2>
         <div className="split-panel__foot">
           <p className="split-panel__lead">
-            Kompletan sistemski asortiman na jednom mjestu: ploče, profili, veziva, spojnice, izolacija i zaptivne trake —
-            za pregradne zidove, plafone, fasade, potkrovlja i podove.
+            Naša specijalizacija: kompletni sistemi za pregradne zidove, plafone, fasade i potkrovlja — ploče, profili,
+            izolacija i veziva iz jednog skladišta, uz savjet kako ih složiti.
           </p>
           <Cta href="/prodavnica" solid>
             Katalog

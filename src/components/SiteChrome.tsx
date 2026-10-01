@@ -197,8 +197,12 @@ export default function SiteChrome() {
             window.setTimeout(go, 3500)
           }
         }
-        if (!document.querySelector('[data-splash]') || html.dataset.gcSplash === 'done') afterSplash()
-        else window.addEventListener('gc:splash-done', afterSplash, { once: true })
+        // Slova izranjaju dok se zavjesa podiže (ne poslije), pa prvi kadar ispod nije prazan.
+        if (!document.querySelector('[data-splash]') || html.dataset.gcSplash === 'done' || document.querySelector('.splash.lift')) afterSplash()
+        else {
+          window.addEventListener('gc:splash-lift', afterSplash, { once: true })
+          window.addEventListener('gc:splash-done', afterSplash, { once: true })
+        }
       })
 
       // Čeka se učitavanje fonta, inače se širina mjeri na rezervnom fontu.

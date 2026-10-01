@@ -18,7 +18,7 @@ import { Arrow, Dial, Track, dateOf, field, go, idx, line, type View } from './u
 // aktivna narudžba sa praćenjem i brze radnje.
 
 const FLOW: [View, string, string][] = [
-  ['katalog', 'Katalog', 'Artikli sa stanjem iz Pantheona i vašom cijenom'],
+  ['katalog', 'Katalog', 'Artikli sa stanjem na stovarištu i vašom cijenom'],
   ['korpa', 'Korpa', 'Rabat i kreditni limit u realnom vremenu'],
   ['korpa', 'Narudžba', 'Dostava kamionom sa kranom, valuta 30/60/90'],
 ]
@@ -63,8 +63,8 @@ function Register() {
           <p className="label opacity-50">Registracija</p>
           <h2 className="display mt-4 text-[clamp(36px,4.4vw,76px)] !leading-[0.88]">Otvorite B2B nalog</h2>
           <p className="mt-5 max-w-[44ch] text-[11.5px] leading-[1.65] opacity-70">
-            Za građevinske firme, izvođače i zanatlije. Nivo rabata i kreditni limit dodjeljujemo prema obimu nabavke; nalog se otvara u
-            Pantheon ERP-u i odmah vidite svoje cijene.
+            Za građevinske firme, izvođače i zanatlije. Nivo rabata i kreditni limit dodjeljujemo prema obimu nabavke; odmah po otvaranju
+            naloga vidite svoje cijene.
           </p>
         </div>
         <ol className="grid gap-3 text-[11px]">
@@ -137,7 +137,7 @@ function Guest() {
             <p className="label">B2B portal · Grand Company</p>
             <p className="flex items-center gap-2 border border-bg/40 px-3 py-1.5 text-[10px]">
               <span className="size-1.5 animate-pulse rounded-full bg-bg" />
-              Pantheon ERP · {PRODUCTS.length} artikala · {units.toLocaleString('de-DE')} jed. na stanju
+              {PRODUCTS.length} artikala · {units.toLocaleString('de-DE')} jed. na stanju
             </p>
           </div>
           <h1 className="display text-[clamp(52px,8vw,150px)] !leading-[0.84]">
@@ -182,7 +182,7 @@ function Guest() {
           ['Do 22%', 'Rabat', 'Ugovoreni rabat po nivou partnera, vidljiv na svakom artiklu čim se prijavite.'],
           ['90 dana', 'Kredit', 'Kreditni limit i odgođeno plaćanje 30, 60 ili 90 dana uz menicu ili bankarsku garanciju.'],
           ['Kran', 'Dostava', 'Kamioni sa hidrauličnom dizalicom istovaraju palete direktno na spratove gradilišta.'],
-          ['Live', 'Zalihe', 'Stanje na skladištu Nenada Kostića 151 u realnom vremenu, iz Pantheon ERP-a.'],
+          ['Stanje', 'Zalihe', 'Šta je na stovarištu vidite prije narudžbe — bez poziva i čekanja.'],
         ].map(([big, t, d], i) => (
           <div key={t} className={`border-b ${line} px-5 py-8 sm:[&:nth-child(odd)]:border-r lg:border-b-0 lg:border-r lg:last:border-r-0 md:px-8`}>
             <span className="label opacity-50">

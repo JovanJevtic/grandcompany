@@ -65,7 +65,7 @@ export default function Admin() {
           <div className="flex flex-wrap items-center gap-3">
             <span className="flex items-center gap-2 border border-ink/25 px-3 py-2 text-[10.5px]">
               <span className={`size-1.5 rounded-full ${syncing ? 'animate-pulse bg-cobalt' : 'bg-[#2e9e5b]'}`} />
-              Pantheon ERP · {s.syncedAt ? time(s.syncedAt) : '—'}
+              Stanje skladišta · {s.syncedAt ? time(s.syncedAt) : '—'}
             </span>
             <button type="button" onClick={sync} disabled={syncing} className="border border-ink px-4 py-2 text-[10.5px] transition-colors hover:bg-ink hover:text-bg disabled:opacity-50">
               {syncing ? 'Sinhronizacija…' : 'Sinhronizuj'}

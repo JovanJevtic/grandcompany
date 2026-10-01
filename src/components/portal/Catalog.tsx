@@ -60,7 +60,7 @@ export default function Catalog({ partner }: { partner: FullPartner | null }) {
           )
         }
       >
-        Suha gradnja, izolacija, veziva i oprema. Stanje se osvježava iz Pantheon ERP-a; cijene su sa PDV-om.
+        Suha gradnja, izolacija, veziva i oprema. Stanje je sa stovarišta; cijene su sa PDV-om.
       </Head>
 
       {/* Filteri */}
@@ -106,7 +106,7 @@ export default function Catalog({ partner }: { partner: FullPartner | null }) {
       <div className={`hidden grid-cols-[72px_1.8fr_1fr_1fr_auto_120px] items-center gap-5 border-b ${line} py-3 text-[10px] opacity-55 lg:grid`}>
         <span />
         <span>Artikal</span>
-        <span>Stanje · Pantheon</span>
+        <span>Stanje</span>
         <span className="text-right">{partner ? 'Vaša cijena' : 'Cijena'}</span>
         <span>Količina</span>
         <span />

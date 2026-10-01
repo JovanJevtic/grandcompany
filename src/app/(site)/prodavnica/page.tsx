@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import Assortment from '@/components/catalog/Assortment'
 import CatalogClient from '@/components/catalog/CatalogClient'
 import BrandStory from '@/components/shop/BrandStory'
 import Pw from '@/components/ui/Pw'
@@ -9,7 +10,7 @@ export const metadata = {
 }
 
 // Prodavnica: naslov u sredini, četiri grupe kao okrugle fotografije, podijeljeni uvod,
-// "Najprodavanije" (mreža sa tankim linijama), pa brend i "Sa gradilišta".
+// "Najprodavanije" (mreža sa tankim linijama), kompletan asortiman (lista sa filterima), pa brend i "Sa gradilišta".
 export default function CataloguePage() {
   return (
     <>
@@ -25,6 +26,8 @@ export default function CataloguePage() {
       <Suspense fallback={<div className="min-h-screen" />}>
         <CatalogClient />
       </Suspense>
+
+      <Assortment />
 
 
       <BrandStory />

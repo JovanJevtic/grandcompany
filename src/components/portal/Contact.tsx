@@ -11,7 +11,7 @@ import { Head, field, line } from './ui'
 // Kontakt za posebne uslove: viši rabat, povećanje limita, ponuda za veći projekat, termin krana.
 // Zahtjev ide komercijalisti (demo: čuva se lokalno i vidi se u internom dijelu).
 
-const TOPICS = ['Ponuda za projekat (veće količine)', 'Viši nivo rabata', 'Povećanje kreditnog limita', 'Termin kamiona sa kranom', 'Tehnički atesti i deklaracije']
+const TOPICS = ['Ponuda za projekat (veće količine)', 'Viši nivo rabata', 'Povećanje kreditnog limita', 'Termin kamiona sa kranom', 'Tehnička dokumentacija za artikal']
 
 export default function Contact({ partner }: { partner: FullPartner | null }) {
   const [sent, setSent] = useState(false)

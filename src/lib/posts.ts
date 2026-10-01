@@ -31,7 +31,6 @@ const w111 = calcW111({
   cwSku: 'PRF-075',
   woolSku: 'ISO-001',
   fillerSku: 'CHM-001',
-  soundTape: true,
 })
 
 export const POSTS: Post[] = [
@@ -261,7 +260,7 @@ export const POSTS: Post[] = [
     date: '2026-02-17',
     read: 4,
     art: 'floor-layers',
-    skus: ['ISO-005', 'ISO-007'],
+    skus: [],
     body: [
       { t: 'h', text: 'EPS 100 ispod estriha' },
       {

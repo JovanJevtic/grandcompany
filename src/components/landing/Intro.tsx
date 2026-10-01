@@ -38,13 +38,13 @@ export default function Intro() {
 
   return (
     <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[18vh] pt-[24vh] text-center">
-      <p data-up className="label mb-8 opacity-60">Veleprodaja i maloprodaja · Banja Luka</p>
+      <p data-up className="label mb-8 opacity-60">Veleprodaja građevinskog materijala · Banja Luka</p>
       <h2 data-head className="display invisible mx-auto max-w-[14ch] px-5 text-[clamp(40px,7.4vw,128px)]">
-        <Pw>Građevinski materijal za izvođače</Pw>
+        <Pw>Građevinski materijal za profesionalce</Pw>
       </h2>
       <p data-up className="mx-auto mt-10 max-w-[56ch] px-5 text-lead opacity-80">
-        Knauf ovlašteni distributer za suhu gradnju. Izolacija, veziva i oprema za montažu — za građevinske firme,
-        izvođače radova i investitore, sa dostavom kamionom sa kranom.
+        Snabdijevamo građevinske firme i izvođače: materijal sa stovarišta u Banjoj Luci, vaša cijena i dostava
+        vlastitim kamionima sa kranom — direktno na gradilište. Suha gradnja i Knauf sistemi su naša specijalizacija.
       </p>
       <div data-up data-delay="0.1" className="mt-12 flex flex-wrap justify-center gap-3">
         <Cta href="/portal" solid>
@@ -66,7 +66,7 @@ export default function Intro() {
           </div>
         </figure>
         <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[12.5px] md:mt-8">
-          <span className="opacity-70">Ploče, profili, vuna, veziva i spojnice — na jednom mjestu.</span>
+          <span className="opacity-70">Od materijala do gradilišta — iz jednog skladišta.</span>
         </figcaption>
       </div>
     </section>
