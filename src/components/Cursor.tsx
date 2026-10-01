@@ -38,7 +38,7 @@ export default function Cursor() {
       }
       xTo(e.clientX)
       yTo(e.clientY)
-      const target = (e.target as Element | null)?.closest?.('[data-cursor]')
+      const target = (e.target as Element | null)?.closest?.('[data-cursor]:not(html)')
       setBig(target ? target.getAttribute('data-cursor') || '' : null)
     }
     const onLeave = () => gsap.to(el, { scale: 0, duration: 0.3 })

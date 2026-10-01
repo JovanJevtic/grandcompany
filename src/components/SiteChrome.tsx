@@ -155,7 +155,7 @@ export default function SiteChrome() {
         if (!document.querySelector('[data-splash]') || document.documentElement.dataset.gcSplash === 'done')
           letters()
         else window.addEventListener('gc:splash-done', letters, { once: true })
-        // Značka uklizne s lijeve strane dok se hero scena kreće.
+        // Značka uklizne s desne strane dok se hero scena kreće.
         // Trigger je element, ne selektor: useGSAP sa `scope` sužava selektore na svoj kontejner.
         const trigger = () => ({
           trigger: hero,
@@ -165,7 +165,7 @@ export default function SiteChrome() {
           invalidateOnRefresh: true,
         })
         // Pikseli, ne procenti: GSAP početni CSS transform čita kao piksele i procenti se ne poklope.
-        gsap.fromTo(badge, { x: -180 }, { x: 0, ease: 'none', scrollTrigger: trigger() })
+        gsap.fromTo(badge, { x: 180 }, { x: 0, ease: 'none', scrollTrigger: trigger() })
       })
 
       // Čeka se učitavanje fonta, inače se širina mjeri na rezervnom fontu.
@@ -211,11 +211,11 @@ export default function SiteChrome() {
         {BRAND}
       </button>
 
-      {/* Značka: uklizne tek kad hero počne da se kreće. */}
+      {/* Značka (desno): uklizne tek kad hero počne da se kreće. */}
       <div
         data-badge
-        className="pointer-events-none fixed left-[34px] top-1/2 z-[500] w-[44px] -translate-y-1/2 mix-blend-difference"
-        style={{ transform: 'translateX(-180px)', color: DIFF }}
+        className="pointer-events-none fixed right-[34px] top-1/2 z-[500] w-[44px] -translate-y-1/2 mix-blend-difference"
+        style={{ transform: 'translateX(180px)', color: DIFF }}
       >
         <BadgeMark />
       </div>

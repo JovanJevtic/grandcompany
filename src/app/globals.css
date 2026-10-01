@@ -14,7 +14,10 @@
   --splash-frame: clamp(190px, 20vw, 340px);
   --splash-mark: #f3ecdf;
   --well: #ffffff;
-  --navy: #1b2436;
+  /* Tamne sekcije: prigušena indigo plava (svjetlija od tinte, ali i dalje zagasita) */
+  --navy: #33467a;
+  /* Električna plava sa reference (bento kartica) */
+  --cobalt: #3156ea;
   /* Nebo iz herosa: tihi akcenat na tamnom */
   --accent: #a9c4e4;
   /* Kontrast: cinober (signal sa gradilišta). Samo kursor, cijena na hover-u, tačke, aktivno stanje. */
@@ -35,6 +38,8 @@
   --color-accent: var(--accent);
   --color-plate: var(--plate);
   --color-signal: var(--signal);
+  --color-cobalt: var(--cobalt);
+  --font-grotesk: var(--font-grotesk), "Helvetica Neue", Arial, sans-serif;
   --font-sans: var(--font-serif), Georgia, serif;
   --font-serif: var(--font-serif), Georgia, serif;
   /* "mono" klase u starim komponentama postaju sitne serif oznake (vidi .font-mono niže) */
@@ -352,22 +357,27 @@ html:not([data-past-hero]) [data-overlay-header] {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* CTA: zaobljena kapsula; tekst se "zakotrlja" naviše, a pozadina se puni odozdo. */
+/* CTA: vodoravno položen romb (karo sa karata) u boji kursora. Na hover se romb napuni
+   tamnom bojom odozdo, a tekst se zakotrlja naviše. Oblik daje clip-path, pa nema okvira. */
 .cta {
   position: relative;
   display: inline-flex;
   align-items: center;
-  gap: 0.9em;
-  min-height: 52px;
-  padding: 0 1.6em 0 1.8em;
-  border: 1px solid currentColor;
-  border-radius: 999px;
+  justify-content: center;
+  min-height: 66px;
+  padding: 0 3.1em;
   overflow: hidden;
   isolation: isolate;
-  font-size: 15px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-  transition: color 0.6s var(--ease-io), border-color 0.6s var(--ease-io);
+  clip-path: polygon(0 50%, 50% 0, 100% 50%, 50% 100%);
+  background: var(--signal);
+  color: #fff;
+  font-family: var(--font-grotesk), Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: color 0.6s var(--ease-io), transform 0.6s var(--ease-io);
 }
 .cta::before {
   content: '';
@@ -375,7 +385,6 @@ html:not([data-past-hero]) [data-overlay-header] {
   inset: 0;
   z-index: -1;
   background: var(--cta-fill, var(--ink));
-  border-radius: inherit;
   transform: translateY(101%);
   transition: transform 0.6s var(--ease-io);
 }
@@ -385,13 +394,17 @@ html:not([data-past-hero]) [data-overlay-header] {
 }
 .cta:hover,
 .cta:focus-visible {
-  color: var(--cta-ink, var(--bg));
+  color: var(--cta-ink, #fff);
+  transform: scaleX(1.04);
+}
+.cta:focus-visible {
+  outline: none;
 }
 .cta-roll {
   position: relative;
   display: block;
   overflow: hidden;
-  line-height: 1.2;
+  line-height: 1.25;
 }
 .cta-roll > span {
   display: block;
@@ -401,7 +414,6 @@ html:not([data-past-hero]) [data-overlay-header] {
   position: absolute;
   inset: 0;
   transform: translateY(110%);
-  font-style: italic;
 }
 .cta:hover .cta-roll > span:first-child {
   transform: translateY(-110%);
@@ -410,28 +422,11 @@ html:not([data-past-hero]) [data-overlay-header] {
   transform: none;
 }
 .cta-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--signal);
-  transition: transform 0.6s var(--ease-io);
+  display: none;
 }
-.cta:hover .cta-dot {
-  transform: scale(1.6);
-}
-/* Puna varijanta (tamna kapsula) */
+/* "solid" je sada isti romb; ostavljen radi kompatibilnosti */
 .cta--solid {
-  background: var(--ink);
-  border-color: var(--ink);
-  color: var(--bg);
-  --cta-fill: var(--signal);
-  --cta-ink: var(--bg);
-}
-.cta--solid:hover {
-  border-color: var(--signal);
-}
-.cta--solid .cta-dot {
-  background: var(--bg);
+  --cta-fill: var(--ink);
 }
 
 /* Tekstualni link: linija se iscrta s lijeva na desno */
@@ -610,4 +605,11 @@ html:not([data-past-hero]) [data-overlay-header] {
     aspect-ratio: auto;
     height: 100%;
   }
+}
+
+/* Kaolin video: dok traje, stranica se ne skrola (ni dodirom) */
+html.scroll-held,
+html.scroll-held body {
+  overflow: hidden;
+  touch-action: none;
 }

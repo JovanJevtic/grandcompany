@@ -1,33 +1,34 @@
 'use client'
 
-import Cta from '@/components/ui/Cta'
-import { useMediaMotion } from '@/lib/media'
 import { useRef, useState } from 'react'
 import ProductCard from '@/components/catalog/ProductCard'
-import { Flip, gsap, useGSAP } from '@/lib/gsap'
+import Cta from '@/components/ui/Cta'
+import Pw from '@/components/ui/Pw'
+import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import { CATEGORIES, PRODUCTS, type CategoryId } from '@/lib/shop'
-import Pw from '@/components/ui/Pw'
 
-// Najčešće birani artikli sa filterom po grupi. Promjena filtera ne "skače": Flip zapamti gdje je
-// svaka kartica bila, React složi novu listu, pa kartice kliznu na nova mjesta, a nove izrone.
-// Uz "Sve" idu artikli označeni kao najčešće birani; uz grupu, prvih osam iz te grupe.
+// Najčešće birano: sekcija se pinuje i skrol, umjesto na sljedeću sekciju, vodi traku kartica
+// vodoravno. Kartice stoje stepenasto (prva najviša, svaka sljedeća niže, pa iznova), a dok
+// traka klizi svaka se njiše gore-dolje i blago naginje prema rubu ekrana — kao lepeza karata.
+// Na mobilnom (i uz reduced-motion) traka je običan vodoravni swipe, bez pinovanja.
 
 type Key = CategoryId | 'sve'
+const COUNT = 10
 
-const pick = (k: Key) =>
-  k === 'sve'
-    ? PRODUCTS.filter((p) => p.featured).slice(0, 4)
-    : [...PRODUCTS.filter((p) => p.category === k)].sort((a, b) => Number(!!b.featured) - Number(!!a.featured)).slice(0, 4)
+const pick = (k: Key) => {
+  const pool = k === 'sve' ? PRODUCTS : PRODUCTS.filter((p) => p.category === k)
+  return [...pool].sort((a, b) => Number(!!b.featured) - Number(!!a.featured)).slice(0, COUNT)
+}
+
+// Stepenice: 0, 1, 2, 3, pa iznova (u jedinicama --step)
+const STAIR = 4
 
 export default function Featured() {
   const root = useRef<HTMLElement>(null)
-  const grid = useRef<HTMLDivElement>(null)
-  const flip = useRef<Flip.FlipState | null>(null)
   const [cat, setCat] = useState<Key>('sve')
   const list = pick(cat)
-  useMediaMotion(root, [cat])
 
   useGSAP(
     () => {
@@ -40,42 +41,70 @@ export default function Featured() {
     { scope: root },
   )
 
-  // Poslije svakog crtanja nove liste: odigraj Flip od zapamćenog stanja.
+  // Vodoravna traka: pravi se iznova kad se promijeni grupa (druga lista, druga širina).
   useGSAP(
     () => {
-      const state = flip.current
-      if (!state) return
-      flip.current = null
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduce) return
-      Flip.from(state, {
-        targets: grid.current!.querySelectorAll('[data-flip-id]'),
-        duration: 0.8,
-        ease: EASE.quintInOut,
-        absolute: true,
-        stagger: 0.03,
-        onEnter: (els) => gsap.fromTo(els, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.7, ease: EASE.out, stagger: 0.04, delay: 0.2 }),
-        onLeave: (els) => gsap.to(els, { autoAlpha: 0, scale: 0.94, duration: 0.35, ease: 'power2.in' }),
+      const el = root.current!
+      const viewport = el.querySelector<HTMLElement>('[data-viewport]')!
+      const track = el.querySelector<HTMLElement>('[data-track]')!
+      const cards = gsap.utils.toArray<HTMLElement>('[data-fan]', track)
+
+      // Kartice nove liste izranjaju jedna za drugom.
+      gsap.fromTo(cards, { autoAlpha: 0, yPercent: 12 }, { autoAlpha: 1, yPercent: 0, duration: 0.9, ease: EASE.quint, stagger: 0.05 })
+
+      const mm = gsap.matchMedia()
+      mm.add({ desktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)' }, () => {
+        const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth)
+        const setters = cards.map((c) => ({
+          y: gsap.quickSetter(c, 'y', 'px'),
+          r: gsap.quickSetter(c, 'rotation', 'deg'),
+        }))
+        // Njihanje: zavisi od toga gdje je kartica u odnosu na sredinu ekrana.
+        const fan = () => {
+          const mid = window.innerWidth / 2
+          cards.forEach((c, i) => {
+            const r = c.getBoundingClientRect()
+            const d = (r.left + r.width / 2 - mid) / mid // -1 lijevo … 1 desno
+            setters[i].y(Math.sin(d * Math.PI + i * 0.9) * window.innerHeight * 0.035 + Math.abs(d) * 24)
+            setters[i].r(d * 4)
+          })
+        }
+        const tween = gsap.to(track, {
+          x: () => -distance(),
+          ease: 'none',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top top',
+            end: () => `+=${distance()}`,
+            pin: true,
+            scrub: 0.8,
+            invalidateOnRefresh: true,
+            onUpdate: fan,
+            onRefresh: fan,
+          },
+        })
+        fan()
+        return () => {
+          tween.scrollTrigger?.kill()
+          tween.kill()
+          gsap.set(cards, { clearProps: 'transform' })
+        }
       })
     },
-    { dependencies: [cat], scope: grid },
+    { scope: root, dependencies: [cat], revertOnUpdate: true },
   )
-
-  const choose = (k: Key) => {
-    if (k === cat) return
-    flip.current = Flip.getState(grid.current!.querySelectorAll('[data-flip-id]'))
-    setCat(k)
-  }
 
   const chips: { id: Key; name: string }[] = [{ id: 'sve', name: 'Najčešće' }, ...CATEGORIES.map((c) => ({ id: c.id, name: c.name }))]
 
   return (
-    <section ref={root} id="najcesce" className="relative z-20 bg-bg pb-[10vh] pt-[20vh]">
-      <div className="px-5 text-center">
-        <h2 data-head className="display invisible text-title"><Pw>
-          Najčešće <em>birano</em>
-        </Pw></h2>
-        <div role="tablist" aria-label="Grupa artikala" className="mt-10 flex flex-wrap justify-center gap-x-8 gap-y-3 text-[15px]">
+    <section ref={root} id="najcesce" className="relative z-20 overflow-hidden bg-bg md:flex md:h-dvh md:flex-col md:justify-center">
+      <div className="px-5 pt-[16vh] text-center md:pt-[11vh]">
+        <h2 data-head className="display invisible text-[clamp(44px,5.4vw,96px)]">
+          <Pw>
+            Najčešće <em>birano</em>
+          </Pw>
+        </h2>
+        <div role="tablist" aria-label="Grupa artikala" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-[15px]">
           {chips.map((c) => {
             const on = c.id === cat
             return (
@@ -84,10 +113,10 @@ export default function Featured() {
                 type="button"
                 role="tab"
                 aria-selected={on}
-                onClick={() => choose(c.id)}
+                onClick={() => setCat(c.id)}
                 className={`relative flex min-h-10 items-center transition-opacity duration-300 ${on ? 'italic' : 'opacity-45 hover:opacity-100'}`}
               >
-                <span className={`absolute -left-3.5 size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
+                <span className={`absolute -left-3.5 size-1.5 rotate-45 bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
                 {c.name}
               </button>
             )
@@ -95,16 +124,27 @@ export default function Featured() {
         </div>
       </div>
 
-      <div ref={grid} className="mx-auto mt-[10vh] grid w-[calc(100%-40px)] grid-cols-2 gap-x-4 gap-y-12 md:w-[88vw] md:gap-x-[2vw] lg:grid-cols-4">
-        {list.map((p, i) => (
-          <div key={p.id} className={i % 2 ? 'lg:mt-[12vh]' : ''}>
-            <ProductCard product={p} />
+      {/* Traka: na desktopu je vozi skrol (GSAP), na mobilnom je običan swipe sa "snap"-om. */}
+      <div data-viewport className="hs-viewport mt-[5vh] md:mt-[4vh] md:flex-1">
+        <div
+          data-track
+          className="flex w-max gap-[4vw] px-5 pb-[10vh] [--step:3.5vh] md:gap-[2.4vw] md:px-[8vw] md:pb-0 md:[--step:5vh]"
+        >
+          {list.map((p, i) => (
+            <div
+              key={p.id}
+              data-fan
+              className="w-[64vw] shrink-0 snap-start will-change-transform sm:w-[38vw] md:w-[18.5vw]"
+              style={{ marginTop: `calc(var(--step) * ${i % STAIR})` }}
+            >
+              <ProductCard product={p} stacked />
+            </div>
+          ))}
+          {/* Kraj trake: poziv na cijeli katalog */}
+          <div className="flex w-[64vw] shrink-0 snap-start items-center justify-center sm:w-[38vw] md:w-[22vw]">
+            <Cta href={cat === 'sve' ? '/prodavnica' : `/prodavnica?kategorija=${cat}`}>Cijeli katalog</Cta>
           </div>
-        ))}
-      </div>
-
-      <div className="mt-[12vh] flex justify-center">
-        <Cta href={cat === 'sve' ? '/prodavnica' : `/prodavnica?kategorija=${cat}`}>Cijeli katalog</Cta>
+        </div>
       </div>
     </section>
   )

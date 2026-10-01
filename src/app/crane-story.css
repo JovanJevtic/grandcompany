@@ -80,66 +80,81 @@
     linear-gradient(180deg, #eef4f9 0%, #e8f0f7 22%, #d9e7f2 48%, #c8dae9 76%, #b8cce1 100%);
 }
 
-/* Bijela skica grada uz dno kadra. Dok kran ulazi u kadar skica se zamućuje, blago
-   smanjuje i gubi na intenzitetu — tako ostaje "daleka" i ne takmiči se sa scenom.
-   Zamućenje se NE animira (to je ranije kočilo skrol — cijeli ekran se precrtavao svaki
-   kadar): postoje dvije kopije, oštra i unaprijed zamućena, i one se pretapaju preko
-   opacity. Izgled je isti, a GPU to slaže bez ponovnog crtanja. */
-.sky-line {
+/* Pozadina: grad u oblacima, rastavljen na tri sloja (generisano iz jedne slike, Codex).
+   --scene-progress (0..1) dolazi iz 3D scene dok kamera ulazi u kadar; --mx / --my (-1..1)
+   iz pozicije miša (CraneHero). Zamućenje se NE animira (to je ranije kočilo skrol): za grad
+   postoje oštra i unaprijed zamućena kopija koje se pretapaju preko opacity. */
+.sky-stack {
   position: absolute;
   inset: 0;
-  background: url('/hero/skyline.svg') center bottom / 100% auto no-repeat;
-  transform-origin: 50% 100%;
-  transform:
-    translate3d(0, calc(var(--scene-progress, 0) * 3%), 0)
-    scale(calc(1 - var(--scene-progress, 0) * 0.05));
-  opacity: calc((1 - var(--scene-progress, 0) * 0.4) * (1 - var(--scene-progress, 0)));
-  will-change: transform, opacity;
+  /* otkrivanje: kad je kran spreman, cijela pozadina se smiri sa blagog zuma */
+  scale: 1.12;
+  transition: scale 2.8s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.sky-line--soft {
-  filter: blur(10px);
-  opacity: calc((1 - var(--scene-progress, 0) * 0.4) * var(--scene-progress, 0));
+.crane-ready .sky-stack,
+.crane-failed .sky-stack,
+.crane-reduced .sky-stack {
+  scale: 1;
 }
-
-/* Oblaci: sitni i razbacani, klize kao magla dok se skroluje. */
-.sky-clouds {
+.sky-layer {
   position: absolute;
-  inset: 0;
-}
-.sky-cloud {
-  position: absolute;
-  display: block;
+  inset: -6%;
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-size: cover;
+  background-position: 50% 58%;
   will-change: transform;
-  transform: translate3d(0, calc(var(--scene-progress, 0) * var(--drift, -8%)), 0);
 }
-.sky-cloud--a {
-  --drift: -13%;
-  width: 26%;
-  aspect-ratio: 400 / 176.8;
-  left: 2%;
-  top: 5%;
-  opacity: 0.9;
-  background-image: url('/hero/cloud-a.svg');
+.sky-back {
+  background-image: url('/hero/sky-back.webp');
+  transform: translate3d(calc(var(--mx, 0) * -0.5%), calc(var(--my, 0) * -0.5% - var(--scene-progress, 0) * 3%), 0);
+  /* nebo stalno, jedva primjetno "diše" — da pozadina nije mrtva dok kran radi */
+  animation: sky-breathe 18s ease-in-out infinite alternate;
 }
-.sky-cloud--b {
-  --drift: -7%;
-  width: 20%;
-  aspect-ratio: 400 / 238.08;
-  right: 5%;
-  top: 14%;
-  opacity: 0.72;
-  background-image: url('/hero/cloud-b.svg');
+.sky-city {
+  background-image: url('/hero/city-mid.webp');
+  transform-origin: 50% 80%;
+  transform:
+    translate3d(calc(var(--mx, 0) * -1.3%), calc(var(--my, 0) * -0.8% + var(--scene-progress, 0) * 5%), 0)
+    scale(calc(1 - var(--scene-progress, 0) * 0.06));
+  opacity: calc((1 - var(--scene-progress, 0) * 0.35) * (1 - var(--scene-progress, 0)));
 }
-.sky-cloud--c {
-  --drift: -19%;
-  width: 13%;
-  aspect-ratio: 1 / 1;
-  left: 29%;
-  top: 33%;
-  opacity: 0.5;
-  background-image: url('/hero/cloud-c.svg');
+.sky-city--soft {
+  background-image: url('/hero/city-mid-soft.webp');
+  opacity: calc((1 - var(--scene-progress, 0) * 0.35) * var(--scene-progress, 0));
+}
+.sky-fog {
+  background-image: url('/hero/fog-front.webp');
+  background-position: 50% 100%;
+  transform: translate3d(calc(var(--mx, 0) * -2.4%), calc(var(--my, 0) * -1.2% + var(--scene-progress, 0) * 9%), 0);
+  animation: fog-drift 24s ease-in-out infinite alternate;
+  opacity: 0.95;
+}
+@keyframes sky-breathe {
+  from { scale: 1; }
+  to { scale: 1.06; }
+}
+@keyframes fog-drift {
+  from { translate: -2.5% 0; }
+  to { translate: 2.5% 0; }
+}
+/* Veo: zamućena kopija cijele slike preko slojeva dok se kran učitava. Ako scena iz bilo kog
+   razloga ne javi da je spremna, veo se ipak skloni poslije 6 s (animacija). */
+.sky-veil {
+  position: absolute;
+  inset: -4%;
+  background: url('/hero/sky-veil.webp') 50% 58% / cover no-repeat;
+  opacity: 1;
+  transition: opacity 1.8s ease;
+  animation: veil-out 1.8s ease 6s forwards;
+  pointer-events: none;
+}
+.crane-ready .sky-veil,
+.crane-failed .sky-veil,
+.crane-reduced .sky-veil {
+  opacity: 0;
+}
+@keyframes veil-out {
+  to { opacity: 0; }
 }
 
 .crane-viewport {
@@ -284,10 +299,13 @@
   right: var(--story-gutter);
   display: flex;
   justify-content: space-between;
-  font-size: clamp(9px, 0.78vw, 11px);
-  letter-spacing: 0.16em;
+  /* Debeli grotesk (Inter Tight 800) — kontrast tankom wordmarku iznad */
+  font-family: var(--font-grotesk), Arial, sans-serif;
+  font-weight: 800;
+  font-size: clamp(10px, 0.86vw, 13px);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--story-muted);
+  color: var(--story-ink, var(--ink));
   padding-bottom: 16px;
   border-bottom: 1px solid var(--story-line);
 }
@@ -326,15 +344,6 @@
   .scene-meter {
     width: 80px;
   }
-  .sky-cloud--a {
-    width: 38%;
-  }
-  .sky-cloud--b {
-    width: 30%;
-  }
-  .sky-cloud--c {
-    width: 19%;
-  }
   .story-section {
     min-height: 70svh;
     padding: 48px var(--story-gutter);
@@ -357,9 +366,6 @@
   .story-opening {
     padding-top: 28px;
   }
-  .sky-cloud--c {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -367,8 +373,7 @@
     position: relative;
     top: 0;
   }
-  .sky-line,
-  .sky-cloud {
+  .sky-layer {
     will-change: auto;
   }
 }

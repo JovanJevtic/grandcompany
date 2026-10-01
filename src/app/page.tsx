@@ -5,6 +5,7 @@ import SiteHeader from "@/components/site/SiteHeader";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
 import Kaolin from "@/components/shop/Kaolin";
+import Bento from "@/components/landing/Bento";
 import BrandsSplit from "@/components/landing/BrandsSplit";
 import Delivery from "@/components/landing/Delivery";
 import Detail from "@/components/landing/Detail";
@@ -35,6 +36,7 @@ export default function Home() {
         <Delivery />
         <Detail />
         <BrandsSplit />
+        <Bento />
         <PostsTeaser />
         <Footer />
       </main>

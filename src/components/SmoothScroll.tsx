@@ -9,6 +9,8 @@ declare global {
     /** Lenis instanca koju SmoothScroll ostavlja za programsko skrolovanje (hero, mali znak, testovi). */
     __gcLenis?: {
       scrollTo: (y: number, o?: Record<string, unknown>) => void
+      stop?: () => void
+      start?: () => void
       options?: Record<string, unknown>
     } | null
   }

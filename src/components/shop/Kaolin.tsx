@@ -12,10 +12,15 @@ import { MQ } from '@/lib/motion'
 // kaolin.mp4 i kaolin-reverse.mp4 (isti kadrovi obrnutim redom). Pri promjeni smjera
 // obrnuti video se premota na isti kadar (vrijeme D − t), pa se tek kad je spreman zamijene.
 // Oba su ubrzana 1,5× i posvijetljena ka boji stranice (ffmpeg); ivice utapa CSS maska.
+// U browseru se dodatno ubrzavaju (RATE), pa je ukupno 1,75×.
+//
+// Zaustavljanje skrola: kad sekcija stigne na vrh ekrana, skrol se zaključa dok video ne
+// prođe do kraja (Lenis stop), pa se otključa. Nazad (skrol nagore) ne zaključava.
 
 const SRC = '/kaolin/video/kaolin.mp4'
 const SRC_REV = '/kaolin/video/kaolin-reverse.mp4'
 const POSTER = '/kaolin/video/kaolin-poster.jpg'
+const RATE = 1.75 / 1.5
 
 // Ivice videa se meko gube u pozadinu stranice: elipsa u sredini i blagi prelaz gore i dolje.
 const MASK =
@@ -75,6 +80,7 @@ export default function Kaolin() {
         const start = () => {
           dir = to
           show(next)
+          next.playbackRate = RATE
           next.play().catch(() => {})
           loop(true)
         }
@@ -98,20 +104,41 @@ export default function Kaolin() {
           else fwd.addEventListener('loadedmetadata', end, { once: true })
           return
         }
-        // Sekcija se kratko zadrži u kadru dok video traje; smjer bira skrol.
+        // Sekcija je pinovana; kad stigne na vrh, skrol staje dok video ne prođe (naprijed).
+        let locked = false
+        let safety = 0
+        const unlock = () => {
+          if (!locked) return
+          locked = false
+          window.clearTimeout(safety)
+          window.__gcLenis?.start?.()
+          document.documentElement.classList.remove('scroll-held')
+        }
+        const lock = (at: number) => {
+          if (locked || progress() > 0.97) return
+          locked = true
+          window.__gcLenis?.scrollTo(at, { immediate: true, force: true })
+          window.__gcLenis?.stop?.()
+          document.documentElement.classList.add('scroll-held')
+          // Sigurnosna mreža: ako video zapne (mreža, pauza taba), skrol se ipak vrati.
+          safety = window.setTimeout(unlock, (D() / RATE + 1.5) * 1000)
+        }
+        fwd.addEventListener('ended', unlock)
         ScrollTrigger.create({
           trigger: el,
           start: 'top top',
           end: () => `+=${window.innerHeight * (mobile ? 0.6 : 0.9)}`,
           pin: true,
           invalidateOnRefresh: true,
-        })
-        ScrollTrigger.create({
-          trigger: el,
-          start: 'top 55%',
-          onEnter: () => play(1),
+          onEnter: (self) => {
+            // Zaključava se samo kad se do videa stiglo skrolom; skok preko sekcije
+            // (link na #kontakt, tipka End) prolazi bez zaustavljanja.
+            if (self.progress < 0.3) lock(self.start)
+            play(1)
+          },
           onLeaveBack: () => play(-1),
         })
+        return unlock
       })
 
       return () => cancelAnimationFrame(raf)

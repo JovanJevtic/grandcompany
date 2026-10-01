@@ -7,11 +7,11 @@ import { pw } from '@/components/ui/Pw'
 import { addToCart, toggleSaved, useShop } from '@/lib/cart'
 import { categoryName, defaultQty, money, type Product } from '@/lib/shop'
 
-type Props = { product: Product; view?: 'grid' | 'list'; size?: 'md' | 'lg'; priority?: boolean }
+type Props = { product: Product; view?: 'grid' | 'list'; size?: 'md' | 'lg'; priority?: boolean; stacked?: boolean }
 
 // Kartica artikla, editorijalno: velika fotografija na polju boje studijske pozadine, ispod ime i cijena.
 // Na hover se slika približi, a odozdo izađe kapsula "Dodaj u korpu"; kursor kaže "Pogledaj".
-export default function ProductCard({ product, view = 'grid', priority }: Props) {
+export default function ProductCard({ product, view = 'grid', priority, stacked }: Props) {
   const { saved } = useShop()
   const isSaved = saved.includes(product.id)
   const href = `/prodavnica/${product.sku}`
@@ -77,7 +77,7 @@ export default function ProductCard({ product, view = 'grid', priority }: Props)
         </button>
       </div>
 
-      <div className="flex flex-col gap-1 pt-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:pt-4">
+      <div className={`flex flex-col gap-1 pt-3 sm:pt-4 ${stacked ? '' : 'sm:flex-row sm:items-start sm:justify-between sm:gap-4'}`}>
         <Link href={href} className="font-pretty text-[clamp(19px,1.45vw,24px)] leading-[1.1]">
           {pw(product.name)}
         </Link>

@@ -65,6 +65,34 @@ export default function CraneHero() {
     }
   }, [])
 
+  // Parallax pozadine za mišem: --mx / --my (-1..1) se mekano približavaju poziciji kursora.
+  useEffect(() => {
+    const el = root.current
+    if (!el || !window.matchMedia('(pointer: fine)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    const target = { x: 0, y: 0 }
+    const cur = { x: 0, y: 0 }
+    let raf = 0
+    const step = () => {
+      cur.x += (target.x - cur.x) * 0.05
+      cur.y += (target.y - cur.y) * 0.05
+      el.style.setProperty('--mx', cur.x.toFixed(4))
+      el.style.setProperty('--my', cur.y.toFixed(4))
+      raf = Math.abs(target.x - cur.x) + Math.abs(target.y - cur.y) > 0.001 ? requestAnimationFrame(step) : 0
+    }
+    const onMove = (e: PointerEvent) => {
+      if (window.scrollY > el.offsetHeight + window.innerHeight * 6) return
+      target.x = (e.clientX / window.innerWidth) * 2 - 1
+      target.y = (e.clientY / window.innerHeight) * 2 - 1
+      if (!raf) raf = requestAnimationFrame(step)
+    }
+    window.addEventListener('pointermove', onMove, { passive: true })
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      cancelAnimationFrame(raf)
+    }
+  }, [])
+
   return (
     <>
       {/* Prazan pojas: scena počinje tačno ispod fiksnog wordmarka. */}
@@ -72,16 +100,17 @@ export default function CraneHero() {
 
       <section id="hero" ref={root} className="construction-story">
         <div className="crane-stage" aria-hidden="true">
-          {/* Nebo ispod krana: gradijent + bijela skica grada + oblaci. Sve je iza canvasa. */}
+          {/* Nebo iza krana u tri sloja (nebo, grad u magli, magla naprijed) — svaki se pomjera
+              svojom brzinom na skrol i za mišem. Dok se kran ne učita, preko svega stoji
+              zamućena kopija ("veo"); kad je scena spremna, veo se pretopi i slojevi se smire. */}
           <div className="scene-sky">
-            {/* Skica grada dvaput: oštra i unaprijed zamućena — na skrol se pretapaju. */}
-            <div className="sky-line" />
-            <div className="sky-line sky-line--soft" />
-            <div className="sky-clouds">
-              <span className="sky-cloud sky-cloud--a" />
-              <span className="sky-cloud sky-cloud--b" />
-              <span className="sky-cloud sky-cloud--c" />
+            <div className="sky-stack">
+              <div className="sky-layer sky-back" />
+              <div className="sky-layer sky-city" />
+              <div className="sky-layer sky-city sky-city--soft" />
+              <div className="sky-layer sky-fog" />
             </div>
+            <div className="sky-veil" />
           </div>
 
           <figure className="crane-viewport">

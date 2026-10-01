@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda } from "next/font/google";
+import { Bodoni_Moda, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -14,6 +14,13 @@ const serif = Bodoni_Moda({
   subsets: ["latin", "latin-ext"],
   style: ["normal", "italic"],
   axes: ["opsz"],
+});
+
+// Debeli grotesk za sitne oznake u verzalu (hero, bento kartice) — kontrast tankom Prettywise-u.
+const grotesk = Inter_Tight({
+  variable: "--font-grotesk",
+  subsets: ["latin", "latin-ext"],
+  weight: ["500", "700", "800"],
 });
 
 // Display serif (italic) za kratke rečenice preko scene. Bodoni Moda je OFL —
@@ -43,7 +50,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${serif.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${serif.variable} ${grotesk.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}
