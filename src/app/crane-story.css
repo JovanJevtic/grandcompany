@@ -1,7 +1,6 @@
 /* ——— 3D priča: kran na početnoj ———
-   Scena je svijetla i sticky: plavo-sivo nebo, bijela skica grada uz dno i razbacani oblaci,
-   a preko svega ide 3D kran (WebGL canvas je providan). Dok kamera ulazi u kadar, skica se
-   zamućuje i povlači, a oblaci klize kao magla — oboje vozi `--scene-progress` iz scena. */
+   Scena je sticky; cijela slika je štampa u tačkama (kobalt mastilo na papiru) iz WebGL-a,
+   koja po poglavljima mijenja boju papira i mastila i raster (vidi public/crane/crane-print.js). */
 
 /* Gornja ivica scene je dno fiksnog wordmarka; --story-header se računa u :root
    (globals.css) jer ga koristi i prazan pojas iznad sekcije, a ne samo sekcija. */
@@ -12,7 +11,7 @@
   --story-line: rgba(30, 42, 54, 0.16);
   --story-sand: #a9754a;
   /* Nebo: ista boja je i u praznom pojasu iznad scene, pa nema šava ni "pravougaonika". */
-  --sky-top: #eef4f9;
+  --sky-top: #e4e8f0; /* = papir prvog poglavlja u crane-print.js */
   position: relative;
   isolation: isolate;
   /* Samo bočno sječenje: scena se naviše produžava iza wordmarka (vidi .crane-viewport). */
@@ -38,7 +37,8 @@
    Preko svijetlih sekcija je tamno plav; preko tamnog podnožja prelazi u bijelo.
    Podloge NEMA — ni pravougaonika ni gradijenta; samo slova preko sadržaja. */
 [data-brand-band] {
-  color: var(--ink);
+  /* Tokom herosa boju daje poglavlje štampe ispod wordmarka (--hero-wm iz crane-hero.js). */
+  color: var(--hero-wm, var(--ink));
   background: none;
   transition: color 0.35s ease;
 }
@@ -66,108 +66,19 @@
   background: var(--sky-top);
 }
 
-/* ——— Nebo ispod krana ——— */
-
-.scene-sky {
+/* ——— Papir preko štampe ———
+   Sama slika je WebGL štampa u tačkama (crane-print.js) i pokriva cijelo platno, uključujući pojas
+   iza wordmarka. Preko nje ide tekstura papira u `multiply`: bijelo ne mijenja ništa, a vlakna,
+   pregibi i izlizano mastilo po ivicama "upiju" boju ispod — i na plavom bloku izgleda kao štampa. */
+.print-paper {
   position: absolute;
   inset: 0;
-  /* Produženo naviše iza wordmarka: naslov nema nikakvu podlogu, iza njega je nebo. */
   top: calc(-1 * var(--story-header));
-  overflow: hidden;
+  z-index: 2;
+  background: url('/hero/paper-grunge.webp') 50% 50% / 100% 100% no-repeat;
+  mix-blend-mode: multiply;
+  opacity: 0.9;
   pointer-events: none;
-  background:
-    radial-gradient(120% 44% at 50% 34%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 70%),
-    linear-gradient(180deg, #eef4f9 0%, #e8f0f7 22%, #d9e7f2 48%, #c8dae9 76%, #b8cce1 100%);
-}
-
-/* Pozadina: grad u oblacima, rastavljen na tri sloja (generisano iz jedne slike, Codex).
-   --scene-progress (0..1) dolazi iz 3D scene dok kamera ulazi u kadar; --mx / --my (-1..1)
-   iz pozicije miša (CraneHero). Zamućenje se NE animira (to je ranije kočilo skrol): za grad
-   postoje oštra i unaprijed zamućena kopija koje se pretapaju preko opacity. */
-.sky-stack {
-  position: absolute;
-  inset: 0;
-  /* otkrivanje: kad je kran spreman, cijela pozadina se smiri sa blagog zuma */
-  scale: 1.12;
-  transition: scale 2.8s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.crane-ready .sky-stack,
-.crane-failed .sky-stack,
-.crane-reduced .sky-stack {
-  scale: 1;
-}
-.sky-layer {
-  position: absolute;
-  inset: -6%;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: 50% 58%;
-  will-change: transform;
-}
-.sky-back {
-  background-image: url('/hero/sky-back.webp');
-  transform: translate3d(calc(var(--mx, 0) * -0.5%), calc(var(--my, 0) * -0.5% - var(--scene-progress, 0) * 3%), 0);
-  /* nebo stalno, jedva primjetno "diše" — da pozadina nije mrtva dok kran radi */
-  animation: sky-breathe 18s ease-in-out infinite alternate;
-}
-.sky-city {
-  background-image: url('/hero/city-mid.webp');
-  transform-origin: 50% 80%;
-  transform:
-    translate3d(calc(var(--mx, 0) * -1.3%), calc(var(--my, 0) * -0.8% + var(--scene-progress, 0) * 5%), 0)
-    scale(calc(1 - var(--scene-progress, 0) * 0.06));
-  opacity: calc((1 - var(--scene-progress, 0) * 0.35) * (1 - var(--scene-progress, 0)));
-}
-.sky-city--soft {
-  background-image: url('/hero/city-mid-soft.webp');
-  opacity: calc((1 - var(--scene-progress, 0) * 0.35) * var(--scene-progress, 0));
-}
-.sky-fog {
-  background-image: url('/hero/fog-front.webp');
-  background-position: 50% 100%;
-  transform: translate3d(calc(var(--mx, 0) * -2.4%), calc(var(--my, 0) * -1.2% + var(--scene-progress, 0) * 9%), 0);
-  animation: fog-drift 24s ease-in-out infinite alternate;
-  opacity: 0.95;
-}
-@keyframes sky-breathe {
-  from { scale: 1; }
-  to { scale: 1.06; }
-}
-@keyframes fog-drift {
-  from { translate: -2.5% 0; }
-  to { translate: 2.5% 0; }
-}
-/* Završni kadar: kad kamera izađe kroz prozor i počne rečenica, preko slojeva se pretopi
-   čisto nebo (bez zamućenih nebodera koji su iza teksta djelovali prljavo). */
-.sky-clean {
-  position: absolute;
-  inset: -3%;
-  background: url('/hero/sky-clean.webp') 50% 45% / cover no-repeat;
-  opacity: max(clamp(0, (var(--scene-progress, 0) - 0.9) * 10, 1), clamp(0, var(--type-p, 0) * 8, 1));
-  transform: translate3d(calc(var(--mx, 0) * -0.6%), calc(var(--my, 0) * -0.4%), 0);
-  animation: sky-breathe 18s ease-in-out infinite alternate;
-  will-change: opacity, transform;
-  pointer-events: none;
-}
-
-/* Veo: zamućena kopija cijele slike preko slojeva dok se kran učitava. Ako scena iz bilo kog
-   razloga ne javi da je spremna, veo se ipak skloni poslije 6 s (animacija). */
-.sky-veil {
-  position: absolute;
-  inset: -4%;
-  background: url('/hero/sky-veil.webp') 50% 58% / cover no-repeat;
-  opacity: 1;
-  transition: opacity 1.8s ease;
-  animation: veil-out 1.8s ease 6s forwards;
-  pointer-events: none;
-}
-.crane-ready .sky-veil,
-.crane-failed .sky-veil,
-.crane-reduced .sky-veil {
-  opacity: 0;
-}
-@keyframes veil-out {
-  to { opacity: 0; }
 }
 
 .crane-viewport {
@@ -204,13 +115,13 @@
 .scene-meter {
   width: 140px;
   height: 1px;
-  background: rgba(30, 42, 54, 0.2);
+  background: color-mix(in srgb, var(--hero-wm, var(--ink)) 25%, transparent);
 }
 .scene-meter i {
   display: block;
   width: 100%;
   height: 100%;
-  background: var(--story-sand);
+  background: var(--hero-wm, var(--ink));
   transform: scaleX(var(--scene-progress, 0));
   transform-origin: left;
 }
@@ -367,8 +278,5 @@
   .crane-stage {
     position: relative;
     top: 0;
-  }
-  .sky-layer {
-    will-change: auto;
   }
 }

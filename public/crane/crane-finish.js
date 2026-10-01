@@ -124,8 +124,20 @@ export function buildFinish({parent,box,rod,group,batch,m,pallet,storeys=4}) {
       balcony(g,-3.3,3.3,1.25,!entry);
       if(f===1)pallet(g,.9,0,D/2+.64,true,1);
     }
-    // Vrh: kamena atika iznad posljednjeg sprata.
+    // Međuspratna ploča (pod ovog sprata). Ranije je nije bilo, pa je zgrada bila otvorena kutija.
+    box(g,m.slab,0,-.1,0,W,.2,D);
+    // Vrh: krovna ploča (na nju sleće paleta — gornja ivica je tačno ROOF_Y = 9.6), kamena atika,
+    // krovni izlaz i ventilacija u uglovima (sredina ostaje slobodna za teret).
     if(f===storeys-1) {
+      box(g,m.slab,0,H+.1,0,W+2*T,.2,D+2*T);
+      for(let x=-W/2+1;x<W/2;x+=1.5)box(g,m.joint,x,H+.205,0,.02,.006,D);
+      box(g,stoneDeep,-2.6,H+.55,-2.1,1.1,.7,1.0);
+      box(g,frame,-2.6,H+.55,-1.59,.7,.5,.03);
+      for(const [x,z] of [[2.7,-2.2],[2.7,2.2],[-2.7,2.3]]) {
+        rod(g,frame,[x,H+.2,z],[x,H+.75,z],.12);
+        box(g,frame,x,H+.8,z,.34,.06,.34);
+      }
+
       for(const sz of [-1,1])box(g,stoneDeep,0,H+.36,sz*(D/2+T/2),W+2*T,.3,T+.02);
       for(const sx of [-1,1])box(g,stoneDeep,sx*(W/2+T/2),H+.36,0,T+.02,.3,D+2*T);
     }

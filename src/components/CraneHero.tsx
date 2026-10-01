@@ -40,15 +40,16 @@ const WORD_GLYPHS = WORDS.map((word) => {
   return glyphs
 })
 
-// Scena se pinuje, a preko nje je nebo: plavo-sivi gradijent, bijela skica grada uz dno i
-// razbacani oblaci. Skica se zamućuje i povlači dok kamera ulazi u kadar (`--scene-progress`).
-// Ostatak visine je prazan prostor (story-immersion) kroz koji se animacija krana odigra.
+// Scena se pinuje; sve na njoj je štampa u tačkama (kobalt mastilo na papiru) koja mijenja boju
+// i raster po poglavljima. Ostatak visine je prazan prostor (story-immersion) kroz koji se
+// animacija krana odigra.
 export default function CraneHero() {
   const root = useRef<HTMLElement>(null)
   // Three.js (najveći fajl, ~680 KB) i scena se skidaju odmah sa HTML-om, a ne tek kad React
   // pokrene efekat ispod. URL-ovi moraju biti isti kao u importima (uključujući ?v=).
   preloadModule('/vendor/three.module.min.js')
-  preloadModule('/crane/crane-scene.js?v=35')
+  preloadModule('/crane/crane-scene.js?v=38')
+  preloadModule('/crane/crane-print.js?v=4')
 
   useEffect(() => {
     const script = document.createElement('script')
@@ -64,36 +65,6 @@ export default function CraneHero() {
     }
   }, [])
 
-  // Parallax pozadine za mišem: --mx / --my (-1..1) se mekano približavaju poziciji kursora.
-  useEffect(() => {
-    const el = root.current
-    // Varijable idu na sam sloj neba (ne na cijeli hero), da promjena ne preračunava stilove cijele sekcije.
-    const sky = el?.querySelector<HTMLElement>('.scene-sky')
-    if (!el || !sky || !window.matchMedia('(pointer: fine)').matches) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const target = { x: 0, y: 0 }
-    const cur = { x: 0, y: 0 }
-    let raf = 0
-    const step = () => {
-      cur.x += (target.x - cur.x) * 0.05
-      cur.y += (target.y - cur.y) * 0.05
-      sky.style.setProperty('--mx', cur.x.toFixed(4))
-      sky.style.setProperty('--my', cur.y.toFixed(4))
-      raf = Math.abs(target.x - cur.x) + Math.abs(target.y - cur.y) > 0.001 ? requestAnimationFrame(step) : 0
-    }
-    const onMove = (e: PointerEvent) => {
-      if (document.documentElement.hasAttribute('data-past-hero')) return
-      target.x = (e.clientX / window.innerWidth) * 2 - 1
-      target.y = (e.clientY / window.innerHeight) * 2 - 1
-      if (!raf) raf = requestAnimationFrame(step)
-    }
-    window.addEventListener('pointermove', onMove, { passive: true })
-    return () => {
-      window.removeEventListener('pointermove', onMove)
-      cancelAnimationFrame(raf)
-    }
-  }, [])
-
   return (
     <>
       {/* Prazan pojas: scena počinje tačno ispod fiksnog wordmarka. */}
@@ -101,24 +72,13 @@ export default function CraneHero() {
 
       <section id="hero" ref={root} className="construction-story">
         <div className="crane-stage" aria-hidden="true">
-          {/* Nebo iza krana u tri sloja (nebo, grad u magli, magla naprijed) — svaki se pomjera
-              svojom brzinom na skrol i za mišem. Dok se kran ne učita, preko svega stoji
-              zamućena kopija ("veo"); kad je scena spremna, veo se pretopi i slojevi se smire. */}
-          <div className="scene-sky">
-            <div className="sky-stack">
-              <div className="sky-layer sky-back" />
-              <div className="sky-layer sky-city" />
-              <div className="sky-layer sky-city sky-city--soft" />
-              <div className="sky-layer sky-fog" />
-            </div>
-            {/* Završni kadar (rečenica "Gradimo, prodajemo..."): čisto nebo bez grada i magle */}
-            <div className="sky-clean" />
-            <div className="sky-veil" />
-          </div>
-
+          {/* Cijela slika (pozadinski grad, kran, zgrada, soba) je jedna štampa u tačkama u
+              WebGL-u (public/crane/crane-print.js). Dok se scena ne učita, vidi se samo papir. */}
           <figure className="crane-viewport">
             <canvas />
           </figure>
+          {/* Papir: vlakna, pregibi i izlizano mastilo po ivicama (Codex), preko štampe u `multiply`. */}
+          <div className="print-paper" />
 
           <div className="scene-caption">
             <span className="scene-meter">

@@ -8,7 +8,7 @@ import {detailKit} from './crane-details.js?v=18';
 import {architectureKit} from './crane-architecture.js?v=14';
 import {createSiteActivity} from './crane-activity.js?v=11';
 import {buildTowerBath} from './crane-interior.js?v=4';
-import {buildFinish,ENTRY} from './crane-finish.js?v=2';
+import {buildFinish,ENTRY} from './crane-finish.js?v=3';
 
 export const clamp = (n, a = 0, b = 1) => Math.min(b, Math.max(a, n));
 export const smooth = (a, b, p) => { const t = clamp((p-a)/(b-a)); return t*t*(3-2*t); };
@@ -18,7 +18,10 @@ const mix = THREE.MathUtils.lerp;
 // chapter-a: zgrada sa paletom se dovrši sprat po sprat, kamera uđe kroz balkonska vrata
 // u kupatilo i izađe kroz prozor u nebo. Sve staro se računa u "story vremenu"
 // (progress / STORY_END), a završna chapter-a koristi sirovi progress.
-export const STORY_END = .58;
+export const STORY_END = .56;
+const LOAD_SCALE = 1.22;
+// Visina gornje ivice krova zgrade (vidi crane-finish: 4 sprata + krovna ploča) — tu sleće paleta.
+const ROOF_Y = 9.62;
 
 // One world, one anchored mast, one payload. All keyframes are reversible.
 export function choreography(progress) {
@@ -127,6 +130,10 @@ export function createCraneScene() {
     m.timber.bumpMap=new THREE.CanvasTexture(wood);m.timber.bumpScale=.035;
   }
   applyConstructionSurfaces(m);
+  // Štampa u tačkama (crane-print.js): `userData.ink` je količina mastila materijala (0 = papir,
+  // 1 = puno mastilo). Kran i sav čelik su puno mastilo kao na referencama; ostalo se računa iz boje.
+  for(const k of ['yellow','edge','steel','rubber','sling','frame'])m[k].userData.ink=1;
+  m.concrete.userData.ink=.14;m.slab.userData.ink=.1;
   const boxGeo = new THREE.BoxGeometry(1,1,1);
   const roundedBoxGeo = new RoundedBoxGeometry(1,1,1,1,.009);
   // Šipke: broj strana prema debljini. Tanki kablovi, armatura i ograde (većina od ~5000 šipki)
@@ -237,7 +244,7 @@ export function createCraneScene() {
   }
   for(const z of [-.6,.6])rod(slew,m.yellow,[0,.4,z],[0,5.5,0],.09);
   for(const x of [-6.5,8,17])rod(slew,m.steel,[0,5.5,0],[x,2.2,0],.026);
-  for(let x=-7;x<-4;x+=.64)box(slew,m.concrete,x,.9,0,.58,2.8,1.6);
+  for(let x=-7;x<-4;x+=.64)box(slew,m.edge,x,.9,0,.58,2.8,1.6); // kontrateg (u štampi puno mastilo)
   box(slew,m.yellow,-3.5,1.1,0,1.5,.6,.85);
   for(let x=-6;x<1;x+=1) {
     rod(slew,m.yellow,[x,1,.9],[x,2,.9],.025);
@@ -268,8 +275,10 @@ export function createCraneScene() {
   for(const x of [-.38,.38])for(const z of [-.62,.62])rod(trolley,m.steel,[x,.94,z-.09],[x,.94,z+.09],.14);
   for(const z of [-.14,.14])rod(trolley,m.steel,[-.22,.7,z],[.22,.7,z],.17);
   batch(trolley);
-  const load=group(slew,16,-8,0);
-  load.scale.setScalar(1.22);
+  // Teret, kuka i sajle više nisu djeca strijele: teret ostaje na krovu kad se kuka otkači,
+  // a kuka nastavlja sa kranom. Njihov položaj u svijetu računa update() (vidi rigPose).
+  const load=group(scene,0,0,0);
+  load.scale.setScalar(LOAD_SCALE);
   function pallet(g,x,y,z,blocks=true,variant=0) {
     for(const px of [-.65,0,.65])box(g,m.darkWood,x+px,y+.12,z,.17,.24,1.3);
     for(let dz=-.56;dz<.7;dz+=.28)box(g,m.timber,x,y+.29,z+dz,1.7,.1,.21);
@@ -278,31 +287,63 @@ export function createCraneScene() {
       for(const px of [-.58,.58])box(g,m.steel,x+px,y+.85,z,.035,1.05,1.23);
     }
   }
-  rig.cargo(load);
+  function boardPallet(g) {
+    const board=mat('#ebe8e2',.9),boardEdge=mat('#dcd7cd',.92);
+    board.userData.ink=.22;boardEdge.userData.ink=.42;
+    // Drvena paleta: tri podužne grede, kocke i gornje daske.
+    for(const x of [-.67,0,.67])for(const z of [-.49,.49])box(g,m.darkWood,x,.12,z,.22,.22,.23);
+    for(const x of [-.67,0,.67])box(g,m.timber,x,.035,0,.22,.07,1.3);
+    for(let z=-.55;z<.7;z+=.275)box(g,m.timber,0,.27,z,1.76,.10,.22);
+    // Složaj ploča: svaka druga ploča je za dlaku uvučena, pa ivice složaja daju tanke pruge.
+    for(let i=0;i<15;i++)box(g,i%2?boardEdge:board,0,.345+i*.044,0,1.68-(i%2)*.02,.042,1.06-(i%2)*.02);
+    const top=.345+15*.044;
+    // Zaštitna kartonska ploča i kutni štitnici, preko njih dvije čelične trake.
+    box(g,m.white,0,top+.02,0,1.72,.04,1.1);
+    for(const x of [-.84,.84])for(const z of [-.53,.53])box(g,m.timber,x,.68,z,.07,.72,.07);
+    for(const x of [-.52,.52]) {
+      box(g,m.sling,x,top+.045,0,.05,.012,1.12);
+      for(const z of [-.555,.555])box(g,m.sling,x,.68,z,.05,.72,.012);
+    }
+    // Kavez za podizanje: četiri stuba od palete do okvira, okvir i ušice za sajle.
+    for(const x of [-.9,.9])for(const z of [-.69,.69]) {
+      rod(g,m.steel,[x,.28,z],[x,2.04,z],.03);
+      box(g,m.steel,x,.29,z,.15,.075,.15);
+      box(g,m.steel,x,2.125,z,.21,.025,.21);
+    }
+    for(const z of [-.69,.69])box(g,m.edge,0,2.04,z,1.9,.12,.1);
+    for(const x of [-.9,.9])box(g,m.edge,x,2.04,0,.1,.12,1.48);
+    // Dijagonale kaveza (ukrućenje), kao na referenci sa spreaderom.
+    for(const z of [-.69,.69])for(const s of [-1,1])rod(g,m.steel,[s*.9,1.2,z],[0,2.0,z],.018);
+    for(const x of [-.75,.75])box(g,m.steel,x,.10,0,.12,.14,1.6);
+    batch(g);
+  }
+  // Paleta gipsanih ploča (2000×1250) u kavezu za podizanje — glavni artikal firme.
+  boardPallet(load);
   if(typeof document!=='undefined') {
     const label=document.createElement('canvas');label.width=512;label.height=320;
     const lc=label.getContext('2d');lc.fillStyle='#e1dfd3';lc.fillRect(0,0,512,320);
     lc.fillStyle='#2c302e';lc.font='bold 42px sans-serif';lc.fillText('GRAND COMPANY',24,66);
-    lc.font='22px sans-serif';lc.fillText('BLOKOVI / PALETNA ISPORUKA',24,104);
+    lc.font='22px sans-serif';lc.fillText('GIPS PLOČE 2000×1250 / PALETA',24,104);
     lc.fillRect(24,123,464,2);lc.font='18px sans-serif';lc.fillText('PALETA / 01     •     SUHO SKLADIŠTENJE',24,158);
     for(let x=25;x<475;x+=7){const width=2+(x%5);lc.fillRect(x,186,width,78);}
     lc.font='17px monospace';lc.fillText('GC  78000  /  001',24,295);
     const texture=new THREE.CanvasTexture(label);texture.colorSpace=THREE.SRGBColorSpace;
     const paper=new THREE.MeshStandardMaterial({map:texture,roughness:.95});
     for(const side of [0,1]) {
-      const tag=new THREE.Mesh(new THREE.PlaneGeometry(.72,.45),paper);tag.position.set(side?.837:0,.89,side?0:.627);tag.rotation.y=side?Math.PI/2:0;load.add(tag);
+      const tag=new THREE.Mesh(new THREE.PlaneGeometry(.72,.45),paper);tag.position.set(side?.846:0,.74,side?0:.536);tag.rotation.y=side?Math.PI/2:0;load.add(tag);
     }
-    const wrap=new THREE.MeshStandardMaterial({color:'#e6ebe9',roughness:.55,metalness:0,transparent:true,opacity:.07,depthWrite:false});
-    const film=new THREE.Mesh(new THREE.BoxGeometry(1.67,.84,1.24),wrap);film.position.y=.82;load.add(film);
   }
-  const hook=group(load,0,2.8,0);
+  // Kuka (kolotur + ušica) visi sa kolica; dok nosi teret, sjedi tačno iznad kaveza.
+  const hook=group(scene,0,0,0);
+  hook.scale.setScalar(LOAD_SCALE);
   details.hook(hook);
   batch(hook);
   const hookRing=new THREE.Mesh(new THREE.TorusGeometry(.18,.05,8,16,Math.PI*1.65),m.steel);
   hookRing.rotation.z=1;hookRing.position.y=-.16;hook.add(hookRing);
-  const hoists=[-.12,.12].map(z=>rod(slew,m.steel,[16,1,z],[16,-5,z],.017));
+  const hoists=[-.12,.12].map(()=>rod(scene,m.steel,[0,0,0],[0,1,0],.017));
+  // Četiri kraka sajle od kuke do ušica kaveza; svaki krak ima dva dijela (da se može ulegnuti).
   const slings=[];
-  for(const x of [-.9,.9])for(const z of [-.69,.69])slings.push({x,z,parts:[rod(load,m.steel,[x,.35,z],[0,2.65,0],.023),rod(load,m.steel,[x,.35,z],[0,2.65,0],.023)]});
+  for(const x of [-.9,.9])for(const z of [-.69,.69])slings.push({x,z,parts:[rod(scene,m.steel,[0,0,0],[0,1,0],.023),rod(scene,m.steel,[0,0,0],[0,1,0],.023)]});
 
   const site=group(scene);
   architecture.excavation(site);
@@ -487,14 +528,22 @@ export function createCraneScene() {
   interiorLight.position.set(10.2,ENTRY_Y+2.0,0);scene.add(interiorLight);
   interiorRoot.visible=false;interiorFade(0);
 
-  // Putanja kamere u sirovom progresu (od STORY_END do 1). Tačke idu kroz glatku krivu
-  // (Catmull-Rom), pa kamera nigdje ne staje između ključeva: odmak da se vidi zgrada kako
-  // raste, spust ispred balkonskih vrata, ulaz, pogled na umivaonik, okret ka prozoru, izlaz.
+  // ——— Putanja kamere kroz cijelu priču (sirovi progres 0..1) ———
+  // Jedna glatka kriva (Catmull-Rom) kroz ključeve: široki kadar krana uperenog lijevo, lagana
+  // orbita udesno dok se kran okreće i zgrada niče, srednji plan krova (spuštanje + otkačinjanje
+  // kuke), pa spust niz fasadu do balkona, ulaz u kupatilo, okret ka prozoru i izlaz u nebo.
+  // Kamera namjerno ne ide u ekstremni krupni plan — teret, kuka i krov su uvijek zajedno u kadru.
   const EYE=ENTRY_Y+1.5;
   const CAMERA_KEYS=[
     // p      pozicija                 pogled
-    [STORY_END, [13.5,12.6,7.5],       [9,9.62,0]],       // kutija je sletjela na krov (isto kao praćenje)
-    [.68,       [15.2,7.6,10.2],       [8.6,6.0,0]],      // klizi niz fasadu ka balkonu sprata ENTRY
+    [0,         [3,17,48],             [-4,19,0]],        // cijeli kran, strijela lijevo
+    [.10,       [10,17.5,47],          [-2,18,0]],
+    [.22,       [22,18,40],            [2,14.5,0]],       // kran prolazi ispred nas, zgrada raste
+    [.34,       [30,18,34],            [6,12.6,0]],       // teret iznad krova
+    [.44,       [29,17.5,29],          [8.2,11.2,0]],     // spuštanje na krov (srednji plan)
+    [.52,       [26,18.5,25],          [8.6,12.6,0]],     // kuka se otkači i ode gore
+    [.60,       [20,13,19],            [8.8,8.4,0]],      // niz fasadu
+    [.68,       [15.2,7.6,12.2],       [8.6,6.0,0]],      // ka balkonu sprata ENTRY
     [.76,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
     [.82,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
     [.87,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
@@ -504,19 +553,28 @@ export function createCraneScene() {
   ];
   const cameraCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[1])),false,'centripetal');
   const lookCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[2])),false,'centripetal');
-  const _interiorPos=new THREE.Vector3(),_interiorLook=new THREE.Vector3();
-  function interiorPath(p) {
+  const _pathPos=new THREE.Vector3(),_pathLook=new THREE.Vector3();
+  function cameraPath(p) {
     const k=CAMERA_KEYS,last=k.length-1;
     let i=last-1;
     for(let j=0;j<last;j++)if(p<k[j+1][0]){i=j;break;}
     let f=clamp((p-k[i][0])/(k[i+1][0]-k[i][0]));
-    // Samo prvi i poslednji segment se ublaže — kamera kreće i staje mekano.
+    // Prvi i poslednji segment se ublaže — kamera kreće i staje mekano.
     if(i===0)f=f*f*(3-2*f)*.5+f*.5;
     if(i===last-1)f=1-(1-f)*(1-f);
     const u=(i+f)/last;
-    cameraCurve.getPoint(u,_interiorPos);lookCurve.getPoint(u,_interiorLook);
-    return {position:_interiorPos,look:_interiorLook};
+    cameraCurve.getPoint(u,_pathPos);lookCurve.getPoint(u,_pathLook);
+    return {position:_pathPos,look:_pathLook};
   }
+  // Tlo: veliki svijetli disk; u daljini se tačke prorijede i stapa se sa papirom (magla u crane-print).
+  const groundMat=new THREE.MeshStandardMaterial({color:'#efede8'});
+  groundMat.userData.ink=.1;groundMat.userData.radial=[1,0,9,34];groundMat.userData.edgeW=.2;
+  const ground=new THREE.Mesh(new THREE.CircleGeometry(90,64),groundMat);
+  ground.rotation.x=-Math.PI/2;ground.position.y=-.02;scene.add(ground);
+  // Betonski plato oko krana i zgrade — tamniji, da kran i zgrada "stoje" na nečemu.
+  const pad=group(scene);
+  box(pad,m.concrete,1,.03,0,26,.06,13);
+  for(let x=-11;x<14;x+=2.6)box(pad,m.joint,x,.065,0,.03,.01,13);
   const ambient=new THREE.HemisphereLight('#f2f4f5','#cbc7bf',.5);scene.add(ambient);
   const key=new THREE.DirectionalLight('#fff8ef',2.9);key.position.set(-22,29,12);key.castShadow=true;
   key.shadow.mapSize.set(2048,2048);Object.assign(key.shadow.camera,{left:-48,right:48,top:45,bottom:-40,near:1,far:150});key.shadow.radius=4;key.shadow.bias=-.0003;key.shadow.normalBias=.04;scene.add(key);
@@ -560,141 +618,97 @@ export function createCraneScene() {
       inst.instanceMatrix.needsUpdate=true;
     }
   }
-  // Ključevi praćenja kutije: [p, pomak kamere, pomak pogleda] u odnosu na kutiju (svijet).
-  const FOLLOW=[
-    [0,   [7.5,4.5,10.5], [-3.0,3.2,0]],  // glava krana: kolica, kuka i kutija
-    [.10, [4.2,1.8,5.8],  [-.4,1.4,0]],   // primicanje kutiji
-    [.20, [2.8,.9,3.9],   [0,.9,0]],      // ekstremno blizu kutije
-    [.42, [3.2,.4,4.6],   [0,.5,0]],      // spuštamo se zajedno; ispod raste zgrada
-    [STORY_END, [4.5,3.0,7.5], [0,0,0]],  // kutija na krovu
-  ];
-  const _loadW=new THREE.Vector3(),_camOff=new THREE.Vector3(),_lookOff=new THREE.Vector3();
-  function followPose(p,cam,look) {
-    let i=FOLLOW.length-2;
-    for(let j=0;j<FOLLOW.length-1;j++)if(p<FOLLOW[j+1][0]){i=j;break;}
-    const a=FOLLOW[i],b=FOLLOW[i+1],k=smooth(a[0],b[0],p);
-    cam.set(...a[1]).lerp(_tmpV.set(...b[1]),k);
-    look.set(...a[2]).lerp(_tmpV.set(...b[2]),k);
+  // ——— Kran: okretanje, teret, kuka ———
+  // Trenuci priče u sirovom progresu skrola.
+  const T={swing0:.02,swing1:.37,drop0:.36,drop1:.47,release0:.47,release1:.51,lift0:.49,lift1:.57,away0:.51,away1:.66};
+  const MAST_X=-7,JIB_Y=25.98;
+  // Ugao strijele: -π = uperena lijevo (prema -X), 0 = desno, iznad zgrade. Okreće se preko
+  // prednje strane (prema kameri), pa teret proleti kroz kadar. Kad otkači teret, nastavlja udesno.
+  function slewAt(p) {
+    return -Math.PI*(1-smooth(T.swing0,T.swing1,p))+.6*smooth(T.away0,T.away1,p);
   }
-  const _tmpV=new THREE.Vector3();
-  // Kadar cijelog krana na početku (stub je na x=-7, strijela do x≈12, vrh na y≈27).
-  const MAST=new THREE.Vector3(-7,26,0);
-  const _wideCam=new THREE.Vector3(),_wideLook=new THREE.Vector3(),_jibEnd=new THREE.Vector3(),_jibDir=new THREE.Vector3(),_perp=new THREE.Vector3();
-  function update(p,aspect=1,framing=1) {
-    // `t` je "story vreme" (0..1) postojeće priče; `p` je sirovi progres preko celog skrola.
-    const t=clamp(p/STORY_END);
-    const s=choreography(t);
-    // (linijski crtež: bez efekata dostave)
-    slew.rotation.y=s.slew;
-    // Payload bottoms out exactly on the receiving slab, never through it.
-    const trolleyX=15+smooth(0,.45,t);
-    trolley.position.x=load.position.x=trolleyX;
-    festoon.update(trolleyX);
-    load.position.y=s.loadY-25;
-    load.rotation.y=Math.sin(t*Math.PI)*.035*(1-smooth(.65,.95,t));
-    hook.position.y=2.8-s.slack*.23;
-    const top=26, bottom=s.loadY+(hook.position.y+.45)*load.scale.y;
-    hoists.forEach((hoist,i)=>{hoist.position.set(trolleyX,(top+bottom)/2-25,i===0?-.12:.12);hoist.scale.y=top-bottom;});
+  // Tačka u ravni strijele (x = udaljenost od stuba) zarotirana za ugao th, u svijetu.
+  function onJib(x,y,z,th,out) {
+    const c=Math.cos(th),s=Math.sin(th);
+    return out.set(MAST_X+x*c+z*s,y,-x*s+z*c);
+  }
+  const _a=new THREE.Vector3(),_b=new THREE.Vector3(),_mid=new THREE.Vector3(),_dir=new THREE.Vector3(),_end=new THREE.Vector3();
+  function setRod(o,a,b) {
+    _dir.subVectors(b,a);
+    const len=Math.max(1e-4,_dir.length());
+    o.position.addVectors(a,b).multiplyScalar(.5);
+    o.scale.y=len;
+    o.quaternion.setFromUnitVectors(unitY,_dir.multiplyScalar(1/len));
+  }
+  // Scena posle priče ostaje ista: bez okolnog gradilišta, samo kran, teret, zgrada i soba.
+  site.visible=false;district.visible=false;activityRoot.visible=false;
+  finishRoot.visible=true;
+  const focus=new THREE.Vector3();
+  function update(p,aspect=1) {
+    const th=slewAt(p);
+    slew.rotation.y=th;
+    // Kolica idu ka kraju strijele dok se kran okreće; posle otkačinjanja se vraćaju.
+    const tx=13+3*smooth(.05,.30,p)-3*smooth(.53,.64,p);
+    trolley.position.x=tx;
+    festoon.update(tx);
+    // Teret na sajli malo kasni za strijelom dok se kran okreće (inercija), a smiri se pri spuštanju.
+    const rate=(slewAt(p+.002)-slewAt(p-.002))/.004;
+    const landed=p>=T.drop1;
+    const thLoad=landed?0:th-.0032*rate*(1-smooth(T.drop0,T.drop1,p));
+    const loadR=landed?16:tx;
+    const loadY=mix(15.2,ROOF_Y,smooth(T.drop0,T.drop1,p));
+    onJib(loadR,loadY,0,thLoad,load.position);
+    load.rotation.y=thLoad;
+    // Kuka: dok nosi, sjedi iznad kaveza; kad se sajle otkače, diže se ka kolicima i ide sa kranom.
+    const release=smooth(T.release0,T.release1,p);
+    const lift=smooth(T.lift0,T.lift1,p);
+    const hookTh=p<T.release0?thLoad:th;
+    const hookR=p<T.release0?loadR:tx;
+    const hookY=loadY+2.8*LOAD_SCALE+lift*4.8;
+    onJib(hookR,hookY,0,hookTh,hook.position);
+    hook.rotation.y=hookTh;
+    hoists.forEach((hoist,i)=>{
+      const z=i?.12:-.12;
+      setRod(hoist,onJib(tx,JIB_Y,z,th,_a),onJib(hookR,hookY+.45*LOAD_SCALE,z,hookTh,_b));
+    });
+    // Sajle: od ušica kaveza do kuke. Pri otkačinjanju donji kraj napušta ušicu, sajla se
+    // ulegne i ostane da visi ispod kuke koja odlazi.
+    const hang=(.35+1.2*lift)*LOAD_SCALE;
     for(const sling of slings) {
-      const a=new THREE.Vector3(sling.x,2.13,sling.z), b=new THREE.Vector3(0,hook.position.y-.15,0);
-      const middle=a.clone().lerp(b,.5);middle.x+=Math.sign(sling.x)*s.slack*.2;middle.y-=s.slack*.09;
-      [[a,middle],[middle,b]].forEach(([start,end],i)=>{
-        const delta=end.clone().sub(start),part=sling.parts[i];part.position.copy(start.clone().add(end).multiplyScalar(.5));part.scale.y=delta.length();part.quaternion.setFromUnitVectors(unitY,delta.normalize());
-      });
+      const anchor=onJib(hookR,hookY-.15*LOAD_SCALE,0,hookTh,_a);
+      const eye=onJib(loadR+sling.x*LOAD_SCALE,loadY+2.13*LOAD_SCALE,sling.z*LOAD_SCALE,thLoad,_end);
+      const free=onJib(hookR+sling.x*.28*LOAD_SCALE,hookY-hang,sling.z*.28*LOAD_SCALE,hookTh,_b);
+      eye.lerp(free,release);
+      _mid.copy(eye).lerp(anchor,.5);
+      _mid.y-=Math.sin(release*Math.PI)*.55;
+      setRod(sling.parts[0],eye,_mid);
+      setRod(sling.parts[1],_mid,anchor);
     }
-    activityRoot.visible=false; // bez gradilišta okolo — samo kran, kutija i zgrada
-    activity.update(t);
-    const travel=11*smooth(.51,.72,t);truck.position.x=-10+travel;
-    wheels.forEach(wheel=>{wheel.rotation.z=-travel/.38;});
-    site.visible=false;
-    // Keep the side copy clear until it has scrolled past the scene.
-    district.visible=false;
-    district.scale.y=1;
-    districtFade(smooth(.73,.82,t));
-    for(const f of floors) {f.group.visible=true;f.group.scale.y=1;f.group.position.y=f.height;}
-    applyGrowth(t);
-    siteFade(smooth(.46,.57,t));
-    key.shadow.intensity=smooth(.46,.6,t);
-    site.position.y=0;
-    activityRoot.position.y=site.position.y;
-    scaffold.visible=true;
-    scaffold.scale.y=1;
-    const assembled=true;
-    growingParts.forEach(part=>{part.visible=!assembled&&(part!==scaffold||t>.60);});
-    finishedSite.visible=assembled;
-    // Fasada raste sprat po sprat odmah posle dostave; kupatilo se pojavljuje pred ulazak.
-    // Zgrada raste sprat po sprat DOK se kutija spušta, i završi se kad kutija sleti na krov.
-    finishRoot.visible=true;
-    finish.update(p,.12,.08,.1);
-    interiorRoot.visible=p>.68;
-    interiorFade(smooth(.68,.74,p));
-    interiorLight.intensity=7*smooth(.72,.8,p);
-    target.set(...s.target);
-    // Portrait framing is wider so the jib never falls off the screen.
-    let distance=s.distance*Math.max(1,1.0/aspect)*framing;
-    // Establish the main site, then release the wide framing for the approach.
-    const forward=new THREE.Vector3(Math.sin(s.azimuth)*Math.cos(s.elevation),Math.sin(s.elevation),Math.cos(s.azimuth)*Math.cos(s.elevation));
-    const right=new THREE.Vector3(Math.cos(s.azimuth),0,-Math.sin(s.azimuth));
-    const up=new THREE.Vector3().crossVectors(forward,right);
-    const tangent=Math.tan(THREE.MathUtils.degToRad(camera.fov/2));
-    let fit=distance;
-    const bounds=[[-7,31.25,0]];
-    for(const x of [-13,21])for(const z of [-16,14])bounds.push([x,-1.31,z]);
-    for(const point of bounds) {
-      const offset=new THREE.Vector3(...point).sub(target),depth=offset.dot(forward);
-      fit=Math.max(fit,depth+Math.abs(offset.dot(right))/(tangent*aspect*.94),depth+Math.abs(offset.dot(up))/(tangent*.92));
+    // Zgrada niče sprat po sprat dok se kran okreće; krov je gotov prije nego teret krene dolje.
+    finish.update(p,.06,.07,.09);
+    interiorRoot.visible=p>.66;
+    interiorFade(smooth(.66,.72,p));
+    interiorLight.intensity=0;
+    // Kamera: jedna kriva kroz cijelu priču. Na uskom (uspravnom) ekranu se, dok traje kran,
+    // odmakne od tačke pogleda da kran i zgrada stanu u širinu; u sobi je normalna.
+    const path=cameraPath(p);
+    target.copy(path.look);
+    const pull=mix(Math.max(1,.92/aspect),1,smooth(.58,.68,p));
+    camera.position.copy(path.position).sub(target).multiplyScalar(pull).add(target);
+    // Uzak ekran: dok je strijela lijevo, kadar se pomjeri ulijevo (teret ne ispada sa ivice),
+    // a pogled spusti, pa kran sjedne više (ispod naslova, a ne pri dnu).
+    const portrait=clamp((1-aspect)/.5);
+    if(portrait>0) {
+      _dir.set(-6*portrait*(1-smooth(.04,.3,p)),-3*portrait*(1-smooth(.3,.5,p)),0);
+      camera.position.add(_dir);target.add(_dir);
     }
-    distance=mix(distance,fit,smooth(.46,.68,t)*(1-smooth(.68,.86,t)));
-    if(t>.68) {
-      // Follow the delivery into the roof, while keeping the entire cargo visible.
-      for(const x of [7.7,10.3])for(const y of [s.loadY,s.loadY+4.05])for(const z of [-1.05,1.05]) {
-        const offset=new THREE.Vector3(x,y,z).sub(target),depth=offset.dot(forward);
-        distance=Math.max(distance,depth+Math.abs(offset.dot(right))/(tangent*aspect*.90),depth+Math.abs(offset.dot(up))/(tangent*.90));
-      }
-    }
-    camera.position.set(target.x+Math.sin(s.azimuth)*Math.cos(s.elevation)*distance,target.y+Math.sin(s.elevation)*distance,target.z+Math.cos(s.azimuth)*Math.cos(s.elevation)*distance);
-    // ——— Nova kamera: krupni plan krana, zoom na kutiju i spuštanje zajedno sa njom ———
-    // Kamera nikad ne ide u širok plan: pomak (offset) je vezan za kutiju u svijetu, pa je
-    // kutija stalno u kadru dok se kran okreće i spušta je na krov zgrade.
-    slew.updateMatrixWorld(true);
-    load.getWorldPosition(_loadW);
-    followPose(p,_camOff,_lookOff);
-    // Uspravan (uzak) ekran: kamera se odmakne srazmjerno, da kutija i zgrada stanu u širinu.
-    _camOff.multiplyScalar(Math.max(1,.95/aspect));
-    camera.position.copy(_loadW).add(_camOff);
-    target.copy(_loadW).add(_lookOff);
-    // Sve počinje od krana: prvi kadar je cijeli kran (stub + strijela + kutija), pa kamera
-    // glatko uđe u krupni plan kutije (do p≈.16) i dalje je prati.
-    const intro=1-smooth(.015,.16,p);
-    if(intro>0) {
-      // Kamera stoji bočno na strijelu (okomito na njen pravac), pa se kran vidi cijelom dužinom
-      // bez obzira na to kako je okrenut.
-      trolley.getWorldPosition(_jibEnd);
-      _jibDir.set(_jibEnd.x-MAST.x,0,_jibEnd.z-MAST.z).normalize();
-      _perp.set(_jibDir.z,0,-_jibDir.x);
-      if(_perp.z<0)_perp.negate();
-      // Na širokom ekranu pogled ide više (kran sjeda niže u kadar, ispod velikog naslova).
-      _wideLook.set((MAST.x+_jibEnd.x)/2,aspect>1?20:15,(MAST.z+_jibEnd.z)/2);
-      const dist=(aspect>1?50:44)*Math.max(1,1.05/aspect);
-      _wideCam.copy(_wideLook).addScaledVector(_perp,dist).add(_tmpV.set(0,6,0));
-      camera.position.lerp(_wideCam,intro);
-      target.lerp(_wideLook,intro);
-    }
-    // Završna chapter-a preuzima kameru: glatko se spoji sa praćenjem pa ide kroz enterijer.
-    const interiorT=smooth(STORY_END,STORY_END+.04,p);
-    if(interiorT>0) {
-      const path=interiorPath(p);
-      camera.position.lerp(path.position,interiorT);
-      target.lerp(path.look,interiorT);
-    }
+    focus.copy(target);
     // U sobi je objektiv širi (naročito na uskom ekranu), da kupatilo stane u kadar.
     const inside=smooth(.74,.8,p)*(1-smooth(.94,.99,p));
     camera.fov=37+(aspect<1?24:9)*inside;
     camera.aspect=aspect;camera.lookAt(target);camera.updateProjectionMatrix();
-    if(p>=STORY_END)s.chapter=4;
-
-    return s;
+    return {chapter:p<.17?0:p<.36?1:p<.58?2:p<.925?3:4};
   }
   update(0);
-  return {scene,camera,update,load,site,slew,trolley,hoists,floors,activity,activityRoot,truck,wheels,lighting:{key,fill},materials:m};
+  return {scene,camera,update,focus,load,hook,site,slew,trolley,hoists,floors,activity,activityRoot,truck,wheels,lighting:{key,fill},materials:m};
 }

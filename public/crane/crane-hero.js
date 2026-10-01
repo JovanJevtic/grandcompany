@@ -5,11 +5,9 @@
 // gornja ivica scene, pa se visina offseta mjeri iz njega, a ne iz headera.
 // Dodat je i dispose() da se scena ugasi ako se stranica montira ponovo.
 import * as THREE from '../vendor/three.module.min.js';
-import {createScrollAmbience} from './crane-ambience.js?v=17';
-import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
-import {createCraneRenderer} from './crane-renderer.js?v=28';
+import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=4';
 import {craneQuality} from './crane-quality.js?v=19';
-import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=35';
+import {createCraneScene, clamp, smooth} from './crane-scene.js?v=38';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -64,17 +62,7 @@ async function init() {
       for(const value of Object.values(material))if(value?.isTexture)textures.add(value);
   });
   for(const texture of textures){texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());texture.needsUpdate=true;}
-  const updateAmbience=createScrollAmbience(cover);
-  const coolFill=new THREE.Color('#e2eaef'),warmFill=new THREE.Color('#f2e6d2');
-  updateAmbience(0);
-  const pmrem=new THREE.PMREMGenerator(renderer);
-  const studio=new RoomEnvironment();
-  const environment=pmrem.fromScene(studio,.055);
-  world.scene.environment=environment.texture;
-  world.scene.environmentIntensity=.7;
-  studio.dispose();pmrem.dispose();
-  await breathe();
-  const pipeline=createCraneRenderer(renderer,world,quality().contactSamples);
+  const pipeline=createCraneRenderer(renderer,world);
   // Dijagnostika (samo uz ?debug u adresi): pristup rendereru i sceni iz konzole.
   const debug=new URLSearchParams(location.search).has('debug');
   if(debug)window.__gcCraneDebug={renderer,world,pipeline,THREE};
@@ -90,9 +78,9 @@ async function init() {
   await pipeline.compile();
   if(debug)console.info(`[crane] šejderi: ${Math.round(performance.now()-tCompile)} ms, programa ${renderer.info.programs.length}`);
   if(cancelled){pipeline.dispose();renderer.dispose();return;}
-  for(const p of [0,.3,.5,.62,.72,.86]) {
+  for(const p of [0,.2,.4,.5,.62,.72,.86]) {
     const tw=performance.now();
-    world.update(p,1.6,1);renderer.shadowMap.needsUpdate=true;pipeline.render(1);
+    world.update(p,1.6);pipeline.setStyle(p);pipeline.render(1);
     if(debug)console.info(`[crane] zagrijavanje p=${p}: ${Math.round(performance.now()-tw)} ms, programa ${renderer.info.programs.length}: ${renderer.info.programs.slice(-12).map(x=>x.name).join(',')}`);
     await new Promise(r=>setTimeout(r,0));
     if(cancelled){pipeline.dispose();renderer.dispose();return;}
@@ -110,7 +98,7 @@ async function init() {
     const sync=()=>gl.readPixels(0,0,1,1,gl.RGBA,gl.UNSIGNED_BYTE,pixel);
     const cost=(ratio,ao=1)=>{
       renderer.setPixelRatio(ratio);renderer.setSize(w,h,false);pipeline.setSize(w,h);
-      world.update(.45,w/h,1);renderer.shadowMap.needsUpdate=true;pipeline.render(ao);sync();
+      world.update(.45,w/h);renderer.shadowMap.needsUpdate=true;pipeline.render(ao);sync();
       const t=performance.now();
       for(let i=0;i<2;i++){renderer.shadowMap.needsUpdate=true;pipeline.render(ao);}
       sync();return (performance.now()-t)/2;
@@ -198,6 +186,14 @@ async function init() {
   // stalno sporo (< ~42 fps), rezolucija se spusti za korak (ali ne ispod rezolucije ekrana);
   // ako je stalno brzo, podigne se nazad ka punoj. Promjena se primijeni tek kad skrol stane,
   // da se usred pokreta ne realocira platno (to bi bio trzaj).
+  // Parallax pozadinskog rastera za mišem (samo precizan pokazivač).
+  const mouse={x:0,y:0},mouseTarget={x:0,y:0};
+  let wmStage=null;
+  const onPointer=e=>{
+    if(document.documentElement.hasAttribute('data-past-hero')||reduced.matches)return;
+    mouseTarget.x=e.clientX/window.innerWidth*2-1;mouseTarget.y=e.clientY/window.innerHeight*2-1;requestDraw();
+  };
+  if(matchMedia('(pointer: fine)').matches)window.addEventListener('pointermove',onPointer,{passive:true});
   let frameAvg=16,slowRun=0,fastRun=0,wantedCap=resolutionCap;
   function govern(ms,continuous) {
     if(!continuous)return;
@@ -223,42 +219,28 @@ async function init() {
     const gapMs=now-lastTime;
     govern(gapMs,gapMs>0&&gapMs<60);
     const dt=Math.min(.1,(now-lastTime)/1000||1/60);lastTime=now;
+    mouse.x+=(mouseTarget.x-mouse.x)*(1-Math.exp(-4*dt));mouse.y+=(mouseTarget.y-mouse.y)*(1-Math.exp(-4*dt));
     // Lenis već ublažava skrol; ovdje samo mali dodatni filter, da scena ne kasni za točkićem.
     progress=Math.abs(targetProgress-progress)<.00015?targetProgress:progress+(targetProgress-progress)*(1-Math.exp(-22*dt));
-    // Postojeća priča se mjeri u "story vremenu"; posle STORY_END ide ulazak u enterijer.
-    const storyT=clamp(progress/STORY_END);
-    const interiorT=smooth(STORY_END,STORY_END+.08,progress);
-    const ambience=updateAmbience(storyT);
-    // U enterijeru se toplo svetlo povlači — soba treba da ostane svetla i vazdušasta.
-    world.lighting.fill.color.copy(coolFill).lerp(warmFill,ambience.warm*(1-interiorT));
-    // Full-width canvas throughout: lens framing holds the opening between columns.
-    const middleWidth=Math.min(window.innerWidth,1680)*(window.innerWidth<1200?.45:.47);
-    const framingCorrection=Math.max(1,frameHeight/middleWidth)/Math.max(1,frameHeight/width);
-    const framing=window.innerWidth<1024?1+.13*smooth(.32,.62,storyT):framingCorrection*(1+.22*smooth(.28,.58,storyT));
-    const openingFrame=framing;
-    const siteEntry=smooth(.68,.88,storyT);
-    const state=world.update(progress,width/frameHeight,openingFrame+(1-openingFrame)*siteEntry);
-    cover.dataset.siteEntry=siteEntry.toFixed(3);
+    const state=world.update(progress,width/frameHeight);
+    pipeline.setStyle(progress,mouse,window.innerWidth<768);
+    // Boja wordmarka prati poglavlje ispod njega (na plavom bloku je svijetao).
+    const top=STAGES[stageAt(progress,.5,.96,window.innerWidth<768?6:12)];
+    if(top!==wmStage){
+      wmStage=top;
+      const n=parseInt(top.paper.slice(1),16),lum=(.2126*(n>>16&255)+.7152*(n>>8&255)+.0722*(n&255))/255;
+      document.documentElement.style.setProperty('--hero-wm',lum<.5?top.ink:'var(--ink)');
+    }
+    cover.style.setProperty('--scene-progress',progress.toFixed(4));
     // Kucanje rečenice: počinje kad kamera izađe kroz prozor, a završi na dnu hero-a.
     // Pisanje: prvih ~72% outra piše rečenicu, ostatak je mirovanje na gotovom tekstu.
     outroP=Math.abs(targetOutro-outroP)<.0005?targetOutro:outroP+(targetOutro-outroP)*(1-Math.exp(-8*dt));
     cover.style.setProperty('--type-p',(reduced.matches?1:clamp((outroP-.04)/.68)).toFixed(4));
-    // Sjenke zavise samo od geometrije i svjetla (fiksno), ne od kamere. Geometrija se mijenja
-    // do kraja rasta fasade (~.76); posle toga se pomjera samo kamera, pa mapa ostaje ista.
-    // Dok se skroluje, na slabijem GPU-u (rezolucija ograničena) mapa se obnavlja svaki drugi
-    // kadar — sjenka kasni 16 ms, što se ne vidi; kad skrol stane, obnovi se odmah.
-    const shadowKey=progress<.77?progress.toFixed(5):'static';
-    const settling=progress===targetProgress;
-    if(shadowKey!==lastShadowKey&&(settling||resolutionCap>=2||!skippedShadow)) {
-      renderer.shadowMap.needsUpdate=true;lastShadowKey=shadowKey;skippedShadow=true;
-    } else if(shadowKey!==lastShadowKey)skippedShadow=false;
-    const siteDissolve=smooth(.43,.46,storyT)*(1-smooth(.57,.61,storyT));
-    const districtDissolve=smooth(.70,.73,storyT)*(1-smooth(.82,.86,storyT));
-    // Linijski crtež; na samom kraju (izlaz kroz prozor u nebo) scena se rastvori u ravnu 2D sliku.
+    // Na samom kraju (izlaz kroz prozor u nebo) scena se rastvori u raster neba.
     pipeline.render(1,1-smooth(.95,.995,progress));
     cover.dataset.sceneChapter=String(state.chapter+1);
     cover.dataset.sceneProgress=progress.toFixed(3);
-    if(progress!==targetProgress||outroP!==targetOutro)requestDraw();
+    if(progress!==targetProgress||outroP!==targetOutro||Math.abs(mouse.x-mouseTarget.x)+Math.abs(mouse.y-mouseTarget.y)>.002)requestDraw();
     else applyGovernor();
   }
   const observer=new ResizeObserver(measure);observer.observe(viewport);observer.observe(cover);
@@ -273,6 +255,7 @@ async function init() {
   const onContextRestored=()=>location.reload();
   canvas.addEventListener('webglcontextlost',onContextLost);
   canvas.addEventListener('webglcontextrestored',onContextRestored);
+  pipeline.onBackground(()=>requestDraw());
   cover.classList.add('crane-ready');cover.classList.toggle('crane-reduced',reduced.matches);measure();
   // Javljamo ostatku stranice da se raspored promijenio (sekcije su više niske dok scena ne krene),
   // pa GSAP/ScrollTrigger treba ponovo da izmjeri pozicije. Flag je i za uvodni splash: on
@@ -284,7 +267,8 @@ async function init() {
   window.__gcCrane={
     dispose() {
       observer.disconnect();intersection.disconnect();
-      window.removeEventListener('scroll',onScroll);window.removeEventListener('resize',measure);
+      window.removeEventListener('scroll',onScroll);window.removeEventListener('resize',measure);window.removeEventListener('pointermove',onPointer);
+      document.documentElement.style.removeProperty('--hero-wm');
       document.removeEventListener('visibilitychange',requestDraw);
       reduced.removeEventListener('change',onReducedChange);
       canvas.removeEventListener('webglcontextlost',onContextLost);
