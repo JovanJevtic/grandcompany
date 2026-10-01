@@ -6,8 +6,8 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 
-// Četiri prednosti (PDF, tačka 3). Lijevo stoji panel (veliki naslov u stepenastim redovima, tekst
-// dolje desno, dugme), desno se skrola po jedna prednost sa generativnim linijskim crtežom
+// Četiri prednosti (PDF, tačka 3). Desno stoji panel (veliki naslov u stepenastim redovima, tekst
+// dolje desno, dugme), lijevo se skrola po jedna prednost sa generativnim linijskim crtežom
 // (zrake, torus, globus, prstenovi tačaka) koji se okreće dok se skrola — crtež se računa iz
 // ugla `t`, pa ga skrol "vrti" bez ijednog video ili slikovnog fajla.
 
@@ -173,8 +173,8 @@ export default function BrandsSplit() {
 
   return (
     <section ref={root} id="prednosti" className="relative z-20 md:grid md:grid-cols-2" aria-label="Zašto Grand Company">
-      {/* Lijevi panel: raspored kao na referenci — naslov u stepenastim redovima gore, tekst dolje desno, dugme */}
-      <div className="split-panel bg-navy text-bg md:sticky md:top-0 md:h-dvh md:self-start">
+      {/* Panel (desno na desktopu, md:order-2): naslov u stepenastim redovima gore, tekst dolje desno, dugme */}
+      <div className="split-panel bg-navy text-bg md:order-2 md:sticky md:top-0 md:h-dvh md:self-start">
         <h2 data-head className="split-panel__head display invisible">
           <span className="block">Četiri</span>
           <span className="block text-right">prednosti</span>
@@ -191,7 +191,8 @@ export default function BrandsSplit() {
         </div>
       </div>
 
-      <div className="bg-bg">
+      {/* Prednosti sa crtežima: lijevo na desktopu */}
+      <div className="bg-bg md:order-1">
         {USPS.map((u, i) => (
           <article
             key={u.title}

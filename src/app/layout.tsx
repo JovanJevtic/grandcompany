@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, Inter, Inter_Tight, Montserrat } from "next/font/google";
+import { Barlow_Condensed, Bodoni_Moda, Inter, Inter_Tight, Montserrat } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -29,6 +29,13 @@ const heavy = Montserrat({
   variable: "--font-heavy",
   subsets: ["latin", "latin-ext"],
   weight: ["700", "800", "900"],
+});
+
+// Navbar: zbijeni masni verzal (ćelije trake, preklopnik, Kupuj).
+const condensed = Barlow_Condensed({
+  variable: "--font-cond",
+  subsets: ["latin", "latin-ext"],
+  weight: ["600", "700"],
 });
 
 // Debeli grotesk za sitne oznake u verzalu (hero, bento kartice) — kontrast tankom Prettywise-u.
@@ -65,7 +72,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${serif.variable} ${sans.variable} ${heavy.variable} ${grotesk.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${serif.variable} ${sans.variable} ${heavy.variable} ${grotesk.variable} ${condensed.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}

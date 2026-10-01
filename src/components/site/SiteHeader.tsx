@@ -173,6 +173,9 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' |
             </span>
             <Link href="/prodavnica" className="nav__buy">
               Kupuj
+              <svg viewBox="0 0 24 12" className="nav__buy-arrow" fill="none" stroke="currentColor" strokeWidth={1.6} aria-hidden>
+                <path d="M0 6h22M17 1l5 5-5 5" />
+              </svg>
             </Link>
             <button type="button" onClick={openCart} className="nav__cart" aria-label={`Korpa, ${count} artikala`}>
               <span className="nav__cart-bg" aria-hidden />
