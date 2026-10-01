@@ -7,6 +7,7 @@ import UseArt from '@/components/landing/UseArt'
 import { axisShift } from '@/components/landing/iso'
 import Cta from '@/components/ui/Cta'
 import Pw from '@/components/ui/Pw'
+import LogoMark from '@/components/site/LogoMark'
 import { COMPANY } from '@/gc/gc'
 import { drawOnScroll } from '@/lib/draw'
 import { gsap, useGSAP } from '@/lib/gsap'
@@ -15,15 +16,19 @@ import { revealChars } from '@/lib/reveal'
 
 const COLS: { title: string; links: [string, string][] }[] = [
   { title: 'Platforma', links: [['B2B portal', '/portal'], ['Katalog', '/prodavnica'], ['Kalkulator', '/prodavnica#kalkulator'], ['Vodiči', '/vodici']] },
-  { title: 'Kupovina', links: [['Dostava', '/dostava'], ['Povrat robe', '/povrat-robe'], ['Načini plaćanja', '/nacini-placanja']] },
-  { title: 'Pravno', links: [['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']] },
+  {
+    title: 'Kupovina i pravno',
+    links: [['Dostava', '/dostava'], ['Povrat robe', '/povrat-robe'], ['Načini plaćanja', '/nacini-placanja'], ['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']],
+  },
 ]
+// Ćelija srednjeg pojasa: na telefonu dvije kolone (lijeva ima liniju desno), na desktopu pet u redu.
+const CELL = 'border-b border-bg/15 px-5 py-10 md:px-10 md:py-12'
 
 // Podnožje u tri pojasa, odvojena tankim linijama:
 // 1) poziv (serif naslov, rečenica, CTA) lijevo, a desno pregradni zid koji se SKLAPA dok footer ulazi
 //    u ekran — slojevi (ploča, profili, vuna, ploča) dolaze iz rastavljenog položaja na svoje mjesto;
-// 2) mreža ćelija sa kontaktom i linkovima (sitni sans u verzalu);
-// 3) veliki wordmark koji izroni slovo po slovo + jedan red sa podacima firme.
+// 2) pet ćelija: kontakt, telefoni, ZNAK u sredini, platforma, kupovina i pravno;
+// 3) veliki wordmark koji izroni slovo po slovo + potpis studija.
 export default function Footer() {
   const root = useRef<HTMLElement>(null)
 
@@ -106,8 +111,8 @@ export default function Footer() {
       </div>
 
       {/* 2. Kontakt i linkovi: ćelije sa tankim linijama */}
-      <div className="grid grid-cols-2 text-[11.5px] md:grid-cols-5 [&>*]:border-b [&>*]:border-bg/15 [&>*:nth-child(odd)]:border-r md:[&>*:not(:last-child)]:border-r [&>*:last-child]:col-span-2 [&>*:last-child]:border-r-0 md:[&>*:last-child]:col-span-1">
-        <div className="px-5 py-10 md:px-10 md:py-12">
+      <div className="grid grid-cols-2 text-[11.5px] md:grid-cols-5">
+        <div className={`${CELL} border-r`}>
           <p className="mb-6 opacity-45">Sjedište i stovarište</p>
           <address className="not-italic leading-[1.9]">
             <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="group block" aria-label="Stovarište na Google mapi">
@@ -127,7 +132,7 @@ export default function Footer() {
             </a>
           </address>
         </div>
-        <div className="px-5 py-10 md:px-10 md:py-12">
+        <div className={`${CELL} md:border-r`}>
           <p className="mb-6 opacity-45">Telefoni i radno vrijeme</p>
           <dl className="grid gap-1 leading-[1.6]">
             <dt className="opacity-60">Veleprodaja / skladište</dt>
@@ -146,8 +151,14 @@ export default function Footer() {
             <dd className="tabular-nums">07–17 · 07–14 · neradna</dd>
           </dl>
         </div>
-        {COLS.map((c) => (
-          <div key={c.title} className="px-5 py-10 md:px-10 md:py-12">
+        {/* Znak u srednjoj ćeliji; na telefonu ide prvi, preko cijele širine */}
+        <div className={`${CELL} order-first col-span-2 flex items-center justify-center md:order-none md:col-span-1 md:border-r`}>
+          <Link href="/" aria-label="Grand Company — početna" className="block w-[96px] transition-opacity hover:opacity-70 md:w-[min(132px,70%)]">
+            <LogoMark className="block h-auto w-full" />
+          </Link>
+        </div>
+        {COLS.map((c, i) => (
+          <div key={c.title} className={`${CELL} ${i === 0 ? 'border-r' : ''}`}>
             <p className="mb-6 opacity-45">{c.title}</p>
             <ul className="flex flex-col gap-2.5">
               {c.links.map(([label, href]) => (
@@ -169,15 +180,9 @@ export default function Footer() {
         </p>
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-2 border-t border-bg/15 px-5 py-5 text-[10.5px] opacity-50 md:flex-row md:px-10">
-        <p>
-          © {COMPANY.founded}–2026 {COMPANY.name} · JIB {COMPANY.jib} · PIB {COMPANY.pib} · MBS {COMPANY.mbs} ·{' '}
-          <Link href="/o-prodavcu" className="ulink">
-            Podaci o prodavcu
-          </Link>
-        </p>
-        <p>Demo prodavnica — narudžbe se još ne šalju</p>
-      </div>
+      <p className="px-5 pb-8 pt-2 text-center text-[10.5px] tracking-[0.04em] opacity-50">
+        Kreirano od studija Blink kao demo · oktobar 2026.
+      </p>
     </footer>
   )
 }
