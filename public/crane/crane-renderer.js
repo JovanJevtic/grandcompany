@@ -76,7 +76,10 @@ export function createCraneRenderer(renderer,world,contactSamples=32) {
       composer.setSize(width,height);
       // Kontaktne sjenke (SSAO) su meke, pa se računaju na pola rezolucije — četvrtina posla,
       // a razlika se ne vidi. Rezultat se rastegne preko pune slike u koraku miješanja.
-      contact.setSize(Math.max(1,Math.round(width*ratio/2)),Math.max(1,Math.round(height*ratio/2)));
+      // Kontaktne sjenke (SSAO) na pola rezolucije pa razvučene daju vidljivo "zrno" (šum iz
+      // kernela se uveća 2×). Do 1,5× ih računamo u punoj rezoluciji; tek iznad toga upola.
+      const ssao=ratio<=1.5?1:.5;
+      contact.setSize(Math.max(1,Math.round(width*ratio*ssao)),Math.max(1,Math.round(height*ratio*ssao)));
       antialias.uniforms.resolution.value.set(1/(width*ratio),1/(height*ratio));
     },
     render(contactStrength=1) {

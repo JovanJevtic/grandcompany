@@ -27,7 +27,9 @@
   /* Kontrast: cinober (signal sa gradilišta). Samo kursor, cijena na hover-u, tačke, aktivno stanje. */
   --signal: #e4472a;
   --hair: 1.25px;
-  --wm-fs: 10.6vw;
+  /* veličina wordmarka: tačna mjera za Prettywise "GRAND COMPANY" preko 93,9% širine (JS je samo
+     potvrdi). Ranije je ovdje stajala mjera za stari font, pa je hero na startu "skakao". */
+  --wm-fs: 12.5169vw;
   --story-header: calc(16px + var(--wm-fs) * 0.862);
   /* Stari nazivi fontova (hero, kaolin) pokazuju na novi serif */
   --font-inter-tight: var(--font-text);

@@ -7,8 +7,8 @@
 import * as THREE from '../vendor/three.module.min.js';
 import {createScrollAmbience} from './crane-ambience.js?v=17';
 import {RoomEnvironment} from '../vendor/RoomEnvironment.js';
-import {createCraneRenderer} from './crane-renderer.js?v=22';
-import {craneQuality} from './crane-quality.js?v=17';
+import {createCraneRenderer} from './crane-renderer.js?v=23';
+import {craneQuality} from './crane-quality.js?v=18';
 import {createCraneScene, clamp, smooth, STORY_END} from './crane-scene.js?v=30';
 
 const cover=document.querySelector('.construction-story');
@@ -137,7 +137,15 @@ async function init() {
     cover.dataset.gpuCost=`${low.toFixed(1)}/${high.toFixed(1)}`;
     return ratio;
   }
-  resolutionCap=pickResolution();
+  // Mjerenje na startu se radi dok se stranica još učitava (fontovi, slike, splash), pa ispadne
+  // pesimistično i scena ostane zaključana na mutnih 1×. Zato: kreće se od pune rezolucije, ali
+  // nikad ispod rezolucije ekrana (pod = devicePixelRatio), a dalje odlučuje regulator u draw().
+  const native=Math.max(1,Math.min(2,window.devicePixelRatio||1));
+  const floorRatio=Math.min(quality().pixelRatio,native);
+  {
+    const startup=pickResolution();
+    resolutionCap=Math.max(floorRatio,startup);
+  }
 
   let sizeKey='';
   function measure() {
@@ -184,8 +192,35 @@ async function init() {
     requestDraw();
   }
   function requestDraw() {if(!frame&&active&&!document.hidden)frame=requestAnimationFrame(draw);}
+  // ——— Regulator rezolucije ———
+  // Dok se skroluje (kadrovi idu jedan za drugim) prati se prosječno trajanje kadra. Ako je
+  // stalno sporo (< ~42 fps), rezolucija se spusti za korak (ali ne ispod rezolucije ekrana);
+  // ako je stalno brzo, podigne se nazad ka punoj. Promjena se primijeni tek kad skrol stane,
+  // da se usred pokreta ne realocira platno (to bi bio trzaj).
+  let frameAvg=16,slowRun=0,fastRun=0,wantedCap=resolutionCap;
+  function govern(ms,continuous) {
+    if(!continuous)return;
+    frameAvg+=(ms-frameAvg)*.1;
+    if(frameAvg>24){slowRun++;fastRun=0;}else if(frameAvg<13){fastRun++;slowRun=0;}else{slowRun=0;fastRun=0;}
+    const full=quality().pixelRatio;
+    if(slowRun>40){
+      slowRun=0;
+      if(wantedCap>floorRatio+.01)wantedCap=Math.max(floorRatio,Math.min(wantedCap,full)-.15);
+      else if(contactEnabled&&frameAvg>32)contactEnabled=false; // posljednji korak: bez SSAO
+    } else if(fastRun>150){
+      fastRun=0;
+      if(!contactEnabled)contactEnabled=true;
+      else wantedCap=Math.min(full,Math.max(wantedCap,floorRatio)+.1);
+    }
+  }
+  function applyGovernor() {
+    if(Math.abs(wantedCap-resolutionCap)<.01)return;
+    resolutionCap=wantedCap;sizeKey='';measure();
+  }
   function draw(now) {
     frame=0;
+    const gapMs=now-lastTime;
+    govern(gapMs,gapMs>0&&gapMs<60);
     const dt=Math.min(.1,(now-lastTime)/1000||1/60);lastTime=now;
     // Lenis već ublažava skrol; ovdje samo mali dodatni filter, da scena ne kasni za točkićem.
     progress=Math.abs(targetProgress-progress)<.00015?targetProgress:progress+(targetProgress-progress)*(1-Math.exp(-22*dt));
@@ -222,6 +257,7 @@ async function init() {
     cover.dataset.sceneChapter=String(state.chapter+1);
     cover.dataset.sceneProgress=progress.toFixed(3);
     if(progress!==targetProgress||outroP!==targetOutro)requestDraw();
+    else applyGovernor();
   }
   const observer=new ResizeObserver(measure);observer.observe(viewport);observer.observe(cover);
   if(wordmark)observer.observe(wordmark);
