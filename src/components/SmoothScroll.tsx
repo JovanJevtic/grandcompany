@@ -40,10 +40,19 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
 
     const lenis = lenisRef.current?.lenis
     lenis?.on('scroll', ScrollTrigger.update)
+    // Visina stranice se mijenja i posle učitavanja (pinovane sekcije, 3D scena, slike). Lenis pamti
+    // staru granicu skrola, pa bi stao prije dna (footer odsječen). Mjeri se ponovo poslije svakog
+    // ScrollTrigger osvježavanja i kad se promijeni visina tijela stranice.
+    const resize = () => lenis?.resize()
+    ScrollTrigger.addEventListener('refresh', resize)
+    const ro = new ResizeObserver(resize)
+    ro.observe(document.body)
 
     return () => {
       gsap.ticker.remove(update)
       lenis?.off('scroll', ScrollTrigger.update)
+      ScrollTrigger.removeEventListener('refresh', resize)
+      ro.disconnect()
     }
   }, [])
 

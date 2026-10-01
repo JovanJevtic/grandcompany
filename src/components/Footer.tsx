@@ -126,7 +126,7 @@ export default function Footer() {
         </div>
 
         {/* Dno: podaci lijevo, potpis studija desno */}
-        <div className="flex flex-col gap-6 px-5 pb-6 pt-8 md:flex-row md:items-end md:justify-between md:px-8">
+        <div className="flex flex-col gap-6 px-5 pb-20 pt-10 md:flex-row md:items-end md:justify-between md:px-8 md:pb-16 md:pr-20">
           <p className="max-w-[78ch] text-[11px] leading-[1.8] opacity-55">
             {COMPANY.address} · {COMPANY.phoneLandline} · {COMPANY.phoneMobile}
             <br />
