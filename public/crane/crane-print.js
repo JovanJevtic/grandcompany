@@ -19,7 +19,7 @@ import * as THREE from '../vendor/three.module.min.js';
 // bg: koliko se vidi pozadina (0..1); at: progres kad prelaz u ovo poglavlje počinje;
 // city: 0 = pozadina je samo nebo u oblacima, 1 = grad sa neboderima (tek kad se izađe kroz prozor).
 export const STAGES = [
-  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .2, floor: 0, city: 0 },  // kran se okreće
+  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 4.4, angle: 45, bg: .2, floor: 0, city: 0 },  // kran se okreće
   { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .24, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
   { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
   // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
@@ -100,6 +100,8 @@ const PRINT_FRAG = /* glsl */ `
   uniform float edgeW;   // 1 = crta obris; manje = bez obrisa prema papiru (tlo)
   uniform float lineOnly; // 1 = samo linije: površina je papir, crtaju se samo obrisi (kran)
   uniform float someDots; // 1 = prozor u linijskom crtežu: otprilike svaki drugi ostaje u tačkama
+  uniform float paperOnly; // 1 = površina je čist papir (tlo), bez tačaka i bez obrisa
+  uniform float inside;    // 1 = objekat iz sobe (enterijer)
   varying vec3 vInst;
   varying float vDepth;
   varying vec3 vWorld;
@@ -145,9 +147,11 @@ const PRINT_FRAG = /* glsl */ `
     tone *= 1.0 - .92 * smoothstep(fog.x, fog.y, vDepth);
     float lo = lineOnly;
     if (someDots > .5 && fract(sin(dot(floor(vInst * 2.0), vec3(12.99, 78.23, 37.71))) * 43758.55) > .5) lo = 0.0;
-    tone *= 1.0 - lo;
+    tone *= (1.0 - lo) * (1.0 - paperOnly);
     // Linijski objekti (kran) pišu pokrivenost .95 umjesto 1, da ih završni shader prepozna.
-    gl_FragColor = vec4(n.xy * .5 + .5, tone, lo > .5 ? .95 : edgeW);
+    // Pokrivenost nosi i oznake: .95 = linijski objekat, .92 = linijski objekat u zgradi sa sobom,
+    // .85 = soba, ostalo edgeW. (Linije: .9–.97; "unutra": .8–.935.)
+    gl_FragColor = vec4(n.xy * .5 + .5, tone, lo > .5 ? (inside > .5 ? .92 : .95) : inside > .5 ? .85 : edgeW);
   }
 `;
 
@@ -170,6 +174,7 @@ const POST_FRAG = /* glsl */ `
   uniform float bgC[${N}];
   uniform float floorC[${N}];
   uniform float cityC[${N}];
+  uniform float room; // 1 = kamera je u sobi: sve van sobe se crta kao završni plavi grad
   uniform float wipe[${N}];
   varying vec2 vUv;
 
@@ -209,10 +214,13 @@ const POST_FRAG = /* glsl */ `
     vec3 paper = paperC[0], ink = inkC[0];
     float cell = cellC[0], ang = angleC[0], bgS = bgC[0], flo = floorC[0], city = cityC[0];
     for (int i = 1; i < ${N}; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; flo = floorC[i]; city = cityC[i]; }
-    cell *= dpr;
-
     // ——— G-buffer ———
     vec4 g0 = texture2D(tG, vUv);
+    // Kamera u sobi: piksel koji nije soba (pogled kroz prozor) je odmah završni plavi grad.
+    float isIn = step(.8, g0.a) * step(g0.a, .935);
+    float outside = room * (1.0 - isIn) * (si == 2 ? 1.0 : 0.0);
+    if (outside > .5) { paper = paperC[${N - 1}]; ink = inkC[${N - 1}]; cell = cellC[${N - 1}]; ang = angleC[${N - 1}]; bgS = bgC[${N - 1}]; flo = floorC[${N - 1}]; city = cityC[${N - 1}]; }
+    cell *= dpr;
     vec2 xy0 = g0.rg * 2.0 - 1.0;
     vec3 n0 = vec3(xy0, sqrt(max(0.0, 1.0 - dot(xy0, xy0))));
     float a0 = g0.a;
@@ -235,7 +243,7 @@ const POST_FRAG = /* glsl */ `
       float a1 = texture2D(tG, vUv + dir * 3.0).a, a2 = texture2D(tG, vUv + dir * 7.0).a;
       nearLine = max(nearLine, max(step(.9, a1) * step(a1, .97), step(.9, a2) * step(a2, .97)));
     }
-    bgTone *= 1.0 - nearLine * fill;
+    bgTone *= 1.0 - nearLine * fill * (1.0 - outside);
 
     // ——— ivice ———
     vec2 px = max(1.0, 1.1 * dpr) / resolution;
@@ -271,7 +279,7 @@ const POST_FRAG = /* glsl */ `
     // ——— ton ———
     float objTone = g0.b;
     float solid = a0 * smoothstep(.78, .86, objTone);
-    float t = mix(bgTone, mix(bgTone, objTone, a0), fill);
+    float t = mix(bgTone, mix(bgTone, objTone, a0 * (1.0 - outside)), fill);
 
     // ——— AM raster: tačka po ćeliji rotirane mreže, poluprečnik ~ sqrt(ton) ———
     float ca = cos(radians(ang)), sn = sin(radians(ang));
@@ -287,7 +295,7 @@ const POST_FRAG = /* glsl */ `
     dotInk = max(dotInk, step(.985, t));
 
     // ——— sklapanje ———
-    float edgeF = fill;
+    float edgeF = fill * (1.0 - outside);
     // linije mastila na svijetlim površinama; na punom mastilu linije su "izbijene" (boja papira)
     float inkLine = max(inner * (1.0 - solid), silhouette * a0) * edgeF;
     float knock = knockLine * solid * edgeF;
@@ -318,14 +326,15 @@ export function createCraneRenderer(renderer, world) {
   }
   // Isti materijal može biti i na kranu (samo linije) i na zgradi, pa su to dva print materijala.
   const lineCache = new Map();
-  function printFor(src, line) {
-    const store = line ? lineCache : cache;
+  const insideCache = new Map();
+  function printFor(src, line, inside) {
+    const store = inside ? insideCache : line ? lineCache : cache;
     let pm = store.get(src);
     if (pm) return pm;
     const defines = {};
     if (src.map) defines.PRINT_MAP = '';
     pm = new THREE.ShaderMaterial({
-      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, map: { value: src.map || null } },
+      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, paperOnly: { value: src.userData.paper ? 1 : 0 }, inside: { value: inside ? 1 : 0 }, map: { value: src.map || null } },
       defines,
       side: src.side,
       vertexShader: PRINT_VERT,
@@ -337,19 +346,20 @@ export function createCraneRenderer(renderer, world) {
   // Zamjena materijala samo za vrijeme crtanja G-buffera (original ostaje za pretapanja i sl.).
   const swapped = [];
   function swapIn(root) {
-    walk(root, false);
+    walk(root, false, false);
   }
   // Kao traverseVisible, uz nasljeđivanje oznake `printLine` od roditelja (cijela grupa krana).
-  function walk(o, line) {
+  function walk(o, line, inside) {
     if (!o.visible) return;
     line = line || !!o.userData.printLine;
-    swapOne(o, line);
-    for (const c of o.children) walk(c, line);
+    inside = inside || !!o.userData.printInside;
+    swapOne(o, line, inside);
+    for (const c of o.children) walk(c, line, inside);
   }
-  function swapOne(o, line) {
+  function swapOne(o, line, inside) {
     if (!o.isMesh || !o.material || Array.isArray(o.material)) return;
     const src = o.material;
-    const pm = printFor(src, line);
+    const pm = printFor(src, line, inside);
     pm.uniforms.opacity.value = src.opacity;
     // Providno staklo koje ne piše dubinu (ograde, tuš, folija) se ne štampa: rasterizovano
     // bi dalo šum ivica. Ostala providnost (pretapanje sobe) ide kroz raster tačaka.
@@ -385,6 +395,7 @@ export function createCraneRenderer(renderer, world) {
     angleC: { value: STAGES.map((s) => s.angle) },
     bgC: { value: STAGES.map((s) => s.bg) },
     floorC: { value: STAGES.map((s) => s.floor) },
+    room: { value: 0 },
     cityC: { value: STAGES.map((s) => s.city) },
     wipe: { value: STAGES.map(() => 0) },
   };
@@ -453,6 +464,8 @@ export function createCraneRenderer(renderer, world) {
       uniforms.bgScale.value = .86 - .08 * Math.min(1, p / .5);
       // U sobi nema sunca: sjenčenje je mekše, pa enterijer ostane svijetao i čitljiv.
       const inside = Math.min(1, Math.max(0, (p - .62) / .1));
+      // Kamera je u sobi (vidi crane-scene: širi objektiv od .74–.8): kroz prozor se vidi plavi grad.
+      uniforms.room.value = p > .76 ? 1 : 0;
       shadeK.value = .78 - .45 * inside * inside * (3 - 2 * inside);
     },
     onBackground(fn) { onBg = fn; if (pending === 0) fn(); },
@@ -485,6 +498,7 @@ export function createCraneRenderer(renderer, world) {
       target?.dispose();
       for (const pm of cache.values()) pm.dispose();
       for (const pm of lineCache.values()) pm.dispose();
+      for (const pm of insideCache.values()) pm.dispose();
       quad.geometry.dispose();
       quad.material.dispose();
       uniforms.tBg.value?.dispose?.();

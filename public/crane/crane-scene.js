@@ -529,10 +529,13 @@ export function createCraneScene() {
   // Fasada je van `site` (koji je spojen u instance) da bi mogla da raste nezavisno.
   const finishRoot=group(scene,9,0,0);
   finishRoot.userData.printLine=true;
+  finishRoot.userData.printInside=true; // zgrada oko sobe (plafon, zidovi) nije "pogled kroz prozor"
   const finish=buildFinish({parent:finishRoot,box,rod,group,batch,m,pallet});
   finishRoot.visible=false;
   const ENTRY_Y=ENTRY*2.35+.2;
   const interiorRoot=new THREE.Group();
+  // Štampa: soba je "unutra"; dok je kamera u sobi, sve ostalo (kroz prozor) je plavi grad.
+  interiorRoot.userData.printInside=true;
   interiorRoot.position.set(9,ENTRY_Y,0);
   buildTowerBath({parent:interiorRoot,box,rod:(g,material,a,b,r)=>rod(g,material,a,b,r,true),m});
   scene.add(interiorRoot);
@@ -582,7 +585,7 @@ export function createCraneScene() {
   }
   // Tlo: veliki svijetli disk; u daljini se tačke prorijede i stapa se sa papirom (magla u crane-print).
   const groundMat=new THREE.MeshStandardMaterial({color:'#efede8'});
-  groundMat.userData.ink=.1;groundMat.userData.radial=[1,0,9,34];groundMat.userData.edgeW=.2;
+  groundMat.userData.ink=.1;groundMat.userData.radial=[1,0,9,34];groundMat.userData.edgeW=.2;groundMat.userData.paper=true; // tlo: čist papir, bez tačaka
   const ground=new THREE.Mesh(new THREE.CircleGeometry(90,64),groundMat);
   ground.rotation.x=-Math.PI/2;ground.position.y=-.02;scene.add(ground);
   // Betonski plato oko krana i zgrade — tamniji, da kran i zgrada "stoje" na nečemu.
