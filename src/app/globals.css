@@ -1646,7 +1646,7 @@ footer li + li {
 }
 
 /* Početna: puno praznog prostora između sekcija (od "Sistemi" nadalje; hero, prelaz i uvod ostaju spojeni) */
-.home-flow > :is(section, footer):nth-child(n + 5) {
+.home-flow > :is(section, footer, .pin-spacer, [data-pinwrap]):nth-child(n + 5) {
   margin-top: clamp(96px, 16vh, 220px);
 }
 
@@ -1699,4 +1699,22 @@ html[data-motion] [data-up] {
 }
 html[data-motion] [data-curtain] {
   clip-path: inset(100% 0% 0% 0%);
+}
+
+/* Dok se fontovi ne učitaju (layout.tsx), sadržaj je nevidljiv: nema preslagivanja teksta. */
+html[data-fonts] main {
+  opacity: 0;
+}
+main {
+  transition: opacity 0.2s ease;
+}
+
+/* Dijelovi koji zavise od stanja u browseru (B2B prijava, korpa) pokažu se tek kad React preuzme
+   stranicu — server ne zna to stanje, pa bi se inače vidjela zamjena gost → partner (skok). */
+html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-count, body > footer, main > footer) {
+  opacity: 0;
+}
+[data-client-state],
+.nav__mode-desk {
+  transition: opacity 0.2s ease;
 }

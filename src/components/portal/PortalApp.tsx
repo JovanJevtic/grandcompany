@@ -51,7 +51,7 @@ export default function PortalApp() {
   const items = cartCount(cart)
 
   return (
-    <div>
+    <div data-client-state>
       {/* Traka portala: dijelovi lijevo (vodoravni skrol na telefonu), nalog desno */}
       <nav
         aria-label="B2B portal"

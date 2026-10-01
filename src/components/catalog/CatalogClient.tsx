@@ -135,7 +135,7 @@ export default function CatalogClient() {
       {/* Najprodavanije: zaglavlje, grupe, mreža ćelija sa tankim linijama */}
       <div id="najprodavanije" className="mt-[22vh] scroll-mt-10 border-t border-ink/20">
         <div className="flex flex-wrap items-end justify-between gap-6 px-5 pb-8 pt-10 md:px-[3vw]">
-          <h2 className="display text-[clamp(40px,4vw,68px)]">
+          <h2 className="display text-[clamp(30px,9.5vw,68px)] md:text-[clamp(40px,4vw,68px)]">
             <Pw>Najprodavanije</Pw>
           </h2>
           <button type="button" onClick={() => setAll((v) => !v)} className="text-[11.5px] tracking-[0.1em] underline decoration-1 underline-offset-[5px] hover:text-signal">

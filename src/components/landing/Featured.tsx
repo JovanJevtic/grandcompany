@@ -4,13 +4,14 @@ import { useRef, useState } from 'react'
 import ProductCard from '@/components/catalog/ProductCard'
 import Cta from '@/components/ui/Cta'
 import Pw from '@/components/ui/Pw'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import { CATEGORIES, PRODUCTS, type CategoryId } from '@/lib/shop'
 
-// Najčešće birano: sekcija se pinuje i skrol, umjesto na sljedeću sekciju, vodi traku kartica
-// vodoravno. Kartice stoje stepenasto (prva najviša, svaka sljedeća niže, pa iznova), a dok
+// Najčešće birano: sekcija se zaustavi (CSS sticky u višem omotaču) i skrol, umjesto na sljedeću
+// sekciju, vodi traku kartica vodoravno. Sticky drži browser sam — bez GSAP pina, pa nema skoka
+// od jednog kadra na početku i kraju zaustavljanja (pin + smooth scroll je to radio). Kartice stoje stepenasto (prva najviša, svaka sljedeća niže, pa iznova), a dok
 // traka klizi svaka se njiše gore-dolje (talas), bez naginjanja — kartice ostaju uspravne.
 // Na mobilnom (i uz reduced-motion) traka je običan vodoravni swipe, bez pinovanja.
 
@@ -45,6 +46,7 @@ export default function Featured() {
   useGSAP(
     () => {
       const el = root.current!
+      const wrap = el.parentElement as HTMLElement
       const viewport = el.querySelector<HTMLElement>('[data-viewport]')!
       const track = el.querySelector<HTMLElement>('[data-track]')!
       const cards = gsap.utils.toArray<HTMLElement>('[data-fan]', track)
@@ -55,6 +57,13 @@ export default function Featured() {
       const mm = gsap.matchMedia()
       mm.add({ desktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)' }, () => {
         const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth)
+        // Omotač je visok koliko traje vožnja trake: ekran + dužina trake. Mjeri se prije svakog
+        // osvježavanja ScrollTriggera, da start/end budu izmjereni na tačnoj visini.
+        const setHeight = () => {
+          wrap.style.height = `${window.innerHeight + distance()}px`
+        }
+        setHeight()
+        ScrollTrigger.addEventListener('refreshInit', setHeight)
         const setters = cards.map((c) => gsap.quickSetter(c, 'y', 'px'))
         // Njihanje: zavisi od toga gdje je kartica u odnosu na sredinu ekrana.
         // Sredine kartica (u odnosu na ekran, kad je traka na x=0) mjere se samo pri osvježavanju;
@@ -83,10 +92,9 @@ export default function Featured() {
           x: () => -distance(),
           ease: 'none',
           scrollTrigger: {
-            trigger: el,
+            trigger: wrap,
             start: 'top top',
             end: () => `+=${distance()}`,
-            pin: true,
             scrub: 0.8,
             invalidateOnRefresh: true,
             onUpdate: fan,
@@ -99,6 +107,8 @@ export default function Featured() {
         measure()
         fan()
         return () => {
+          ScrollTrigger.removeEventListener('refreshInit', setHeight)
+          wrap.style.height = ''
           tween.scrollTrigger?.kill()
           tween.kill()
           gsap.set(cards, { clearProps: 'transform' })
@@ -112,7 +122,8 @@ export default function Featured() {
 
   return (
     <>
-      <section ref={root} id="najcesce" className="relative z-20 overflow-hidden bg-bg md:flex md:h-dvh md:flex-col md:justify-center">
+      <div data-pinwrap className="relative z-20 bg-bg">
+      <section ref={root} id="najcesce" className="relative z-20 overflow-hidden bg-bg md:sticky md:top-0 md:flex md:h-dvh md:flex-col md:justify-center">
         <div className="px-5 pt-[16vh] text-center md:pt-[11vh]">
           <h2 data-head className="display invisible text-[clamp(44px,5.4vw,96px)]">
             <Pw>
@@ -161,6 +172,7 @@ export default function Featured() {
           </div>
         </div>
       </section>
+      </div>
       {/* Predah poslije trake: više bijelog prostora prije sljedeće sekcije */}
       <div aria-hidden className="relative z-20 h-[12vh] bg-bg md:h-[30vh]" />
     </>

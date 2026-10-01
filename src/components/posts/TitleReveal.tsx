@@ -10,8 +10,16 @@ export default function TitleReveal({ children, className }: { children: ReactNo
     () => {
       const mm = gsap.matchMedia()
       mm.add(MQ, (context) => {
-        const split = revealChars(ref.current!, (context.conditions as { reduce: boolean }).reduce, 'top 95%')
-        return () => split.revert()
+        const el = ref.current!
+        // Podjela na slova malo mijenja širinu razmaka, pa se naslov može prelomiti u red manje i
+        // sve ispod bi skočilo naviše. Visina se zato zaključa na onu prije podjele.
+        const before = el.offsetHeight
+        const split = revealChars(el, (context.conditions as { reduce: boolean }).reduce, 'top 95%')
+        if (el.offsetHeight < before) el.style.minHeight = `${before}px`
+        return () => {
+          split.revert()
+          el.style.minHeight = ''
+        }
       })
     },
     { scope: ref },

@@ -25,6 +25,8 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
   // Scrollytelling uvijek kreće od vrha.
   useEffect(() => {
     if ('scrollRestoration' in history) history.scrollRestoration = 'manual'
+    // React je preuzeo stranicu: dijelovi koji zavise od podataka iz browsera (prijava, korpa) se sada pokažu.
+    document.documentElement.setAttribute('data-hydrated', '')
     window.scrollTo(0, 0)
   }, [])
 

@@ -71,7 +71,9 @@ export const metadata: Metadata = {
     "GRAND COMPANY d.o.o. iz Banje Luke: veleprodaja i maloprodaja građevinskog materijala, sistemi suhe gradnje i kamena vuna. Pristupačne cijene i stručan savjet.",
 };
 
-const MOTION_FLAG = "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.setAttribute('data-motion','')"
+// Prije prvog crtanja: (1) elementi koji izranjaju na skrol su odmah sakriveni; (2) sadržaj čeka
+// fontove (najviše 800 ms), da se prvi kadar ne nacrta rezervnim fontom pa preslaže (skok teksta).
+const MOTION_FLAG = "var d=document.documentElement;if(!matchMedia('(prefers-reduced-motion: reduce)').matches)d.setAttribute('data-motion','');if(document.fonts&&document.fonts.load){d.setAttribute('data-fonts','');var f=function(){d.removeAttribute('data-fonts')};Promise.all([document.fonts.load('800 1em Montserrat'),document.fonts.load('400 1em Inter'),document.fonts.load('500 1em Inter')]).then(f,f);setTimeout(f,800)}"
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
