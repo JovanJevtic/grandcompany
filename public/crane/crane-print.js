@@ -372,7 +372,7 @@ const POST_FRAG = /* glsl */ `
       float an = float(i) * .5236;
       vec2 dir = vec2(cos(an), sin(an)) * dpr / resolution;
       float a1 = texture2D(tG, vUv + dir * 3.0).a, a2 = texture2D(tG, vUv + dir * 7.0).a;
-      nearLine = max(nearLine, max(step(.9, a1) * step(a1, .97), step(.9, a2) * step(a2, .97)));
+      nearLine = max(nearLine, max(step(.875, a1) * step(a1, .985), step(.875, a2) * step(a2, .985)));
     }
     bgTone *= 1.0 - nearLine * fill * (1.0 - outside);
 
@@ -436,9 +436,10 @@ const POST_FRAG = /* glsl */ `
     float amount = max(max(dotInk, inkLine), solidN * edgeF);
     amount = mix(amount, 0.0, knock * .92);
     amount = max(amount, geoLine * fill * (1.0 - outside));
+    if (navyF > .5) amount = smoothstep(.45, .55, objTone);
     // istrošena štampa: sitne mrlje papira u mastilu i poneka mrlja mastila na papiru
     float fleck = smoothstep(.84, .9, grain * vnoise(frag / (5.0 * dpr) + 7.0) * 1.7);
-    amount *= 1.0 - fleck * .3 * (1.0 - geoLine);
+    amount *= 1.0 - fleck * .3 * (1.0 - geoLine) * (1.0 - navyF);
     vec3 col = mix(paper, ink, clamp(amount, 0.0, 1.0));
     gl_FragColor = vec4(col, 1.0);
   }
@@ -460,6 +461,7 @@ export function createCraneRenderer(renderer, world) {
   }
   // Isti materijal može biti i na kranu (samo linije) i na zgradi, pa su to dva print materijala.
   const lineCache = new Map();
+  const rodCache = new Map();
   const insideCache = new Map();
   function printFor(src, line, inside) {
     const store = inside ? insideCache : line ? lineCache : cache;
@@ -493,7 +495,14 @@ export function createCraneRenderer(renderer, world) {
   function swapOne(o, line, inside) {
     if (!o.isMesh || !o.material || Array.isArray(o.material) || o.userData.printKeep) return;
     const src = o.material;
-    const pm = printFor(src, line && !o.userData.printSolid && !src.userData.printSolid, inside);
+    const asLine = line && !o.userData.printSolid && !src.userData.printSolid;
+    let pm = printFor(src, asLine, inside);
+    // Šipke u linijskom crtežu su samo linija kroz sredinu: površina se ne crta i ne zaklanja.
+    if (asLine && o.geometry?.type === 'CylinderGeometry') {
+      let thin = rodCache.get(pm);
+      if (!thin) { thin = pm.clone(); thin.uniforms = pm.uniforms; thin.depthWrite = false; thin.colorWrite = false; rodCache.set(pm, thin); }
+      pm = thin;
+    }
     pm.uniforms.opacity.value = src.opacity;
     // Providno staklo koje ne piše dubinu (ograde, tuš, folija) se ne štampa: rasterizovano
     // bi dalo šum ivica. Ostala providnost (pretapanje sobe) ide kroz raster tačaka.
@@ -637,6 +646,7 @@ export function createCraneRenderer(renderer, world) {
       target?.dispose();
       for (const pm of cache.values()) pm.dispose();
       for (const pm of lineCache.values()) pm.dispose();
+      for (const pm of rodCache.values()) pm.dispose();
       for (const pm of insideCache.values()) pm.dispose();
       disposeLines();
       quad.geometry.dispose();
