@@ -16,14 +16,15 @@ import * as THREE from '../vendor/three.module.min.js';
 
 // ——— Poglavlja (sirovi progres skrola 0..1) ———
 // paper/ink: sRGB hex; cell: veličina ćelije rastera u CSS pikselima; angle: ugao rastera;
-// bg: koliko se vidi grad u pozadini (0..1); at: progres kad prelaz u ovo poglavlje počinje.
+// bg: koliko se vidi pozadina (0..1); at: progres kad prelaz u ovo poglavlje počinje;
+// city: 0 = pozadina je samo nebo u oblacima, 1 = grad sa neboderima (tek kad se izađe kroz prozor).
 export const STAGES = [
-  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .32, floor: 0 },  // kran se okreće
-  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30, floor: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
-  { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0 },   // enterijer — topao papir
+  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .32, floor: 0, city: 0 },  // kran se okreće
+  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
+  { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
   // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
   // grad se nazire samo kroz gustinu tačaka. Preko nje se ispisuje rečenica, svijetla i centrirana.
-  { at: .925, paper: '#2448e0', ink: '#13289c', cell: 6.0, angle: 30, bg: .55, floor: .2 },
+  { at: .925, paper: '#2448e0', ink: '#13289c', cell: 6.0, angle: 30, bg: .55, floor: .2, city: 1 },
 ];
 const WIPE = .045; // trajanje prelaza u progresu
 const COLS = 12;   // broj kolona stepenastog prelaza
@@ -143,6 +144,7 @@ const POST_FRAG = /* glsl */ `
   uniform sampler2D tG;
   uniform sampler2D tDepth;
   uniform sampler2D tBg;
+  uniform sampler2D tSky;
   uniform vec2 resolution;
   uniform float near, far, dpr, fill, bgAspect, cols;
   uniform vec2 bgShift;
@@ -153,6 +155,7 @@ const POST_FRAG = /* glsl */ `
   uniform float angleC[${N}];
   uniform float bgC[${N}];
   uniform float floorC[${N}];
+  uniform float cityC[${N}];
   uniform float wipe[${N}];
   varying vec2 vUv;
 
@@ -190,8 +193,8 @@ const POST_FRAG = /* glsl */ `
     int si = 0;
     for (int i = 1; i < ${N}; i++) if (switched(wipe[i], vUv, float(i))) si = i;
     vec3 paper = paperC[0], ink = inkC[0];
-    float cell = cellC[0], ang = angleC[0], bgS = bgC[0], flo = floorC[0];
-    for (int i = 1; i < ${N}; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; flo = floorC[i]; }
+    float cell = cellC[0], ang = angleC[0], bgS = bgC[0], flo = floorC[0], city = cityC[0];
+    for (int i = 1; i < ${N}; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; flo = floorC[i]; city = cityC[i]; }
     cell *= dpr;
 
     // ——— G-buffer ———
@@ -201,12 +204,13 @@ const POST_FRAG = /* glsl */ `
     float a0 = g0.a;
     float d0 = lin(texture2D(tDepth, vUv).r);
 
-    // ——— pozadina: tonska slika grada, "cover" preko platna ———
+    // ——— pozadina: tonska slika neba ili grada (po poglavlju), "cover" preko platna ———
     vec2 buv = vUv - .5;
     float sa = resolution.x / resolution.y;
     if (sa > bgAspect) buv.y *= bgAspect / sa; else buv.x *= sa / bgAspect;
     buv = buv * bgScale + .5 + bgShift;
-    float bgTone = (1.0 - texture2D(tBg, clamp(buv, .001, .999)).r) * bgS;
+    vec2 cuv = clamp(buv, .001, .999);
+    float bgTone = (1.0 - mix(texture2D(tSky, cuv).r, texture2D(tBg, cuv).r, city)) * bgS;
     bgTone = flo + (1.0 - flo) * bgTone;
 
     // ——— ivice ———
@@ -327,6 +331,7 @@ export function createCraneRenderer(renderer, world) {
     tG: { value: null },
     tDepth: { value: null },
     tBg: { value: blank },
+    tSky: { value: blank },
     bgAspect: { value: 1 },
     bgShift: { value: new THREE.Vector2() },
     bgScale: { value: 1 },
@@ -342,20 +347,24 @@ export function createCraneRenderer(renderer, world) {
     angleC: { value: STAGES.map((s) => s.angle) },
     bgC: { value: STAGES.map((s) => s.bg) },
     floorC: { value: STAGES.map((s) => s.floor) },
+    cityC: { value: STAGES.map((s) => s.city) },
     wipe: { value: STAGES.map(() => 0) },
   };
   let disposed = false;
-  new THREE.TextureLoader().load('/hero/city-tone.webp', (tex) => {
+  // Dvije tonske slike istog formata (2688×1152): nebo za početak, grad za kraj (posle prozora).
+  let pending = 2;
+  const loadTone = (url, key) => new THREE.TextureLoader().load(url, (tex) => {
     // Scena ugašena dok se slika učitavala: ne instaliramo je (inače ostaje u memoriji GPU-a).
     if (disposed) { tex.dispose(); return; }
     tex.colorSpace = THREE.NoColorSpace;
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     tex.generateMipmaps = true;
-    uniforms.tBg.value = tex;
-    blank.dispose();
+    uniforms[key].value = tex;
     uniforms.bgAspect.value = tex.image.width / tex.image.height;
-    onBg?.();
+    if (--pending === 0) { blank.dispose(); onBg?.(); }
   });
+  loadTone('/hero/sky-tone.webp', 'tSky');
+  loadTone('/hero/city-tone.webp', 'tBg');
   let onBg = null;
 
   const quad = new THREE.Mesh(
@@ -408,7 +417,7 @@ export function createCraneRenderer(renderer, world) {
       const inside = Math.min(1, Math.max(0, (p - .62) / .1));
       shadeK.value = .78 - .45 * inside * inside * (3 - 2 * inside);
     },
-    onBackground(fn) { onBg = fn; if (uniforms.tBg.value !== blank) fn(); },
+    onBackground(fn) { onBg = fn; if (pending === 0) fn(); },
     /** fill: 1 = puna scena; 0 = scena se rastvori u pozadinu (ostaje samo raster neba) */
     render(_contact = 1, fill = 1) {
       ensureTarget();
@@ -440,6 +449,7 @@ export function createCraneRenderer(renderer, world) {
       quad.geometry.dispose();
       quad.material.dispose();
       uniforms.tBg.value?.dispose?.();
+      uniforms.tSky.value?.dispose?.();
     },
   };
 }
