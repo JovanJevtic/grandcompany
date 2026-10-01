@@ -101,7 +101,7 @@ export default function Featured() {
               Najčešće <em>birano</em>
             </Pw>
           </h2>
-          <div role="tablist" aria-label="Grupa artikala" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-[12.5px]">
+          <div role="tablist" aria-label="Grupa artikala" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-[12.5px] max-md:-mx-5 max-md:gap-x-6 max-md:px-8 max-md:flex-nowrap max-md:justify-start max-md:overflow-x-auto max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden max-md:[&>*]:shrink-0 max-md:[&>*]:whitespace-nowrap">
             {chips.map((c) => {
               const on = c.id === cat
               return (

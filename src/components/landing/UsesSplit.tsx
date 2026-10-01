@@ -87,7 +87,7 @@ export default function UsesSplit() {
               </Pw></h3>
               <UseArt use={u.id} className="w-full max-w-[520px] text-bg/90" title={`Presjek sistema: ${u.name}`} />
               <p className="max-w-[34ch] text-[13px] leading-[1.4] opacity-80">{COPY[u.id]}</p>
-              <Link href={`/prodavnica?namjena=${u.id}`} className="ulink text-[12.5px]">
+              <Link href={`/prodavnica?namjena=${u.id}`} className="ulink text-[12.5px] max-md:py-3">
                 {artikala(items.length)} →
               </Link>
             </article>

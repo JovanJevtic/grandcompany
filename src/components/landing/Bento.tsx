@@ -71,7 +71,7 @@ export default function Bento() {
 
       <div className="mt-2.5 grid gap-2.5 md:grid-cols-[1fr_1fr_2fr]">
         {/* Plava kartica */}
-        <Link href="/dostava" data-bento className="group flex min-h-[460px] flex-col rounded-[18px] bg-cobalt p-7 text-white" data-cursor="Dostava">
+        <Link href="/dostava" data-bento className="group flex min-h-[340px] flex-col md:min-h-[460px] rounded-[18px] bg-cobalt p-7 text-white" data-cursor="Dostava">
           <span className="label">Isporuka</span>
           <span className="display mt-auto text-[clamp(30px,2.6vw,44px)]"><Pw>Kran na etažu</Pw></span>
           <span className="mt-4 flex flex-wrap gap-1.5">
@@ -85,7 +85,7 @@ export default function Bento() {
         </Link>
 
         {/* Tamna kartica */}
-        <Link href="/upit-za-izvodjace" data-bento className="group flex min-h-[460px] flex-col rounded-[18px] bg-[#1e1e1e] p-7 text-white" data-cursor="Upit">
+        <Link href="/upit-za-izvodjace" data-bento className="group flex min-h-[340px] flex-col md:min-h-[460px] rounded-[18px] bg-[#1e1e1e] p-7 text-white" data-cursor="Upit">
           <span className="label">Partneri</span>
           <span className="display mt-auto text-[clamp(30px,2.6vw,44px)]"><Pw>Račun za izvođače</Pw></span>
           <span className="mt-4 flex flex-wrap gap-1.5">
@@ -98,11 +98,11 @@ export default function Bento() {
         </Link>
 
         {/* Fotografija + svijetli panel */}
-        <Link href="/prodavnica" data-bento className="group flex min-h-[460px] flex-col overflow-hidden rounded-[18px] bg-[#d9d9d9] text-ink" data-cursor="Katalog">
+        <Link href="/prodavnica" data-bento className="group flex min-h-[340px] flex-col md:min-h-[460px] overflow-hidden rounded-[18px] bg-[#d9d9d9] text-ink" data-cursor="Katalog">
           <div data-parallax="6" className="relative h-[260px] overflow-hidden rounded-[18px] bg-[#111] md:h-[54%]">
             <img src="/editorial/bento-mono.webp" alt="Radnik u rukavicama nosi pocinčani profil" className="absolute inset-0 h-full w-full object-cover grayscale" />
             <span className="label absolute left-7 top-7 text-white">Stovarište</span>
-            <span className="absolute right-6 top-6 flex gap-1.5 text-white">
+            <span className="absolute right-6 top-6 flex gap-1.5 text-white max-md:left-7 max-md:right-auto max-md:top-14">
               <Tag tone="photo">Ploče</Tag>
               <Tag tone="photo">Profili</Tag>
               <Tag tone="photo">Vuna</Tag>

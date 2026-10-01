@@ -142,7 +142,7 @@ export default function CatalogClient() {
           </button>
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-7 gap-y-2 border-t border-ink/20 px-5 py-4 md:px-[3vw]" role="tablist" aria-label="Grupa artikala">
+        <div className="flex flex-wrap items-center gap-x-7 gap-y-2 border-t border-ink/20 px-5 py-4 md:px-[3vw] max-md:pl-8 max-md:flex-nowrap max-md:justify-start max-md:overflow-x-auto max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden max-md:[&>*]:shrink-0 max-md:[&>*]:whitespace-nowrap" role="tablist" aria-label="Grupa artikala">
           {tabs.map((t) => {
             const on = cat === t.id
             return (

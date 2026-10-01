@@ -25,7 +25,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
 
   return (
     <section className="mt-[18dvh]">
-      <div role="tablist" aria-label="Tema" className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-5 text-[12.5px]">
+      <div role="tablist" aria-label="Tema" className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-5 text-[12.5px] max-md:gap-x-6 max-md:pl-8 max-md:flex-nowrap max-md:justify-start max-md:overflow-x-auto max-md:[scrollbar-width:none] max-md:[&::-webkit-scrollbar]:hidden max-md:[&>*]:shrink-0 max-md:[&>*]:whitespace-nowrap max-md:[&>*]:min-h-10">
         {tags.map((item) => {
           const on = tag === item
           return (

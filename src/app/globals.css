@@ -710,3 +710,41 @@ input::placeholder {
   -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 72%, transparent 100%);
   mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 72%, transparent 100%);
 }
+
+/* Krupni brojevi (cijene, mjere): Bodoni cifre bez sopstvene veličine — veličinu daje text-* klasa.
+   (.pw-alt ima 0.92em jer stoji UNUTAR Prettywise naslova; ovo je za samostalne brojeve.) */
+.num {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: -0.01em;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* ——— Mobilni (samo < 768px; desktop ostaje isti) ——— */
+@media (max-width: 767px) {
+  /* Dugi tekstovi u verzalu: na telefonu manji i mirniji red */
+  .article-copy p,
+  .article-copy li {
+    font-size: 14px;
+    line-height: 1.65;
+  }
+  .article-copy h2 {
+    font-size: 26px;
+    margin-top: 2.6rem;
+  }
+  .prose-ed p,
+  .prose-ed li {
+    font-size: 13.5px;
+    line-height: 1.7;
+  }
+  /* Linkovi u footeru: veća zona dodira (min ~40px) bez promjene izgleda */
+  footer li a,
+  footer address a {
+    display: inline-block;
+    padding-block: 9px;
+  }
+  footer li + li {
+    margin-top: -6px;
+  }
+}

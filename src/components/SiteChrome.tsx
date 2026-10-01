@@ -214,7 +214,7 @@ export default function SiteChrome() {
       {/* Značka (desno): uklizne tek kad hero počne da se kreće. */}
       <div
         data-badge
-        className="pointer-events-none fixed right-[34px] top-1/2 z-[500] w-[44px] -translate-y-1/2 mix-blend-difference"
+        className="pointer-events-none fixed right-3 top-1/2 z-[500] w-[30px] -translate-y-1/2 mix-blend-difference md:right-[34px] md:w-[44px]"
         style={{ transform: 'translateX(180px)', color: DIFF }}
       >
         <BadgeMark />

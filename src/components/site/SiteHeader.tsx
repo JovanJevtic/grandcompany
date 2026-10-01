@@ -89,7 +89,7 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
           </nav>
 
           <div className="flex items-center gap-6 justify-self-end text-[12.5px]">
-            <button onClick={openCart} className="flex items-center gap-2" aria-label={`Korpa, ${count} artikala`}>
+            <button onClick={openCart} className="flex items-center gap-2 max-md:min-h-11 max-md:min-w-11 max-md:justify-center" aria-label={`Korpa, ${count} artikala`}>
               <span className="ulink hidden sm:inline">Korpa</span>
               <span
                 className={`grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[12px] tabular-nums transition-colors ${
@@ -103,7 +103,7 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls="site-menu"
-              className="flex h-10 items-center gap-2 md:hidden"
+              className="flex h-11 min-w-11 items-center justify-center gap-2 md:hidden"
             >
               <span className="relative block h-2.5 w-6" aria-hidden>
                 <i className={`absolute left-0 h-px w-full bg-current transition-transform duration-500 ${open ? 'top-1/2 rotate-45' : 'top-0'}`} />
