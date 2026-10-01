@@ -2,10 +2,12 @@
 
 import { useEffect, useRef } from 'react'
 import { useLenis } from 'lenis/react'
+import { useRouter } from 'next/navigation'
 import { cartCount, cartLines, cartTotal, closeCart, removeFromCart, setQty, useShop } from '@/lib/cart'
 import { artikala, money, qtyLabel } from '@/lib/shop'
 import ProductImage from './ProductImage'
 import { useScrollTo } from '@/lib/useScrollTo'
+import Cta from '@/components/ui/Cta'
 
 const FOCUSABLE = 'button:not(:disabled), a[href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
@@ -15,6 +17,7 @@ export default function CartDrawer() {
   const { cart, cartOpen } = useShop()
   const lenis = useLenis()
   const scrollTo = useScrollTo()
+  const router = useRouter()
   const panel = useRef<HTMLDivElement>(null)
   const lines = cartLines(cart)
   const count = cartCount(cart)
@@ -49,19 +52,21 @@ export default function CartDrawer() {
     }
   }, [cartOpen, lenis])
 
+  // Upit ide na formu (#ponuda) ako je ima na stranici, inače na kontakt u podnožju.
   const go = (id: string) => {
     closeCart()
-    scrollTo(id)
+    scrollTo(document.getElementById(id) ? id : 'kontakt')
+  }
+  const toShop = () => {
+    closeCart()
+    router.push('/prodavnica')
   }
 
   return (
-    <div
-      className={`fixed inset-0 z-[600] ${cartOpen ? '' : 'pointer-events-none'}`}
-      aria-hidden={!cartOpen}
-    >
+    <div className={`fixed inset-0 z-[600] ${cartOpen ? '' : 'pointer-events-none'}`} aria-hidden={!cartOpen}>
       <div
         onClick={closeCart}
-        className={`absolute inset-0 bg-ink/50 transition-opacity duration-700 ${cartOpen ? 'opacity-100' : 'opacity-0'}`}
+        className={`absolute inset-0 bg-ink/35 backdrop-blur-[2px] transition-opacity duration-700 ${cartOpen ? 'opacity-100' : 'opacity-0'}`}
       />
 
       <div
@@ -70,79 +75,66 @@ export default function CartDrawer() {
         aria-modal="true"
         aria-label="Korpa"
         inert={!cartOpen}
-        className={`absolute right-0 top-0 flex h-dvh w-full flex-col bg-ink text-bg transition-[transform,visibility] duration-700 [transition-timing-function:var(--ease-io)] sm:w-[480px] ${
+        className={`absolute right-0 top-0 flex h-dvh w-full flex-col bg-bg text-ink transition-[transform,visibility] duration-700 [transition-timing-function:var(--ease-io)] sm:w-[480px] ${
           cartOpen ? 'visible translate-x-0' : 'invisible translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between border-b-2 border-bg px-5 py-5 text-micro uppercase">
-          <h2>
-            Korpa <span className="tabular-nums opacity-60">({count})</span>
+        <div className="flex items-baseline justify-between px-6 pb-6 pt-7 md:px-8">
+          <h2 className="text-[32px] leading-none tracking-[-0.02em]">
+            Korpa <em className="text-[0.6em] text-ink/45 not-italic tabular-nums">({count})</em>
           </h2>
-          <button data-close type="button" onClick={closeCart} className="uppercase underline underline-offset-4">
+          <button data-close type="button" onClick={closeCart} className="ulink text-[15px]">
             Zatvori
           </button>
         </div>
 
-        <div data-lenis-prevent className="flex-1 overflow-y-auto overscroll-contain px-5">
+        <div data-lenis-prevent className="flex-1 overflow-y-auto overscroll-contain px-6 md:px-8">
           {lines.length === 0 ? (
-            <div className="flex h-full flex-col items-start justify-center gap-6 pb-10">
-              <p className="text-lead uppercase">Korpa je prazna.</p>
-              <p className="max-w-[32ch] text-micro uppercase opacity-60">
-                Dodajte artikle ili komplete iz prodavnice, pa pošaljite upit za ponudu.
-              </p>
-              <button
-                type="button"
-                onClick={() => go('prodavnica')}
-                className="border-2 border-bg px-4 py-3 text-micro uppercase transition-colors duration-300 hover:bg-bg hover:text-ink"
-              >
-                Idi u prodavnicu →
-              </button>
+            <div className="flex h-full flex-col items-center justify-center gap-5 pb-16 text-center">
+              <p className="text-[clamp(28px,3vw,40px)] italic leading-[1.05] tracking-[-0.02em]">Korpa je prazna.</p>
+              <p className="max-w-[30ch] text-[15px] text-ink/60">Dodajte artikle iz prodavnice, pa pošaljite upit za ponudu.</p>
+              <Cta onClick={toShop} className="mt-4">
+                U prodavnicu
+              </Cta>
             </div>
           ) : (
-            <ul>
+            <ul className="border-t border-ink/15">
               {lines.map((l) => (
-                <li key={l.key} className="border-b border-bg/25 py-5">
-                  <div className="flex items-start justify-between gap-4 uppercase">
-                    {l.image && (
-                      <ProductImage src={l.image} drawing={l.drawing} alt="" className="size-16 shrink-0" />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-small">{l.name}</p>
-                      <p className="mt-1.5 text-micro opacity-60">{l.spec}</p>
+                <li key={l.key} className="flex gap-4 border-b border-ink/15 py-5">
+                  {l.image ? (
+                    <ProductImage src={l.image} alt="" className="aspect-[4/5] w-[72px] shrink-0 !bg-plate" />
+                  ) : (
+                    <span className="aspect-[4/5] w-[72px] shrink-0 bg-plate" aria-hidden />
+                  )}
+                  <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
+                    <div className="flex items-start justify-between gap-4">
+                      <p className="text-[16px] leading-[1.25]">{l.name}</p>
+                      <p className="shrink-0 text-[15px] tabular-nums">{money(l.price * l.qty)}</p>
                     </div>
-                    <p className="shrink-0 text-small tabular-nums">{money(l.price * l.qty)}</p>
-                  </div>
-
-                  <div className="mt-4 flex items-center justify-between text-micro uppercase">
-                    <div className="flex items-stretch border-2 border-bg">
-                      <button
-                        type="button"
-                        aria-label={`Smanji količinu: ${l.name}`}
-                        onClick={() => setQty(l.key, l.qty - l.step)}
-                        className="w-9 transition-colors duration-300 hover:bg-bg hover:text-ink"
-                      >
-                        −
-                      </button>
-                      <span className="grid min-w-16 place-items-center border-x-2 border-bg px-2 tabular-nums">{qtyLabel(l.qty, l.unit)}</span>
-                      <button
-                        type="button"
-                        aria-label={`Povećaj količinu: ${l.name}`}
-                        onClick={() => setQty(l.key, l.qty + l.step)}
-                        className="w-9 transition-colors duration-300 hover:bg-bg hover:text-ink"
-                      >
-                        +
+                    <div className="flex items-center justify-between gap-3 text-[13px]">
+                      <div className="flex items-center rounded-full border border-ink/20">
+                        <button
+                          type="button"
+                          aria-label={`Smanji količinu: ${l.name}`}
+                          onClick={() => setQty(l.key, l.qty - l.step)}
+                          className="grid size-8 place-items-center rounded-full transition-colors hover:text-signal"
+                        >
+                          −
+                        </button>
+                        <span className="min-w-14 text-center tabular-nums">{qtyLabel(l.qty, l.unit)}</span>
+                        <button
+                          type="button"
+                          aria-label={`Povećaj količinu: ${l.name}`}
+                          onClick={() => setQty(l.key, l.qty + l.step)}
+                          className="grid size-8 place-items-center rounded-full transition-colors hover:text-signal"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <button type="button" onClick={() => removeFromCart(l.key)} className="ulink text-ink/55 hover:text-ink">
+                        Ukloni
                       </button>
                     </div>
-                    <p className="opacity-60">
-                      {money(l.price)} / {l.unit}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => removeFromCart(l.key)}
-                      className="underline underline-offset-4"
-                    >
-                      Ukloni
-                    </button>
                   </div>
                 </li>
               ))}
@@ -151,29 +143,22 @@ export default function CartDrawer() {
         </div>
 
         {lines.length > 0 && (
-          <div className="border-t-2 border-bg px-5 pb-8 pt-5">
-            <div className="flex items-baseline justify-between uppercase">
-              <p className="text-micro opacity-60">Orijentacioni iznos · {artikala(count)}</p>
-              <p className="text-lead tabular-nums">{money(cartTotal(cart))}</p>
+          <div className="px-6 pb-8 pt-6 md:px-8">
+            <div className="flex items-baseline justify-between">
+              <p className="text-[15px] text-ink/60">{artikala(count)}</p>
+              <p className="text-[28px] tabular-nums tracking-[-0.02em]">{money(cartTotal(cart))}</p>
             </div>
-            <p className="mt-3 text-micro uppercase opacity-60">
-              Cijene u KM sa PDV-om. Dostavu i plaćanje potvrđujemo ponudom. Demo prodavnica: ništa se ne naplaćuje.
+            <p className="mt-2 text-[13px] italic text-ink/50">
+              Sa PDV-om. Dostavu i plaćanje potvrđujemo ponudom. Demo prodavnica — ništa se ne naplaćuje.
             </p>
-            <button
-              type="button"
-              onClick={() => go('ponuda')}
-              className="mt-5 flex w-full items-center justify-between bg-bg px-4 py-4 text-micro uppercase text-ink transition-opacity duration-300 hover:opacity-85"
-            >
-              <span>Pošalji upit za ponudu</span>
-              <span aria-hidden>→</span>
-            </button>
-            <button
-              type="button"
-              onClick={closeCart}
-              className="mt-2 w-full border-2 border-bg px-4 py-3.5 text-micro uppercase transition-colors duration-300 hover:bg-bg hover:text-ink"
-            >
-              Nastavi kupovinu
-            </button>
+            <div className="mt-6 grid gap-2">
+              <Cta solid onClick={() => go('ponuda')} className="w-full justify-center">
+                Pošalji upit za ponudu
+              </Cta>
+              <button type="button" onClick={closeCart} className="ulink mx-auto mt-2 text-[15px] text-ink/70">
+                Nastavi kupovinu
+              </button>
+            </div>
           </div>
         )}
       </div>

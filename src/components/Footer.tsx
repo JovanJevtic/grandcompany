@@ -1,15 +1,21 @@
 'use client'
 
-import { useRef } from 'react'
-import { useGSAP } from '@/lib/gsap'
-import { SIDE, fitFontSize } from '@/lib/motion'
-import { revealChars } from '@/lib/reveal'
 import Link from 'next/link'
+import { useRef } from 'react'
+import Cta from '@/components/ui/Cta'
 import { COMPANY } from '@/gc/gc'
-import { LEGAL_DOCS } from '@/lib/legal'
-import BadgeMark from './BadgeMark'
-import { BRAND } from './SiteChrome'
+import { gsap, useGSAP } from '@/lib/gsap'
+import { EASE, MQ, fitFontSize } from '@/lib/motion'
+import { revealChars } from '@/lib/reveal'
 
+const COLS: { title: string; links: [string, string][] }[] = [
+  { title: 'Prodavnica', links: [['Katalog', '/prodavnica'], ['Kalkulator zida', '/prodavnica#kalkulator'], ['Objave', '/objave']] },
+  { title: 'Kupovina', links: [['Dostava', '/dostava'], ['Povrat robe', '/povrat-robe'], ['Načini plaćanja', '/nacini-placanja']] },
+  { title: 'Pravno', links: [['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']] },
+]
+
+// Podnožje: rečenica-poziv, kontakt, tri kratke kolone i veliki wordmark koji izroni slovo po slovo.
+// Podaci firme (JIB, adresa) stoje u jednom sitnom redu na dnu — zakonski dovoljno, vizuelno tiho.
 export default function Footer() {
   const root = useRef<HTMLElement>(null)
 
@@ -17,22 +23,24 @@ export default function Footer() {
     (_, contextSafe) => {
       const el = root.current!
       const word = el.querySelector<HTMLElement>('[data-word]')!
-      const talk = el.querySelector<HTMLElement>('[data-talk]')!
       let dead = false
       let onResize: (() => void) | null = null
 
       const boot = contextSafe!(() => {
         if (dead) return
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-        // Wordmark se razdvaja na slova PRIJE mjerenja širine, da mjera odgovara onome što se vidi.
-        revealChars(word, reduce, 'top 75%')
         const fit = () => {
-          word.style.fontSize = `${fitFontSize(word, window.innerWidth * (1 - 2 * SIDE))}px`
+          word.style.fontSize = `${fitFontSize(word, (el.clientWidth - 40) * 0.95)}px`
         }
         fit()
         onResize = fit
         window.addEventListener('resize', fit)
-        revealChars(talk, reduce, 'top 90%')
+        gsap.matchMedia().add(MQ, (ctx) => {
+          const { reduce } = ctx.conditions as { reduce: boolean }
+          revealChars(el.querySelector('[data-head]')!, reduce, 'top 85%')
+          const split = revealChars(word, true)
+          if (reduce) return
+          gsap.fromTo(split.chars, { yPercent: 110 }, { yPercent: 0, duration: 1.4, ease: EASE.quint, stagger: 0.04, scrollTrigger: { trigger: word, start: 'top 98%' } })
+        })
       })
 
       document.fonts.ready.then(boot)
@@ -45,104 +53,66 @@ export default function Footer() {
   )
 
   return (
-    <footer
-      ref={root}
-      id="kontakt"
-      className="relative z-40 flex min-h-[80dvh] flex-col justify-between overflow-x-clip bg-ink px-5 pb-[16dvh] pt-[10dvh] text-bg md:px-[3.05vw]"
-    >
-      <div className="text-center">
-        <h2
-          data-word
-          className="invisible inline-block whitespace-nowrap font-bold uppercase leading-none"
-          style={{ fontSize: '10vw' }}
-        >
-          {BRAND}
+    <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink pt-[20vh] text-bg">
+      <div className="flex flex-col items-center px-5 text-center">
+        <h2 data-head className="display invisible text-title">
+          Gradimo <em>zajedno.</em>
         </h2>
+        <p className="mt-8 max-w-[34ch] text-[17px] italic opacity-70">Upit za veći projekat, ponuda za partnere ili samo savjet — javite se.</p>
+        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
+          <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
+            Pišite nam
+          </Cta>
+          <a href={COMPANY.phoneMobileHref} className="ulink text-[17px] tabular-nums">
+            {COMPANY.phoneMobile}
+          </a>
+        </div>
       </div>
 
-      {/* Glavne stranice: veliki linkovi preko cijele širine, na hover strelica uđe s lijeva. */}
-      <nav aria-label="Stranice" className="mt-[8dvh] grid border-t-2 border-bg md:mx-[5.3vw] md:grid-cols-4">
-        {[
-          ['Prodavnica', '/prodavnica'],
-          ['Kalkulator', '/#kalkulator'],
-          ['Isporuka', '/#isporuka'],
-          ['Objave', '/objave'],
-        ].map(([label, href], i) => (
-          <Link
-            key={href}
-            href={href}
-            className="group flex items-center justify-between border-b border-bg/25 py-5 text-[clamp(22px,2.2vw,40px)] uppercase leading-none md:border-b-0 md:border-r md:px-5 md:last:border-r-0"
-          >
-            <span className="flex items-baseline gap-4">
-              <span className="font-mono text-[11px] text-accent">0{i + 1}</span>
-              {label}
-            </span>
-            <span aria-hidden className="-translate-x-3 opacity-0 transition-all duration-300 group-hover:translate-x-0 group-hover:opacity-100">
-              →
-            </span>
-          </Link>
-        ))}
-      </nav>
-
-      {/* Podaci firme i pravne stranice (iz grand-root), složeni u kolone sa linijama od 2px. */}
-      <div className="my-[10dvh] grid gap-10 border-t-2 border-bg pt-6 text-micro uppercase sm:grid-cols-2 md:mx-[5.3vw] lg:grid-cols-4 lg:gap-[1.5vw]">
+      <div className="mx-auto mt-[18vh] grid w-[calc(100%-40px)] grid-cols-2 gap-x-6 gap-y-12 border-t border-bg/15 pt-12 text-[15px] md:w-[88vw] md:grid-cols-4">
         <div>
-          <p className="opacity-60">Kontakt</p>
-          <address className="mt-4 flex flex-col gap-2 not-italic leading-[1.3]">
-            <span>{COMPANY.address}</span>
-            <a href={COMPANY.phoneLandlineHref} className="hover:underline">Tel. {COMPANY.phoneLandline}</a>
-            <a href={COMPANY.phoneMobileHref} className="hover:underline">Mob. {COMPANY.phoneMobile}</a>
-            <a href={`mailto:${COMPANY.emailInfo}`} className="normal-case hover:underline">{COMPANY.emailInfo}</a>
-            <a href={`mailto:${COMPANY.emailSales}`} className="normal-case hover:underline">{COMPANY.emailSales}</a>
+          <p className="mb-4 italic opacity-50">Stovarište</p>
+          <address className="not-italic leading-[1.6]">
+            {COMPANY.address.split(', ').map((l) => (
+              <span key={l} className="block">
+                {l}
+              </span>
+            ))}
+            <a href={COMPANY.phoneLandlineHref} className="ulink mt-2 inline-block tabular-nums">
+              {COMPANY.phoneLandline}
+            </a>
           </address>
         </div>
-        <div>
-          <p className="opacity-60">Firma</p>
-          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 tabular-nums">
-            <dt className="opacity-60">JIB</dt>
-            <dd>{COMPANY.jib}</dd>
-            <dt className="opacity-60">PIB</dt>
-            <dd>{COMPANY.pib}</dd>
-            <dt className="opacity-60">MBS</dt>
-            <dd>{COMPANY.mbs}</dd>
-            <dt className="opacity-60">Osnovana</dt>
-            <dd>{COMPANY.founded}.</dd>
-          </dl>
-        </div>
-        {(['kupovina', 'pravno'] as const).map((g) => (
-          <div key={g}>
-            <p className="opacity-60">{g === 'kupovina' ? 'Kupovina' : 'Pravno'}</p>
-            <ul className="mt-4 flex flex-col gap-2">
-              {LEGAL_DOCS.filter((d) => d.group === g || (g === 'pravno' && d.group === 'usluge')).map((d) => (
-                <li key={d.slug}>
-                  <Link href={`/${d.slug}`} className="hover:underline">
-                    {d.title}
+        {COLS.map((c) => (
+          <div key={c.title}>
+            <p className="mb-4 italic opacity-50">{c.title}</p>
+            <ul className="flex flex-col gap-1.5">
+              {c.links.map(([label, href]) => (
+                <li key={href}>
+                  <Link href={href} className="ulink">
+                    {label}
                   </Link>
                 </li>
               ))}
-              {g === 'pravno' && (
-                <li>
-                  <Link href="/sve-politike" className="hover:underline">
-                    Sve politike →
-                  </Link>
-                </li>
-              )}
             </ul>
           </div>
         ))}
       </div>
 
-      <div className="flex flex-col items-center gap-10">
-        <BadgeMark className="w-[44px] text-bg" />
-        <p
-          data-talk
-          className="invisible text-[clamp(13px,1.25vw,20px)] uppercase leading-none tracking-[0.55em]"
-        >
-          Banja Luka · od 2012.
+      <div className="mt-[14vh] overflow-x-clip px-5 pb-[1.5vw] text-center">
+        <p data-word className="inline-block whitespace-nowrap leading-[0.82] tracking-[-0.045em]" aria-label="Grand Company">
+          Grand <em>Company</em>
         </p>
-        <p className="max-w-[90vw] text-center text-[11px] uppercase leading-[1.5] tracking-[0.18em] opacity-60">
-          {COMPANY.name} · Demo prodavnica: narudžbe i upiti se još ne šalju.
+      </div>
+
+      <div className="flex flex-col items-center justify-between gap-2 px-5 pb-8 pt-6 text-[12px] opacity-45 md:flex-row md:px-10">
+        <p>
+          © {COMPANY.founded}–2026 {COMPANY.name} · JIB {COMPANY.jib} ·{' '}
+          <Link href="/o-prodavcu" className="ulink">
+            Podaci o prodavcu
+          </Link>
         </p>
+        <p className="italic">Demo prodavnica — narudžbe se još ne šalju.</p>
       </div>
     </footer>
   )

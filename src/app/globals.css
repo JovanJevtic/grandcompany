@@ -4,27 +4,27 @@
 @import "./splash.css";
 
 :root {
-  /* "papir" sajta: skoro bijelo, sa tragom svijetlo plave — nastavlja se na nebo iz herosa */
-  --bg: #f8fafc;
-  --ink: #222a36;
-  /* splash: pozadina uvodnog ekrana — tamnija, jasnije plava od teksta (--ink) */
+  /* Papir sajta: topla, skoro bijela (editorijalni katalog). Hero ostaje nebo. */
+  --bg: #f4f1ec;
+  /* Tinta: duboka tamno plava, ne crna */
+  --ink: #1b2436;
+  /* Pozadina fotografija proizvoda: ista boja kao studijska pozadina na slikama, pa slika "nema ivicu" */
+  --plate: #e4dfd9;
   --splash-bg: #1a2331;
-  /* splash: okvir od četiri kvadratića i visina okvira (blago uspravan, kao na uzoru) */
   --splash-frame: clamp(190px, 20vw, 340px);
-  /* boja splash-a: kvadratići i monogram prije nego se sajt učita */
   --splash-mark: #f3ecdf;
-  /* svijetlo polje za crteže artikala (SVG packshot) */
   --well: #ffffff;
-  /* tamno plava za invertovane sekcije (stepenaste trake): bijel tekst na njoj */
   --navy: #1b2436;
-  /* nebo iz herosa kao jedini akcenat: kvadratići u listama, aktivni filteri, linije na tamnom */
+  /* Nebo iz herosa: tihi akcenat na tamnom */
   --accent: #a9c4e4;
-  /* tanka linija crteža (outline ilustracije) */
+  /* Kontrast: cinober (signal sa gradilišta). Samo kursor, cijena na hover-u, tačke, aktivno stanje. */
+  --signal: #e4472a;
   --hair: 1.25px;
-  /* veličina wordmarka; postavlja se iz JS-a tako da tekst popuni širinu ekrana */
   --wm-fs: 10.6vw;
-  /* dno wordmarka: ispod te linije počinje 3D scena krana i prazan pojas iznad nje */
   --story-header: calc(16px + var(--wm-fs) * 0.862);
+  /* Stari nazivi fontova (hero, kaolin) pokazuju na novi serif */
+  --font-inter-tight: var(--font-serif);
+  --font-mono-src: var(--font-serif);
 }
 
 @theme inline {
@@ -33,18 +33,23 @@
   --color-well: var(--well);
   --color-navy: var(--navy);
   --color-accent: var(--accent);
-  --font-sans: var(--font-inter-tight);
-  --font-mono: var(--font-mono-src), ui-monospace, monospace;
+  --color-plate: var(--plate);
+  --color-signal: var(--signal);
+  --font-sans: var(--font-serif), Georgia, serif;
+  --font-serif: var(--font-serif), Georgia, serif;
+  /* "mono" klase u starim komponentama postaju sitne serif oznake (vidi .font-mono niže) */
+  --font-mono: var(--font-serif), Georgia, serif;
 
-  /* Tipografska skala prodavnice: ista veličina kao u landingu (label, tekst, izjava), plus naslov sekcije. */
-  --text-micro: clamp(11px, 0.97vw, 16px);
-  --text-micro--line-height: 1.15;
-  --text-small: clamp(13px, 1.25vw, 20px);
-  --text-small--line-height: 1.1;
-  --text-lead: clamp(20px, 2.6vw, 48px);
-  --text-lead--line-height: 1.02;
-  --text-title: clamp(34px, 5.4vw, 100px);
-  --text-title--line-height: 0.94;
+  --text-micro: clamp(11px, 0.8vw, 13px);
+  --text-micro--line-height: 1.3;
+  --text-small: clamp(14px, 1vw, 17px);
+  --text-small--line-height: 1.45;
+  --text-lead: clamp(20px, 1.9vw, 32px);
+  --text-lead--line-height: 1.2;
+  --text-title: clamp(40px, 6vw, 112px);
+  --text-title--line-height: 0.95;
+  --text-display: clamp(56px, 11vw, 200px);
+  --text-display--line-height: 0.88;
 }
 
 html {
@@ -59,8 +64,9 @@ html::-webkit-scrollbar {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-sans), system-ui, sans-serif;
-  font-weight: 700;
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 400;
+  font-feature-settings: "lnum", "kern";
   -webkit-font-smoothing: antialiased;
 }
 
@@ -213,9 +219,11 @@ button:not(:disabled),
   }
 }
 
-/* JetBrains Mono je učitan u 400 i 500; bez ovoga bi naslijedio bold (700) sa body-ja i browser bi ga lažno podebljao. */
+/* Bivši mono: sada sitna serif oznaka u verzalu sa razmakom (kao na etiketi parfema). */
 .font-mono {
   font-weight: 500;
+  letter-spacing: 0.12em;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
 /* Klizač u kalkulatoru: tanka linija i kvadratna ručka (bez zaobljenja, kao ostatak sajta). */
@@ -256,4 +264,286 @@ button:not(:disabled),
 html:not([data-past-hero]) [data-overlay-header] {
   opacity: 0;
   visibility: hidden;
+}
+
+/* ——— Editorijalni sloj (redizajn) ——— */
+
+/* Naslovi: serif, normalan verzal/kurent, tanko na velikim veličinama (opsz to radi sam). */
+.display {
+  font-weight: 400;
+  letter-spacing: -0.035em;
+  line-height: 0.9;
+  text-wrap: balance;
+}
+.display em {
+  font-style: italic;
+  letter-spacing: -0.02em;
+}
+/* Sitna oznaka u verzalu (zamjena za mono etikete) */
+.label {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* CTA: zaobljena kapsula; tekst se "zakotrlja" naviše, a pozadina se puni odozdo. */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  min-height: 52px;
+  padding: 0 1.6em 0 1.8em;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  overflow: hidden;
+  isolation: isolate;
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  transition: color 0.6s var(--ease-io), border-color 0.6s var(--ease-io);
+}
+.cta::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--cta-fill, var(--ink));
+  border-radius: inherit;
+  transform: translateY(101%);
+  transition: transform 0.6s var(--ease-io);
+}
+.cta:hover::before,
+.cta:focus-visible::before {
+  transform: none;
+}
+.cta:hover,
+.cta:focus-visible {
+  color: var(--cta-ink, var(--bg));
+}
+.cta-roll {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  line-height: 1.2;
+}
+.cta-roll > span {
+  display: block;
+  transition: transform 0.6s var(--ease-io);
+}
+.cta-roll > span + span {
+  position: absolute;
+  inset: 0;
+  transform: translateY(110%);
+  font-style: italic;
+}
+.cta:hover .cta-roll > span:first-child {
+  transform: translateY(-110%);
+}
+.cta:hover .cta-roll > span + span {
+  transform: none;
+}
+.cta-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--signal);
+  transition: transform 0.6s var(--ease-io);
+}
+.cta:hover .cta-dot {
+  transform: scale(1.6);
+}
+/* Puna varijanta (tamna kapsula) */
+.cta--solid {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--bg);
+  --cta-fill: var(--signal);
+  --cta-ink: var(--bg);
+}
+.cta--solid:hover {
+  border-color: var(--signal);
+}
+.cta--solid .cta-dot {
+  background: var(--bg);
+}
+
+/* Tekstualni link: linija se iscrta s lijeva na desno */
+.ulink {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 0.6s var(--ease-io);
+}
+.ulink:hover,
+.ulink:focus-visible {
+  background-size: 100% 1px;
+}
+
+/* Fotografija proizvoda: polje iste boje kao studijska pozadina, slika lagano "diše" na hover */
+.shot {
+  position: relative;
+  overflow: hidden;
+  background: var(--plate);
+}
+.shot img {
+  transition: transform 1.4s var(--ease-out);
+  will-change: transform;
+}
+.group:hover .shot img {
+  transform: scale(1.045);
+}
+
+/* Prilagođeni kursor (samo miš). Nativni kursor se sakriva tek kad je naš spreman. */
+@media (pointer: fine) {
+  html[data-cursor] body,
+  html[data-cursor] a,
+  html[data-cursor] button,
+  html[data-cursor] [role='button'],
+  html[data-cursor] label {
+    cursor: none;
+  }
+}
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 2000;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  width: 84px;
+  height: 84px;
+  margin: -42px 0 0 -42px;
+  border-radius: 50%;
+  background: var(--signal);
+  color: #fff;
+  transform: translate3d(-200px, -200px, 0) scale(0.1);
+  font-size: 12px;
+  font-weight: 500;
+  font-style: italic;
+  letter-spacing: 0.02em;
+  will-change: transform;
+}
+.cursor span {
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+.cursor[data-big] span {
+  opacity: 1;
+}
+@media (pointer: coarse), (hover: none) {
+  .cursor {
+    display: none;
+  }
+}
+
+/* Crteži u karticama objava na početnoj: ispuna = boja polja, i na hover */
+[data-post] .post-art,
+[data-post]:hover .post-art {
+  --art-fill: var(--plate);
+}
+
+/* Lagani film grain preko cijelog sajta (statičan, jeftin) */
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 1500;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.site-header {
+  color: var(--ink);
+  transition: background-color 0.5s, color 0.5s, backdrop-filter 0.5s;
+}
+.site-header[data-solid] {
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+}
+.site-header.is-open {
+  background: transparent;
+  backdrop-filter: none;
+  color: var(--bg);
+}
+
+/* ——— pages (fork) ——— */
+
+/* Crteži u objavama na polju boje papira: ispuna silueta = boja polja (i na hover-u). */
+.ed-art .post-art,
+.group:hover .ed-art .post-art {
+  --art-fill: var(--plate);
+}
+
+/* Tekst pravnih stranica i članaka: jedan stub, miran serif. */
+.legal-copy {
+  font-size: clamp(16px, 1.1vw, 18px);
+  line-height: 1.65;
+}
+.prose-ed {
+  font-size: clamp(17px, 1.25vw, 20px);
+  line-height: 1.68;
+}
+.prose-ed > * + * {
+  margin-top: 1.4em;
+}
+.prose-ed h2 {
+  margin-top: 2em;
+  scroll-margin-top: 7rem;
+  font-size: clamp(28px, 2.6vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+.prose-ed h2:first-child {
+  margin-top: 0;
+}
+.prose-ed ul {
+  padding-left: 1.2em;
+  list-style: disc;
+}
+.prose-ed li + li {
+  margin-top: 0.5em;
+}
+.prose-ed li::marker {
+  color: var(--signal);
+}
+.prose-ed .note {
+  margin-block: 2.4em;
+  padding: 0.2em 0 0.2em 1.4em;
+  border-left: 1px solid var(--signal);
+  font-style: italic;
+  font-size: 1.08em;
+  color: color-mix(in srgb, var(--ink) 80%, transparent);
+}
+.prose-ed .spec {
+  margin-block: 2.4em;
+  border-top: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+  font-size: 0.88em;
+}
+.prose-ed .spec > div {
+  display: grid;
+  grid-template-columns: minmax(100px, 1fr) 2fr;
+  gap: 1rem;
+  padding-block: 0.8rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 15%, transparent);
+}
+.prose-ed .spec dt {
+  color: color-mix(in srgb, var(--ink) 55%, transparent);
+}
+
+/* ——— shop (fork) ——— */
+/* Veliki artikal u mreži kataloga (2 × 2): fotografija se razvuče do visine dva reda. */
+@media (min-width: 1024px) {
+  [data-feature] > article {
+    height: 100%;
+  }
+  [data-feature] > article > div:first-child {
+    flex: 1;
+  }
+  [data-feature] .shot {
+    aspect-ratio: auto;
+    height: 100%;
+  }
 }

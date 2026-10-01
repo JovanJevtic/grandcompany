@@ -5,6 +5,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { POST_TAGS, postDate, type Post } from '@/lib/posts'
 import PostArtDraw from './PostArtDraw'
 
+// Filter po temi (tihi tekstualni izbor u sredini) i mreža objava sa crtežom na polju boje papira.
 export default function PostList({ posts }: { posts: Post[] }) {
   const search = useSearchParams()
   const router = useRouter()
@@ -19,43 +20,48 @@ export default function PostList({ posts }: { posts: Post[] }) {
     router.replace(`${pathname}${query.size ? `?${query}` : ''}`, { scroll: false })
   }
 
+  const tags = ['sve', ...POST_TAGS]
+
   return (
-    <>
-      <div className="gutter flex flex-wrap gap-2 border-b-2 border-ink py-5">
-        <button
-          type="button"
-          onClick={() => setTag('sve')}
-          className={`min-h-10 border-2 border-ink px-4 font-mono text-[11px] uppercase ${tag === 'sve' ? 'bg-navy text-bg' : ''}`}
-        >
-          Sve teme
-        </button>
-        {POST_TAGS.map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setTag(item)}
-            className={`min-h-10 border-2 border-ink px-4 font-mono text-[11px] uppercase ${tag === item ? 'bg-navy text-bg' : ''}`}
-          >
-            ■ {item}
-          </button>
-        ))}
+    <section className="mt-[18dvh]">
+      <div role="tablist" aria-label="Tema" className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-5 text-[16px]">
+        {tags.map((item) => {
+          const on = tag === item
+          return (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              aria-selected={on}
+              onClick={() => setTag(item)}
+              className={`relative flex items-center gap-2 transition-colors ${on ? 'italic text-ink' : 'text-ink/50 hover:text-ink'}`}
+            >
+              <span className={`size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} aria-hidden />
+              {item === 'sve' ? 'Sve teme' : item}
+            </button>
+          )
+        })}
       </div>
-      <div className="gutter grid gap-x-5 gap-y-14 py-16 md:grid-cols-2 xl:grid-cols-3">
+
+      <div className="mt-[8dvh] grid gap-x-8 gap-y-20 px-5 md:grid-cols-2 md:px-10 xl:grid-cols-3">
         {shown.map((post) => (
-          <article key={post.slug} className="group border-t-2 border-ink pt-4">
-            <Link href={`/objave/${post.slug}`}>
-              <div className="h-64 bg-well transition-colors group-hover:bg-navy group-hover:text-bg">
-                <PostArtDraw kind={post.art} className="h-full p-4" />
+          <article key={post.slug} className="group">
+            <Link href={`/objave/${post.slug}`} className="block" data-cursor="Čitaj">
+              <div className="ed-art aspect-[4/3] bg-plate p-[9%]">
+                <PostArtDraw kind={post.art} className="h-full transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.04]" />
               </div>
-              <p className="mt-5 font-mono text-[11px] uppercase">
-                {post.tag} · {postDate(post.date)} · {post.read} min
+              <p className="mt-6 text-[14px] text-ink/50">
+                {post.tag} · {post.read} min
               </p>
-              <h2 className="mt-3 text-[clamp(27px,3vw,48px)] uppercase leading-[.94] tracking-[-.02em]">{post.title}</h2>
-              <p className="mt-4 font-medium leading-snug">{post.lead}</p>
+              <h2 className="mt-2 max-w-[22ch] text-[clamp(24px,2vw,32px)] leading-[1.1] tracking-[-0.02em] transition-[font-style] group-hover:italic">
+                {post.title}
+              </h2>
+              <p className="sr-only">{postDate(post.date)}</p>
             </Link>
           </article>
         ))}
       </div>
-    </>
+      {!shown.length && <p className="mt-16 text-center italic text-ink/50">Nema objava za ovu temu.</p>}
+    </section>
   )
 }

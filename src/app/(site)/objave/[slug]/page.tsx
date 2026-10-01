@@ -5,7 +5,6 @@ import ProductCard from '@/components/catalog/ProductCard'
 import PostArtDraw from '@/components/posts/PostArtDraw'
 import ReadingProgress from '@/components/posts/ReadingProgress'
 import TitleReveal from '@/components/posts/TitleReveal'
-import StepBand from '@/components/ui/StepBand'
 import { POSTS, postBySlug, postDate, type Block } from '@/lib/posts'
 import { PRODUCTS } from '@/lib/shop'
 
@@ -31,22 +30,27 @@ export async function generateMetadata({ params }: PageProps<'/objave/[slug]'>):
 
 function BodyBlock({ block, index }: { block: Block; index: number }) {
   if (block.t === 'h') return <h2 id={headingId(block.text)}>{block.text}</h2>
-  if (block.t === 'p') return <p className="mt-6">{block.text}</p>
+  if (block.t === 'p') return <p>{block.text}</p>
   if (block.t === 'list') {
-    return <ul className="mt-6 space-y-3">{block.items.map((item) => <li key={item}>{item}</li>)}</ul>
+    return (
+      <ul>
+        {block.items.map((item) => (
+          <li key={item}>{item}</li>
+        ))}
+      </ul>
+    )
   }
   if (block.t === 'note') {
     return (
-      <aside className="my-10 border-l-8 border-accent bg-navy p-6 text-bg">
-        <p className="font-mono text-sm uppercase">Napomena</p>
-        <p className="mt-3">{block.text}</p>
+      <aside className="note">
+        <p>{block.text}</p>
       </aside>
     )
   }
   return (
-    <dl className="my-10 border-t-2 border-ink font-mono text-xs uppercase">
+    <dl className="spec">
       {block.rows.map(([term, value]) => (
-        <div key={`${index}-${term}`} className="grid grid-cols-[minmax(100px,1fr)_2fr] gap-4 border-b border-ink py-4">
+        <div key={`${index}-${term}`}>
           <dt>{term}</dt>
           <dd>{value}</dd>
         </div>
@@ -55,6 +59,8 @@ function BodyBlock({ block, index }: { block: Block; index: number }) {
   )
 }
 
+// Članak: naslov u sredini, crtež kao naslovna "fotografija", pa jedan centriran stub teksta.
+// Sadržaj (lijevo, sitno) samo na širokom ekranu. Na kraju artikli iz teksta i sljedeća objava.
 export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'>) {
   const { slug } = await params
   const post = postBySlug(slug)
@@ -66,66 +72,67 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
     return product ? [product] : []
   })
   const index = POSTS.indexOf(post)
-  const previous = POSTS[index - 1]
-  const next = POSTS[index + 1]
+  const next = POSTS[index + 1] ?? POSTS[0]
 
   return (
-    <article>
+    <article className="pb-[14dvh]">
       <ReadingProgress />
-      <header className="gutter py-16 md:py-24">
-        <p className="font-mono text-xs uppercase">{post.tag} · {postDate(post.date)} · {post.read} min čitanja</p>
-        <TitleReveal className="mt-8 max-w-[14ch] text-[clamp(50px,9vw,150px)] uppercase leading-[.88] tracking-[-.03em]">
-          {post.title}
-        </TitleReveal>
-        <p className="mt-10 max-w-[50ch] text-xl uppercase leading-tight">{post.lead}</p>
+      <header className="px-5 pb-[8dvh] pt-[18dvh] text-center md:pt-[22dvh]">
+        <p className="text-[14px] text-ink/50">
+          {post.tag} · {postDate(post.date)} · {post.read} min čitanja
+        </p>
+        <TitleReveal className="display mx-auto mt-8 max-w-[16ch] text-[clamp(44px,7.4vw,128px)]">{post.title}</TitleReveal>
+        <p className="mx-auto mt-8 max-w-[42ch] text-[clamp(18px,1.5vw,23px)] italic leading-[1.45] text-ink/70">{post.lead}</p>
       </header>
-      <StepBand profile="diag-rev" tone="navy" className="gutter py-14">
-        <PostArtDraw kind={post.art} title={post.title} className="mx-auto h-[45vh] max-w-5xl" />
-      </StepBand>
-      <div className="gutter grid gap-12 py-24 md:grid-cols-[220px_minmax(0,720px)] md:justify-center">
-        <aside className="hidden md:block">
-          <div className="sticky top-24">
-            <p className="font-mono text-[11px] uppercase opacity-60">U tekstu</p>
-            <nav className="mt-4 flex flex-col">
+
+      <div className="ed-art mx-5 bg-plate px-[6%] py-[5%] md:mx-10">
+        <PostArtDraw kind={post.art} title={post.title} className="mx-auto h-[38vh] max-w-5xl md:h-[min(56vh,620px)]" />
+      </div>
+
+      <div className="relative mt-[12dvh] px-5 md:grid md:grid-cols-[1fr_minmax(0,64ch)_1fr] md:gap-x-12 md:px-10">
+        {headings.length > 2 && (
+          <nav aria-label="U tekstu" className="hidden self-start text-[13px] lg:sticky lg:top-28 lg:block lg:max-w-[220px]">
+            <p className="label text-ink/45">U tekstu</p>
+            <ul className="mt-4 space-y-2.5 text-ink/70">
               {headings.map((heading) => (
-                <Link
-                  key={heading.text}
-                  href={`#${headingId(heading.text)}`}
-                  className="border-t border-ink py-3 font-mono text-[11px] uppercase"
-                >
-                  {heading.text}
-                </Link>
+                <li key={heading.text}>
+                  <Link href={`#${headingId(heading.text)}`} className="ulink hover:text-ink">
+                    {heading.text}
+                  </Link>
+                </li>
               ))}
-            </nav>
-          </div>
-        </aside>
-        <div className="article-copy">
-          {post.body.map((block, blockIndex) => <BodyBlock key={blockIndex} block={block} index={blockIndex} />)}
+            </ul>
+          </nav>
+        )}
+        <div className="prose-ed mx-auto w-full max-w-[64ch] md:col-start-2">
+          {post.body.map((block, blockIndex) => (
+            <BodyBlock key={blockIndex} block={block} index={blockIndex} />
+          ))}
         </div>
       </div>
+
       {products.length > 0 && (
-        <section className="gutter pb-24">
-          <p className="font-mono text-xs uppercase">Artikli iz teksta</p>
-          <h2 className="mt-5 text-title uppercase">Materijal za ovaj posao</h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
-            {products.slice(0, 6).map((product) => <ProductCard key={product.id} product={product} view="grid" />)}
+        <section className="mt-[18dvh] px-5 md:px-10">
+          <h2 className="display text-center text-[clamp(36px,4.6vw,80px)]">
+            Materijal za <em>ovaj posao</em>
+          </h2>
+          <div className="mx-auto mt-[8dvh] grid max-w-[1400px] grid-cols-2 gap-x-5 gap-y-12 md:grid-cols-3 md:gap-x-8">
+            {products.slice(0, 6).map((product) => (
+              <ProductCard key={product.id} product={product} view="grid" />
+            ))}
           </div>
         </section>
       )}
-      <nav className="grid border-y-2 border-ink md:grid-cols-2">
-        {previous ? (
-          <Link href={`/objave/${previous.slug}`} className="p-8 md:p-16">
-            <span className="font-mono text-xs uppercase">← Prethodna</span>
-            <strong className="mt-4 block text-3xl uppercase">{previous.title}</strong>
-          </Link>
-        ) : <div />}
-        {next && (
-          <Link href={`/objave/${next.slug}`} className="border-t-2 border-ink p-8 text-right md:border-l-2 md:border-t-0 md:p-16">
-            <span className="font-mono text-xs uppercase">Sljedeća →</span>
-            <strong className="mt-4 block text-3xl uppercase">{next.title}</strong>
-          </Link>
-        )}
-      </nav>
+
+      {next && next !== post && (
+        <Link href={`/objave/${next.slug}`} className="group mt-[18dvh] block px-5 text-center" data-cursor="Čitaj">
+          <p className="text-[14px] text-ink/50">Sljedeća objava</p>
+          <p className="display mx-auto mt-5 max-w-[18ch] text-[clamp(36px,5vw,88px)] transition-[font-style] group-hover:italic">
+            {next.title}
+          </p>
+          <span className="mt-8 inline-block size-2 rounded-full bg-signal transition-transform duration-500 group-hover:scale-150" aria-hidden />
+        </Link>
+      )}
     </article>
   )
 }

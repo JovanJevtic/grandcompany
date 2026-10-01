@@ -73,8 +73,16 @@ const USE_MAP: Record<string, UseId[]> = {
   'ACC-006': ['spusteni-plafon', 'potkrovlje'],
 }
 
+// Studijske fotografije artikala (generisane za ovaj sajt, ista pozadina kao --plate).
+// Zamjenjuju crteže i stock fotografije iz zajedničkog kataloga.
+export const shotOf = (sku: string) => `/shop/${sku}.webp`
+
 export const PRODUCTS: Product[] = GC_PRODUCTS.map((p) => ({
   ...p,
+  image: shotOf(p.sku),
+  photo: shotOf(p.sku),
+  drawing: false,
+  illustrative: false,
   id: p.sku,
   uses: USE_MAP[p.sku] ?? [],
   badge: p.featured ? 'Najčešće birano' : undefined,

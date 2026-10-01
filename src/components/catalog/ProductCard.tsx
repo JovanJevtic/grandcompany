@@ -1,51 +1,43 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- studijske fotografije iz /public, već optimizovane u WebP */
+
 import Link from 'next/link'
-import { STOCK_LABEL, stockLevel } from '@/gc/gc'
 import { addToCart, toggleSaved, useShop } from '@/lib/cart'
-import { defaultQty, money, type Product } from '@/lib/shop'
-import GlyphDraw from './GlyphDraw'
+import { categoryName, defaultQty, money, type Product } from '@/lib/shop'
 
-type Props = { product: Product; view: 'grid' | 'list' }
+type Props = { product: Product; view?: 'grid' | 'list'; size?: 'md' | 'lg'; priority?: boolean }
 
-export default function ProductCard({ product, view }: Props) {
+// Kartica artikla, editorijalno: velika fotografija na polju boje studijske pozadine, ispod ime i cijena.
+// Na hover se slika približi, a odozdo izađe kapsula "Dodaj u korpu"; kursor kaže "Pogledaj".
+export default function ProductCard({ product, view = 'grid', priority }: Props) {
   const { saved } = useShop()
   const isSaved = saved.includes(product.id)
-  const stock = stockLevel(product)
+  const href = `/prodavnica/${product.sku}`
 
   if (view === 'list') {
     return (
-      <article
-        data-flip-id={product.id}
-        className="grid grid-cols-[1fr_auto] gap-3 border-t-2 border-ink py-4 md:grid-cols-[110px_1fr_160px_130px_auto] md:items-center md:px-3"
-      >
-        <GlyphDraw product={product} className="hidden h-16 md:block" />
+      <article data-flip-id={product.id} className="group grid grid-cols-[88px_1fr_auto] items-center gap-5 border-t border-ink/15 py-4">
+        <Link href={href} className="shot block aspect-[4/5]" data-cursor="Pogledaj">
+          <img src={product.image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        </Link>
         <div>
-          <p className="font-mono text-[11px] uppercase opacity-60">{product.sku} · {product.brand}</p>
-          <Link href={`/prodavnica/${product.sku}`} className="mt-1 block text-lg uppercase leading-none">
+          <p className="label opacity-50">{categoryName(product.category)}</p>
+          <Link href={href} className="mt-1 block text-[clamp(17px,1.4vw,22px)] leading-[1.15]">
             {product.name}
           </Link>
-          <p className="mt-2 font-mono text-[11px] uppercase opacity-60">{product.spec}</p>
         </div>
-        <p className="hidden font-mono text-xs uppercase md:block">
-          <i className="mr-2 inline-block size-2 bg-accent" />{STOCK_LABEL[stock]}
-        </p>
-        <p className="font-mono text-sm uppercase tabular-nums">{money(product.price)} / {product.unit}</p>
-        <div className="flex gap-2">
-          <button
-            type="button"
-            aria-label={isSaved ? 'Ukloni iz sačuvanih' : 'Sačuvaj'}
-            onClick={() => toggleSaved(product.id)}
-            className="min-h-10 border-2 border-ink px-3"
-          >
-            {isSaved ? '■' : '□'}
-          </button>
+        <div className="flex items-center gap-5">
+          <p className="tabular-nums">
+            {money(product.price)} <span className="opacity-50">/ {product.unit}</span>
+          </p>
           <button
             type="button"
             onClick={() => addToCart(product.id, defaultQty(product))}
-            className="min-h-10 border-2 border-ink px-3 font-mono text-[11px] uppercase"
+            className="grid size-11 place-items-center rounded-full border border-ink/30 text-lg transition-colors hover:border-signal hover:bg-signal hover:text-bg"
+            aria-label={`Dodaj u korpu: ${product.name}`}
           >
-            + U korpu
+            +
           </button>
         </div>
       </article>
@@ -53,39 +45,42 @@ export default function ProductCard({ product, view }: Props) {
   }
 
   return (
-    <article data-flip-id={product.id} className="product-card flex flex-col border-2 border-ink bg-well p-4">
-      <div className="flex justify-between font-mono text-[11px] uppercase tracking-wide">
-        <span>{product.sku} · {product.brand}</span>
+    <article data-flip-id={product.id} className="group flex flex-col">
+      <div className="relative">
+        <Link href={href} className="shot block aspect-[4/5]" data-cursor="Pogledaj" data-float>
+          <img
+            src={product.image}
+            alt={product.name}
+            loading={priority ? 'eager' : 'lazy'}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </Link>
+
         <button
           type="button"
           aria-label={isSaved ? 'Ukloni iz sačuvanih' : 'Sačuvaj'}
+          aria-pressed={isSaved}
           onClick={() => toggleSaved(product.id)}
-          className="min-h-10 min-w-10"
+          className="absolute right-3 top-3 grid size-10 place-items-center rounded-full text-ink/70 transition-colors hover:text-signal"
         >
-          {isSaved ? '■' : '□'}
+          <span className={`block size-2.5 rounded-full border border-current ${isSaved ? 'bg-signal border-signal' : ''}`} />
         </button>
-      </div>
-      <Link href={`/prodavnica/${product.sku}`} className="flex flex-1 flex-col">
-        <div className="product-plate relative my-3 aspect-[4/3] overflow-hidden border-y border-ink/20">
-          <GlyphDraw product={product} className="relative z-10 h-full p-4" />
-        </div>
-        <h2 className="text-[clamp(19px,1.7vw,28px)] uppercase leading-[.96]">{product.name}</h2>
-        <p className="mt-2 font-mono text-[11px] uppercase opacity-60">{product.spec}</p>
-      </Link>
-      <div className="mt-5 flex items-end justify-between gap-3 border-t border-ink pt-4">
-        <div>
-          <p className="font-mono text-[11px] uppercase">
-            <i className="mr-2 inline-block size-2 bg-accent" />{STOCK_LABEL[stock]}
-          </p>
-          <p className="mt-2 font-mono text-sm uppercase tabular-nums">{money(product.price)} / {product.unit}</p>
-        </div>
+
+        {/* Kapsula za brzu kupovinu: izlazi odozdo preko slike */}
         <button
           type="button"
           onClick={() => addToCart(product.id, defaultQty(product))}
-          className="min-h-10 border-2 border-ink px-3 font-mono text-[11px] uppercase"
+          className="absolute inset-x-3 bottom-3 flex min-h-11 translate-y-3 items-center justify-center gap-2 rounded-full bg-ink text-[14px] text-bg opacity-0 transition-[opacity,transform,background-color] duration-500 ease-[var(--ease-out)] hover:bg-signal focus-visible:translate-y-0 focus-visible:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 max-md:hidden"
         >
-          + U korpu
+          Dodaj u korpu
         </button>
+      </div>
+
+      <div className="flex flex-col gap-1 pt-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4 sm:pt-4">
+        <Link href={href} className="text-[clamp(16px,1.25vw,20px)] leading-[1.2]">
+          {product.name}
+        </Link>
+        <p className="shrink-0 text-[14px] tabular-nums sm:pt-[2px] sm:text-[15px] transition-colors group-hover:text-signal">{money(product.price)}</p>
       </div>
     </article>
   )

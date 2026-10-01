@@ -1,14 +1,14 @@
 'use client'
 
-import Link from 'next/link'
+import Cta from '@/components/ui/Cta'
 import { useRef } from 'react'
 import { BRAND_NOTES } from '@/gc/gc'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
-import { revealChars, revealLines } from '@/lib/reveal'
+import { revealChars } from '@/lib/reveal'
 import { PRODUCTS, artikala } from '@/lib/shop'
 
-// Brendovi: ogledalo prve sekcije (tamno plava kolona lijevo, svijetla desno). Uz svaki brend ide
+// Brendovi: ogledalo sekcije "Po namjeni" (tamno plava kolona lijevo, svijetla desno). Uz svaki brend ide
 // generativni linijski crtež (zrake, torus, globus, zrnca) koji se okreće dok se skrola — crtež se
 // računa iz ugla `t`, pa ga skrol "vrti" bez ijednog video ili slikovnog fajla.
 
@@ -132,11 +132,9 @@ export default function BrandsSplit() {
       mm.add(MQ, (ctx) => {
         const { reduce } = ctx.conditions as { reduce: boolean }
         revealChars(el.querySelector('[data-head]')!, reduce, 'top 75%')
-        revealLines(el.querySelector('[data-lead]')!, reduce, 'top 90%')
 
         gsap.utils.toArray<HTMLElement>('[data-brand]', el).forEach((row, i) => {
           revealChars(row.querySelector('[data-title]')!, reduce, 'top 80%', row)
-          revealLines(row.querySelector('[data-text]')!, reduce, 'top 85%')
           const g = row.querySelector<SVGGElement>('[data-gen]')!
           const art = ARTS[i]
           if (!g.childElementCount) art.init(g)
@@ -159,33 +157,15 @@ export default function BrandsSplit() {
 
   return (
     <section ref={root} id="brendovi" className="relative z-20 md:grid md:grid-cols-2" aria-label="Brendovi">
-      <div className="flex flex-col justify-between bg-navy px-5 pb-12 pt-[14dvh] text-bg md:sticky md:top-0 md:h-dvh md:self-start md:px-[3.05vw] md:pb-[6dvh] md:pt-[11dvh]">
-        <div>
-          <p className="mb-[4dvh] flex justify-between border-t border-bg/40 pt-3 font-mono text-micro uppercase tracking-wider">
-            <span>05 — Brendovi</span>
-            <span>{BRAND_NOTES.length} proizvođača</span>
-          </p>
-          <h2 data-head className="invisible text-[clamp(48px,7.2vw,150px)] font-bold uppercase leading-[0.86] tracking-[-0.02em]">
-            <span className="block">Sistemi,</span>
-            <span className="block text-right">ne samo</span>
-            <span className="block">ploče</span>
-          </h2>
-        </div>
-        <div className="mt-12 grid gap-8 md:ml-[36%] md:mt-0">
-          <p data-lead className="invisible text-[clamp(16px,1.35vw,22px)] font-medium leading-[1.3]">
-            Radimo sa proizvođačima čiji se dijelovi slažu u sistem: ploča, profil, vuna i masa
-            predviđeni su da rade zajedno, pa zid ima deklarisanu zvučnu izolaciju, a ne procjenu.
-          </p>
-          <Link
-            href="/prodavnica"
-            className="group inline-flex w-fit items-center gap-10 border-2 border-bg px-5 py-4 font-mono text-micro uppercase tracking-wider transition-colors hover:bg-bg hover:text-navy"
-          >
-            Artikli po brendu
-            <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1.5">
-              →
-            </span>
-          </Link>
-        </div>
+      <div className="flex flex-col items-center justify-center gap-12 bg-navy px-5 py-[16vh] text-center text-bg md:sticky md:top-0 md:h-dvh md:self-start">
+        <h2 data-head className="display invisible text-[clamp(56px,7.4vw,140px)]">
+          Sistemi,
+          <br />
+          <em>ne samo</em> ploče
+        </h2>
+        <Cta href="/prodavnica" className="[--cta-fill:var(--bg)] [--cta-ink:var(--navy)]">
+          Artikli po brendu
+        </Cta>
       </div>
 
       <div className="bg-bg">
@@ -193,28 +173,18 @@ export default function BrandsSplit() {
           <article
             key={brand}
             data-brand
-            className="grid grid-cols-[auto_1fr] gap-x-5 gap-y-10 border-b border-ink/15 px-5 py-[10dvh] md:min-h-[86dvh] md:grid-cols-[3.2vw_1.1fr_1fr] md:gap-x-[2vw] md:px-[3vw]"
+            className="flex flex-col items-center justify-center gap-10 border-b border-ink/10 px-6 py-[14vh] text-center md:min-h-[90dvh] md:px-[5vw]"
           >
-            <span className="pt-2 font-mono text-micro tabular-nums opacity-60">0{i + 1}</span>
-            <h3 data-title className="invisible text-[clamp(32px,3vw,58px)] font-bold uppercase leading-[0.92]">
+            <svg viewBox={`${-R - 6} ${-R - 6} ${2 * R + 12} ${2 * R + 12}`} className="art w-[min(60vw,280px)]" fill="none" stroke="currentColor" strokeWidth={1} aria-hidden>
+              {i !== 2 && i !== 3 && <circle r={R} />}
+              <g data-gen />
+              <circle r={3} fill="var(--signal)" stroke="none" />
+            </svg>
+            <h3 data-title className="display invisible text-[clamp(40px,4.2vw,76px)]">
               {brand}
             </h3>
-            <p data-text className="invisible col-span-2 text-[clamp(15px,1.15vw,20px)] font-medium leading-[1.3] md:col-span-1">
-              {note}
-            </p>
-            <div className="col-span-2 flex items-center justify-center md:col-span-1 md:col-start-2">
-              <svg viewBox={`${-R - 6} ${-R - 6} ${2 * R + 12} ${2 * R + 12}`} className="art w-[min(64vw,300px)]" fill="none" stroke="currentColor" strokeWidth={1} aria-hidden>
-                {i !== 2 && i !== 3 && <circle r={R} />}
-                <g data-gen />
-                <circle r={3} fill="currentColor" />
-              </svg>
-            </div>
-            <p className="col-span-2 self-end font-mono text-micro uppercase tracking-wider md:col-span-1 md:col-start-3">
-              <span className="flex items-center gap-3 border-t border-ink/25 pt-3">
-                <i className="size-2 bg-accent" />
-                {count(brand) ? `${artikala(count(brand))} u katalogu` : 'Na upit'}
-              </span>
-            </p>
+            <p className="max-w-[36ch] text-[clamp(16px,1.2vw,19px)] italic leading-[1.45] opacity-75">{note}</p>
+            <p className="text-[14px] opacity-60">{count(brand) ? `${artikala(count(brand))} u katalogu` : 'Na upit'}</p>
           </article>
         ))}
       </div>

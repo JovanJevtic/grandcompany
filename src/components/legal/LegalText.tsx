@@ -9,7 +9,7 @@ export function T({ s }: { s: string }) {
         p.kind === 'em' ? (
           <em key={i}>{p.text}</em>
         ) : p.kind === 'missing' ? (
-          <span key={i} className="bg-ink px-1 text-bg" title="Podatak nije poznat, dopuniti prije objave">
+          <span key={i} className="rounded-[2px] bg-plate px-1 text-signal" title="Podatak nije poznat, dopuniti prije objave">
             {p.text}
           </span>
         ) : (

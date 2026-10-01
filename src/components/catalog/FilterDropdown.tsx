@@ -1,8 +1,8 @@
 'use client'
 
-import { useId, useRef, useState } from 'react'
+import { useEffect, useId, useRef, useState } from 'react'
 import { gsap, useGSAP } from '@/lib/gsap'
-import { MQ } from '@/lib/motion'
+import { EASE, MQ } from '@/lib/motion'
 
 type Option = { value: string; label: string }
 type Props = {
@@ -10,14 +10,28 @@ type Props = {
   value: string
   options: Option[]
   onChange: (value: string) => void
+  /** Poravnanje panela: lijevo (podrazumijevano) ili desno (za padajuće uz desnu ivicu) */
+  align?: 'left' | 'right'
 }
 
-export default function FilterDropdown({ label, value, options, onChange }: Props) {
+// Tihi padajući izbor: tekst sa malom strelicom; panel je zaobljena kartica koja izroni odozgo.
+export default function FilterDropdown({ label, value, options, onChange, align = 'left' }: Props) {
   const id = useId()
   const root = useRef<HTMLDivElement>(null)
   const trigger = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
   const selected = options.find((option) => option.value === value) ?? options[0]
+  const isSet = value !== options[0]?.value
+
+  // Klik van panela ga zatvara.
+  useEffect(() => {
+    if (!open) return
+    const onDown = (event: PointerEvent) => {
+      if (!root.current?.contains(event.target as Node)) setOpen(false)
+    }
+    window.addEventListener('pointerdown', onDown)
+    return () => window.removeEventListener('pointerdown', onDown)
+  }, [open])
 
   useGSAP(
     () => {
@@ -27,10 +41,10 @@ export default function FilterDropdown({ label, value, options, onChange }: Prop
       mm.add(MQ, (context) => {
         const { reduce } = context.conditions as { reduce: boolean }
         gsap.to(panel, {
-          scaleY: open ? 1 : 0,
           autoAlpha: open ? 1 : 0,
-          duration: reduce ? 0 : 0.28,
-          ease: reduce ? 'none' : 'steps(4)',
+          y: open ? 0 : -8,
+          duration: reduce ? 0 : 0.35,
+          ease: EASE.out,
         })
       })
     },
@@ -79,40 +93,48 @@ export default function FilterDropdown({ label, value, options, onChange }: Prop
         type="button"
         aria-expanded={open}
         aria-controls={id}
-        onClick={() => setOpen((value) => !value)}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((v) => !v)}
         onKeyDown={onTriggerKey}
-        className="flex min-h-11 w-full items-center justify-between border-2 border-ink px-3 font-mono text-[11px] uppercase"
+        className="flex min-h-11 items-center gap-2 text-[15px]"
       >
-        <span className="truncate">{value === 'sve' ? label : selected.label}</span>
-        <span aria-hidden>{open ? '↑' : '↓'}</span>
+        {isSet && <span className="size-1.5 rounded-full bg-signal" aria-hidden />}
+        <span className="opacity-50">{label}</span>
+        <span className="truncate">{isSet ? selected.label : ''}</span>
+        <svg viewBox="0 0 10 6" className={`w-2.5 transition-transform duration-500 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" aria-hidden>
+          <path d="M1 1l4 4 4-4" />
+        </svg>
       </button>
       <div
         id={id}
         data-panel
         role="listbox"
         aria-label={label}
-        className="invisible absolute inset-x-0 top-[calc(100%-2px)] z-50 origin-top border-2 border-ink bg-bg opacity-0"
-        style={{ transform: 'scaleY(0)' }}
+        className={`invisible absolute top-full z-50 mt-2 min-w-[220px] rounded-2xl bg-bg p-2 opacity-0 shadow-[0_24px_60px_-20px_rgba(27,36,54,.35)] ring-1 ring-ink/10 ${
+          align === 'right' ? 'right-0' : 'left-0'
+        }`}
       >
-        {options.map((option, index) => (
-          <button
-            key={option.value}
-            type="button"
-            role="option"
-            aria-selected={option.value === value}
-            onKeyDown={(event) => onOptionKey(event, index)}
-            onClick={() => {
-              onChange(option.value)
-              setOpen(false)
-              trigger.current?.focus()
-            }}
-            className={`flex min-h-10 w-full items-center gap-2 border-t border-ink px-3 text-left font-mono text-[11px]
-              uppercase first:border-t-0 hover:bg-navy hover:text-bg`}
-          >
-            <span className={option.value === value ? 'text-accent' : 'invisible'}>■</span>
-            {option.label}
-          </button>
-        ))}
+        {options.map((option, index) => {
+          const on = option.value === value
+          return (
+            <button
+              key={option.value}
+              type="button"
+              role="option"
+              aria-selected={on}
+              onKeyDown={(event) => onOptionKey(event, index)}
+              onClick={() => {
+                onChange(option.value)
+                setOpen(false)
+                trigger.current?.focus()
+              }}
+              className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-[15px] transition-colors hover:bg-plate/70"
+            >
+              <span className={`size-1.5 shrink-0 rounded-full ${on ? 'bg-signal' : 'bg-transparent'}`} />
+              <span className={on ? 'italic' : ''}>{option.label}</span>
+            </button>
+          )
+        })}
       </div>
     </div>
   )

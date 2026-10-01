@@ -192,7 +192,7 @@ export default function SiteChrome() {
       >
         <h1
           data-wordmark
-          className="invisible inline-block whitespace-nowrap font-bold uppercase leading-none"
+          className="invisible inline-block whitespace-nowrap font-normal uppercase leading-none tracking-[-0.03em]"
           style={{ fontSize: 'var(--wm-fs)' }}
         >
           {BRAND}
@@ -205,7 +205,7 @@ export default function SiteChrome() {
         type="button"
         data-mini
         onClick={() => window.__gcLenis?.scrollTo(0)}
-        className="invisible fixed left-5 top-4 z-[150] text-[15px] font-bold uppercase leading-none tracking-[-0.01em] text-white mix-blend-difference md:left-[3.05vw] md:top-5 md:text-[17px]"
+        className="invisible fixed left-5 top-4 z-[150] hidden text-[15px] font-bold uppercase leading-none tracking-[-0.01em] text-white mix-blend-difference md:left-[3.05vw] md:top-5 md:text-[17px]"
         aria-label="Na vrh stranice"
       >
         {BRAND}

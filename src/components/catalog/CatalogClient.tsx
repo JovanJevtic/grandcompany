@@ -1,17 +1,22 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- studijske fotografije iz /public, već optimizovane u WebP */
+
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import ProductGlyph from '@/components/art/ProductGlyph'
 import { useShop } from '@/lib/cart'
 import { Flip, gsap, useGSAP } from '@/lib/gsap'
+import { useMediaMotion } from '@/lib/media'
+import { EASE } from '@/lib/motion'
 import {
   CATEGORIES,
   PRICE_BANDS,
   PRODUCTS,
   SORTS,
   USES,
+  artikala,
   filterProducts,
+  shotOf,
   type CategoryId,
   type Filters,
   type SortId,
@@ -22,10 +27,17 @@ import ProductCard from './ProductCard'
 
 type Extra = { brand: string; stock: boolean; view: 'grid' | 'list' }
 type State = Filters & Extra
-type Active = { key: string; label: string; patch: Partial<State> }
 
 const BRANDS = [...new Set(PRODUCTS.map((product) => product.brand))]
 const option = (value: string, label: string) => ({ value, label })
+
+// Naslovna fotografija za svaku grupu: jedan tipičan artikal iz nje.
+const COVER: Record<CategoryId, string> = {
+  'suha-gradnja': 'KNF-001',
+  izolacija: 'ISO-002',
+  veziva: 'CHM-002',
+  oprema: 'ACC-003',
+}
 
 function read(search: URLSearchParams): State {
   return {
@@ -41,44 +53,18 @@ function read(search: URLSearchParams): State {
   }
 }
 
-function RollingCount({ value }: { value: number }) {
-  const root = useRef<HTMLSpanElement>(null)
-  const previous = useRef(value)
-
-  useGSAP(
-    () => {
-      const old = root.current?.querySelector<HTMLElement>('[data-old]')
-      const next = root.current?.querySelector<HTMLElement>('[data-next]')
-      if (!old || !next || previous.current === value) return
-      next.textContent = String(value)
-      gsap.set(next, { yPercent: 0 })
-      gsap.timeline({ onComplete: () => {
-        old.textContent = String(value)
-        gsap.set(old, { yPercent: 0 })
-        gsap.set(next, { yPercent: 100 })
-      } })
-        .to(old, { yPercent: -100, duration: 0.35, ease: 'power3.inOut' }, 0)
-        .fromTo(next, { yPercent: 100 }, { yPercent: 0, duration: 0.35, ease: 'power3.inOut' }, 0)
-      previous.current = value
-    },
-    { scope: root, dependencies: [value] },
-  )
-
-  return (
-    <span ref={root} className="relative inline-grid h-[1em] min-w-[2ch] overflow-hidden align-baseline">
-      <span data-old>{value}</span>
-      <span data-next className="absolute inset-x-0 translate-y-full">{value}</span>
-    </span>
-  )
-}
+// Ritam mreže na širokom ekranu (4 kolone): svaki deveti artikal je veliki (2 × 2),
+// naizmjenično lijevo i desno.
+const feature = (i: number) => (i % 9 === 0 ? (i % 18 === 0 ? 'lg:col-span-2 lg:row-span-2' : 'lg:col-span-2 lg:row-span-2 lg:col-start-3') : '')
 
 export default function CatalogClient() {
   const search = useSearchParams()
   const router = useRouter()
   const pathname = usePathname()
   const { saved } = useShop()
+  const section = useRef<HTMLElement>(null)
   const grid = useRef<HTMLDivElement>(null)
-  const [mobile, setMobile] = useState(false)
+  const [more, setMore] = useState(false)
   const [filters, setFilters] = useState(() => read(new URLSearchParams(search.toString())))
 
   // Browser back/forward mora vratiti i lokalno stanje filtera.
@@ -89,17 +75,28 @@ export default function CatalogClient() {
   }, [])
 
   const shown = useMemo(
-    () => filterProducts(filters, saved).filter((product) => (
-      (filters.brand === 'sve' || product.brand === filters.brand)
-      && (!filters.stock || product.stock > 0)
-    )),
+    () =>
+      filterProducts(filters, saved).filter(
+        (product) => (filters.brand === 'sve' || product.brand === filters.brand) && (!filters.stock || product.stock > 0),
+      ),
     [filters, saved],
   )
 
+  useMediaMotion(section, [shown.length, filters.view])
+
+  // Dodatni filteri se otvaraju "harmonikom".
+  useGSAP(
+    () => {
+      const panel = section.current?.querySelector('[data-more]')
+      if (!panel) return
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      gsap.to(panel, { height: more ? 'auto' : 0, autoAlpha: more ? 1 : 0, duration: reduce ? 0 : 0.6, ease: EASE.quintInOut })
+    },
+    { scope: section, dependencies: [more] },
+  )
+
   const update = (patch: Partial<State>) => {
-    const flip = grid.current
-      ? Flip.getState(grid.current.querySelectorAll('[data-flip-id]'))
-      : null
+    const flip = grid.current ? Flip.getState(grid.current.querySelectorAll('[data-flip-id]')) : null
     const next = { ...filters, ...patch }
     setFilters(next)
     const query = new URLSearchParams()
@@ -112,170 +109,186 @@ export default function CatalogClient() {
     if (next.sort !== 'preporuceno') query.set('sort', next.sort)
     if (next.view === 'list') query.set('prikaz', 'lista')
     router.replace(`${pathname}${query.size ? `?${query}` : ''}`, { scroll: false })
-    if (flip) {
-      requestAnimationFrame(() => Flip.from(flip, {
-        duration: 0.55,
-        ease: 'power3.inOut',
-        absolute: true,
-        stagger: 0.015,
-      }))
+    if (flip && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      requestAnimationFrame(() =>
+        Flip.from(flip, {
+          duration: 0.8,
+          ease: EASE.quintInOut,
+          absolute: true,
+          stagger: 0.02,
+          onEnter: (els) => gsap.fromTo(els, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.8, ease: EASE.out, stagger: 0.03, delay: 0.15 }),
+          onLeave: (els) => gsap.to(els, { autoAlpha: 0, duration: 0.3 }),
+        }),
+      )
     }
   }
 
   const reset = () => update({ ...read(new URLSearchParams()), view: filters.view })
-  const active = [
-    filters.category !== 'sve' && { key: 'category', label: filters.category, patch: { category: 'sve' } },
-    filters.use !== 'sve' && { key: 'use', label: filters.use, patch: { use: 'sve' } },
-    filters.price !== 'sve' && { key: 'price', label: filters.price, patch: { price: 'sve' } },
-    filters.brand !== 'sve' && { key: 'brand', label: filters.brand, patch: { brand: 'sve' } },
-    filters.stock && { key: 'stock', label: 'na stanju', patch: { stock: false } },
-    filters.query && { key: 'query', label: `“${filters.query}”`, patch: { query: '' } },
-  ].filter(Boolean) as Active[]
-
-  const controls = (
-    <div className="grid gap-2 md:grid-cols-4 xl:grid-cols-8">
-      <input
-        className="site-input min-h-11 md:col-span-2"
-        value={filters.query}
-        onChange={(event) => update({ query: event.target.value })}
-        placeholder="Pretraži naziv, SKU…"
-      />
-      <FilterDropdown
-        label="Kategorija"
-        value={filters.category}
-        options={[option('sve', 'Sve kategorije'), ...CATEGORIES.map((item) => option(item.id, item.name))]}
-        onChange={(value) => update({ category: value as CategoryId | 'sve' })}
-      />
-      <FilterDropdown
-        label="Namjena"
-        value={filters.use}
-        options={[option('sve', 'Sve namjene'), ...USES.map((item) => option(item.id, item.name))]}
-        onChange={(value) => update({ use: value as UseId | 'sve' })}
-      />
-      <FilterDropdown
-        label="Cijena"
-        value={filters.price}
-        options={[option('sve', 'Sve cijene'), ...PRICE_BANDS.map((item) => option(item.id, item.label))]}
-        onChange={(value) => update({ price: value })}
-      />
-      <FilterDropdown
-        label="Brend"
-        value={filters.brand}
-        options={[option('sve', 'Svi brendovi'), ...BRANDS.map((brand) => option(brand, brand))]}
-        onChange={(value) => update({ brand: value })}
-      />
-      <FilterDropdown
-        label="Sortiranje"
-        value={filters.sort}
-        options={SORTS.map((item) => option(item.id, item.label))}
-        onChange={(value) => update({ sort: value as SortId })}
-      />
-      <button
-        type="button"
-        onClick={() => update({ stock: !filters.stock })}
-        className={`min-h-11 border-2 border-ink px-3 font-mono text-[11px] uppercase ${filters.stock ? 'bg-navy text-bg' : ''}`}
-      >
-        ■ Na stanju
-      </button>
-    </div>
-  )
+  const extra = [filters.use !== 'sve', filters.price !== 'sve', filters.brand !== 'sve', filters.stock].filter(Boolean).length
+  const tabs: { id: CategoryId | 'sve'; name: string }[] = [{ id: 'sve', name: 'Sve' }, ...CATEGORIES.map((c) => ({ id: c.id, name: c.name }))]
 
   return (
-    <section id="artikli">
-      <div
-        className={`sticky top-[var(--site-header-offset,64px)] z-40 border-y-2 border-ink bg-bg/95 px-5 py-3
-          backdrop-blur transition-[top] duration-300 md:px-[8.33vw]`}
-      >
-        <div className="flex items-center justify-between md:hidden">
-          <button
-            type="button"
-            onClick={() => setMobile(true)}
-            className="min-h-11 border-2 border-ink px-4 font-mono text-[11px] uppercase"
-          >
-            Filteri {active.length ? `(${active.length})` : ''}
-          </button>
-          <span className="font-mono text-xs uppercase tabular-nums"><RollingCount value={shown.length} /> artikala</span>
-        </div>
-        <div className="hidden md:block">{controls}</div>
-        {active.length > 0 && (
-          <div className="mt-3 hidden flex-wrap gap-2 md:flex">
-            {active.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() => update(item.patch)}
-                className="min-h-10 border border-ink px-3 font-mono text-[11px] uppercase"
-              >
-                ■ {item.label} ×
-              </button>
-            ))}
-            <button type="button" onClick={reset} className="min-h-10 font-mono text-[11px] uppercase underline">
-              Poništi sve
+    <section ref={section} id="artikli">
+      {/* Grupe kao četiri male fotografije: najbrži put do dijela kataloga */}
+      <div className="gutter mx-auto grid max-w-[1280px] grid-cols-4 gap-x-3 md:gap-x-[2vw]">
+        {CATEGORIES.map((c, i) => {
+          const on = filters.category === c.id
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => update({ category: on ? 'sve' : c.id })}
+              aria-pressed={on}
+              style={{ animationDelay: `${0.15 + i * 0.08}s` }}
+              data-cursor={on ? 'Sve' : 'Izaberi'}
+              className="fade-up group text-center"
+            >
+              <span className="shot block aspect-square rounded-full">
+                <img src={shotOf(COVER[c.id])} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              </span>
+              <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] leading-tight md:mt-4 md:gap-2 md:text-[clamp(16px,1.3vw,21px)]">
+                <span className={`size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
+                <span className={on ? 'italic' : ''}>{c.name}</span>
+              </span>
             </button>
-          </div>
-        )}
+          )
+        })}
       </div>
 
-      <div className="gutter py-10">
-        <div className="mb-6 flex items-center justify-between gap-4">
-          <p className="font-mono text-xs uppercase tabular-nums">
-            Prikazano <RollingCount value={shown.length} /> / {PRODUCTS.length}
-          </p>
-          <div className="flex shrink-0 border-2 border-ink font-mono text-[11px] uppercase">
-            <button
-              type="button"
-              aria-pressed={filters.view === 'grid'}
-              className={`min-h-10 px-4 ${filters.view === 'grid' ? 'bg-ink text-bg' : 'bg-bg text-ink'}`}
-              onClick={() => update({ view: 'grid' })}
-            >
-              Mreža
+      {/* Tihi red filtera */}
+      <div className="gutter mt-[12vh]">
+        <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-3 border-b border-ink/15 pb-3">
+          <div role="tablist" aria-label="Grupa artikala" className="-ml-1 hidden flex-wrap items-center gap-x-6 gap-y-1 md:flex">
+            {tabs.map((t) => {
+              const on = filters.category === t.id
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={on}
+                  onClick={() => update({ category: t.id })}
+                  className={`relative flex min-h-11 items-center gap-2 px-1 text-[15px] transition-opacity ${on ? '' : 'opacity-50 hover:opacity-100'}`}
+                >
+                  {on && <span className="size-1.5 rounded-full bg-signal" />}
+                  <span className={on ? 'italic' : ''}>{t.name}</span>
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="flex w-full items-center justify-between gap-x-7 md:w-auto md:justify-start">
+            <label className="flex min-h-11 items-center gap-2 text-[15px]">
+              <span className="sr-only">Pretraga</span>
+              <svg viewBox="0 0 16 16" className="w-3.5 opacity-50" fill="none" stroke="currentColor" aria-hidden>
+                <circle cx="7" cy="7" r="5" />
+                <path d="M11 11l4 4" />
+              </svg>
+              <input
+                type="search"
+                value={filters.query}
+                onChange={(event) => update({ query: event.target.value })}
+                placeholder="Pretraga"
+                className="w-[6.5rem] bg-transparent md:w-[9.5rem] outline-none placeholder:text-ink/50 focus:placeholder:text-ink/30"
+              />
+            </label>
+            <button type="button" onClick={() => setMore((v) => !v)} aria-expanded={more} className="flex min-h-11 items-center gap-2 text-[15px]">
+              {extra > 0 && <span className="grid size-5 place-items-center rounded-full bg-signal text-[11px] text-bg">{extra}</span>}
+              <span className="ulink">Filteri</span>
+              <span aria-hidden className={`inline-block transition-transform duration-500 ${more ? 'rotate-45' : ''}`}>+</span>
             </button>
-            <button
-              type="button"
-              aria-pressed={filters.view === 'list'}
-              className={`min-h-10 border-l-2 border-ink px-4 ${filters.view === 'list' ? 'bg-ink text-bg' : 'bg-bg text-ink'}`}
-              onClick={() => update({ view: 'list' })}
-            >
-              Lista
-            </button>
+            <FilterDropdown
+              label="Redoslijed"
+              value={filters.sort}
+              align="right"
+              options={SORTS.map((item) => option(item.id, item.label))}
+              onChange={(value) => update({ sort: value as SortId })}
+            />
           </div>
         </div>
-        <div ref={grid} className={filters.view === 'grid' ? 'grid gap-5 sm:grid-cols-2 xl:grid-cols-3' : ''}>
-          {shown.map((product) => <ProductCard key={product.id} product={product} view={filters.view} />)}
-        </div>
-        {!shown.length && (
-          <div className="grid min-h-[60vh] place-items-center border-2 border-ink p-8 text-center">
-            <div>
-              <ProductGlyph product={PRODUCTS[0]} kind="hanger" className="mx-auto h-52" />
-              <h2 className="text-title uppercase">Nema artikala.</h2>
-              <p className="mt-4 font-mono text-xs uppercase">Promijenite filtere ili pretragu.</p>
-              <button type="button" onClick={reset} className="mt-6 border-2 border-ink px-5 py-3 font-mono text-xs uppercase">
-                Poništi sve
-              </button>
+
+        <div data-more className="invisible h-0 overflow-hidden opacity-0" inert={!more}>
+          <div className="flex flex-wrap items-center gap-x-8 gap-y-1 border-b border-ink/15 py-3">
+            <FilterDropdown
+              label="Namjena"
+              value={filters.use}
+              options={[option('sve', 'Sve namjene'), ...USES.map((item) => option(item.id, item.name))]}
+              onChange={(value) => update({ use: value as UseId | 'sve' })}
+            />
+            <FilterDropdown
+              label="Cijena"
+              value={filters.price}
+              options={[option('sve', 'Sve cijene'), ...PRICE_BANDS.map((item) => option(item.id, item.label))]}
+              onChange={(value) => update({ price: value })}
+            />
+            <FilterDropdown
+              label="Brend"
+              value={filters.brand}
+              options={[option('sve', 'Svi brendovi'), ...BRANDS.map((brand) => option(brand, brand))]}
+              onChange={(value) => update({ brand: value })}
+            />
+            <button type="button" aria-pressed={filters.stock} onClick={() => update({ stock: !filters.stock })} className="flex min-h-11 items-center gap-2 text-[15px]">
+              <span className={`grid size-4 place-items-center rounded-full border transition-colors ${filters.stock ? 'border-signal bg-signal' : 'border-ink/40'}`} />
+              Samo na stanju
+            </button>
+            <div className="ml-auto flex items-center gap-5 text-[15px]">
+              {(['grid', 'list'] as const).map((v) => (
+                <button
+                  key={v}
+                  type="button"
+                  aria-pressed={filters.view === v}
+                  onClick={() => update({ view: v })}
+                  className={`min-h-11 ${filters.view === v ? 'italic' : 'opacity-50 hover:opacity-100'}`}
+                >
+                  {v === 'grid' ? 'Mreža' : 'Lista'}
+                </button>
+              ))}
+              {extra > 0 && (
+                <button type="button" onClick={reset} className="ulink min-h-11 text-signal">
+                  Poništi
+                </button>
+              )}
             </div>
           </div>
-        )}
+        </div>
+
+        <p className="mt-4 text-[13px] opacity-50" aria-live="polite">
+          {artikala(shown.length)}
+        </p>
       </div>
 
       <div
-        className={`fixed inset-0 z-[500] bg-navy p-5 text-bg transition-transform duration-500 md:hidden
-          ${mobile ? 'translate-y-0' : 'translate-y-full'}`}
-        aria-hidden={!mobile}
-        inert={!mobile}
+        ref={grid}
+        className={
+          filters.view === 'grid'
+            ? 'gutter mt-10 grid grid-flow-dense grid-cols-2 gap-x-4 gap-y-14 md:grid-cols-3 md:gap-x-[2vw] md:gap-y-[6vw] lg:grid-cols-4'
+            : 'gutter mx-auto mt-10 max-w-[1100px]'
+        }
       >
-        <div className="flex justify-between border-b-2 border-bg pb-4">
-          <strong className="uppercase">Filteri</strong>
-          <button type="button" onClick={() => setMobile(false)} className="min-h-10 font-mono text-xs uppercase">Zatvori</button>
-        </div>
-        <div className="mt-6">{controls}</div>
-        <button
-          type="button"
-          onClick={() => setMobile(false)}
-          className="absolute inset-x-5 bottom-5 border-2 border-bg bg-bg px-4 py-4 font-mono text-xs uppercase text-ink"
-        >
-          Prikaži {shown.length} artikala
-        </button>
+        {shown.map((product, i) => (
+          <div key={product.id} className={filters.view === 'grid' ? feature(i) : ''} data-feature={filters.view === 'grid' && i % 9 === 0 ? '' : undefined}>
+            <ProductCard product={product} view={filters.view} priority={i < 4} />
+          </div>
+        ))}
       </div>
+
+      {!shown.length && (
+        <div className="gutter grid min-h-[50vh] place-items-center text-center">
+          <div>
+            <h2 className="display text-[clamp(40px,5vw,80px)]">
+              Ništa <em>ovdje.</em>
+            </h2>
+            <p className="mt-4 opacity-60">Promijenite filtere ili pretragu.</p>
+            <button type="button" onClick={reset} className="cta mt-8">
+              <span className="cta-dot" aria-hidden />
+              <span className="cta-roll">
+                <span>Poništi filtere</span>
+                <span aria-hidden>Poništi filtere</span>
+              </span>
+            </button>
+          </div>
+        </div>
+      )}
     </section>
   )
 }

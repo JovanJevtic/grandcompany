@@ -6,11 +6,12 @@ import { addToCart, notify } from '@/lib/cart'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
+import Cta from '@/components/ui/Cta'
 import { calcW111, money, qtyLabel } from '@/lib/shop'
 
-// Kalkulator pregradnog zida po normi W111/W112 (ista funkcija kao u prodavnici): mjere i izbor
-// ploče, profila i mase daju spisak materijala sa cijenom, a crtež zida (pogled i presjek) se
-// mijenja uživo. "Dodaj sve u korpu" ubacuje cijeli spisak odjednom.
+// Kalkulator pregradnog zida po normi W111/W112 (dno prodavnice, #kalkulator): mjere i izbor
+// ploče, profila i mase daju spisak materijala sa cijenom, a tehnički crtež zida (pogled i presjek)
+// se mijenja uživo. "Dodaj sve u korpu" ubacuje cijeli spisak odjednom.
 
 const PLATES = [
   { sku: 'KNF-001', label: 'GKB', note: 'standardna' },
@@ -33,7 +34,7 @@ const f1 = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 1, 
 function Choice<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: { id: T; text: string; hint?: string }[]; onChange: (v: T) => void }) {
   return (
     <fieldset>
-      <legend className="mb-2 font-mono text-[11px] uppercase tracking-wider opacity-60">{label}</legend>
+      <legend className="mb-3 text-[13px] opacity-50">{label}</legend>
       <div className="flex flex-wrap gap-2">
         {options.map((o) => {
           const on = o.id === value
@@ -43,10 +44,12 @@ function Choice<T extends string>({ label, value, options, onChange }: { label: 
               type="button"
               aria-pressed={on}
               onClick={() => onChange(o.id)}
-              className={`border-2 border-ink px-3 py-2 text-left font-mono text-[11px] uppercase tracking-wider transition-colors duration-300 ${on ? 'bg-ink text-bg' : 'hover:bg-ink/5'}`}
+              className={`min-h-11 rounded-full border px-4 py-2 text-left text-[15px] leading-tight transition-colors duration-300 ${
+                on ? 'border-ink bg-ink text-bg' : 'border-ink/20 hover:border-ink'
+              }`}
             >
               {o.text}
-              {o.hint && <span className="block text-[9px] opacity-60">{o.hint}</span>}
+              {o.hint && <span className={`ml-2 italic ${on ? 'opacity-70' : 'opacity-50'}`}>{o.hint}</span>}
             </button>
           )
         })}
@@ -58,9 +61,9 @@ function Choice<T extends string>({ label, value, options, onChange }: { label: 
 function Range({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
   return (
     <label className="block">
-      <span className="mb-2 flex justify-between font-mono text-[11px] uppercase tracking-wider">
-        <span className="opacity-60">{label}</span>
-        <span className="tabular-nums">{f1(value)} m</span>
+      <span className="mb-2 flex items-baseline justify-between">
+        <span className="text-[13px] opacity-50">{label}</span>
+        <span className="text-[22px] tabular-nums">{f1(value)} m</span>
       </span>
       <input
         type="range"
@@ -102,7 +105,7 @@ function Elevation({ L, H, wool }: { L: number; H: number; wool: boolean }) {
           return <polyline key={`w${i}`} data-wool points={pts.join(' ')} opacity={0.3} />
         })}
       {studs.map((x, i) => (
-        <rect key={`s${i}`} data-stud x={x0 + x * s - 2} y={y0 + 4} width={4} height={h - 8} fill="var(--bg)" />
+        <rect key={`s${i}`} data-stud x={x0 + x * s - 2} y={y0 + 4} width={4} height={h - 8} fill="var(--plate)" />
       ))}
       <path d={`M${x0} ${y0 + 4}H${x0 + w}M${x0} ${y0 + h - 4}H${x0 + w}`} strokeWidth={2.5} />
       {seams.map((x) => (
@@ -110,11 +113,11 @@ function Elevation({ L, H, wool }: { L: number; H: number; wool: boolean }) {
       ))}
       {/* kote */}
       <path d={`M${x0} ${y0 + h + 18}H${x0 + w}M${x0} ${y0 + h + 12}v12M${x0 + w} ${y0 + h + 12}v12`} opacity={0.7} />
-      <text x={x0 + w / 2} y={y0 + h + 36} textAnchor="middle" stroke="none" fill="currentColor" className="font-mono" fontSize={15}>
+      <text x={x0 + w / 2} y={y0 + h + 36} textAnchor="middle" stroke="none" fill="currentColor" fontSize={15} fontStyle="italic">
         {f1(L)} m
       </text>
       <path d={`M${x0 - 18} ${y0}V${y0 + h}M${x0 - 24} ${y0}h12M${x0 - 24} ${y0 + h}h12`} opacity={0.7} />
-      <text x={x0 - 26} y={y0 + h / 2} textAnchor="end" dominantBaseline="middle" stroke="none" fill="currentColor" className="font-mono" fontSize={15}>
+      <text x={x0 - 26} y={y0 + h / 2} textAnchor="end" dominantBaseline="middle" stroke="none" fill="currentColor" fontSize={15} fontStyle="italic">
         {f1(H)} m
       </text>
     </svg>
@@ -135,24 +138,24 @@ function Section({ layers, stud, wool }: { layers: number; stud: number; wool: b
   return (
     <svg viewBox={`0 0 ${len + 40} ${total + 60}`} className="art h-auto w-full" fill="none" stroke="currentColor" strokeWidth={1.25} aria-hidden>
       {rows.map((y) => (
-        <rect key={`a${y}`} x={x0} y={y} width={len} height={board} fill="var(--bg)" />
+        <rect key={`a${y}`} x={x0} y={y} width={len} height={board} fill="var(--plate)" />
       ))}
       {wool && <path d={Array.from({ length: 22 }, (_, i) => `${i ? 'L' : 'M'}${x0 + 5 + i * 10} ${i % 2 ? coreY + 4 : coreY + core - 4}`).join('')} opacity={0.35} />}
       {[0.12, 0.5, 0.88].map((t) => (
         <path key={t} d={`M${x0 + len * t - 12} ${coreY}h24M${x0 + len * t - 12} ${coreY}v${core}h24M${x0 + len * t - 12} ${coreY + core}h24`} strokeWidth={1.8} />
       ))}
       {rows.map((y) => (
-        <rect key={`b${y}`} x={x0} y={coreY + core + (y - y0)} width={len} height={board} fill="var(--bg)" />
+        <rect key={`b${y}`} x={x0} y={coreY + core + (y - y0)} width={len} height={board} fill="var(--plate)" />
       ))}
       <path d={`M${x0 + len + 12} ${y0}V${y0 + total}M${x0 + len + 6} ${y0}h12M${x0 + len + 6} ${y0 + total}h12`} opacity={0.7} />
-      <text x={x0 + len / 2} y={y0 + total + 26} textAnchor="middle" stroke="none" fill="currentColor" className="font-mono" fontSize={15}>
+      <text x={x0 + len / 2} y={y0 + total + 26} textAnchor="middle" stroke="none" fill="currentColor" fontSize={15} fontStyle="italic">
         {Math.round(stud + layers * 2 * 12.5)} mm
       </text>
     </svg>
   )
 }
 
-export default function WallBuilder() {
+export default function WallCalculator() {
   const root = useRef<HTMLElement>(null)
   const [code, setCode] = useState<'W111' | 'W112'>('W111')
   const [L, setL] = useState(4)
@@ -216,118 +219,92 @@ export default function WallBuilder() {
   }
 
   return (
-    <section ref={root} id="kalkulator" className="relative z-20 bg-bg pb-[16dvh] pt-[12dvh]">
-      <div className="gutter">
-        <p className="flex justify-between border-t-2 border-ink pt-3 font-mono text-micro uppercase tracking-wider">
-          <span>04 — Kalkulator zida</span>
-          <span>Norma W111 · W112</span>
-        </p>
-        <h2 data-head className="invisible mt-[6dvh] max-w-[14ch] text-[clamp(44px,6.6vw,128px)] font-bold uppercase leading-[0.88] tracking-[-0.02em]">
-          Izmjerite zid, mi složimo spisak
+    <section ref={root} id="kalkulator" className="scroll-mt-20 py-[18vh]">
+      <div className="gutter text-center">
+        <h2 data-head className="display invisible mx-auto max-w-[16ch] text-[clamp(44px,6vw,108px)]">
+          Izmjerite zid. <em>Mi složimo spisak.</em>
         </h2>
       </div>
 
-      <div className="gutter mt-[8dvh] grid gap-12 md:grid-cols-12 md:gap-[2vw]">
-        {/* Upravljanje */}
-        <div className="grid content-start gap-7 md:col-span-4">
+      <div className="gutter mx-auto mt-[10vh] grid max-w-[1400px] gap-14 md:grid-cols-12 md:gap-[3vw]">
+        <div className="grid content-start gap-8 md:col-span-4">
           <Choice
             label="Sistem"
             value={code}
             onChange={setCode}
             options={[
-              { id: 'W111', text: 'W111', hint: 'jednostruka obloga' },
-              { id: 'W112', text: 'W112', hint: 'dvostruka obloga' },
+              { id: 'W111', text: 'W111', hint: 'jednostruka' },
+              { id: 'W112', text: 'W112', hint: 'dvostruka' },
             ]}
           />
           <Range label="Dužina zida" value={L} min={1} max={12} step={0.1} onChange={setL} />
           <Range label="Visina zida" value={H} min={2} max={4} step={0.05} onChange={setH} />
-          <Choice label="Ploča" value={plate} onChange={setPlate} options={PLATES.map((p) => ({ id: p.sku, text: p.label, hint: p.note }))} />
+          <Choice label="Ploča" value={plate} onChange={setPlate} options={PLATES.map((p) => ({ id: p.sku, text: p.label }))} />
           <Choice label="Profil" value={stud} onChange={setStud} options={STUDS.map((s) => ({ id: s.sku, text: s.label }))} />
           <Choice label="Masa za spojeve" value={filler} onChange={setFiller} options={FILLERS.map((f) => ({ id: f.sku, text: f.label }))} />
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-x-6 gap-y-2">
             {[
               { on: wool, set: setWool, text: 'Kamena vuna 50 mm' },
               { on: tape, set: setTape, text: 'Zvučna traka' },
             ].map((t) => (
-              <button
-                key={t.text}
-                type="button"
-                aria-pressed={t.on}
-                onClick={() => t.set(!t.on)}
-                className="flex items-center gap-2 border-2 border-ink px-3 py-2 font-mono text-[11px] uppercase tracking-wider"
-              >
-                <i className={`size-2.5 border border-ink transition-colors ${t.on ? 'bg-ink' : ''}`} />
+              <button key={t.text} type="button" aria-pressed={t.on} onClick={() => t.set(!t.on)} className="flex min-h-11 items-center gap-2.5 text-[15px]">
+                <span className={`size-4 rounded-full border transition-colors ${t.on ? 'border-signal bg-signal' : 'border-ink/40'}`} />
                 {t.text}
               </button>
             ))}
           </div>
         </div>
 
-        {/* Crtež i spisak */}
         <div className="md:col-span-8">
-          <div className="grid gap-6 border-2 border-ink bg-well p-4 md:grid-cols-[1fr_200px] md:p-6">
+          <div className="grid gap-8 bg-plate p-6 md:grid-cols-[1fr_200px] md:p-10">
             <div>
-              <p className="mb-3 font-mono text-[11px] uppercase tracking-wider opacity-60">Pogled · {f1(P)} m²</p>
+              <p className="mb-4 text-[13px] italic opacity-60">Pogled · {f1(P)} m²</p>
               <Elevation L={L} H={H} wool={wool} />
             </div>
-            <div className="md:border-l md:border-ink/20 md:pl-6">
-              <p className="mb-3 font-mono text-[11px] uppercase tracking-wider opacity-60">Presjek</p>
-              <div className="mx-auto max-w-[180px] md:max-w-none"><Section layers={layers} stud={studMm} wool={wool} /></div>
-              <dl className="mt-4 grid gap-1 font-mono text-[11px] uppercase">
+            <div className="md:border-l md:border-ink/15 md:pl-8">
+              <p className="mb-4 text-[13px] italic opacity-60">Presjek</p>
+              <div className="mx-auto max-w-[180px] md:max-w-none">
+                <Section layers={layers} stud={studMm} wool={wool} />
+              </div>
+              <dl className="mt-5 grid gap-1.5 text-[13px]">
                 <div className="flex justify-between">
-                  <dt className="opacity-60">Zvučna izolacija</dt>
+                  <dt className="opacity-50">Zvučna izolacija</dt>
                   <dd>Rw {system.rw} dB</dd>
                 </div>
                 <div className="flex justify-between">
-                  <dt className="opacity-60">Profil po normi</dt>
+                  <dt className="opacity-50">Profil</dt>
                   <dd>{system.profile}</dd>
                 </div>
               </dl>
             </div>
           </div>
 
-          <table className="mt-6 w-full border-collapse text-left">
+          <table className="mt-8 w-full border-collapse text-left">
             <caption className="sr-only">Spisak materijala</caption>
-            <thead>
-              <tr className="border-b-2 border-ink font-mono text-[11px] uppercase tracking-wider">
-                <th className="py-2 font-medium">Artikal</th>
-                <th className="hidden py-2 font-medium md:table-cell">Potrebno</th>
-                <th className="py-2 text-right font-medium">Količina</th>
-                <th className="py-2 text-right font-medium">Iznos</th>
-              </tr>
-            </thead>
             <tbody>
               {rows.map((r) => (
-                <tr key={r.sku} className="border-b border-ink/15 align-top">
-                  <td className="py-3 pr-3">
-                    <span className="block text-[clamp(13px,1vw,16px)] uppercase leading-tight">{r.name}</span>
-                    <span className="font-mono text-[10px] uppercase opacity-50">{r.note}</span>
+                <tr key={r.sku} className="border-b border-ink/15 align-baseline">
+                  <td className="py-4 pr-3">
+                    <span className="block text-[clamp(15px,1.1vw,18px)] leading-tight">{r.name}</span>
+                    <span className="text-[13px] italic opacity-50">{r.note}</span>
                   </td>
-                  <td className="hidden py-3 font-mono text-[11px] uppercase tabular-nums md:table-cell">{r.need}</td>
-                  <td className="py-3 text-right font-mono text-[11px] uppercase tabular-nums">{qtyLabel(r.qty, r.unit)}</td>
-                  <td className="py-3 text-right font-mono text-[11px] tabular-nums">{money(r.line)}</td>
+                  <td className="hidden py-4 text-right text-[15px] tabular-nums opacity-60 sm:table-cell">{qtyLabel(r.qty, r.unit)}</td>
+                  <td className="w-[7.5rem] py-4 text-right text-[15px] tabular-nums">{money(r.line)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
 
-          <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
-            <p className="font-mono text-micro uppercase">
-              <span className="opacity-60">Ukupno sa PDV-om </span>
-              <span data-total className="text-[clamp(22px,2vw,34px)] font-bold tabular-nums" data-value={0}>
+          <div className="mt-10 flex flex-wrap items-end justify-between gap-6">
+            <p>
+              <span className="block text-[13px] opacity-50">Ukupno sa PDV-om</span>
+              <span data-total className="text-[clamp(32px,3vw,52px)] leading-none tabular-nums" data-value={0}>
                 {money(total)}
               </span>
             </p>
-            <button
-              type="button"
-              onClick={addAll}
-              className="group inline-flex items-center gap-10 bg-ink px-5 py-4 font-mono text-micro uppercase tracking-wider text-bg transition-colors hover:bg-navy"
-            >
+            <Cta solid onClick={addAll}>
               Dodaj sve u korpu
-              <span aria-hidden className="transition-transform duration-300 group-hover:translate-x-1.5">
-                →
-              </span>
-            </button>
+            </Cta>
           </div>
         </div>
       </div>

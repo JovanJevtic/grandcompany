@@ -2,15 +2,16 @@ import Link from 'next/link'
 import { SITE } from '@/lib/company'
 import { GROUP_LABEL, type LegalBlock, type LegalDoc, type LegalGroup } from '@/lib/legal-types'
 import { LEGAL_DOCS } from '@/lib/legal'
-import Footer from '@/components/Footer'
+import Cta from '@/components/ui/Cta'
 import { T } from './LegalText'
 
-// Pravne i servisne stranice iz grand-root (LegalPage + PoliciesIndex), obučene u jezik grand-maison:
-// krem podloga, linije od 2px, džinovski uppercase naslov, a sam tekst u normalnom pismu da bude čitak.
+// Pravne i servisne stranice: mirna stranica za čitanje. Naslov u sredini, jedna rečenica uvoda,
+// pa jedan centriran stub teksta (~62 znaka u redu). Sadržaj (lijevo, sitno) samo na desktopu i samo
+// kad je dokument dug. Header, podnožje i korpu daje (site) layout.
 
-const COPY = 'text-[clamp(15px,1.1vw,18px)] font-medium normal-case leading-[1.5]'
+const MEASURE = 'mx-auto w-full max-w-[62ch]'
 
-// Stranice sa radnjom: dugme vodi na kontakt u podnožju (forma za upit je uklonjena sa početne).
+// Stranice sa radnjom: dugme vodi na kontakt u podnožju.
 const CTA: Record<string, { label: string; href: string }> = {
   'upit-za-izvodjace': { label: 'Pošaljite upit', href: '/#kontakt' },
 }
@@ -19,7 +20,7 @@ function Block({ b }: { b: LegalBlock }) {
   switch (b.t) {
     case 'p':
       return (
-        <p className={`${COPY} mt-5 max-w-[62ch]`}>
+        <p className="mt-5">
           <T s={b.text} />
         </p>
       )
@@ -27,9 +28,9 @@ function Block({ b }: { b: LegalBlock }) {
     case 'ol': {
       const Tag = b.t
       return (
-        <Tag className={`${COPY} mt-5 max-w-[62ch] space-y-2 pl-6 ${b.t === 'ul' ? 'list-[square]' : 'list-decimal'}`}>
+        <Tag className={`mt-5 space-y-2 pl-5 ${b.t === 'ul' ? 'list-disc marker:text-signal' : 'list-decimal marker:text-ink/45'}`}>
           {b.items.map((it, i) => (
-            <li key={i}>
+            <li key={i} className="pl-1">
               <T s={it} />
             </li>
           ))}
@@ -38,11 +39,11 @@ function Block({ b }: { b: LegalBlock }) {
     }
     case 'dl':
       return (
-        <dl className="mt-5 max-w-[62ch] border-t-2 border-ink">
+        <dl className="mt-6 border-t border-ink/15 text-[0.94em]">
           {b.items.map((it) => (
-            <div key={it.k} className="grid grid-cols-[38%_1fr] gap-4 border-b border-ink/25 py-3">
-              <dt className="pt-[3px] text-micro uppercase text-ink/60">{it.k}</dt>
-              <dd className={COPY}>
+            <div key={it.k} className="grid gap-1 border-b border-ink/15 py-3 sm:grid-cols-[38%_1fr] sm:gap-4">
+              <dt className="text-ink/55">{it.k}</dt>
+              <dd>
                 <T s={it.v} />
               </dd>
             </div>
@@ -51,9 +52,9 @@ function Block({ b }: { b: LegalBlock }) {
       )
     case 'box':
       return (
-        <div className="mt-6 max-w-[62ch] border-2 border-ink p-6">
-          {b.title && <p className="text-micro uppercase">{b.title}</p>}
-          <div className={`${COPY} space-y-3 ${b.title ? 'mt-4' : ''}`}>
+        <div className="mt-7 rounded-[2px] bg-plate/60 px-6 py-6 md:px-8">
+          {b.title && <p className="label text-ink/60">{b.title}</p>}
+          <div className={`space-y-3 ${b.title ? 'mt-4' : ''}`}>
             {b.lines.map((l, i) => (
               <p key={i}>
                 <T s={l} />
@@ -64,149 +65,121 @@ function Block({ b }: { b: LegalBlock }) {
       )
     case 'note':
       return (
-        <p className="mt-5 max-w-[62ch] text-micro uppercase leading-[1.4] text-ink/60">
+        <p className="mt-5 text-[0.85em] italic leading-[1.5] text-ink/55">
           <T s={b.text} />
         </p>
       )
   }
 }
 
-// Traka na vrhu pravnih stranica, u obliku ShopBar-a iz grand-maison.
-function LegalBar() {
+export default function LegalPage({ doc }: { doc: LegalDoc }) {
+  const cta = CTA[doc.slug]
+  const long = doc.sections.length > 4
+
   return (
-    <div className="sticky top-0 z-50 flex h-[var(--bar)] items-stretch border-b-2 border-ink bg-bg text-micro uppercase">
-      <Link href="/" className="flex shrink-0 items-center border-r-2 border-ink px-4 transition-colors duration-300 hover:bg-ink hover:text-bg md:px-[3.05vw]">
-        Grand Company
-      </Link>
-      <Link href="/sve-politike" className="flex items-center px-4 transition-colors duration-300 hover:bg-ink/10 md:px-5">
-        Sve politike
-      </Link>
-      <Link
-        href="/#namjena"
-        className="ml-auto flex shrink-0 items-center gap-2 border-l-2 border-ink px-4 transition-colors duration-300 hover:bg-ink hover:text-bg md:px-[3.05vw]"
-      >
-        Šta gradite <span aria-hidden>→</span>
-      </Link>
+    <div className="legal-page px-5 pb-[18dvh] pt-[16dvh] md:px-10 md:pt-[20dvh]">
+      <header className="text-center">
+        <p className="label text-ink/50">{GROUP_LABEL[doc.group]}</p>
+        <h1 className="display mx-auto mt-6 max-w-[14ch] text-[clamp(44px,7vw,120px)] [hyphens:auto]">{doc.title}</h1>
+      </header>
+      <p className="mx-auto mt-8 max-w-[46ch] text-center text-[clamp(17px,1.35vw,21px)] italic leading-[1.45] text-ink/75">
+        <T s={doc.lead} />
+      </p>
+      {cta && (
+        <div className="mt-10 flex justify-center">
+          <Cta href={cta.href} solid>
+            {cta.label}
+          </Cta>
+        </div>
+      )}
+
+      <div className="relative mt-[12dvh] md:grid md:grid-cols-[1fr_minmax(0,62ch)_1fr] md:gap-x-12">
+        {long && (
+          <nav aria-label="Sadržaj stranice" className="hidden self-start text-[13px] md:sticky md:top-28 md:block md:max-w-[220px]">
+            <p className="label text-ink/45">Sadržaj</p>
+            <ul className="mt-4 space-y-2.5 text-ink/70">
+              {doc.sections.map((s) => (
+                <li key={s.id}>
+                  <a href={`#${s.id}`} className="ulink leading-[1.35] transition-colors hover:text-ink">
+                    {s.title}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )}
+
+        <div className={`legal-copy ${MEASURE} md:col-start-2`}>
+          {doc.sections.map((s) => (
+            <section key={s.id} id={s.id} className="scroll-mt-28 pt-12 first:pt-0">
+              <h2 className="text-[clamp(24px,2vw,32px)] leading-[1.15] tracking-[-0.015em]">{s.title}</h2>
+              {s.blocks.map((b, j) => (
+                <Block key={j} b={b} />
+              ))}
+            </section>
+          ))}
+
+          {SITE.legalDraft && doc.group === 'pravno' && (
+            <p className="mt-16 text-[13px] italic text-ink/45">
+              Nacrt: tekst je predložak i treba ga pregledati pravnik prije objave. Istaknute oznake su podaci koje firma
+              još treba da dopuni.
+            </p>
+          )}
+
+          <div className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-ink/15 pt-6 text-[14px] text-ink/60">
+            <span>Ažurirano {doc.updated}</span>
+            <Link href="/sve-politike" className="ulink text-ink">
+              Sve politike
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
 
-export default function LegalPage({ doc }: { doc: LegalDoc }) {
-  const cta = CTA[doc.slug]
-
-  return (
-    <>
-      <LegalBar />
-      <main className="gutter relative z-30 bg-bg pb-[14dvh] pt-[8dvh]">
-        <div className="flex items-baseline justify-between gap-4 border-t-2 border-ink pt-3 text-micro uppercase">
-          <span>{GROUP_LABEL[doc.group]}</span>
-          <span className="max-sm:hidden">{doc.kicker}</span>
-          <span className="text-right">Ažurirano: {doc.updated}</span>
-        </div>
-
-        <h1 className="mt-[5dvh] text-[clamp(40px,8vw,150px)] uppercase leading-[0.92] [overflow-wrap:anywhere]">{doc.title}</h1>
-
-        <div className="mt-[7dvh] grid grid-cols-12 gap-x-[1.5vw] gap-y-12">
-          <div className="col-span-12 md:col-span-4">
-            <p className="max-w-[30ch] text-small uppercase">
-              <T s={doc.lead} />
-            </p>
-            {cta && (
-              <Link
-                href={cta.href}
-                className="mt-8 inline-flex items-center gap-6 bg-ink px-4 py-4 text-micro uppercase text-bg transition-opacity duration-300 hover:opacity-85"
-              >
-                {cta.label} <span aria-hidden>→</span>
-              </Link>
-            )}
-            {SITE.legalDraft && doc.group === 'pravno' && (
-              <p className="mt-10 border-t-2 border-ink pt-4 text-micro uppercase leading-[1.4]">
-                Nacrt: tekst je predložak i treba ga pregledati pravnik prije objave. Oznake u tamnom polju su
-                podaci koje firma još treba da dopuni.
-              </p>
-            )}
-            <nav aria-label="Sadržaj stranice" className="mt-10 hidden border-t-2 border-ink pt-4 text-micro uppercase md:sticky md:top-[calc(var(--bar)+24px)] md:block">
-              <ul className="space-y-3">
-                {doc.sections.map((s, i) => (
-                  <li key={s.id}>
-                    <a href={`#${s.id}`} className="underline-offset-4 hover:underline">
-                      {String(i + 1).padStart(2, '0')} · {s.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          </div>
-
-          <div className="col-span-12 md:col-span-8">
-            {doc.sections.map((s, i) => (
-              <section
-                key={s.id}
-                id={s.id}
-                className="scroll-mt-[calc(var(--bar)+24px)] border-t-2 border-ink pb-10 pt-5"
-              >
-                <h2 className="flex gap-4 text-small uppercase">
-                  <span className="tabular-nums text-ink/60">{String(i + 1).padStart(2, '0')}</span>
-                  <span>{s.title}</span>
-                </h2>
-                <div className="md:pl-9">
-                  {s.blocks.map((b, j) => (
-                    <Block key={j} b={b} />
-                  ))}
-                </div>
-              </section>
-            ))}
-            <p className="mt-6 border-t-2 border-ink pt-5 text-micro uppercase">
-              <Link href="/sve-politike" className="underline underline-offset-4">
-                Sve politike →
-              </Link>
-            </p>
-          </div>
-        </div>
-      </main>
-      <Footer />
-    </>
-  )
-}
-
-// /sve-politike: pregled svih stranica, grupisan.
+// /sve-politike: pregled svih stranica, grupisan — tihi spisak sa hover stanjem.
 export function PoliciesIndex() {
-  const groups = (['kupovina', 'pravno', 'usluge'] as LegalGroup[]).map((g) => ({
-    g,
-    docs: LEGAL_DOCS.filter((d) => d.group === g),
-  }))
+  const groups = (['kupovina', 'pravno', 'usluge'] as LegalGroup[])
+    .map((g) => ({ g, docs: LEGAL_DOCS.filter((d) => d.group === g) }))
+    .filter(({ docs }) => docs.length)
+
   return (
-    <>
-      <LegalBar />
-      <main className="gutter relative z-30 bg-bg pb-[14dvh] pt-[8dvh]">
-        <div className="flex items-baseline justify-between gap-4 border-t-2 border-ink pt-3 text-micro uppercase">
-          <span>Pravno</span>
-          <span>Pregled</span>
-          <span>{LEGAL_DOCS.length} stranica</span>
-        </div>
-        <h1 className="mt-[5dvh] text-[clamp(40px,8vw,150px)] uppercase leading-[0.92]">Sve politike</h1>
-        <div className="mt-[7dvh] space-y-14">
-          {groups.map(({ g, docs }) => (
-            <section key={g} className="grid grid-cols-12 gap-x-[1.5vw] gap-y-4">
-              <p className="col-span-12 border-t-2 border-ink pt-3 text-micro uppercase md:col-span-3">{GROUP_LABEL[g]}</p>
-              <ul className="col-span-12 border-t-2 border-ink md:col-span-9">
-                {docs.map((d) => (
-                  <li key={d.slug} className="border-b border-ink/25">
-                    <Link
-                      href={`/${d.slug}`}
-                      className="group flex items-baseline justify-between gap-6 px-1 py-4 uppercase transition-colors duration-300 hover:bg-ink hover:text-bg"
-                    >
-                      <span className="text-[clamp(22px,2.6vw,44px)] leading-[0.95]">{d.title}</span>
-                      <span className="shrink-0 text-micro max-sm:hidden">{d.kicker} →</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
-        </div>
-      </main>
-      <Footer />
-    </>
+    <div className="px-5 pb-[18dvh] pt-[16dvh] md:px-10 md:pt-[20dvh]">
+      <header className="text-center">
+        <h1 className="display text-[clamp(52px,9vw,150px)]">
+          Sve <em>politike</em>
+        </h1>
+        <p className="mx-auto mt-8 max-w-[40ch] text-[clamp(17px,1.35vw,21px)] italic text-ink/70">
+          Dostava, povrat, plaćanje i uslovi — na jednom mjestu.
+        </p>
+      </header>
+
+      <div className="mx-auto mt-[12dvh] max-w-[860px] space-y-20">
+        {groups.map(({ g, docs }) => (
+          <section key={g}>
+            <h2 className="label text-center text-ink/45">{GROUP_LABEL[g]}</h2>
+            <ul className="mt-6 border-t border-ink/15">
+              {docs.map((d) => (
+                <li key={d.slug} className="border-b border-ink/15">
+                  <Link
+                    href={`/${d.slug}`}
+                    className="group flex items-baseline justify-between gap-6 py-5 transition-[padding] duration-500 ease-[var(--ease-out)] hover:pl-3"
+                  >
+                    <span className="text-[clamp(24px,2.6vw,40px)] leading-[1.05] tracking-[-0.02em] transition-[font-style] group-hover:italic">
+                      {d.title}
+                    </span>
+                    <span
+                      aria-hidden
+                      className="size-2 shrink-0 self-center rounded-full bg-signal opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </div>
   )
 }

@@ -19,5 +19,5 @@ export default function ReadingProgress() {
     },
     { scope: bar },
   )
-  return <div ref={bar} className="fixed inset-x-0 top-0 z-[700] h-1 origin-left bg-accent" />
+  return <div ref={bar} className="fixed inset-x-0 top-0 z-[700] h-[2px] origin-left bg-signal" />
 }

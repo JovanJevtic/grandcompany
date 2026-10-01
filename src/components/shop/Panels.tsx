@@ -75,7 +75,7 @@ export default function Panels() {
       <div
         aria-hidden
         onClick={closePanel}
-        className={`fixed inset-0 z-[610] bg-ink/50 transition-opacity duration-700 ${entered ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
+        className={`fixed inset-0 z-[610] bg-ink/35 backdrop-blur-[2px] transition-opacity duration-700 ${entered ? 'opacity-100' : 'pointer-events-none opacity-0'}`}
       />
 
       {shown && (
@@ -85,7 +85,7 @@ export default function Panels() {
           role="dialog"
           aria-modal="true"
           aria-label={TITLES[shown.kind]}
-          className={`fixed inset-y-0 right-0 z-[620] h-dvh border-l-2 border-ink bg-bg outline-none transition-transform duration-700 [transition-timing-function:var(--ease-io)] ${
+          className={`fixed inset-y-0 right-0 z-[620] h-dvh bg-bg outline-none transition-transform duration-700 [transition-timing-function:var(--ease-io)] ${
             entered ? 'translate-x-0' : 'translate-x-full'
           }`}
           style={{ width: WIDTH[shown.kind] ?? 'min(560px, 100vw)' }}
@@ -103,12 +103,13 @@ export default function Panels() {
         }`}
       >
         {toast && (
-          <div className="pointer-events-auto flex max-w-full items-center gap-5 border-2 border-bg bg-ink px-5 py-3.5 text-micro uppercase text-bg">
+          <div className="pointer-events-auto flex max-w-full items-center gap-4 rounded-full bg-ink py-2.5 pl-5 pr-2.5 text-[14px] text-bg shadow-[0_18px_40px_-18px_rgba(27,36,54,.6)]">
+            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-signal" />
             <span className="truncate">{toast.text}</span>
             {toast.action && (
               <button
                 type="button"
-                className="shrink-0 underline underline-offset-4"
+                className="shrink-0 rounded-full bg-bg px-4 py-1.5 italic text-ink transition-colors hover:bg-signal hover:text-bg"
                 onClick={() => {
                   const target = toast.action!.open
                   if (target === 'cart') openCart()

@@ -1,21 +1,19 @@
 import type { Metadata } from "next";
-import { Inter_Tight, JetBrains_Mono } from "next/font/google";
+import { Bodoni_Moda } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
 import Splash from "@/components/Splash";
+import Cursor from "@/components/Cursor";
 
-// latin-ext je obavezan za č, ć, š, đ, ž
-const interTight = Inter_Tight({
-  variable: "--font-inter-tight",
+// Jedan serif za cijeli sajt (editorijalni stil, srodan tankom serifu iz herosa).
+// Varijabilan sa osom optičke veličine: na 14px su crte deblje i čitljive, na 140px tanke i elegantne.
+// latin-ext je obavezan za č, ć, š, đ, ž.
+const serif = Bodoni_Moda({
+  variable: "--font-serif",
   subsets: ["latin", "latin-ext"],
-});
-
-// Mono za tehničke liste i oznake (SKU, sastav sistema, brojači), kao etikete na paleti.
-const mono = JetBrains_Mono({
-  variable: "--font-mono-src",
-  subsets: ["latin", "latin-ext"],
-  weight: ["400", "500"],
+  style: ["normal", "italic"],
+  axes: ["opsz"],
 });
 
 // Display serif (italic) za kratke rečenice preko scene. Bodoni Moda je OFL —
@@ -45,12 +43,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${interTight.variable} ${mono.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${serif.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}
           {/* Uvodni splash stoji iznad sajta dok se ne odigra (i ne skrola se dok traje). */}
           <Splash />
+          <Cursor />
         </SmoothScroll>
       </body>
     </html>

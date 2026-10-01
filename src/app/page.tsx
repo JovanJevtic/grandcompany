@@ -5,39 +5,37 @@ import SiteHeader from "@/components/site/SiteHeader";
 import CartDrawer from "@/components/shop/CartDrawer";
 import Panels from "@/components/shop/Panels";
 import Kaolin from "@/components/shop/Kaolin";
-import Pricing from "@/components/shop/Pricing";
 import BrandsSplit from "@/components/landing/BrandsSplit";
-import CraneBand from "@/components/landing/CraneBand";
+import Delivery from "@/components/landing/Delivery";
+import Detail from "@/components/landing/Detail";
 import Featured from "@/components/landing/Featured";
+import Intro from "@/components/landing/Intro";
 import PostsTeaser from "@/components/landing/PostsTeaser";
 import SkySwipe from "@/components/landing/SkySwipe";
 import UsesSplit from "@/components/landing/UsesSplit";
-import WallBuilder from "@/components/landing/WallBuilder";
 
-// Početna: hero sa kranom, pa se nebo "obriše" bijelim stepenicama i počinje prodavnica.
-// Sekcije se smjenjuju svijetlo / tamno plavo (stepenaste trake), kao na referencama.
+// Početna, editorijalno: hero sa kranom, kaolin, pa kratak niz sekcija koje se smjenjuju
+// fotografija / crtež / fotografija. Svaka sekcija ima jedan naslov i najviše jednu rečenicu.
+// Kalkulator zida je u prodavnici (/prodavnica#kalkulator).
 export default function Home() {
   return (
     <>
       <SiteChrome />
-      {/* Meni i korpa se pojavljuju tek kad veliki wordmark ode (vidi SiteChrome i globals.css). */}
+      {/* Header se pojavljuje tek kad veliki wordmark ode (vidi SiteChrome i globals.css). */}
       <div data-overlay-header>
         <SiteHeader variant="overlay" />
       </div>
       <main>
         <CraneHero />
         <SkySwipe />
-        {/* Od kaolina do umivaonika: video koji skrol pušta naprijed i nazad. */}
         <Kaolin />
+        <Intro />
         <UsesSplit />
         <Featured />
-        <CraneBand />
-        <WallBuilder />
+        <Delivery />
+        <Detail />
         <BrandsSplit />
         <PostsTeaser />
-        <div className="relative z-20 bg-bg">
-          <Pricing />
-        </div>
         <Footer />
       </main>
       <CartDrawer />

@@ -44,3 +44,6 @@ next-env.d.ts
 
 # test snimci iz Playwright-a
 .playwright-mcp/
+
+# originalni PNG-ovi iz Codex generatora (sajt koristi WebP iz public/shop i public/editorial)
+/public/gen/
