@@ -98,7 +98,7 @@ export default function FilterDropdown({ label, value, options, onChange, align 
         onKeyDown={onTriggerKey}
         className="flex min-h-11 items-center gap-2 text-[15px]"
       >
-        {isSet && <span className="size-1.5 rounded-full bg-signal" aria-hidden />}
+        {isSet && <span className="spark size-2.5" aria-hidden />}
         <span className="opacity-50">{label}</span>
         <span className="truncate">{isSet ? selected.label : ''}</span>
         <svg viewBox="0 0 10 6" className={`w-2.5 transition-transform duration-500 ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" aria-hidden>
@@ -130,7 +130,7 @@ export default function FilterDropdown({ label, value, options, onChange, align 
               }}
               className="flex min-h-10 w-full items-center gap-3 rounded-xl px-3 text-left text-[15px] transition-colors hover:bg-plate/70"
             >
-              <span className={`size-1.5 shrink-0 rounded-full ${on ? 'bg-signal' : 'bg-transparent'}`} />
+              <span className={`spark size-2.5 ${on ? '' : 'opacity-0'}`} />
               <span className={on ? 'italic' : ''}>{option.label}</span>
             </button>
           )

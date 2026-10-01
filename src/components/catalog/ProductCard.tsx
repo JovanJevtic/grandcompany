@@ -64,7 +64,7 @@ export default function ProductCard({ product, view = 'grid', priority, stacked 
           onClick={() => toggleSaved(product.id)}
           className="absolute right-3 top-3 grid size-10 place-items-center rounded-full text-ink/70 transition-colors hover:text-signal"
         >
-          <span className={`block size-2.5 rounded-full border border-current ${isSaved ? 'bg-signal border-signal' : ''}`} />
+          <span className={`spark size-3.5 transition-[opacity,scale] duration-500 ${isSaved ? 'scale-125' : 'opacity-35 [--spark:var(--ink)]'}`} />
         </button>
 
         {/* Kapsula za brzu kupovinu: izlazi odozdo preko slike */}

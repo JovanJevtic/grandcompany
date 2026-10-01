@@ -56,13 +56,14 @@ export default function Footer() {
   return (
     <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink pt-[20vh] text-bg">
       <div className="flex flex-col items-center px-5 text-center">
+        <span className="spark spark--spin mb-8 block size-4" aria-hidden />
         <h2 data-head className="display invisible text-title"><Pw>
           Gradimo <em>zajedno.</em>
         </Pw></h2>
         <p className="mt-8 max-w-[34ch] text-[17px] italic opacity-70">Upit za veći projekat, ponuda za partnere ili samo savjet — javite se.</p>
         <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
           <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
-            Pišite nam
+            Pišite
           </Cta>
           <a href={COMPANY.phoneMobileHref} className="ulink text-[17px] tabular-nums">
             {COMPANY.phoneMobile}
@@ -72,7 +73,10 @@ export default function Footer() {
 
       <div className="mx-auto mt-[18vh] grid w-[calc(100%-40px)] grid-cols-2 gap-x-6 gap-y-12 border-t border-bg/15 pt-12 text-[15px] md:w-[88vw] md:grid-cols-4">
         <div>
-          <p className="mb-4 italic opacity-50">Stovarište</p>
+          <p className="mb-4 flex items-center gap-2.5 italic">
+            <span className="spark size-2" aria-hidden />
+            <span className="opacity-50">Stovarište</span>
+          </p>
           <address className="not-italic leading-[1.6]">
             {COMPANY.address.split(', ').map((l) => (
               <span key={l} className="block">
@@ -86,7 +90,10 @@ export default function Footer() {
         </div>
         {COLS.map((c) => (
           <div key={c.title}>
-            <p className="mb-4 italic opacity-50">{c.title}</p>
+            <p className="mb-4 flex items-center gap-2.5 italic">
+              <span className="spark size-2" aria-hidden />
+              <span className="opacity-50">{c.title}</span>
+            </p>
             <ul className="flex flex-col gap-1.5">
               {c.links.map(([label, href]) => (
                 <li key={href}>

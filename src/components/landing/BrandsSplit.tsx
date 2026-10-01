@@ -165,7 +165,7 @@ export default function BrandsSplit() {
           <em>ne samo</em> ploče
         </Pw></h2>
         <Cta href="/prodavnica" className="[--cta-fill:var(--bg)] [--cta-ink:var(--navy)]">
-          Artikli po brendu
+          Brendovi
         </Cta>
       </div>
 

@@ -14,7 +14,7 @@ const MEASURE = 'mx-auto w-full max-w-[62ch]'
 
 // Stranice sa radnjom: dugme vodi na kontakt u podnožju.
 const CTA: Record<string, { label: string; href: string }> = {
-  'upit-za-izvodjace': { label: 'Pošaljite upit', href: '/#kontakt' },
+  'upit-za-izvodjace': { label: 'Upit', href: '/#kontakt' },
 }
 
 function Block({ b }: { b: LegalBlock }) {
@@ -172,7 +172,7 @@ export function PoliciesIndex() {
                     </span>
                     <span
                       aria-hidden
-                      className="size-2 shrink-0 self-center rounded-full bg-signal opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+                      className="spark size-3 self-center opacity-0 transition-opacity duration-500 group-hover:opacity-100"
                     />
                   </Link>
                 </li>

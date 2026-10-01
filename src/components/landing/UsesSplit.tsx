@@ -69,7 +69,7 @@ export default function UsesSplit() {
         <h2 data-head className="display invisible text-[clamp(56px,8vw,150px)]"><Pw>
           Po <em>namjeni</em>
         </Pw></h2>
-        <Cta href="/prodavnica">Sve vrste radova</Cta>
+        <Cta href="/prodavnica">Radovi</Cta>
       </div>
 
       {/* Desno: tamno plava kolona, pet vrsta radova. */}

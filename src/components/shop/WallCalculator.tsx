@@ -304,7 +304,7 @@ export default function WallCalculator() {
               </span>
             </p>
             <Cta solid onClick={addAll}>
-              Dodaj sve u korpu
+              Dodaj
             </Cta>
           </div>
         </div>

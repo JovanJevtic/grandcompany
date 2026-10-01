@@ -82,7 +82,7 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
           <nav className="hidden items-center gap-10 text-[15px] md:flex" aria-label="Glavni meni">
             {NAV.map(([label, href]) => (
               <Link key={href} href={href} className="relative flex items-center gap-2">
-                <span className={`absolute -left-3.5 size-1.5 rounded-full bg-signal transition-transform duration-500 ${active(href) ? 'scale-100' : 'scale-0'}`} />
+                <span className={`spark absolute -left-4 size-2.5 transition-transform duration-500 ${active(href) ? 'scale-100' : 'scale-0'}`} />
                 <span className="ulink">{label}</span>
               </Link>
             ))}

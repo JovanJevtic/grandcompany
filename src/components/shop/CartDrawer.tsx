@@ -94,7 +94,7 @@ export default function CartDrawer() {
               <p className="text-[clamp(28px,3vw,40px)] italic leading-[1.05] tracking-[-0.02em]">Korpa je prazna.</p>
               <p className="max-w-[30ch] text-[15px] text-ink/60">Dodajte artikle iz prodavnice, pa pošaljite upit za ponudu.</p>
               <Cta onClick={toShop} className="mt-4">
-                U prodavnicu
+                Prodavnica
               </Cta>
             </div>
           ) : (
@@ -152,8 +152,8 @@ export default function CartDrawer() {
               Sa PDV-om. Dostavu i plaćanje potvrđujemo ponudom. Demo prodavnica — ništa se ne naplaćuje.
             </p>
             <div className="mt-6 grid gap-2">
-              <Cta solid onClick={() => go('ponuda')} className="w-full justify-center">
-                Pošalji upit za ponudu
+              <Cta solid onClick={() => go('ponuda')} className="mx-auto">
+                Upit
               </Cta>
               <button type="button" onClick={closeCart} className="ulink mx-auto mt-2 text-[15px] text-ink/70">
                 Nastavi kupovinu

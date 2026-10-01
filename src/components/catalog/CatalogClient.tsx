@@ -148,7 +148,7 @@ export default function CatalogClient() {
                 <img src={shotOf(COVER[c.id])} alt="" className="absolute inset-0 h-full w-full object-cover" />
               </span>
               <span className="mt-3 inline-flex items-center gap-1.5 text-[13px] leading-tight md:mt-4 md:gap-2 md:text-[clamp(16px,1.3vw,21px)]">
-                <span className={`size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
+                <span className={`spark size-2.5 transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
                 <span className={on ? 'italic' : ''}>{c.name}</span>
               </span>
             </button>
@@ -171,7 +171,7 @@ export default function CatalogClient() {
                   onClick={() => update({ category: t.id })}
                   className={`relative flex min-h-11 items-center gap-2 px-1 text-[15px] transition-opacity ${on ? '' : 'opacity-50 hover:opacity-100'}`}
                 >
-                  {on && <span className="size-1.5 rounded-full bg-signal" />}
+                  {on && <span className="spark size-2.5" />}
                   <span className={on ? 'italic' : ''}>{t.name}</span>
                 </button>
               )

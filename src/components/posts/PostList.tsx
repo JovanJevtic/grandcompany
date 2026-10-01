@@ -36,7 +36,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
               onClick={() => setTag(item)}
               className={`relative flex items-center gap-2 transition-colors ${on ? 'italic text-ink' : 'text-ink/50 hover:text-ink'}`}
             >
-              <span className={`size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} aria-hidden />
+              <span className={`spark size-2.5 transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} aria-hidden />
               {item === 'sve' ? 'Sve teme' : item}
             </button>
           )

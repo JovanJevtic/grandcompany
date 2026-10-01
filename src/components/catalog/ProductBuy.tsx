@@ -42,17 +42,20 @@ export default function ProductBuy({ product, zones }: Props) {
           </button>
         </div>
         <Cta solid onClick={() => addToCart(product.id, qty)}>
-          {`Dodaj u korpu — ${money(qty * product.price)}`}
+          Dodaj
         </Cta>
+        <span className="text-[15px] tabular-nums opacity-70" aria-live="polite">
+          {money(qty * product.price)}
+        </span>
       </div>
 
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-[14px]">
         <button type="button" onClick={() => toggleSaved(product.id)} aria-pressed={isSaved} className="flex min-h-11 items-center gap-2">
-          <span className={`size-2.5 rounded-full border transition-colors ${isSaved ? 'border-signal bg-signal' : 'border-ink/50'}`} />
+          <span className={`spark size-3.5 transition-opacity ${isSaved ? '' : 'opacity-40 [--spark:var(--ink)]'}`} />
           <span className="ulink">{isSaved ? 'Sačuvano' : 'Sačuvaj'}</span>
         </button>
         <span className="flex items-center gap-2 opacity-60">
-          <span className={`size-1.5 rounded-full ${level === 'low' ? 'bg-signal' : 'bg-ink'}`} />
+          <span className={`spark size-2.5 ${level === 'low' ? '' : '[--spark:var(--ink)]'}`} />
           {STOCK_LABEL[level]}
         </span>
         <span className="opacity-60">Dostava od {money(cheapest)}</span>

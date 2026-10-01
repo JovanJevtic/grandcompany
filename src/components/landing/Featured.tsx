@@ -99,6 +99,7 @@ export default function Featured() {
   return (
     <section ref={root} id="najcesce" className="relative z-20 overflow-hidden bg-bg md:flex md:h-dvh md:flex-col md:justify-center">
       <div className="px-5 pt-[16vh] text-center md:pt-[11vh]">
+        <span className="spark spark--spin mx-auto mb-5 block size-4" aria-hidden />
         <h2 data-head className="display invisible text-[clamp(44px,5.4vw,96px)]">
           <Pw>
             Najčešće <em>birano</em>
@@ -116,7 +117,7 @@ export default function Featured() {
                 onClick={() => setCat(c.id)}
                 className={`relative flex min-h-10 items-center transition-opacity duration-300 ${on ? 'italic' : 'opacity-45 hover:opacity-100'}`}
               >
-                <span className={`absolute -left-3.5 size-1.5 rotate-45 bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
+                <span className={`spark absolute -left-4 size-2.5 transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
                 {c.name}
               </button>
             )
@@ -142,7 +143,7 @@ export default function Featured() {
           ))}
           {/* Kraj trake: poziv na cijeli katalog */}
           <div className="flex w-[64vw] shrink-0 snap-start items-center justify-center sm:w-[38vw] md:w-[22vw]">
-            <Cta href={cat === 'sve' ? '/prodavnica' : `/prodavnica?kategorija=${cat}`}>Cijeli katalog</Cta>
+            <Cta href={cat === 'sve' ? '/prodavnica' : `/prodavnica?kategorija=${cat}`}>Katalog</Cta>
           </div>
         </div>
       </div>
