@@ -102,6 +102,7 @@ const PRINT_FRAG = /* glsl */ `
   uniform float someDots; // 1 = prozor u linijskom crtežu: otprilike svaki drugi ostaje u tačkama
   uniform float paperOnly; // 1 = površina je čist papir (tlo), bez tačaka i bez obrisa
   uniform float inside;    // 1 = objekat iz sobe (enterijer)
+  uniform float navy;      // 1 = tabla sa logom: ravan ton (bez sjenčenja), mastilo tamno plavo
   varying vec3 vInst;
   varying float vDepth;
   varying vec3 vWorld;
@@ -140,7 +141,8 @@ const PRINT_FRAG = /* glsl */ `
     #endif
     float tone;
     // Mastilo (kran, čelik): puno, samo lica okrenuta direktno ka svjetlu se "otvore" u tačke.
-    if (base > .88) tone = 1.0 - pow(lamb, 6.0) * .2;
+    if (navy > .5) tone = base;
+    else if (base > .88) tone = 1.0 - pow(lamb, 6.0) * .2;
     else tone = clamp(base + (1.0 - base) * (1.0 - light) * shadeK, 0.0, 1.0);
     if (radial.w > 0.0) tone *= 1.0 - smoothstep(radial.z, radial.w, length(vWorld.xz - radial.xy));
     // vazdušna perspektiva: daleko = manje mastila (stapa se sa papirom)
@@ -150,10 +152,134 @@ const PRINT_FRAG = /* glsl */ `
     tone *= (1.0 - lo) * (1.0 - paperOnly);
     // Linijski objekti (kran) pišu pokrivenost .95 umjesto 1, da ih završni shader prepozna.
     // Pokrivenost nosi i oznake: .95 = linijski objekat, .92 = linijski objekat u zgradi sa sobom,
-    // .85 = soba, ostalo edgeW. (Linije: .9–.97; "unutra": .8–.935.)
-    gl_FragColor = vec4(n.xy * .5 + .5, tone, lo > .5 ? (inside > .5 ? .92 : .95) : inside > .5 ? .85 : edgeW);
+    // .85 = soba, .76 = tabla sa logom, ostalo edgeW. Geometrijske linije (LINE_FRAG): .975 / .89.
+    gl_FragColor = vec4(n.xy * .5 + .5, tone, navy > .5 ? .76 : lo > .5 ? (inside > .5 ? .92 : .95) : inside > .5 ? .85 : edgeW);
   }
 `;
+
+// ——— Geometrijske linije za linijske objekte (kran, zgrada, teret) ———
+// Umjesto ivica izvučenih iz piksela (nazubljene, isprekidane), crtaju se prave ivice geometrije:
+// kutija → 12 ivica, šipka → jedna središnja linija. Svaka linija je traka konstantne širine u
+// pikselima (kao LineSegments2), pa je glatka i neprekinuta. Upisuje se u G-buffer sa svojom
+// oznakom (.975 napolju / .89 u zgradi sa sobom), a završni shader je štampa kao puno mastilo.
+const LINE_VERT = /* glsl */ `
+  attribute vec3 instanceStart;
+  attribute vec3 instanceEnd;
+  uniform vec2 resolution;
+  uniform float linewidth;
+  void trimSegment(const in vec4 start, inout vec4 end) {
+    float a = projectionMatrix[2][2], b = projectionMatrix[3][2];
+    float nearEstimate = -0.5 * b / a;
+    float alpha = (nearEstimate - start.z) / (end.z - start.z);
+    end.xyz = mix(start.xyz, end.xyz, alpha);
+  }
+  void main() {
+    vec4 start = modelViewMatrix * vec4(instanceStart, 1.0);
+    vec4 end = modelViewMatrix * vec4(instanceEnd, 1.0);
+    // malo ka kameri: ivica na površini (i središnja linija šipke) ne nestaje u svojoj geometriji
+    start.z += .15; end.z += .15;
+    if (start.z < 0.0 && end.z >= 0.0) trimSegment(start, end);
+    else if (end.z < 0.0 && start.z >= 0.0) trimSegment(end, start);
+    vec4 clipStart = projectionMatrix * start, clipEnd = projectionMatrix * end;
+    vec2 ndcStart = clipStart.xy / clipStart.w, ndcEnd = clipEnd.xy / clipEnd.w;
+    float aspect = resolution.x / resolution.y;
+    vec2 dir = ndcEnd - ndcStart;
+    dir.x *= aspect;
+    dir = length(dir) > 1e-6 ? normalize(dir) : vec2(1.0, 0.0);
+    vec2 offset = vec2(dir.y, -dir.x);
+    dir.x /= aspect; offset.x /= aspect;
+    if (position.x < 0.0) offset *= -1.0;
+    // kratko produženje na krajevima: spojevi ivica se zatvore bez rupa
+    offset += (position.y < 0.5 ? -dir : dir) * .5;
+    offset *= linewidth / resolution.y;
+    vec4 clip = position.y < 0.5 ? clipStart : clipEnd;
+    clip.xy += offset * clip.w;
+    gl_Position = clip;
+  }
+`;
+const LINE_FRAG = /* glsl */ `
+  uniform float flag;
+  void main() { gl_FragColor = vec4(.5, .5, 1.0, flag); }
+`;
+const BOX_EDGES = (() => {
+  const c = (i) => [(i & 1) - .5, ((i >> 1) & 1) - .5, ((i >> 2) & 1) - .5];
+  const out = [];
+  for (let i = 0; i < 8; i++) for (const bit of [1, 2, 4]) if (!(i & bit)) out.push(c(i), c(i | bit));
+  return out;
+})();
+const ROD_LINE = [[0, -.5, 0], [0, .5, 0]];
+
+function buildLineOverlays(scene, lineUniforms) {
+  const mats = [false, true].map((inside) => new THREE.ShaderMaterial({
+    uniforms: { ...lineUniforms, flag: { value: inside ? .89 : .975 } },
+    vertexShader: LINE_VERT,
+    fragmentShader: LINE_FRAG,
+  }));
+  const edgeCache = new Map();
+  const isBox = (geo) => geo.type.includes('Box') || !!(geo.parameters && 'depth' in geo.parameters && 'width' in geo.parameters);
+  const segsOf = (geo) => {
+    if (isBox(geo)) return BOX_EDGES;
+    if (geo.type === 'CylinderGeometry') return ROD_LINE;
+    if (!edgeCache.has(geo.uuid)) {
+      const p = new THREE.EdgesGeometry(geo, 35).attributes.position, pts = [];
+      for (let i = 0; i < p.count; i++) pts.push([p.getX(i), p.getY(i), p.getZ(i)]);
+      edgeCache.set(geo.uuid, pts);
+    }
+    return edgeCache.get(geo.uuid);
+  };
+  // Sitni detalji (fuge, šrafovi, nosači) se ne crtaju: na crtežu su samo crtice po bijelom.
+  const pos = new THREE.Vector3(), quat = new THREE.Quaternion(), scl = new THREE.Vector3();
+  const tooSmall = (geo, m) => {
+    m.decompose(pos, quat, scl);
+    const d = [Math.abs(scl.x), Math.abs(scl.y), Math.abs(scl.z)].sort((a, b) => a - b);
+    if (geo.type === 'CylinderGeometry') return Math.abs(scl.y) < .3;
+    if (isBox(geo)) return d[1] < .05 || d[2] < .3;
+    if (!geo.boundingSphere) geo.computeBoundingSphere();
+    return geo.boundingSphere.radius * d[2] < .15;
+  };
+  const perParent = new Map();
+  const v = new THREE.Vector3(), mi = new THREE.Matrix4(), mm = new THREE.Matrix4();
+  const collect = (o, inside) => {
+    o.updateMatrix();
+    const add = (m) => {
+      if (tooSmall(o.geometry, m)) return;
+      if (!perParent.has(o.parent)) perParent.set(o.parent, { inside, data: [] });
+      const data = perParent.get(o.parent).data;
+      for (const p of segsOf(o.geometry)) { v.set(p[0], p[1], p[2]).applyMatrix4(m); data.push(v.x, v.y, v.z); }
+    };
+    if (o.isInstancedMesh) for (let i = 0; i < o.count; i++) { o.getMatrixAt(i, mi); add(mm.multiplyMatrices(o.matrix, mi)); }
+    else add(o.matrix);
+  };
+  const walk = (o, line, inside) => {
+    line = line || !!o.userData.printLine;
+    inside = inside || !!o.userData.printInside;
+    if (line && o.isMesh && o.visible && !o.userData.printSolid && !o.userData.printKeep && o.material && !Array.isArray(o.material) && !o.material.userData.printSolid &&
+        !(o.material.transparent && o.material.depthWrite === false)) collect(o, inside);
+    for (const c of o.children) walk(c, line, inside);
+  };
+  walk(scene, false, false);
+  const quadPos = new THREE.Float32BufferAttribute([-1, 0, 0, 1, 0, 0, -1, 1, 0, 1, 1, 0], 3);
+  const made = [];
+  for (const [parent, { inside, data }] of perParent) {
+    if (!data.length) continue;
+    const geo = new THREE.InstancedBufferGeometry();
+    geo.setAttribute('position', quadPos);
+    geo.setIndex([0, 1, 2, 2, 1, 3]);
+    const buf = new THREE.InstancedInterleavedBuffer(new Float32Array(data), 6, 1);
+    geo.setAttribute('instanceStart', new THREE.InterleavedBufferAttribute(buf, 3, 0));
+    geo.setAttribute('instanceEnd', new THREE.InterleavedBufferAttribute(buf, 3, 3));
+    geo.instanceCount = data.length / 6;
+    const line = new THREE.Mesh(geo, mats[inside ? 1 : 0]);
+    line.frustumCulled = false;
+    line.userData.printKeep = true;
+    parent.add(line);
+    made.push(line);
+  }
+  return () => {
+    for (const l of made) { l.removeFromParent(); l.geometry.dispose(); }
+    mats.forEach((m) => m.dispose());
+  };
+}
 
 // ——— Završni shader (raster + ivice + boje poglavlja) ———
 const N = STAGES.length;
@@ -218,7 +344,12 @@ const POST_FRAG = /* glsl */ `
     vec4 g0 = texture2D(tG, vUv);
     // Kamera u sobi: piksel koji nije soba (pogled kroz prozor) je odmah završni plavi grad.
     float isIn = step(.8, g0.a) * step(g0.a, .935);
+    // Geometrijske linije (glatke ivice krana i zgrade, LINE_FRAG) i površine linijskih objekata.
+    float geoLine = max(step(.965, g0.a) * step(g0.a, .985), step(.875, g0.a) * step(g0.a, .905));
+    float lineSurf = step(.9, g0.a) * step(g0.a, .97);
+    float navyF = step(.745, g0.a) * step(g0.a, .775);
     float outside = room * (1.0 - isIn) * (si == 2 ? 1.0 : 0.0);
+    if (navyF > .5) { paper = vec3(.957, .945, .925); ink = vec3(.106, .141, .212); }
     if (outside > .5) { paper = paperC[${N - 1}]; ink = inkC[${N - 1}]; cell = cellC[${N - 1}]; ang = angleC[${N - 1}]; bgS = bgC[${N - 1}]; flo = floorC[${N - 1}]; city = cityC[${N - 1}]; }
     cell *= dpr;
     vec2 xy0 = g0.rg * 2.0 - 1.0;
@@ -256,7 +387,8 @@ const POST_FRAG = /* glsl */ `
       vec3 n; float d; float a; float tn;
       sampleG(vUv + offs[i] * px, n, d, a, tn);
       float c = step(.1, a);
-      solidN = max(solidN, c * smoothstep(.78, .86, tn));
+      float nGeo = max(step(.965, a) * step(a, .985), step(.875, a) * step(a, .905));
+      solidN = max(solidN, c * smoothstep(.78, .86, tn) * (1.0 - nGeo));
       // obris prema papiru samo za objekte sa punom težinom ivice (tlo je nema)
       aEdge = max(aEdge, abs(c - c0) * smoothstep(.3, .9, max(a, a0)));
       // Piksel koji je IZA krana (kroz rupe rešetke se vidi tlo/zgrada) ne crta ivicu prema njemu —
@@ -295,16 +427,18 @@ const POST_FRAG = /* glsl */ `
     dotInk = max(dotInk, step(.985, t));
 
     // ——— sklapanje ———
-    float edgeF = fill * (1.0 - outside);
+    // Linijski objekti nemaju ivice iz piksela (nazubljene, isprekidane) — samo geometrijske linije.
+    float edgeF = fill * (1.0 - outside) * (1.0 - lineSurf) * (1.0 - geoLine);
     // linije mastila na svijetlim površinama; na punom mastilu linije su "izbijene" (boja papira)
     float inkLine = max(inner * (1.0 - solid), silhouette * a0) * edgeF;
     float knock = knockLine * solid * edgeF;
     // puno mastilo se razlije ~1px (deblja, štamparska linija; tanke šipke krana ne pucaju)
     float amount = max(max(dotInk, inkLine), solidN * edgeF);
     amount = mix(amount, 0.0, knock * .92);
+    amount = max(amount, geoLine * fill * (1.0 - outside));
     // istrošena štampa: sitne mrlje papira u mastilu i poneka mrlja mastila na papiru
     float fleck = smoothstep(.84, .9, grain * vnoise(frag / (5.0 * dpr) + 7.0) * 1.7);
-    amount *= 1.0 - fleck * .3;
+    amount *= 1.0 - fleck * .3 * (1.0 - geoLine);
     vec3 col = mix(paper, ink, clamp(amount, 0.0, 1.0));
     gl_FragColor = vec4(col, 1.0);
   }
@@ -334,7 +468,7 @@ export function createCraneRenderer(renderer, world) {
     const defines = {};
     if (src.map) defines.PRINT_MAP = '';
     pm = new THREE.ShaderMaterial({
-      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, paperOnly: { value: src.userData.paper ? 1 : 0 }, inside: { value: inside ? 1 : 0 }, map: { value: src.map || null } },
+      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, paperOnly: { value: src.userData.paper ? 1 : 0 }, inside: { value: inside ? 1 : 0 }, navy: { value: src.userData.navy ? 1 : 0 }, map: { value: src.map || null } },
       defines,
       side: src.side,
       vertexShader: PRINT_VERT,
@@ -357,9 +491,9 @@ export function createCraneRenderer(renderer, world) {
     for (const c of o.children) walk(c, line, inside);
   }
   function swapOne(o, line, inside) {
-    if (!o.isMesh || !o.material || Array.isArray(o.material)) return;
+    if (!o.isMesh || !o.material || Array.isArray(o.material) || o.userData.printKeep) return;
     const src = o.material;
-    const pm = printFor(src, line, inside);
+    const pm = printFor(src, line && !o.userData.printSolid && !src.userData.printSolid, inside);
     pm.uniforms.opacity.value = src.opacity;
     // Providno staklo koje ne piše dubinu (ograde, tuš, folija) se ne štampa: rasterizovano
     // bi dalo šum ivica. Ostala providnost (pretapanje sobe) ide kroz raster tačaka.
@@ -428,6 +562,9 @@ export function createCraneRenderer(renderer, world) {
   );
   const post = new THREE.Scene();
   post.add(quad);
+  // Glatke linije za kran, zgradu i teret (vidi buildLineOverlays).
+  const lineUniforms = { resolution: { value: new THREE.Vector2(1, 1) }, linewidth: { value: 2 } };
+  const disposeLines = buildLineOverlays(world.scene, lineUniforms);
   const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
 
   let target = null, width = 1, height = 1;
@@ -443,6 +580,8 @@ export function createCraneRenderer(renderer, world) {
     uniforms.tDepth.value = depth;
     uniforms.resolution.value.set(w, h);
     uniforms.dpr.value = Math.max(1, ratio);
+    lineUniforms.resolution.value.set(w, h);
+    lineUniforms.linewidth.value = 1.35 * Math.max(1, ratio);
   }
 
   return {
@@ -499,6 +638,7 @@ export function createCraneRenderer(renderer, world) {
       for (const pm of cache.values()) pm.dispose();
       for (const pm of lineCache.values()) pm.dispose();
       for (const pm of insideCache.values()) pm.dispose();
+      disposeLines();
       quad.geometry.dispose();
       quad.material.dispose();
       uniforms.tBg.value?.dispose?.();

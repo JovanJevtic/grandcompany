@@ -218,13 +218,15 @@ export function createCraneScene() {
     rod(crane,m.yellow,[x,.5,z],[Math.sign(x)*.65,4,Math.sign(z)*.65],.105);
   }
   const mastTop=25;
-  for(let y=.5;y<mastTop;y+=2.45) {
-    for(const x of [-.68,.68])for(const z of [-.68,.68])profile(crane,m.yellow,[x,y,z],[x,y+2.45,z],.14);
+  const MBAY=SIMPLE_CRANE?4.9:2.45; // visina polja stuba
+  for(let y=.5;y<mastTop;y+=MBAY) {
+    const top=Math.min(mastTop,y+MBAY);
+    for(const x of [-.68,.68])for(const z of [-.68,.68])profile(crane,m.yellow,[x,y,z],[x,top,z],.14);
     for(const s of [-1,1]) {
-      rod(crane,m.yellow,[-.68,y,s*.68],[.68,y+2.45,s*.68],.045);
-      if(!SIMPLE_CRANE)rod(crane,m.yellow,[.68,y,s*.68],[-.68,y+2.45,s*.68],.045);
-      rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,y+2.45,.68],.045);
-      if(!SIMPLE_CRANE)rod(crane,m.yellow,[s*.68,y,.68],[s*.68,y+2.45,-.68],.045);
+      rod(crane,m.yellow,[-.68,y,s*.68],[.68,top,s*.68],.045);
+      if(!SIMPLE_CRANE)rod(crane,m.yellow,[.68,y,s*.68],[-.68,top,s*.68],.045);
+      rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,top,.68],.045);
+      if(!SIMPLE_CRANE)rod(crane,m.yellow,[s*.68,y,.68],[s*.68,top,-.68],.045);
       rod(crane,m.yellow,[-.68,y,s*.68],[.68,y,s*.68],.065);
       rod(crane,m.yellow,[s*.68,y,-.68],[s*.68,y,.68],.065);
     }
@@ -249,13 +251,38 @@ export function createCraneScene() {
       rod(slew,m.yellow,[x,2.25,0],[end,1,z],.047);
     }
     rod(slew,m.yellow,[x,2.25,0],[end,2.25,0],.07);
-    rod(slew,m.yellow,[x,1,-.6],[x,1,.6],.045);
+    if(!SIMPLE_CRANE)rod(slew,m.yellow,[x,1,-.6],[x,1,.6],.045);
   }
   for(const z of [-.6,.6])rod(slew,m.yellow,[0,.4,z],[0,5.5,0],.09);
   for(const x of [-6.5,8,17])rod(slew,m.steel,[0,5.5,0],[x,2.2,0],.026);
   if(SIMPLE_CRANE)box(slew,m.edge,-5.66,.9,0,3.1,2.8,1.6); // kontrateg: jedan blok
+  if(typeof document!=='undefined') {
+    // Kvadratna tabla: svijetla podloga, znak i GRAND COMPANY u tamno plavoj (štampa: oznaka `navy`).
+    const c=document.createElement('canvas');c.width=c.height=1024;
+    const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.anisotropy=8;
+    const paint=(mark)=>{
+      const g=c.getContext('2d');g.fillStyle='#ffffff';g.fillRect(0,0,1024,1024);
+      if(mark){
+        const w=520,h=w*216/281,t=document.createElement('canvas');t.width=w;t.height=h;const tc=t.getContext('2d');
+        tc.drawImage(mark,0,0,w,h);tc.globalCompositeOperation='source-in';tc.fillStyle='#1b2436';tc.fillRect(0,0,w,h);
+        g.drawImage(t,(1024-w)/2,170);
+      }
+      const fam=getComputedStyle(document.documentElement).getPropertyValue('--font-heavy').trim()||'sans-serif';
+      g.fillStyle='#1b2436';g.textAlign='center';g.textBaseline='alphabetic';g.font=`900 118px ${fam}`;
+      g.fillText('GRAND',512,700);g.fillText('COMPANY',512,830);
+      tex.needsUpdate=true;
+    };
+    paint(null);
+    const img=new Image();img.onload=()=>{document.fonts.ready.then(()=>paint(img));};img.src='/brand/mark.svg';
+    document.fonts.ready.then(()=>paint(img.complete&&img.naturalWidth?img:null));
+    const boardMat=new THREE.MeshBasicMaterial({map:tex,color:'#ffffff'});boardMat.userData.navy=true;boardMat.userData.printSolid=true; // na materijalu: batch() ne čuva userData mesha
+    for(const side of [-1,1]){
+      const board=new THREE.Mesh(new THREE.PlaneGeometry(2.4,2.4),boardMat);
+      board.position.set(-5.66,.9,side*.83);board.rotation.y=side<0?Math.PI:0;board.userData.printSolid=true;slew.add(board);
+    }
+  }
   else for(let x=-7;x<-4;x+=.64)box(slew,m.edge,x,.9,0,.58,2.8,1.6); // kontrateg (u štampi puno mastilo)
-  box(slew,m.yellow,-3.5,1.1,0,1.5,.6,.85);
+  if(!SIMPLE_CRANE)box(slew,m.yellow,-3.5,1.1,0,1.5,.6,.85);
   if(!SIMPLE_CRANE)for(let x=-6;x<1;x+=1) {
     rod(slew,m.yellow,[x,1,.9],[x,2,.9],.025);
     rod(slew,m.yellow,[x,2,.9],[x+1,2,.9],.025);
@@ -284,8 +311,10 @@ export function createCraneScene() {
   const festoon=rig.festoon(festoonRoot);
   const trolley=group(slew,16,0,0);
   box(trolley,m.yellow,0,.75,0,1.05,.26,1.45);
-  for(const x of [-.38,.38])for(const z of [-.62,.62])rod(trolley,m.steel,[x,.94,z-.09],[x,.94,z+.09],.14);
-  for(const z of [-.14,.14])rod(trolley,m.steel,[-.22,.7,z],[.22,.7,z],.17);
+  if(!SIMPLE_CRANE){
+    for(const x of [-.38,.38])for(const z of [-.62,.62])rod(trolley,m.steel,[x,.94,z-.09],[x,.94,z+.09],.14);
+    for(const z of [-.14,.14])rod(trolley,m.steel,[-.22,.7,z],[.22,.7,z],.17);
+  }
   batch(trolley);
   // Teret, kuka i sajle više nisu djeca strijele: teret ostaje na krovu kad se kuka otkači,
   // a kuka nastavlja sa kranom. Njihov položaj u svijetu računa update() (vidi rigPose).
@@ -555,8 +584,9 @@ export function createCraneScene() {
   const EYE=ENTRY_Y+1.5;
   const CAMERA_KEYS=[
     // p      pozicija                 pogled
-    [0,         [3,17,48],             [-4,19,0]],        // cijeli kran, strijela lijevo
-    [.10,       [10,17.5,47],          [-2,18,0]],
+    [0,         [-1.34,25.4,8.2],      [-1.34,25.4,0]],   // tabla sa logom na protivtegu, izbliza
+    [.07,       [3,17,48],             [-4,19,0]],        // cijeli kran, strijela lijevo
+    [.13,       [10,17.5,47],          [-2,18,0]],
     [.22,       [22,18,40],            [2,14.5,0]],       // kran prolazi ispred nas, zgrada raste
     [.34,       [30,18,34],            [6,12.6,0]],       // teret iznad krova
     [.44,       [29,17.5,29],          [8.2,11.2,0]],     // spuštanje na krov (srednji plan)
@@ -640,7 +670,7 @@ export function createCraneScene() {
   }
   // ——— Kran: okretanje, teret, kuka ———
   // Trenuci priče u sirovom progresu skrola.
-  const T={swing0:.02,swing1:.37,drop0:.36,drop1:.47,release0:.47,release1:.51,lift0:.49,lift1:.57,away0:.51,away1:.66};
+  const T={swing0:.07,swing1:.37,drop0:.36,drop1:.47,release0:.47,release1:.51,lift0:.49,lift1:.57,away0:.51,away1:.66};
   const MAST_X=-7,JIB_Y=25.98;
   // Ugao strijele: -π = uperena lijevo (prema -X), 0 = desno, iznad zgrade. Okreće se preko
   // prednje strane (prema kameri), pa teret proleti kroz kadar. Kad otkači teret, nastavlja udesno.
@@ -723,7 +753,7 @@ export function createCraneScene() {
     // a pogled spusti, pa kran sjedne više (ispod naslova, a ne pri dnu).
     const portrait=clamp((1-aspect)/.5);
     if(portrait>0) {
-      _dir.set(-6*portrait*(1-smooth(.04,.3,p)),-3*portrait*(1-smooth(.3,.5,p)),0);
+      _dir.set(-6*portrait*(1-smooth(.04,.3,p)),-3*portrait*(1-smooth(.3,.5,p)),0).multiplyScalar(smooth(0,.07,p));
       camera.position.add(_dir);target.add(_dir);
     }
     focus.copy(target);
