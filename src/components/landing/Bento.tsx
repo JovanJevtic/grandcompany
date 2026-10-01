@@ -22,7 +22,7 @@ const Arrow = ({ className = '' }: { className?: string }) => (
 
 const Tag = ({ children, tone }: { children: string; tone: 'blue' | 'dark' | 'photo' }) => (
   <span
-    className={`inline-flex min-h-8 items-center rounded-[4px] px-3.5 text-[11px] font-medium uppercase tracking-[0.1em] ${
+    className={`inline-flex min-h-8 items-center px-3.5 text-[11px] font-medium uppercase tracking-[0.1em] ${
       tone === 'blue' ? 'bg-white/15' : tone === 'dark' ? 'bg-white/12' : 'bg-[#3a3a3a]/85 backdrop-blur'
     }`}
   >
@@ -57,7 +57,7 @@ export default function Bento() {
   return (
     <section ref={root} id="b2b" className="relative z-20 bg-bg px-3 py-[14vh] md:px-4" aria-label="B2B Partner Portal">
       {/* Gornje polje: ogromna riječ + kratak tekst desno */}
-      <div className="flex flex-col gap-8 rounded-[18px] border-[1.5px] border-ink/80 px-6 py-10 md:flex-row md:items-end md:justify-between md:px-8 md:pb-[3.2vw] md:pt-[9vw]">
+      <div className="flex flex-col gap-8 border-[1.5px] border-ink/80 px-6 py-10 md:flex-row md:items-end md:justify-between md:px-8 md:pb-[3.2vw] md:pt-[9vw]">
         <h2 className="overflow-hidden pb-[0.06em]">
           <span data-word className="display block text-[clamp(52px,10vw,170px)] !leading-[0.86]">
             B2B portal
@@ -71,7 +71,7 @@ export default function Bento() {
 
       <div className="mt-2.5 grid gap-2.5 md:grid-cols-[1fr_1fr_2fr]">
         {/* Plava kartica: rabatna skala */}
-        <Link href="/portal" data-bento className="group flex min-h-[340px] flex-col rounded-[18px] bg-cobalt p-7 text-white md:min-h-[460px]" data-cursor="Portal">
+        <Link href="/portal" data-bento className="group flex min-h-[340px] flex-col bg-cobalt p-7 text-white md:min-h-[460px]" data-cursor="Portal">
           <span className="label">Rabatna skala</span>
           <span className="display mt-auto text-[clamp(34px,3vw,52px)]">10–22%</span>
           <span className="mt-4 flex flex-wrap gap-1.5">
@@ -86,7 +86,7 @@ export default function Bento() {
         </Link>
 
         {/* Tamna kartica: kreditni limit i valuta */}
-        <Link href="/portal" data-bento className="group flex min-h-[340px] flex-col rounded-[18px] bg-[#1e1e1e] p-7 text-white md:min-h-[460px]" data-cursor="Portal">
+        <Link href="/portal" data-bento className="group flex min-h-[340px] flex-col bg-[#1e1e1e] p-7 text-white md:min-h-[460px]" data-cursor="Portal">
           <span className="label">Kreditni limit</span>
           <span className="display mt-auto text-[clamp(34px,3vw,52px)]">30/60/90</span>
           <span className="mt-4 flex flex-wrap gap-1.5">
@@ -100,8 +100,8 @@ export default function Bento() {
         </Link>
 
         {/* Fotografija + svijetli panel: Pantheon ERP zalihe */}
-        <Link href="/prodavnica" data-bento className="group flex min-h-[340px] flex-col overflow-hidden rounded-[18px] bg-[#d9d9d9] text-ink md:min-h-[460px]" data-cursor="Katalog">
-          <div data-parallax="6" className="relative h-[260px] overflow-hidden rounded-[18px] bg-[#111] md:h-[54%]">
+        <Link href="/prodavnica" data-bento className="group flex min-h-[340px] flex-col overflow-hidden bg-[#d9d9d9] text-ink md:min-h-[460px]" data-cursor="Katalog">
+          <div data-parallax="6" className="relative h-[260px] overflow-hidden bg-[#111] md:h-[54%]">
             <img src="/editorial/bento-mono.webp" alt="Pocinčani profili na regalima skladišta" className="absolute inset-0 h-full w-full object-cover" />
             <span className="label absolute left-7 top-7 text-white">Pantheon ERP</span>
             <span className="absolute right-6 top-6 flex gap-1.5 text-white max-md:left-7 max-md:right-auto max-md:top-14">
