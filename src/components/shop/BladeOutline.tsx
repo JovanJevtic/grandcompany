@@ -10,7 +10,7 @@ export default function BladeOutline({ label, href, onClick, dark, className = '
     <>
       <span
         aria-hidden
-        className={`absolute inset-0 transition-colors duration-500 ${
+        className={`keep-round absolute inset-0 rounded-full transition-colors duration-500 ${
           dark ? 'bg-ink' : 'border border-current group-hover:border-transparent group-hover:bg-[var(--btn)]'
         }`}
       />

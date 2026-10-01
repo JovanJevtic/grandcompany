@@ -1285,10 +1285,14 @@ html.scroll-held body {
 }
 /* sve "pill" kapsule u aplikaciji (tagovi, količine, B2B oznake) postaju oštre */
 .b2b-pill,
-.rounded-full.border,
-button.rounded-full,
-a.rounded-full {
+.rounded-full.border:not(.keep-round),
+button.rounded-full:not(.keep-round),
+a.rounded-full:not(.keep-round) {
   border-radius: 0 !important;
+}
+/* veliki tanki krugovi sa linkom (prodavnica, "Svi artikli" / "Pročitaj") ostaju krugovi */
+.keep-round {
+  border-radius: 9999px !important;
 }
 
 /* Lijevi panel (Sistemi, Četiri prednosti): veliki naslov u stepenastim redovima gore lijevo,
@@ -1330,4 +1334,20 @@ a.rounded-full {
 
 .b2b-input {
   border-radius: 0 !important;
+}
+
+/* Portal: dekorativni krug (sporo okretanje) i traka faktura bez vidljivog skrolbara */
+.dial {
+  animation: dial-spin 40s linear infinite;
+}
+@keyframes dial-spin {
+  to {
+    rotate: 360deg;
+  }
+}
+.invoice-rail {
+  scrollbar-width: none;
+}
+.invoice-rail::-webkit-scrollbar {
+  display: none;
 }
