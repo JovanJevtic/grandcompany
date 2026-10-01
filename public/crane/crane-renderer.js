@@ -8,7 +8,8 @@ import * as THREE from '../vendor/three.module.min.js';
 // Linije su glatke (mekani prelaz preko smoothstep) i iste debljine u pikselima ekrana.
 // API je isti kao kod starog SSAO renderera (compile, setSamples, setSize, render, dispose).
 
-const LINE = new THREE.Color('#1b2436');
+// Plava kao mastilo hemijske olovke; površine su providne (vidi se nebo), crtaju se samo linije i tačkice.
+const LINE = new THREE.Color('#1f3d9c');
 const FILL = new THREE.Color('#ffffff');
 
 export function createCraneRenderer(renderer, world) {
@@ -82,12 +83,13 @@ export function createCraneRenderer(renderer, world) {
           float shade = 1.0 - lit;
           vec2 cell = floor(gl_FragCoord.xy / dotSize);
           float rnd = fract(sin(dot(cell, vec2(12.9898, 78.233))) * 43758.5453);
-          float density = 0.012 + pow(shade, 1.7) * 0.34;
-          float stipple = a0 * step(rnd, density) * 0.7;
+          float density = 0.02 + pow(shade, 1.6) * 0.38;
+          float stipple = a0 * step(rnd, density) * 0.85;
           float ink = max(e, stipple);
-          float alpha = max(a0, e) * fillAlpha; // fillAlpha = rastvaranje cijele scene na kraju (2D)
+          // Nema bijele podloge: piksel postoji samo gdje je linija ili tačkica (ostalo je providno).
+          float alpha = ink * fillAlpha; // fillAlpha = rastvaranje cijele scene na kraju (2D)
           if (alpha < 0.002) discard;
-          vec3 col = mix(fillColor, lineColor, ink);
+          vec3 col = lineColor;
           gl_FragColor = vec4(col * alpha, alpha);
         }
       `,
