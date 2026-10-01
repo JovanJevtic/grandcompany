@@ -1,10 +1,12 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { ScrollTrigger } from '@/lib/gsap'
 
-// Od tvrdog kamena kaolina do umivaonika: JEDAN video, bez ikakve veze sa skrolom osim okidača.
-// Kad sekcija uđe u ekran, video krene i odigra se do kraja — jednom — i ostane na umivaoniku.
-// Nema pinovanja, nema zaustavljanja skrola, nema premotavanja unazad.
+// Od tvrdog kamena kaolina do umivaonika: JEDAN video. Kad sekcija stigne na vrh ekrana, skrol se
+// zaključa, video se odigra do kraja (jednom) i skrol se otključa. Nema premotavanja unazad i nema
+// ponovnog zaključavanja. Ko skoči preko sekcije (link, End) ne biva zaustavljen; ako video zapne,
+// skrol se oslobodi sam (sigurnosni tajmer).
 // Fajl je ubrzan 1,5× (ffmpeg); RATE ga dodatno ubrza na ukupno 1,75×.
 
 const SRC = '/kaolin/video/kaolin.mp4?v=3'
@@ -42,26 +44,52 @@ export default function Kaolin() {
       return () => v.removeEventListener('timeupdate', paint)
     }
 
-    let started = false
-    const io = new IntersectionObserver(
-      ([entry]) => {
-        if (!entry.isIntersecting || started) return
-        started = true
-        io.disconnect()
-        v.playbackRate = RATE
-        v.play().catch(() => {
-          // Ako browser odbije autoplay (rijetko za utišan video), pusti na prvi dodir/klik.
-          const go = () => v.play().catch(() => {})
-          window.addEventListener('pointerdown', go, { once: true })
-        })
+    let done = false
+    let locked = false
+    let safety = 0
+    const html = document.documentElement
+    const unlock = () => {
+      if (!locked) return
+      locked = false
+      window.clearTimeout(safety)
+      window.__gcLenis?.start?.()
+      html.classList.remove('scroll-held')
+    }
+    const lock = (at: number) => {
+      locked = true
+      window.__gcLenis?.scrollTo(at, { immediate: true, force: true })
+      window.__gcLenis?.stop?.()
+      html.classList.add('scroll-held')
+      const dur = (v.duration || 2.8) / RATE
+      safety = window.setTimeout(unlock, (dur + 1.5) * 1000)
+    }
+    const play = () => {
+      v.playbackRate = RATE
+      v.play().catch(() => {
+        // autoplay odbijen (rijetko za utišan video): ne držimo skrol, video krene na prvi dodir
+        unlock()
+        window.addEventListener('pointerdown', () => v.play().catch(() => {}), { once: true })
+      })
+    }
+    v.addEventListener('ended', unlock)
+
+    const st = ScrollTrigger.create({
+      trigger: root.current,
+      start: 'top top',
+      onEnter: (self) => {
+        if (done) return
+        done = true
+        // zaključava se samo ako se do sekcije stiglo skrolom (nije preskočena)
+        if (Math.abs(window.scrollY - self.start) < window.innerHeight * 0.6) lock(self.start)
+        play()
       },
-      { threshold: 0.45 },
-    )
-    io.observe(v)
+    })
     return () => {
-      io.disconnect()
+      st.kill()
+      unlock()
       v.removeEventListener('timeupdate', paint)
       v.removeEventListener('ended', paint)
+      v.removeEventListener('ended', unlock)
     }
   }, [])
 
@@ -72,7 +100,7 @@ export default function Kaolin() {
       className="relative z-20 flex min-h-dvh flex-col items-center justify-center overflow-hidden bg-bg pt-[calc(var(--story-header)+var(--nav-h)+var(--nav-gap))]"
       aria-label="Od kamena kaolina do umivaonika od porcelana"
     >
-      <div className="relative mx-auto aspect-video w-[min(100%,calc(78dvh*16/9))]" style={{ maskImage: MASK, WebkitMaskImage: MASK }}>
+      <div className="relative mx-auto aspect-video w-[min(88%,calc(46dvh*16/9))] md:w-[min(64%,calc(54dvh*16/9))]" style={{ maskImage: MASK, WebkitMaskImage: MASK }}>
         <video ref={video} className="absolute inset-0 h-full w-full object-contain" src={SRC} poster={POSTER} muted playsInline preload="auto" aria-hidden />
       </div>
       <p className="sr-only">Komad tvrdog kamena kaolina postaje umivaonik od porcelana sa mesinganom slavinom.</p>

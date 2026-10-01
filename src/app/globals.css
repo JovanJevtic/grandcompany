@@ -846,3 +846,10 @@ html[data-past-hero] .hero-nav {
     font-size: 10.5px;
   }
 }
+
+/* Kaolin video: dok traje, stranica se ne skrola (ni prstom) — vidi Kaolin.tsx */
+html.scroll-held,
+html.scroll-held body {
+  overflow: hidden;
+  touch-action: none;
+}
