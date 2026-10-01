@@ -212,7 +212,7 @@ export function createCraneScene() {
   // Štampa: kran se crta samo linijama (obrisi), bez tačaka i punog mastila — vidi crane-print.
   crane.userData.printLine=true;
   box(crane,m.concrete,0,.23,0,3.8,.46,3.8);
-  for(const x of [-1.3,1.3]) for(const z of [-1.3,1.3]) {
+  if(!SIMPLE_CRANE)for(const x of [-1.3,1.3]) for(const z of [-1.3,1.3]) {
     box(crane,m.steel,x,.5,z,.7,.1,.7);
     box(crane,m.concrete,x,1,z,.85,.9,.85);
     rod(crane,m.yellow,[x,.5,z],[Math.sign(x)*.65,4,Math.sign(z)*.65],.105);
@@ -240,8 +240,9 @@ export function createCraneScene() {
   mesh(slew,rodGeo,m.steel,0,0,0,1.05,.4,1.05);
   box(slew,m.yellow,0,.38,0,2.4,.35,2.4);
   // Triangular truss boom: working jib + short counterjib.
-  for(let x=-7;x<19;x+=1.3) {
-    const end=Math.min(19,x+1.3);
+  const BAY=SIMPLE_CRANE?2.6:1.3; // jednostavan kran: duplo ređe dijagonale na strijeli
+  for(let x=-7;x<19;x+=BAY) {
+    const end=Math.min(19,x+BAY);
     for(const z of [-.6,.6]) {
       rod(slew,m.yellow,[x,1,z],[end,1,z],.07);
       rod(slew,m.yellow,[x,1,z],[end,2.25,0],.047);
@@ -252,7 +253,8 @@ export function createCraneScene() {
   }
   for(const z of [-.6,.6])rod(slew,m.yellow,[0,.4,z],[0,5.5,0],.09);
   for(const x of [-6.5,8,17])rod(slew,m.steel,[0,5.5,0],[x,2.2,0],.026);
-  for(let x=-7;x<-4;x+=.64)box(slew,m.edge,x,.9,0,.58,2.8,1.6); // kontrateg (u štampi puno mastilo)
+  if(SIMPLE_CRANE)box(slew,m.edge,-5.66,.9,0,3.1,2.8,1.6); // kontrateg: jedan blok
+  else for(let x=-7;x<-4;x+=.64)box(slew,m.edge,x,.9,0,.58,2.8,1.6); // kontrateg (u štampi puno mastilo)
   box(slew,m.yellow,-3.5,1.1,0,1.5,.6,.85);
   if(!SIMPLE_CRANE)for(let x=-6;x<1;x+=1) {
     rod(slew,m.yellow,[x,1,.9],[x,2,.9],.025);
@@ -590,6 +592,7 @@ export function createCraneScene() {
   ground.rotation.x=-Math.PI/2;ground.position.y=-.02;scene.add(ground);
   // Betonski plato oko krana i zgrade — tamniji, da kran i zgrada "stoje" na nečemu.
   const pad=group(scene);
+  pad.visible=false; // plato je uklonjen iz kadra (kran i zgrada stoje na čistom papiru)
   box(pad,m.concrete,1,.03,0,26,.06,13);
   for(let x=-11;x<14;x+=2.6)box(pad,m.joint,x,.065,0,.03,.01,13);
   const ambient=new THREE.HemisphereLight('#f2f4f5','#cbc7bf',.5);scene.add(ambient);
@@ -702,6 +705,8 @@ export function createCraneScene() {
       _mid.y=Math.max(_mid.y,loadY+2.22*LOAD_SCALE);
       setRod(sling.parts[0],eye,_mid);
       setRod(sling.parts[1],_mid,anchor);
+      // Kad kran otkači teret, sajle nestanu (ne vise sa kuke).
+      sling.parts[0].visible=sling.parts[1].visible=release<.05;
     }
     // Zgrada niče sprat po sprat dok se kran okreće; krov je gotov prije nego teret krene dolje.
     finish.update(p,.06,.07,.09);

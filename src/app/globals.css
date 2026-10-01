@@ -2001,3 +2001,34 @@ footer li + li {
 .calc2-cta:hover span:last-child {
   transform: translateX(4px);
 }
+
+/* Navbar tokom herosa (početna): bez pozadine, samo obrisi. Boja prati štampu ispod velikog
+   wordmarka (--hero-wm iz crane-hero.js): tamno plava na svijetloj, bijela na plavoj. CTA dugmad
+   (preklopnik, Kupuj) se ne mijenjaju. */
+html:not([data-past-hero]) .nav--home .nav__bar {
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-color: var(--hero-wm, var(--ink)) !important;
+  color: var(--hero-wm, var(--ink));
+}
+html:not([data-past-hero]) .nav--home :is(.nav__link, .nav__side--end, .nav__cart) {
+  border-color: var(--hero-wm, var(--ink));
+  color: var(--hero-wm, var(--ink));
+}
+.nav__bar,
+.nav__link,
+.nav__side--end,
+.nav__cart {
+  transition:
+    background-color 0.35s,
+    border-color 0.35s,
+    color 0.35s;
+}
+html:not([data-past-hero]) .nav--home .nav__link:is(:hover, :focus-visible) {
+  background: var(--cobalt);
+  color: #fff;
+}
+html:not([data-past-hero]) .nav--home .nav__cart:hover {
+  color: #fff;
+}

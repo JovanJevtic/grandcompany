@@ -18,7 +18,6 @@ export default function SiteChrome() {
     (_, contextSafe) => {
       const el = root.current!
       const wm = el.querySelector<HTMLElement>('[data-wordmark]')!
-      const badge = el.querySelector<HTMLElement>('[data-badge]')!
       const band = el.querySelector<HTMLElement>('[data-brand-band]')!
       let dead = false
       let onResize: (() => void) | null = null
@@ -120,7 +119,6 @@ export default function SiteChrome() {
             if (reduce) {
               if (out) dock()
               else gsap.set(wm, { x: 0, y: 0, scale: 1 })
-              gsap.set(badge, { autoAlpha: out ? 0 : 1 })
               return
             }
             gsap.to(wm, {
@@ -131,7 +129,6 @@ export default function SiteChrome() {
             })
             // Naslov u heroju i logo u navbaru su isti font (debeli sans), pa se naslov samo smanji
             // tačno u logo; na kraju (dock) ga zamijeni pravi logo, bez vidljive razlike.
-            gsap.to(badge, { autoAlpha: out ? 0 : 1, duration: 0.4, overwrite: 'auto' })
           }
           ScrollTrigger.create({
             trigger: after,
@@ -141,10 +138,7 @@ export default function SiteChrome() {
           })
         }
 
-        if (reduce) {
-          gsap.set(badge, { x: 0, y: 0 })
-          return
-        }
+        if (reduce) return
 
         // Slova wordmarka izranjaju tek kad se uvodni splash skloni — inače se animacija
         // potroši za zavjesom. Ako splasha nema (ili je već gotov), ide odmah.
@@ -178,17 +172,6 @@ export default function SiteChrome() {
         if (!document.querySelector('[data-splash]') || document.documentElement.dataset.gcSplash === 'done')
           letters()
         else window.addEventListener('gc:splash-done', letters, { once: true })
-        // Značka uklizne s desne strane dok se hero scena kreće.
-        // Trigger je element, ne selektor: useGSAP sa `scope` sužava selektore na svoj kontejner.
-        const trigger = () => ({
-          trigger: hero,
-          start: 'top top',
-          end: () => `+=${window.innerHeight * 0.5}`,
-          scrub: 1,
-          invalidateOnRefresh: true,
-        })
-        // Pikseli, ne procenti: GSAP početni CSS transform čita kao piksele i procenti se ne poklope.
-        gsap.fromTo(badge, { x: 180 }, { x: 0, ease: 'none', scrollTrigger: trigger() })
       })
 
       // Čeka se učitavanje fonta, inače se širina mjeri na rezervnom fontu.
@@ -234,14 +217,22 @@ export default function SiteChrome() {
         {BRAND}
       </button>
 
-      {/* Značka (desno): uklizne tek kad hero počne da se kreće. */}
-      <div
+      {/* Mali GC znak, stalno zakačen dole desno; vodi na sekciju sa artiklima. */}
+      <a
         data-badge
-        className="pointer-events-none fixed right-3 top-1/2 z-[500] w-[30px] -translate-y-1/2 mix-blend-difference md:right-[34px] md:w-[44px]"
-        style={{ transform: 'translateX(180px)', color: DIFF }}
+        href="#najcesce"
+        onClick={(e) => {
+          const target = document.getElementById('najcesce')
+          if (!target || !window.__gcLenis) return
+          e.preventDefault()
+          window.__gcLenis.scrollTo(target.getBoundingClientRect().top + window.scrollY - 80)
+        }}
+        aria-label="Artikli na stanju"
+        className="fixed bottom-4 right-4 z-[500] block w-[22px] mix-blend-difference transition-transform duration-300 hover:scale-110 md:bottom-6 md:right-6 md:w-[28px]"
+        style={{ color: DIFF }}
       >
         <BadgeMark />
-      </div>
+      </a>
     </div>
   )
 }
