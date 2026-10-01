@@ -41,7 +41,7 @@ export default function Home() {
         </StepBand>
         <Featured />
         <Delivery />
-        <StepBand tone="navy" profile="valley" steps={11} aria-label="Vodiči">
+        <StepBand tone="navy" profile="valley" steps={11} aria-label="Vodiči" className="!z-[45]">
           <PostsTeaser />
         </StepBand>
         <Footer />
