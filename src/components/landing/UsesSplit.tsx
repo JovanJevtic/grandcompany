@@ -61,7 +61,7 @@ export default function UsesSplit() {
           revealChars(row.querySelector('[data-title]')!, reduce, 'top 80%', row)
 
           const svg = row.querySelector('svg')!
-          drawOnScroll(svg, reduce, { trigger: row, start: 'top 70%', duration: 1.2 })
+          drawOnScroll(svg, reduce, { trigger: row, start: 'top 92%' })
 
 
           if (reduce) return

@@ -23,9 +23,10 @@ export function useMediaMotion(scope: RefObject<HTMLElement | null>, deps: unkno
         gsap.utils.toArray<HTMLElement>('[data-curtain]', root).forEach((box) => {
           const img = box.querySelector('img, video')
           if (reduce) return gsap.set(box, { clipPath: 'inset(0% 0% 0% 0%)' })
-          const tl = gsap.timeline({ scrollTrigger: { trigger: box, start: 'top 90%' } })
-          tl.fromTo(box, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.4, ease: EASE.quintInOut })
-          if (img) tl.fromTo(img, { scale: 1.3 }, { scale: 1, duration: 2, ease: EASE.out }, 0)
+          const tl = gsap.timeline({ scrollTrigger: { trigger: box, start: 'top 98%' } })
+          // Brzo otvaranje (ease-out: kreće odmah, ne "stoji" na početku); zum je blag i na GPU-u.
+          tl.fromTo(box, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 0.6, ease: EASE.out })
+          if (img) tl.fromTo(img, { scale: 1.12 }, { scale: 1, duration: 0.8, ease: EASE.out, force3D: true }, 0)
         })
 
         if (reduce) return
@@ -44,8 +45,8 @@ export function useMediaMotion(scope: RefObject<HTMLElement | null>, deps: unkno
         gsap.utils.toArray<HTMLElement>('[data-up]', root).forEach((el) => {
           gsap.fromTo(
             el,
-            { autoAlpha: 0, y: 40 },
-            { autoAlpha: 1, y: 0, duration: 1.2, ease: EASE.quint, delay: Number(el.dataset.delay || 0), scrollTrigger: { trigger: el, start: 'top 92%' } },
+            { autoAlpha: 0, y: 24 },
+            { autoAlpha: 1, y: 0, duration: 0.55, ease: EASE.quint, delay: Number(el.dataset.delay || 0) * 0.4, scrollTrigger: { trigger: el, start: 'top 98%' } },
           )
         })
 

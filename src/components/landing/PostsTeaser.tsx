@@ -34,7 +34,7 @@ export default function PostsTeaser() {
         gsap.fromTo(
           cards,
           { y: 80, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 1.1, ease: EASE.quint, stagger: 0.12, scrollTrigger: { trigger: el.querySelector('[data-grid]'), start: 'top 85%' } },
+          { y: 0, autoAlpha: 1, duration: 0.55, ease: EASE.quint, stagger: 0.05, scrollTrigger: { trigger: el.querySelector('[data-grid]'), start: 'top 85%' } },
         )
       })
     },

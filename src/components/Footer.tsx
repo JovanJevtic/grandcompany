@@ -47,9 +47,9 @@ export default function Footer() {
           const { reduce } = ctx.conditions as { reduce: boolean }
           revealChars(el.querySelector('[data-head]')!, reduce, 'top 85%')
           const split = revealChars(word, true)
-          drawOnScroll(svg, reduce, { trigger: svg, start: 'top 90%', duration: 1.4 })
+          drawOnScroll(svg, reduce, { trigger: svg, start: 'top 98%' })
           if (reduce) return
-          gsap.fromTo(split.chars, { yPercent: 110 }, { yPercent: 0, duration: 1.4, ease: EASE.quint, stagger: 0.04, scrollTrigger: { trigger: word, start: 'top 98%' } })
+          gsap.fromTo(split.chars, { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: EASE.quint, stagger: 0.02, scrollTrigger: { trigger: word, start: 'top 98%' } })
 
           // Sklapanje: svaki sloj kreće iz rastavljenog položaja (dalje što je bliži) i dolazi na 0.
           const axis = svg.dataset.axis as 'x' | 'y' | 'z'

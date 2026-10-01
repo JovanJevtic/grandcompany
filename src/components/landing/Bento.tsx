@@ -43,11 +43,11 @@ export default function Bento() {
         const cards = el.querySelectorAll('[data-bento]')
         const word = el.querySelector('[data-word]')
         if (reduce) return
-        gsap.fromTo(word, { yPercent: 105 }, { yPercent: 0, duration: 1.3, ease: EASE.quint, scrollTrigger: { trigger: el, start: 'top 75%' } })
+        gsap.fromTo(word, { yPercent: 105 }, { yPercent: 0, duration: 0.6, ease: EASE.quint, scrollTrigger: { trigger: el, start: 'top 90%' } })
         gsap.fromTo(
           cards,
           { y: 80, autoAlpha: 0 },
-          { y: 0, autoAlpha: 1, duration: 1.1, ease: EASE.quint, stagger: 0.1, scrollTrigger: { trigger: cards[1], start: 'top 92%' } },
+          { y: 0, autoAlpha: 1, duration: 0.55, ease: EASE.quint, stagger: 0.05, scrollTrigger: { trigger: cards[1], start: 'top 92%' } },
         )
       })
     },

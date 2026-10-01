@@ -157,7 +157,7 @@ export default function BrandsSplit() {
           art.draw(g, 0)
           const svg = row.querySelector('svg')!
           if (reduce) return
-          gsap.fromTo(svg, { scale: 0.6, autoAlpha: 0, rotate: -20 }, { scale: 1, autoAlpha: 1, rotate: 0, duration: 1.4, ease: EASE.quint, scrollTrigger: { trigger: row, start: 'top 75%' } })
+          gsap.fromTo(svg, { scale: 0.6, autoAlpha: 0, rotate: -20 }, { scale: 1, autoAlpha: 1, rotate: 0, duration: 0.6, ease: EASE.quint, scrollTrigger: { trigger: row, start: 'top 75%' } })
           ScrollTrigger.create({
             trigger: row,
             start: 'top bottom',

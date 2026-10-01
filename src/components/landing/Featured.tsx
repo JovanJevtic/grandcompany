@@ -50,7 +50,7 @@ export default function Featured() {
       const cards = gsap.utils.toArray<HTMLElement>('[data-fan]', track)
 
       // Kartice nove liste izranjaju jedna za drugom.
-      gsap.fromTo(cards, { autoAlpha: 0, yPercent: 12 }, { autoAlpha: 1, yPercent: 0, duration: 0.9, ease: EASE.quint, stagger: 0.05 })
+      gsap.fromTo(cards, { autoAlpha: 0, yPercent: 12 }, { autoAlpha: 1, yPercent: 0, duration: 0.5, ease: EASE.quint, stagger: 0.03 })
 
       const mm = gsap.matchMedia()
       mm.add({ desktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)' }, () => {

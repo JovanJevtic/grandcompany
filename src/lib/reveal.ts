@@ -9,7 +9,7 @@ const CLOSED = 'inset(0% 50% 0% 50%)'
 
 // Otvaranje sive ploče: clip-path krene od srednje linije, a unutrašnjost se smiruje sa zuma 1.2 na 1.
 // Uvijek fromTo: browser sažima inset(a b a b) u inset(a b), pa bi `to` pročitao pogrešan broj vrijednosti.
-export function revealMedia(media: Element, reduce: boolean, start = 'top 88%') {
+export function revealMedia(media: Element, reduce: boolean, start = 'top 96%') {
   const scale = media.querySelector('[data-scale]')
   if (reduce) {
     gsap.set(media, { clipPath: OPEN })
@@ -20,16 +20,16 @@ export function revealMedia(media: Element, reduce: boolean, start = 'top 88%') 
     { clipPath: CLOSED },
     {
       clipPath: OPEN,
-      duration: 1.4,
-      ease: EASE.quintInOut,
+      duration: 0.6,
+      ease: EASE.out,
       scrollTrigger: { trigger: media, start },
     },
   )
   if (scale) {
     gsap.fromTo(
       scale,
-      { scale: 1.2 },
-      { scale: 1, duration: 1.8, ease: EASE.out, scrollTrigger: { trigger: media, start } },
+      { scale: 1.1 },
+      { scale: 1, duration: 0.8, ease: EASE.out, force3D: true, scrollTrigger: { trigger: media, start } },
     )
   }
 }
@@ -46,9 +46,9 @@ export function revealLines(el: Element, reduce: boolean, start = 'top 88%') {
       if (reduce) return
       return gsap.from(self.lines, {
         yPercent: 120,
-        duration: 1.1,
+        duration: 0.6,
         ease: EASE.quint,
-        stagger: 0.08,
+        stagger: 0.04,
         scrollTrigger: { trigger: el, start },
       })
     },
@@ -62,9 +62,9 @@ export function revealChars(el: Element, reduce: boolean, start = 'top 88%', tri
   if (reduce) return split
   gsap.from(split.chars, {
     yPercent: 120,
-    duration: 0.9,
+    duration: 0.5,
     ease: EASE.quint,
-    stagger: 0.02,
+    stagger: 0.012,
     scrollTrigger: { trigger, start },
   })
   return split

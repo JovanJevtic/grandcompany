@@ -65,7 +65,7 @@ export default function CatalogClient() {
     () => {
       const cells = grid.current?.querySelectorAll('[data-cell]')
       if (!cells?.length || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      gsap.fromTo(cells, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.9, ease: EASE.quint, stagger: 0.04, scrollTrigger: { trigger: grid.current, start: 'top 85%' } })
+      gsap.fromTo(cells, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: EASE.quint, stagger: 0.025, scrollTrigger: { trigger: grid.current, start: 'top 85%' } })
     },
     { scope: grid, dependencies: [cat, use, all], revertOnUpdate: true },
   )
