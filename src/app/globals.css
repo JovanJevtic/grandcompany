@@ -1411,24 +1411,24 @@ html.menu-open .nav--home {
   color: var(--ink);
 }
 
-/* ——— Navbar: traka preko cijele širine, podijeljena na ćelije pune visine (runda 5) ———
+/* ——— Navbar: plutajuća traka (odmaknuta od ivica), podijeljena na ćelije pune visine (runda 5) ———
    Linkovi su ćelije sa linijom desno; na hover ćelija se ispuni kobalt plavom, tekst bijeli.
    Desno: preklopnik u okviru, Kupuj sa strelicom, korpa u svojoj ćeliji. Font: Barlow Condensed. */
 :root {
   --nav-h: 64px;
-  --nav-inset: 0px;
+  --nav-inset: 12px;
 }
 .nav {
-  padding: 0;
+  padding: var(--nav-inset) var(--nav-inset) 0;
 }
 .nav__bar {
-  max-width: none;
+  max-width: 1600px;
   height: var(--nav-h);
-  margin: 0;
+  margin-inline: auto;
   padding: 0;
-  border: 0 !important;
-  border-block: 1.5px solid var(--ink) !important;
+  border: 1.5px solid var(--ink) !important;
   border-radius: 0;
+  overflow: hidden;
   background: color-mix(in srgb, var(--bg) 94%, transparent);
   box-shadow: none;
 }
@@ -1598,6 +1598,7 @@ html.menu-open .nav--home {
 @media (max-width: 899px) {
   :root {
     --nav-h: 56px;
+    --nav-inset: 8px;
   }
   .nav__side {
     align-items: center;
