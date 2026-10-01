@@ -17,9 +17,10 @@ import { MQ } from '@/lib/motion'
 // Zaustavljanje skrola: kad sekcija stigne na vrh ekrana, skrol se zaključa dok video ne
 // prođe do kraja (Lenis stop), pa se otključa. Nazad (skrol nagore) ne zaključava.
 
-const SRC = '/kaolin/video/kaolin.mp4'
-const SRC_REV = '/kaolin/video/kaolin-reverse.mp4'
-const POSTER = '/kaolin/video/kaolin-poster.jpg'
+// ?v=2: video je skraćen (kamen → umivaonik, bez međufaza), pa se stari ne smije služiti iz keša
+const SRC = '/kaolin/video/kaolin.mp4?v=2'
+const SRC_REV = '/kaolin/video/kaolin-reverse.mp4?v=2'
+const POSTER = '/kaolin/video/kaolin-poster.jpg?v=2'
 const RATE = 1.75 / 1.5
 
 // Ivice videa se meko gube u pozadinu stranice: elipsa u sredini i blagi prelaz gore i dolje.
@@ -40,7 +41,7 @@ export default function Kaolin() {
 
       let dir: 1 | -1 = 1
       let raf = 0
-      const D = () => fwd.duration || rev.duration || 6.67
+      const D = () => fwd.duration || rev.duration || 2.8
 
       // Napredak 0..1 iz videa koji se trenutno vidi; vozi kuglicu na traci.
       const progress = () => (dir === 1 ? fwd.currentTime / D() : 1 - rev.currentTime / D())
@@ -158,7 +159,7 @@ export default function Kaolin() {
         <video data-fwd className={video} src={SRC} poster={POSTER} muted playsInline preload="auto" aria-hidden />
         <video data-rev className={video} style={{ opacity: 0 }} src={SRC_REV} muted playsInline preload="auto" aria-hidden />
       </div>
-      <p className="sr-only">Sirovi kaolin se oblikuje u kuglu, pa u činiju i na kraju u umivaonik sa mesinganom slavinom.</p>
+      <p className="sr-only">Komad tvrdog kamena kaolina postaje umivaonik od porcelana sa mesinganom slavinom.</p>
 
       {/* Traka odmah ispod modela: pokazuje koliko je puta od materijala do proizvoda pređeno. */}
       <div className="mt-2 flex w-full max-w-[1000px] items-center gap-5 px-5 font-mono text-[11px] uppercase tracking-[0.18em] md:gap-8 md:text-micro">
