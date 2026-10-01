@@ -5,9 +5,9 @@
 // gornja ivica scene, pa se visina offseta mjeri iz njega, a ne iz headera.
 // Dodat je i dispose() da se scena ugasi ako se stranica montira ponovo.
 import * as THREE from '../vendor/three.module.min.js';
-import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=4';
-import {craneQuality} from './crane-quality.js?v=19';
-import {createCraneScene, clamp, smooth} from './crane-scene.js?v=38';
+import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=5';
+import {craneQuality} from './crane-quality.js?v=20';
+import {createCraneScene, clamp, smooth} from './crane-scene.js?v=40';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -35,7 +35,8 @@ async function init() {
   window.__gcCrane={dispose(){cancelled=true;}};
   let renderer;
   try {
-    renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:true,powerPreference:'high-performance'});
+    // Bez MSAA: konačna slika je jedan pravougaonik preko ekrana (štampa), MSAA tu ništa ne dobija.
+    renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:false,powerPreference:'high-performance'});
   } catch(error) { console.warn('3D hero unavailable; showing illustration.',error); cover.classList.add('crane-failed'); return; }
   // `resolutionCap` postavlja mjerenje GPU-a pri pokretanju (vidi pickResolution): slabiji
   // uređaji dobiju nižu rezoluciju umjesto trzanja, jaki zadržavaju punu.
@@ -202,12 +203,10 @@ async function init() {
     const full=quality().pixelRatio;
     if(slowRun>30){
       slowRun=0;
-      if(contactEnabled)contactEnabled=false; // prvi korak: bez SSAO (najskuplji dio, slika ostaje oštra)
-      else if(wantedCap>floorRatio+.01)wantedCap=Math.max(floorRatio,Math.min(wantedCap,full)-.2);
+      if(wantedCap>floorRatio+.01)wantedCap=Math.max(floorRatio,Math.min(wantedCap,full)-.2);
     } else if(fastRun>180){
       fastRun=0;
       if(wantedCap<Math.min(full,native)-.01)wantedCap=Math.min(full,wantedCap+.15);
-      else if(!contactEnabled&&frameAvg<10)contactEnabled=true;
     }
   }
   function applyGovernor() {
@@ -274,7 +273,7 @@ async function init() {
       canvas.removeEventListener('webglcontextlost',onContextLost);
       canvas.removeEventListener('webglcontextrestored',onContextRestored);
       cancelAnimationFrame(frame);
-      pipeline.dispose();renderer.dispose();
+      pipeline.dispose();world.dispose();renderer.dispose();
       cover.classList.remove('crane-ready','crane-reduced');
       window.__gcCraneReady=false;
       window.__gcCrane=null;

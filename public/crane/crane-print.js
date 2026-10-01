@@ -193,8 +193,10 @@ const POST_FRAG = /* glsl */ `
 
     // ——— G-buffer ———
     vec4 g0 = texture2D(tG, vUv);
-    vec3 n0; float d0; float a0; float tone0;
-    sampleG(vUv, n0, d0, a0, tone0);
+    vec2 xy0 = g0.rg * 2.0 - 1.0;
+    vec3 n0 = vec3(xy0, sqrt(max(0.0, 1.0 - dot(xy0, xy0))));
+    float a0 = g0.a;
+    float d0 = lin(texture2D(tDepth, vUv).r);
 
     // ——— pozadina: tonska slika grada, "cover" preko platna ———
     vec2 buv = vUv - .5;
@@ -297,7 +299,7 @@ export function createCraneRenderer(renderer, world) {
   // Zamjena materijala samo za vrijeme crtanja G-buffera (original ostaje za pretapanja i sl.).
   const swapped = [];
   function swapIn(root) {
-    root.traverse((o) => {
+    root.traverseVisible((o) => {
       if (!o.isMesh || !o.material || Array.isArray(o.material)) return;
       const src = o.material;
       const pm = printFor(src);
@@ -337,11 +339,15 @@ export function createCraneRenderer(renderer, world) {
     bgC: { value: STAGES.map((s) => s.bg) },
     wipe: { value: STAGES.map(() => 0) },
   };
+  let disposed = false;
   new THREE.TextureLoader().load('/hero/city-tone.webp', (tex) => {
+    // Scena ugašena dok se slika učitavala: ne instaliramo je (inače ostaje u memoriji GPU-a).
+    if (disposed) { tex.dispose(); return; }
     tex.colorSpace = THREE.NoColorSpace;
     tex.minFilter = THREE.LinearMipmapLinearFilter;
     tex.generateMipmaps = true;
     uniforms.tBg.value = tex;
+    blank.dispose();
     uniforms.bgAspect.value = tex.image.width / tex.image.height;
     onBg?.();
   });
@@ -369,7 +375,7 @@ export function createCraneRenderer(renderer, world) {
     target?.dispose();
     const depth = new THREE.DepthTexture(w, h);
     depth.type = THREE.UnsignedIntType;
-    target = new THREE.WebGLRenderTarget(w, h, { depthTexture: depth, type: THREE.HalfFloatType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter });
+    target = new THREE.WebGLRenderTarget(w, h, { depthTexture: depth, type: THREE.UnsignedByteType, minFilter: THREE.NearestFilter, magFilter: THREE.NearestFilter });
     uniforms.tG.value = target.texture;
     uniforms.tDepth.value = depth;
     uniforms.resolution.value.set(w, h);
@@ -423,6 +429,7 @@ export function createCraneRenderer(renderer, world) {
       renderer.render(post, postCam);
     },
     dispose() {
+      disposed = true;
       target?.dispose();
       for (const pm of cache.values()) pm.dispose();
       quad.geometry.dispose();

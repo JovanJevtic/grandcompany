@@ -667,10 +667,10 @@ export function createCraneScene() {
     const hookY=loadY+2.8*LOAD_SCALE+lift*4.8;
     onJib(hookR,hookY,0,hookTh,hook.position);
     hook.rotation.y=hookTh;
-    hoists.forEach((hoist,i)=>{
+    for(let i=0;i<hoists.length;i++) {
       const z=i?.12:-.12;
-      setRod(hoist,onJib(tx,JIB_Y,z,th,_a),onJib(hookR,hookY+.45*LOAD_SCALE,z,hookTh,_b));
-    });
+      setRod(hoists[i],onJib(tx,JIB_Y,z,th,_a),onJib(hookR,hookY+.45*LOAD_SCALE,z,hookTh,_b));
+    }
     // Sajle: od ušica kaveza do kuke. Pri otkačinjanju donji kraj napušta ušicu, sajla se
     // ulegne i ostane da visi ispod kuke koja odlazi.
     const hang=(.35+1.2*lift)*LOAD_SCALE;
@@ -681,6 +681,8 @@ export function createCraneScene() {
       eye.lerp(free,release);
       _mid.copy(eye).lerp(anchor,.5);
       _mid.y-=Math.sin(release*Math.PI)*.55;
+      // sajla se ne smije spustiti kroz gornji okvir kaveza dok se oslobađa
+      _mid.y=Math.max(_mid.y,loadY+2.22*LOAD_SCALE);
       setRod(sling.parts[0],eye,_mid);
       setRod(sling.parts[1],_mid,anchor);
     }
@@ -710,5 +712,17 @@ export function createCraneScene() {
     return {chapter:p<.17?0:p<.36?1:p<.58?2:p<.925?3:4};
   }
   update(0);
-  return {scene,camera,update,focus,load,hook,site,slew,trolley,hoists,floors,activity,activityRoot,truck,wheels,lighting:{key,fill},materials:m};
+  // Oslobađa geometrije, materijale i teksture scene (pri ponovnoj montaži stranice).
+  function dispose() {
+    const seen=new Set();
+    scene.traverse(o=>{
+      if(o.geometry&&!seen.has(o.geometry)){seen.add(o.geometry);o.geometry.dispose();}
+      for(const mt of [o.material].flat().filter(Boolean)) {
+        if(seen.has(mt))continue;seen.add(mt);
+        for(const v of Object.values(mt))if(v?.isTexture&&!seen.has(v)){seen.add(v);v.dispose();}
+        mt.dispose();
+      }
+    });
+  }
+  return {dispose,scene,camera,update,focus,load,hook,site,slew,trolley,hoists,floors,activity,activityRoot,truck,wheels,lighting:{key,fill},materials:m};
 }
