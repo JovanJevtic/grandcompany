@@ -285,4 +285,7 @@ export const POSTS: Post[] = [
   },
 ]
 
+/** Fotografija vodiča (krupni plan materijala ili rada, generisano za ovaj sajt), u /public/editorial/posts. */
+export const postPhoto = (slug: string) => `/editorial/posts/${slug}.webp`
+
 export const postBySlug = (slug: string) => POSTS.find((post) => post.slug === slug)

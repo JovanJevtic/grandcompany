@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- vlastita fotografija stovarišta iz /public */
 
+import { MAPS_URL } from '@/lib/company'
 import { useRef } from 'react'
 import Cta from '@/components/ui/Cta'
 import { COMPANY } from '@/gc/gc'
@@ -50,9 +51,14 @@ export default function Detail() {
             Stovarište
           </h2>
           <address data-up className="mt-8 not-italic text-[12.5px] leading-[1.7]">
-            {street}
-            <br />
-            {city} · Zalužani / Lazarevo
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="ulink">
+              {street}
+              <br />
+              {city} · Zalužani / Lazarevo
+            </a>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="mt-2 block text-[11px] opacity-60 hover:opacity-100">
+              Otvori na Google mapi ↗
+            </a>
           </address>
 
           <dl data-up className="mt-8 border-t border-ink/20 text-[12px]">

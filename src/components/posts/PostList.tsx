@@ -1,9 +1,10 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- fotografije iz /public, već u WebP */
+
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { POST_TAGS, postDate, type Post } from '@/lib/posts'
-import PostArtDraw from './PostArtDraw'
+import { POST_TAGS, postDate, postPhoto, type Post } from '@/lib/posts'
 import { pw } from '@/components/ui/Pw'
 
 // Filter po temi (tihi tekstualni izbor u sredini) i mreža objava sa crtežom na polju boje papira.
@@ -48,8 +49,13 @@ export default function PostList({ posts }: { posts: Post[] }) {
         {shown.map((post) => (
           <article key={post.slug} className="group">
             <Link href={`/vodici/${post.slug}`} className="block" data-cursor="Čitaj">
-              <div className="ed-art aspect-[4/3] bg-plate p-[9%]">
-                <PostArtDraw kind={post.art} className="h-full transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.04]" />
+              <div className="relative aspect-[4/3] overflow-hidden bg-plate">
+                <img
+                  src={postPhoto(post.slug)}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.04]"
+                />
               </div>
               <p className="mt-6 text-[14px] text-ink/50">
                 {post.tag} · {post.read} min

@@ -27,6 +27,10 @@ export const COMPANY = {
   web: null as string | null,
 }
 
+// Lokacija stovarišta na Google mapi (Nenada Kostića 151, Zalužani). Svaka adresa na sajtu vodi ovdje.
+export const MAPS_URL =
+  'https://www.google.com/maps/place/Grand+company/@44.8314274,17.1833883,17z/data=!3m1!4b1!4m6!3m5!1s0x475e0147a2de83a9:0xc6444a56e406d81b!8m2!3d44.8314236!4d17.1859632!16s%2Fg%2F11fp802zb2'
+
 // Poslovni uslovi iz podataka firme. Rok za odustanak od ugovora nije potvrđen, pa ostaje oznaka.
 export const TERMS = {
   currency: 'KM',

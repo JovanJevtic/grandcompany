@@ -7,6 +7,8 @@ import { STATUSES, type Status } from './store'
 // teški verzal naslovi (.display), brojevi (.num), sitne oznake (.label), kobalt blokovi.
 
 export const line = 'border-ink/20'
+// zaokruživanje koordinata crteža: server i browser se inače razlikuju u poslednjoj decimali
+const r2 = (n: number) => Math.round(n * 100) / 100
 export const idx = (i: number) => String(i + 1).padStart(2, '0')
 export const field = 'h-11 w-full rounded-none border border-ink/25 bg-transparent px-3 text-[12px] outline-none transition-colors focus:border-ink'
 
@@ -85,7 +87,7 @@ export function Dial({ value, label, size = 'size-[180px] md:size-[220px]' }: { 
         {Array.from({ length: 60 }, (_, i) => {
           const a = (i / 60) * Math.PI * 2
           const r1 = i % 5 ? 90 : 84
-          return <line key={i} x1={100 + Math.cos(a) * r1} y1={100 + Math.sin(a) * r1} x2={100 + Math.cos(a) * 96} y2={100 + Math.sin(a) * 96} strokeWidth="1" />
+          return <line key={i} x1={r2(100 + Math.cos(a) * r1)} y1={r2(100 + Math.sin(a) * r1)} x2={r2(100 + Math.cos(a) * 96)} y2={r2(100 + Math.sin(a) * 96)} strokeWidth="1" />
         })}
         <circle cx="196" cy="100" r="4" fill="var(--cobalt)" stroke="none" />
       </svg>

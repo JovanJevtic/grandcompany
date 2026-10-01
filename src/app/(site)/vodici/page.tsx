@@ -1,8 +1,7 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
-import PostArtDraw from '@/components/posts/PostArtDraw'
 import PostList from '@/components/posts/PostList'
-import { POSTS, postDate } from '@/lib/posts'
+import { POSTS, postDate, postPhoto } from '@/lib/posts'
 import Pw, { pw } from '@/components/ui/Pw'
 
 export const metadata = {
@@ -30,8 +29,9 @@ export default function PostsPage() {
         className="group mx-5 grid items-center gap-10 md:mx-10 md:grid-cols-[1.25fr_1fr] md:gap-[6vw]"
         data-cursor="Čitaj"
       >
-        <div className="ed-art aspect-[4/3] bg-plate p-[7%] transition-colors duration-700 md:aspect-[16/11]">
-          <PostArtDraw kind={featured.art} className="h-full" />
+        <div className="relative aspect-[4/3] overflow-hidden bg-plate md:aspect-[16/11]">
+          {/* eslint-disable-next-line @next/next/no-img-element -- fotografija iz /public, već u WebP */}
+          <img src={postPhoto(featured.slug)} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.03]" />
         </div>
         <div className="max-w-[540px] md:pr-[4vw]">
           <p className="label text-ink/50">Najnovije · {featured.tag}</p>

@@ -1,5 +1,6 @@
 'use client'
 
+import { MAPS_URL } from '@/lib/company'
 import Link from 'next/link'
 import { useRef } from 'react'
 import UseArt from '@/components/landing/UseArt'
@@ -109,12 +110,14 @@ export default function Footer() {
         <div className="px-5 py-10 md:px-10 md:py-12">
           <p className="mb-6 opacity-45">Sjedište i stovarište</p>
           <address className="not-italic leading-[1.9]">
-            {COMPANY.address.split(', ').map((l) => (
-              <span key={l} className="block">
-                {l}
-              </span>
-            ))}
-            <span className="block opacity-60">Zalužani / Lazarevo</span>
+            <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="group block" aria-label="Stovarište na Google mapi">
+              {COMPANY.address.split(', ').map((l) => (
+                <span key={l} className="block">
+                  <span className="ulink">{l}</span>
+                </span>
+              ))}
+              <span className="block opacity-60">Zalužani / Lazarevo · mapa ↗</span>
+            </a>
             <a href={`mailto:${COMPANY.emailInfo}`} className="ulink break-all">
               {COMPANY.emailInfo}
             </a>

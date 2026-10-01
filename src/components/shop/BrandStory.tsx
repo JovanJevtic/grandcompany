@@ -2,6 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element -- editorijalne fotografije iz /public, već u WebP */
 
+import { MAPS_URL } from '@/lib/company'
 import { useRef } from 'react'
 import Pw from '@/components/ui/Pw'
 import { COMPANY } from '@/gc/gc'
@@ -82,9 +83,17 @@ export default function BrandStory() {
                 </div>
               </figure>
             ) : (
-              <div key={i} className="col-span-2 grid place-items-center bg-bg p-6 md:col-span-1">
+              <a
+                key={i}
+                href={MAPS_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Stovarište Banja Luka na Google mapi"
+                data-cursor="Mapa"
+                className="col-span-2 grid place-items-center bg-bg p-6 transition-opacity hover:opacity-70 md:col-span-1"
+              >
                 <BladeOutline label="Banja Luka" dark className="w-full max-w-[260px]" />
-              </div>
+              </a>
             ),
           )}
         </div>

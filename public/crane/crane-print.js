@@ -19,8 +19,7 @@ import * as THREE from '../vendor/three.module.min.js';
 // bg: koliko se vidi grad u pozadini (0..1); at: progres kad prelaz u ovo poglavlje počinje.
 export const STAGES = [
   { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 6.5, angle: 45, bg: .32, floor: 0 },  // kran se okreće
-  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30, floor: 0 }, // zgrada niče — plavi blok (negativ, nacrt)
-  { at: .36, paper: '#a9c4e4', ink: '#142a8f', cell: 7.4, angle: 72, bg: .34, floor: 0 }, // spuštanje na krov, kuka se otkači
+  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .30, floor: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
   { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0 },   // enterijer — topao papir
   // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
   // grad se nazire samo kroz gustinu tačaka. Preko nje se ispisuje rečenica, svijetla i centrirana.
@@ -138,6 +137,7 @@ const PRINT_FRAG = /* glsl */ `
 `;
 
 // ——— Završni shader (raster + ivice + boje poglavlja) ———
+const N = STAGES.length;
 const POST_FRAG = /* glsl */ `
   precision highp float;
   uniform sampler2D tG;
@@ -147,13 +147,13 @@ const POST_FRAG = /* glsl */ `
   uniform float near, far, dpr, fill, bgAspect, cols;
   uniform vec2 bgShift;
   uniform float bgScale;
-  uniform vec3 paperC[5];
-  uniform vec3 inkC[5];
-  uniform float cellC[5];
-  uniform float angleC[5];
-  uniform float bgC[5];
-  uniform float floorC[5];
-  uniform float wipe[5];
+  uniform vec3 paperC[${N}];
+  uniform vec3 inkC[${N}];
+  uniform float cellC[${N}];
+  uniform float angleC[${N}];
+  uniform float bgC[${N}];
+  uniform float floorC[${N}];
+  uniform float wipe[${N}];
   varying vec2 vUv;
 
   float lin(float d) { float z = d * 2.0 - 1.0; return (2.0 * near * far) / (far + near - z * (far - near)); }
@@ -188,10 +188,10 @@ const POST_FRAG = /* glsl */ `
 
     // ——— poglavlje za ovaj piksel ———
     int si = 0;
-    for (int i = 1; i < 5; i++) if (switched(wipe[i], vUv, float(i))) si = i;
+    for (int i = 1; i < ${N}; i++) if (switched(wipe[i], vUv, float(i))) si = i;
     vec3 paper = paperC[0], ink = inkC[0];
     float cell = cellC[0], ang = angleC[0], bgS = bgC[0], flo = floorC[0];
-    for (int i = 1; i < 5; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; flo = floorC[i]; }
+    for (int i = 1; i < ${N}; i++) if (i == si) { paper = paperC[i]; ink = inkC[i]; cell = cellC[i]; ang = angleC[i]; bgS = bgC[i]; flo = floorC[i]; }
     cell *= dpr;
 
     // ——— G-buffer ———

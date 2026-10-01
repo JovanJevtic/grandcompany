@@ -52,6 +52,14 @@
   background: none;
 }
 
+/* GC znak (desno) inače stoji u `difference` režimu; preko plave štampe bi ispao narandžast,
+   pa je tada običan bijeli znak. Atribut postavlja crane-hero.js prema poglavlju ispod wordmarka. */
+html[data-hero-dark]:not([data-past-hero]) [data-badge] {
+  mix-blend-mode: normal;
+  color: #f4f1ec !important;
+  transition: color 0.35s ease;
+}
+
 /* ——— Scena ——— */
 
 .crane-stage {

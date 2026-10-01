@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { COMPANY } from '@/gc/gc'
 import type { FullPartner } from '@/lib/b2b'
 import Cta from '@/components/ui/Cta'
+import { MAPS_URL } from '@/lib/company'
 import { addRequest } from './store'
 import { Head, field, line } from './ui'
 
@@ -84,7 +85,11 @@ export default function Contact({ partner }: { partner: FullPartner | null }) {
           ))}
           <div className={`border-t ${line} pt-4`}>
             <dt className="opacity-55">Stovarište</dt>
-            <dd className="mt-1">{COMPANY.address}</dd>
+            <dd className="mt-1">
+              <a href={MAPS_URL} target="_blank" rel="noopener noreferrer" className="ulink">
+                {COMPANY.address} ↗
+              </a>
+            </dd>
             <dd className="mt-1 opacity-70">Pon–Pet 07–17 h · Sub 07–14 h · Nedjelja ne radimo</dd>
           </div>
         </dl>

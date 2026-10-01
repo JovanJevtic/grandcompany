@@ -1,17 +1,18 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- fotografije iz /public, već u WebP */
+
 import Link from 'next/link'
 import { useRef } from 'react'
-import PostArtDraw from '@/components/posts/PostArtDraw'
 import Cta from '@/components/ui/Cta'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
-import { POSTS } from '@/lib/posts'
+import { POSTS, postPhoto } from '@/lib/posts'
 import Pw, { pw } from '@/components/ui/Pw'
 
-// Tri najnovija vodiča (ranije "objave"). Kartice zadržavaju linijske crteže (jedino mjesto na sajtu, uz
-// "Po namjeni" i brendove, gdje su ilustracije umjesto fotografija). Na hover se crtež podigne.
+// Tri najnovija vodiča (ranije "objave"). Svaka kartica ima fotografiju teme (krupni plan materijala ili
+// rada); na hover se fotografija blago približi.
 
 // Datum ručno (dd.mm.gggg.): Node i browser nemaju iste podatke za lokal sr-Latn-BA, pa bi
 // toLocaleDateString dao različit tekst na serveru i u browseru (greška pri hidrataciji).
@@ -49,8 +50,13 @@ export default function PostsTeaser() {
       <div data-grid className="mx-auto mt-[10vh] grid w-[calc(100%-40px)] gap-x-[2vw] gap-y-16 md:w-[88vw] md:grid-cols-3">
         {latest.map((p, i) => (
           <Link key={p.slug} href={`/vodici/${p.slug}`} data-post data-cursor="Čitaj" className={`group flex flex-col ${i === 1 ? 'md:mt-[10vh]' : ''}`}>
-            <span className="flex aspect-[4/5] items-center justify-center bg-plate px-[12%] [--art-fill:var(--plate)]">
-              <PostArtDraw kind={p.art} className="w-full text-ink/80 transition-transform duration-700 ease-[var(--ease-out)] group-hover:-translate-y-3" />
+            <span className="relative block aspect-[4/5] overflow-hidden bg-plate">
+              <img
+                src={postPhoto(p.slug)}
+                alt=""
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1.4s] ease-[var(--ease-out)] group-hover:scale-[1.05]"
+              />
             </span>
             <span className="mt-5 flex justify-between text-[13px] opacity-60">
               <span>{p.tag}</span>
