@@ -1,92 +1,111 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- fotografije iz /public, već u WebP */
+
 import Link from 'next/link'
+import { useRef } from 'react'
 import { bySku } from '@/gc/gc'
 import { creditUsage, logout, openLogin, PARTNER_TIERS, useB2B, withDiscount, type FullPartner } from '@/lib/b2b'
 import { cartCount, useShop } from '@/lib/cart'
+import { useMediaMotion } from '@/lib/media'
 import { categoryName, money } from '@/lib/shop'
 import Cta from '@/components/ui/Cta'
-import Bars from './Bars'
+import StepBand from '@/components/ui/StepBand'
+import UseArt from '@/components/landing/UseArt'
 import { setPrefs, useDeliveryPrefs } from './prefs'
 import { buildQuote, dateAgo, orderTotal } from './quote'
 
-// B2B Partner Portal. Neprijavljen korisnik vidi šta portal daje i rabatnu skalu (PDF, tačka 5),
-// prijavljen partner vidi kontrolnu tablu: rabat, kreditni limit, gradilišta, narudžbe, fakture,
-// analitiku potrošnje i predračun iz trenutne korpe. Svi podaci su demo (u produkciji Pantheon ERP).
+// B2B Partner Portal — brutalist / editorijalni raspored: mreža ćelija odvojenih tankim linijama,
+// ogromni brojevi i nazivi, jarka plava za kontrast, stepenasti prelazi u plave sekcije, fotografije
+// sa stovarišta i skicirani crteži sa početne. Funkcija ostaje glavna: rabat, kreditni limit,
+// gradilišta, narudžbe, fakture, potrošnja i predračun iz korpe. Svi podaci su demo (Pantheon ERP).
 
-const BENEFITS: [string, string][] = [
-  ['Ugovoreni rabat', 'Uvid u ugovorene rabate od 15% do 25% na sve artikle.'],
-  ['Kreditni limit', 'Odgođeno plaćanje 30, 60 ili 90 dana uz menicu ili bankarsku garanciju.'],
-  ['Zalihe u realnom vremenu', 'Stanje na skladištu Nenada Kostića 151, direktno iz Pantheon ERP-a.'],
-  ['Kran transport', 'Istovar paleta direktno na spratove i etaže gradilišta.'],
-]
+const line = 'border-ink/20'
+const idx = (i: number) => String(i + 1).padStart(2, '0')
 
-function Landing() {
+function Arrow() {
   return (
-    <div className="px-5 pb-[16vh] pt-[14vh] md:px-10">
-      <div className="text-center">
-        <p className="label opacity-50">Za građevinske firme i izvođače</p>
-        <h1 className="display mx-auto mt-5 max-w-[14ch] text-[clamp(44px,6.4vw,104px)]">B2B Partner Portal</h1>
-        <p className="mx-auto mt-6 max-w-[52ch] text-[12.5px] leading-[1.7] opacity-70">
-          Ugovoreni rabat, kreditni limit i odgođeno plaćanje — sve na jednom mjestu, sinhronizovano sa Pantheon ERP-om.
-        </p>
-        <div className="mt-10 flex justify-center">
-          <Cta solid onClick={openLogin}>
-            Prijava
-          </Cta>
-        </div>
-      </div>
+    <svg viewBox="0 0 16 16" className="size-3.5" aria-hidden>
+      <path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.4" />
+    </svg>
+  )
+}
 
-      <div className="mx-auto mt-[12vh] grid max-w-[1200px] border-y border-ink/15 sm:grid-cols-2 lg:grid-cols-4 [&>*]:border-ink/15 max-lg:[&>*]:border-b sm:[&>*:nth-child(odd)]:border-r lg:[&>*:not(:last-child)]:border-r">
-        {BENEFITS.map(([t, d]) => (
-          <div key={t} className="px-6 py-10">
-            <p className="font-pretty text-[18px]">{t}</p>
-            <p className="mt-3 text-[11.5px] leading-[1.7] opacity-65">{d}</p>
+// ——— Neprijavljen: ulaz ———
+function Landing() {
+  const root = useRef<HTMLDivElement>(null)
+  useMediaMotion(root)
+  return (
+    <div ref={root}>
+      <section className={`grid border-b ${line} md:grid-cols-[1.25fr_1fr]`}>
+        <div className={`flex flex-col justify-between gap-12 bg-cobalt px-5 pb-10 pt-[12vh] text-bg md:border-r ${line} md:px-10`}>
+          <p className="label">B2B Partner Portal · Grand Company</p>
+          <h1 className="display text-[clamp(56px,9vw,168px)] !leading-[0.84]">
+            B2B
+            <br />
+            portal
+          </h1>
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <p className="max-w-[40ch] text-[12.5px] leading-[1.65]">
+              Za građevinske firme, izvođače radova i subjekte visokogradnje: ugovoreni rabat, kreditni limit i odgođeno plaćanje, stanje
+              zaliha iz Pantheon ERP-a.
+            </p>
+            <button type="button" onClick={openLogin} className="cta">
+              <span className="cta-roll">
+                <span>Uđi kao demo gost</span>
+                <span aria-hidden>Uđi kao demo gost</span>
+              </span>
+              <svg className="cta-arrow" viewBox="0 0 16 16" aria-hidden>
+                <path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" strokeWidth="1.4" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <figure data-curtain data-parallax="6" className="relative min-h-[48vh] overflow-hidden bg-ink">
+          <img src="/shop2/brand.webp" alt="Kamion sa kranom istovara paletu na sprat" className="absolute inset-0 h-full w-full object-cover" />
+          <figcaption className="absolute bottom-0 left-0 bg-bg px-4 py-2 text-[11px]">Istovar paleta na etaže — kran transport</figcaption>
+        </figure>
+      </section>
+
+      <section className={`grid border-b ${line} sm:grid-cols-2 lg:grid-cols-4`}>
+        {[
+          ['Rabat', 'Ugovoreni rabati od 10% do 22% po nivou partnera.'],
+          ['Kredit', 'Kreditni limit i odgođeno plaćanje 30, 60 ili 90 dana uz menicu ili bankarsku garanciju.'],
+          ['Zalihe', 'Stanje na skladištu Nenada Kostića 151 u realnom vremenu, iz Pantheon ERP-a.'],
+          ['Kran', 'Kamioni sa hidrauličnom dizalicom — istovar direktno na spratove gradilišta.'],
+        ].map(([t, d], i) => (
+          <div key={t} className={`border-b ${line} px-5 py-8 sm:[&:nth-child(odd)]:border-r lg:border-b-0 lg:border-r lg:last:border-r-0 md:px-8`}>
+            <span className="label opacity-50">{idx(i)}</span>
+            <p className="display mt-6 text-[clamp(34px,3.4vw,56px)]">{t}</p>
+            <p className="mt-4 max-w-[34ch] text-[11.5px] leading-[1.6] opacity-70">{d}</p>
           </div>
         ))}
-      </div>
-
-      <section className="mx-auto mt-[14vh] max-w-[1200px]" aria-label="Rabatna skala">
-        <h2 className="display text-center text-[clamp(30px,3.6vw,56px)]">Rabatna skala</h2>
-        <div className="mt-10 overflow-x-auto" data-lenis-prevent>
-          <table className="w-full min-w-[640px] border-collapse text-left text-[11.5px]">
-            <thead>
-              <tr className="border-b border-ink/25 opacity-60">
-                <th className="py-3 pr-4 font-medium">Nivo</th>
-                <th className="py-3 pr-4 font-medium">Ko</th>
-                <th className="py-3 pr-4 font-medium">Rabat</th>
-                <th className="py-3 pr-4 font-medium">Kreditni limit</th>
-                <th className="py-3 font-medium">Plaćanje</th>
-              </tr>
-            </thead>
-            <tbody>
-              {PARTNER_TIERS.map((t) => (
-                <tr key={t.name} className="border-b border-ink/15">
-                  <td className="py-4 pr-4 font-semibold">{t.name}</td>
-                  <td className="py-4 pr-4">{t.who}</td>
-                  <td className="num py-4 pr-4 text-[18px]">{t.rebate}</td>
-                  <td className="py-4 pr-4">{t.limit}</td>
-                  <td className="py-4">{t.days}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </section>
+
+      <StepBand tone="navy" profile="diag" steps={12} aria-label="Rabatna skala">
+        <div className="px-5 py-[10vh] md:px-10">
+          <h2 className="display text-[clamp(40px,5.4vw,96px)]">Rabatna skala</h2>
+          <div className="mt-10 border-t border-bg/40">
+            {PARTNER_TIERS.map((t) => (
+              <div key={t.name} className="grid grid-cols-2 gap-x-6 gap-y-1 border-b border-bg/40 py-5 md:grid-cols-[1fr_1.6fr_.7fr_1.2fr_1.2fr] md:items-baseline">
+                <span className="display text-[24px]">{t.name}</span>
+                <span className="text-[11.5px] opacity-80">{t.who}</span>
+                <span className="num text-[30px]">{t.rebate}</span>
+                <span className="text-[11.5px] opacity-80">{t.limit}</span>
+                <span className="text-[11.5px] opacity-80">{t.days}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </StepBand>
     </div>
   )
 }
 
-function Card({ title, children, className = '' }: { title: string; children: React.ReactNode; className?: string }) {
-  return (
-    <section className={`border-ink/15 p-6 md:p-8 ${className}`}>
-      <h2 className="text-[11px] opacity-55">{title}</h2>
-      <div className="mt-5">{children}</div>
-    </section>
-  )
-}
-
+// ——— Prijavljen partner: kontrolna tabla ———
 function Dashboard({ partner }: { partner: FullPartner }) {
+  const root = useRef<HTMLDivElement>(null)
+  useMediaMotion(root)
   const { cart } = useShop()
   const prefs = useDeliveryPrefs()
   const credit = creditUsage(partner)
@@ -94,7 +113,7 @@ function Dashboard({ partner }: { partner: FullPartner }) {
   const q = buildQuote(cart, d, prefs)
 
   const orders = partner.orders.map((o) => ({ ...o, total: orderTotal(o.items, d, o.deliveryCost), site: partner.sites.find((s) => s.id === o.siteId) }))
-  const perSite = partner.sites.map((s) => ({ name: s.name, value: orders.filter((o) => o.siteId === s.id).reduce((t, o) => t + o.total, 0) }))
+  const perSite = partner.sites.map((s) => ({ id: s.id, name: s.name, value: orders.filter((o) => o.siteId === s.id).reduce((t, o) => t + o.total, 0), count: orders.filter((o) => o.siteId === s.id).length }))
   const catTotals = new Map<string, number>()
   partner.orders.forEach((o) =>
     o.items.forEach(([sku, qty]) => {
@@ -105,180 +124,260 @@ function Dashboard({ partner }: { partner: FullPartner }) {
     }),
   )
   const perCategory = [...catTotals.entries()].map(([name, value]) => ({ name, value })).sort((a, b) => b.value - a.value)
+  const maxSite = Math.max(1, ...perSite.map((s) => s.value))
+  const maxCat = Math.max(1, ...perCategory.map((c) => c.value))
   const unpaid = partner.invoices.filter((i) => !i.paid)
+  const unpaidSum = unpaid.reduce((s, i) => s + i.amount, 0)
 
   return (
-    <div className="px-3 pb-[16vh] pt-[8vh] md:px-8">
-      {/* zaglavlje partnera */}
-      <header className="flex flex-wrap items-end justify-between gap-6 border-b border-ink/15 px-3 pb-8">
-        <div>
-          <p className="label opacity-50">B2B Partner Portal · demo podaci</p>
-          <h1 className="display mt-4 max-w-[22ch] text-[clamp(30px,3.8vw,60px)]">{partner.name}</h1>
-          <p className="mt-3 text-[11.5px] opacity-65">{partner.tier}</p>
+    <div ref={root}>
+      {/* 1. Zaglavlje partnera */}
+      <section className={`grid border-b ${line} md:grid-cols-[1.5fr_1fr]`}>
+        <div className={`flex flex-col justify-between gap-10 px-5 pb-8 pt-[10vh] md:border-r ${line} md:px-10`}>
+          <p className="label flex items-center gap-3">
+            <span className="bg-cobalt px-2 py-1 text-bg">Demo gost</span>
+            <span className="opacity-50">B2B Partner Portal · Pantheon ERP (demo)</span>
+          </p>
+          <h1 data-up className="display text-[clamp(44px,6.6vw,124px)] !leading-[0.86]">
+            {partner.name}
+          </h1>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <Cta href="/prodavnica">Katalog</Cta>
-          <button type="button" onClick={logout} className="ulink text-[11px]">
-            Odjava
-          </button>
-        </div>
-      </header>
+        <figure data-curtain data-parallax="6" className="relative min-h-[34vh] overflow-hidden bg-ink">
+          <img src="/shop2/brand.webp" alt="Kamion sa kranom na gradilištu" className="absolute inset-0 h-full w-full object-cover" />
+        </figure>
+      </section>
+      <div className={`grid grid-cols-2 border-b ${line} text-[11px] md:grid-cols-4`}>
+        <span className={`border-r ${line} px-5 py-3 md:px-10`}>{partner.tier}</span>
+        <span className={`${line} px-5 py-3 md:border-r md:px-8`}>Valuta {partner.paymentDays} dana</span>
+        <Link href="/prodavnica" className={`flex items-center justify-between border-r border-t ${line} px-5 py-3 transition-colors hover:bg-ink hover:text-bg md:border-t-0 md:px-8`}>
+          Katalog <Arrow />
+        </Link>
+        <button type="button" onClick={logout} className={`flex items-center justify-between border-t ${line} px-5 py-3 text-left transition-colors hover:bg-ink hover:text-bg md:border-t-0 md:px-8`}>
+          Odjava <Arrow />
+        </button>
+      </div>
 
-      {/* ključni brojevi */}
-      <div className="grid border-b border-ink/15 md:grid-cols-[1fr_1fr_2fr]">
-        <Card title="Ugovoreni rabat" className="border-b md:border-b-0 md:border-r">
-          <p className="num text-[56px] leading-none">{Math.round(d * 100)}%</p>
-          <p className="mt-3 text-[11px] opacity-60">na sve artikle iz kataloga</p>
-        </Card>
-        <Card title="Valuta plaćanja" className="border-b md:border-b-0 md:border-r">
-          <p className="num text-[56px] leading-none">{partner.paymentDays}</p>
-          <p className="mt-3 text-[11px] opacity-60">dana, odgođeno plaćanje</p>
-        </Card>
-        <Card title="Kreditni limit · sinhronizacija sa Pantheon ERP-om (demo)">
-          <div className="flex flex-wrap items-baseline justify-between gap-3">
-            <p className="num text-[34px] leading-none">{money(credit.available)}</p>
-            <p className="text-[11px] opacity-60">raspoloživo od {money(credit.limit)}</p>
+      {/* 2. Ključni brojevi */}
+      <section className={`grid border-b ${line} sm:grid-cols-2 xl:grid-cols-4`}>
+        <div className="bg-cobalt px-5 py-8 text-bg md:px-8">
+          <p className="label">Ugovoreni rabat</p>
+          <p className="num mt-6 text-[clamp(72px,8vw,140px)] leading-[0.85]">{Math.round(d * 100)}%</p>
+          <p className="mt-4 text-[11px] opacity-80">na sve artikle iz kataloga</p>
+        </div>
+        <div className={`border-b ${line} px-5 py-8 sm:border-b-0 sm:border-r xl:border-r md:px-8`}>
+          <p className="label opacity-50">Raspoloživ kredit</p>
+          <p className="num mt-6 text-[clamp(30px,2.6vw,44px)] leading-none">{money(credit.available)}</p>
+          <div className="mt-5 h-3 border border-ink">
+            <div className="h-full bg-cobalt" style={{ width: `${Math.round(credit.ratio * 100)}%` }} />
           </div>
-          <div className="mt-5 h-3 overflow-hidden rounded-full bg-ink/10" role="meter" aria-valuemin={0} aria-valuemax={credit.limit} aria-valuenow={credit.used} aria-label="Iskorištenost kreditnog limita">
-            <div className={`h-full rounded-full ${credit.ratio > 0.85 ? 'bg-signal' : 'bg-ink'}`} style={{ width: `${credit.ratio * 100}%` }} />
-          </div>
-          <div className="mt-2 flex justify-between text-[10.5px] opacity-60">
+          <p className="mt-3 flex justify-between text-[10.5px] opacity-60">
             <span>Iskorišteno {money(credit.used)}</span>
-            <span>{Math.round(credit.ratio * 100)}%</span>
-          </div>
-        </Card>
-      </div>
-
-      {/* gradilišta */}
-      <Card title="Gradilišta" className="border-b">
-        <div className="grid gap-3 md:grid-cols-2">
-          {partner.sites.map((s) => {
-            const siteOrders = orders.filter((o) => o.siteId === s.id)
-            const on = prefs.siteId === s.id
-            return (
-              <article key={s.id} className={`rounded-[14px] border p-5 transition-colors ${on ? 'border-ink' : 'border-ink/15'}`}>
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <p className="font-pretty text-[17px]">{s.name}</p>
-                    <p className="mt-1 text-[11px] opacity-65">{s.address}</p>
-                    <p className="mt-1 text-[10.5px] opacity-50">{s.note}</p>
-                  </div>
-                  <p className="num shrink-0 text-[18px]">{money(siteOrders.reduce((t, o) => t + o.total, 0))}</p>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-[10.5px]">
-                  <span className="opacity-60">
-                    {siteOrders.length} {siteOrders.length === 1 ? 'narudžba' : 'narudžbe'}
-                  </span>
-                  <button type="button" onClick={() => setPrefs({ siteId: on ? null : s.id })} className={`rounded-full px-4 py-2 transition-colors ${on ? 'bg-ink text-bg' : 'bg-[var(--btn)]'}`}>
-                    {on ? 'Isporuka korpe ovdje' : 'Isporuči korpu ovdje'}
-                  </button>
-                </div>
-              </article>
-            )
-          })}
+            <span>Limit {money(credit.limit)}</span>
+          </p>
         </div>
-      </Card>
+        <div className={`border-t ${line} px-5 py-8 sm:border-r sm:border-t xl:border-t-0 md:px-8`}>
+          <p className="label opacity-50">Valuta plaćanja</p>
+          <p className="num mt-6 text-[clamp(72px,8vw,140px)] leading-[0.85]">{partner.paymentDays}</p>
+          <p className="mt-4 text-[11px] opacity-60">dana, odgođeno plaćanje</p>
+        </div>
+        <div className={`border-t ${line} px-5 py-8 sm:border-t xl:border-t-0 md:px-8`}>
+          <p className="label opacity-50">Otvorene fakture</p>
+          <p className="num mt-6 text-[clamp(72px,8vw,140px)] leading-[0.85]">{unpaid.length}</p>
+          <p className="mt-4 text-[11px] opacity-60">ukupno {money(unpaidSum)}</p>
+        </div>
+      </section>
 
-      {/* analitika */}
-      <div className="grid border-b border-ink/15 md:grid-cols-2">
-        <Card title="Potrošnja po gradilištu" className="border-b md:border-b-0 md:border-r">
-          <Bars data={perSite} label="Potrošnja po gradilištu" />
-        </Card>
-        <Card title="Potrošnja po grupi artikala">
-          <Bars data={perCategory} label="Potrošnja po grupi artikala" />
-        </Card>
-      </div>
+      {/* 3. Gradilišta — plava sekcija sa stepenastim prelazom */}
+      <StepBand tone="navy" profile="diag" steps={12} aria-label="Gradilišta">
+        <div className="px-5 py-[9vh] md:px-10">
+          <div className="flex flex-wrap items-end justify-between gap-6">
+            <h2 className="display text-[clamp(44px,6vw,110px)] !leading-[0.86]">Gradilišta</h2>
+            <p className="max-w-[40ch] text-[11.5px] leading-[1.6] opacity-85">
+              Izaberite gradilište na koje se isporučuje trenutna korpa — kamion sa kranom istovara direktno na sprat.
+            </p>
+          </div>
+          <div className="mt-10 grid border-l border-t border-bg/40 md:grid-cols-2">
+            {partner.sites.map((s, i) => {
+              const on = prefs.siteId === s.id
+              const stat = perSite.find((x) => x.id === s.id)!
+              return (
+                <article key={s.id} className={`flex flex-col gap-6 border-b border-r border-bg/40 p-6 transition-colors md:p-8 ${on ? 'bg-bg text-cobalt' : ''}`}>
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="num text-[44px] leading-none">{idx(i)}</span>
+                    <span className="num text-right text-[22px]">{money(stat.value)}</span>
+                  </div>
+                  <div>
+                    <h3 className="display text-[clamp(24px,2.2vw,36px)]">{s.name}</h3>
+                    <p className="mt-3 text-[11px] leading-[1.6] opacity-80">{s.address}</p>
+                    <p className="text-[11px] leading-[1.6] opacity-60">{s.note}</p>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between gap-4 border-t border-current/30 pt-4 text-[11px]">
+                    <span>
+                      {stat.count} {stat.count === 1 ? 'narudžba' : 'narudžbe'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setPrefs({ siteId: s.id, method: 'kran' })}
+                      aria-pressed={on}
+                      className={`flex items-center gap-3 border px-3 py-2 transition-colors ${on ? 'border-cobalt bg-cobalt text-bg' : 'border-bg/60 hover:bg-bg hover:text-cobalt'}`}
+                    >
+                      {on ? 'Isporuka ovdje' : 'Isporuči korpu ovdje'} <Arrow />
+                    </button>
+                  </div>
+                </article>
+              )
+            })}
+          </div>
+        </div>
+      </StepBand>
 
-      {/* narudžbe */}
-      <Card title="Narudžbe" className="border-b">
-        <div className="overflow-x-auto" data-lenis-prevent>
-          <table className="w-full min-w-[680px] border-collapse text-left text-[11px]">
+      {/* 4. Potrošnja + skica */}
+      <section className={`grid border-y ${line} lg:grid-cols-[1fr_1fr_.9fr]`}>
+        {[
+          { title: 'Potrošnja po gradilištu', rows: perSite, max: maxSite, bar: 'bg-cobalt' },
+          { title: 'Potrošnja po grupi artikala', rows: perCategory, max: maxCat, bar: 'bg-ink' },
+        ].map((c) => (
+          <div key={c.title} className={`border-b ${line} px-5 py-8 lg:border-b-0 lg:border-r md:px-8`}>
+            <p className="label opacity-50">{c.title}</p>
+            <ul className="mt-6 grid gap-5">
+              {c.rows.map((r) => (
+                <li key={r.name}>
+                  <div className="flex justify-between gap-4 text-[11px]">
+                    <span>{r.name}</span>
+                    <span className="tabular-nums">{money(r.value)}</span>
+                  </div>
+                  <div className={`mt-2 h-5 border ${line}`}>
+                    <div className={`h-full ${c.bar}`} style={{ width: `${Math.max(2, (r.value / c.max) * 100)}%` }} />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+        <div className="flex flex-col justify-between gap-6 px-5 py-8 md:px-8">
+          <p className="label opacity-50">Sistem · Knauf W111</p>
+          <UseArt use="pregradni-zid" className="mx-auto w-full max-w-[340px] text-ink" title="Pregradni zid W111" />
+          <Link href="/prodavnica#kalkulator" className="flex items-center justify-between border-t border-ink/20 pt-4 text-[11px] hover:text-cobalt">
+            Kalkulator utroška <Arrow />
+          </Link>
+        </div>
+      </section>
+
+      {/* 5. Narudžbe */}
+      <section className="px-5 pt-[12vh] md:px-10">
+        <div className="flex items-end justify-between gap-6 border-b-2 border-ink pb-4">
+          <h2 className="display text-[clamp(36px,4.6vw,84px)] !leading-[0.88]">Narudžbe</h2>
+          <span className="num text-[clamp(36px,4.6vw,84px)] leading-[0.88] opacity-20">{String(orders.length).padStart(2, '0')}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[720px] border-collapse text-left text-[11.5px]">
             <thead>
-              <tr className="border-b border-ink/25 opacity-60">
-                <th className="py-2 pr-4 font-medium">Broj</th>
-                <th className="py-2 pr-4 font-medium">Datum</th>
-                <th className="py-2 pr-4 font-medium">Gradilište</th>
-                <th className="py-2 pr-4 font-medium">Status</th>
-                <th className="py-2 pr-4 font-medium">Isporuka</th>
-                <th className="py-2 text-right font-medium">Iznos</th>
+              <tr className={`border-b ${line} opacity-50`}>
+                {['Broj', 'Datum', 'Gradilište', 'Isporuka', 'Status', 'Iznos'].map((h, i) => (
+                  <th key={h} className={`py-3 font-medium ${i === 5 ? 'text-right' : ''}`}>
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
               {orders.map((o) => (
-                <tr key={o.no} className="border-b border-ink/10">
-                  <td className="py-3 pr-4 tabular-nums">{o.no}</td>
-                  <td className="py-3 pr-4 tabular-nums">{dateAgo(o.daysAgo)}</td>
-                  <td className="py-3 pr-4">{o.site?.name ?? '—'}</td>
-                  <td className="py-3 pr-4">{o.status}</td>
-                  <td className="py-3 pr-4">{o.delivery === 'kran' ? 'Kamion sa kranom' : 'Standardna'}</td>
-                  <td className="py-3 text-right tabular-nums">{money(o.total)}</td>
+                <tr key={o.no} className={`border-b ${line} transition-colors hover:bg-ink/[.04]`}>
+                  <td className="py-4 font-semibold">{o.no}</td>
+                  <td className="py-4 tabular-nums">{dateAgo(o.daysAgo)}</td>
+                  <td className="py-4">{o.site?.name ?? '—'}</td>
+                  <td className="py-4">{o.delivery === 'kran' ? 'Kamion sa kranom' : 'Standardna'}</td>
+                  <td className="py-4">
+                    <span className={`inline-block px-2 py-1 ${o.status === 'Isporučena' ? 'border border-ink/30' : 'bg-cobalt text-bg'}`}>{o.status}</span>
+                  </td>
+                  <td className="num py-4 text-right text-[15px]">{money(o.total)}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-      </Card>
+      </section>
 
-      {/* fakture */}
-      <Card title={`Fakture · otvoreno ${unpaid.length}`} className="border-b">
-        <div className="overflow-x-auto" data-lenis-prevent>
-          <table className="w-full min-w-[560px] border-collapse text-left text-[11px]">
+      {/* 6. Fakture */}
+      <section className="px-5 pb-[12vh] pt-[12vh] md:px-10">
+        <div className="flex items-end justify-between gap-6 border-b-2 border-ink pb-4">
+          <h2 className="display text-[clamp(36px,4.6vw,84px)] !leading-[0.88]">Fakture</h2>
+          <span className="text-[11px] opacity-60">Otvoreno {unpaid.length} · {money(unpaidSum)}</span>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px] border-collapse text-left text-[11.5px]">
             <thead>
-              <tr className="border-b border-ink/25 opacity-60">
-                <th className="py-2 pr-4 font-medium">Broj</th>
-                <th className="py-2 pr-4 font-medium">Izdata</th>
-                <th className="py-2 pr-4 font-medium">Dospijeće</th>
-                <th className="py-2 pr-4 font-medium">Status</th>
-                <th className="py-2 text-right font-medium">Iznos</th>
+              <tr className={`border-b ${line} opacity-50`}>
+                {['Broj', 'Izdata', 'Dospijeće', 'Status', 'Iznos'].map((h, i) => (
+                  <th key={h} className={`py-3 font-medium ${i === 4 ? 'text-right' : ''}`}>
+                    {h}
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
-              {partner.invoices.map((i) => {
-                const dueIn = partner.paymentDays - i.issuedDaysAgo
-                const status = i.paid ? 'Plaćena' : dueIn < 0 ? 'Dospjela' : 'Otvorena'
+              {partner.invoices.map((inv) => {
+                const dueIn = partner.paymentDays - inv.issuedDaysAgo
+                const status = inv.paid ? 'Plaćena' : dueIn < 0 ? 'Dospjela' : 'Otvorena'
                 return (
-                  <tr key={i.no} className="border-b border-ink/10">
-                    <td className="py-3 pr-4 tabular-nums">{i.no}</td>
-                    <td className="py-3 pr-4 tabular-nums">{dateAgo(i.issuedDaysAgo)}</td>
-                    <td className="py-3 pr-4 tabular-nums">{dateAgo(-dueIn)}</td>
-                    <td className={`py-3 pr-4 ${status === 'Dospjela' ? 'text-signal' : ''}`}>{status}</td>
-                    <td className="py-3 text-right tabular-nums">{money(i.amount)}</td>
+                  <tr key={inv.no} className={`border-b ${line}`}>
+                    <td className="py-4 font-semibold">{inv.no}</td>
+                    <td className="py-4 tabular-nums">{dateAgo(inv.issuedDaysAgo)}</td>
+                    <td className="py-4 tabular-nums">{dateAgo(-dueIn)}</td>
+                    <td className="py-4">
+                      <span className={`inline-block px-2 py-1 ${status === 'Plaćena' ? 'opacity-50' : status === 'Dospjela' ? 'bg-ink text-bg' : 'bg-cobalt text-bg'}`}>{status}</span>
+                    </td>
+                    <td className="num py-4 text-right text-[15px]">{money(inv.amount)}</td>
                   </tr>
                 )
               })}
             </tbody>
           </table>
         </div>
-      </Card>
+      </section>
 
-      {/* predračun iz korpe */}
-      <Card title="Predračun iz korpe (CPQ)">
-        {cartCount(cart) ? (
-          <div className="flex flex-wrap items-end justify-between gap-6">
-            <div>
-              <p className="num text-[34px] leading-none">{money(q.total)}</p>
-              <p className="mt-2 text-[11px] opacity-60">
-                {cartCount(cart)} stavki · rabat {Math.round(d * 100)}% · ušteda {money(q.savings)}
-              </p>
-            </div>
-            <Cta href="/portal/predracun" solid>
-              Predračun
-            </Cta>
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-center justify-between gap-6">
-            <p className="text-[11.5px] opacity-65">Korpa je prazna — dodajte artikle ili koristite kalkulator.</p>
-            <Link href="/prodavnica#kalkulator" className="ulink text-[11px]">
-              Kalkulator
-            </Link>
-          </div>
-        )}
-      </Card>
+      {/* 7. Predračun iz korpe — tamni panel */}
+      <section className="grid bg-char text-bg md:grid-cols-[1.3fr_1fr]">
+        <div className="flex flex-col justify-between gap-10 px-5 py-[9vh] md:border-r md:border-bg/15 md:px-10">
+          <p className="label opacity-60">Predračun iz korpe · CPQ</p>
+          {cartCount(cart) ? (
+            <>
+              <div>
+                <p className="num text-[clamp(56px,7vw,128px)] leading-[0.85]">{money(q.total)}</p>
+                <p className="mt-5 text-[11px] opacity-70">
+                  {q.lines.length} stavki · rabat {Math.round(d * 100)}% · ušteda {money(q.savings)} · masa {(q.kg / 1000).toLocaleString('de-DE', { maximumFractionDigits: 2 })} t
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-3">
+                <Cta href="/portal/predracun" className="[--cta-fill:var(--cobalt)] [--cta-ink:var(--bg)]">
+                  Predračun
+                </Cta>
+                <Cta href="/prodavnica">Katalog</Cta>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="display text-[clamp(36px,4.4vw,80px)] !leading-[0.9]">Korpa je prazna</p>
+              <div className="flex flex-wrap gap-3">
+                <Cta href="/prodavnica#kalkulator" className="[--cta-fill:var(--cobalt)] [--cta-ink:var(--bg)]">
+                  Kalkulator
+                </Cta>
+                <Cta href="/prodavnica">Katalog</Cta>
+              </div>
+            </>
+          )}
+        </div>
+        <figure data-curtain className="relative min-h-[40vh] overflow-hidden">
+          <img src="/shop2/hero.webp" alt="Palete gips-kartonskih ploča na skladištu" className="absolute inset-0 h-full w-full object-cover opacity-90" />
+          <figcaption className="absolute bottom-0 left-0 bg-cobalt px-4 py-2 text-[11px] text-bg">Skladište Nenada Kostića 151 · zalihe iz Pantheon ERP-a (demo)</figcaption>
+        </figure>
+      </section>
     </div>
   )
 }
 
 export default function PortalClient() {
-  const { partner } = useB2B()
-  return partner ? <Dashboard partner={partner} /> : <Landing />
+  const { partner, mode } = useB2B()
+  if (partner && mode === 'b2b') return <Dashboard partner={partner} />
+  return <Landing />
 }

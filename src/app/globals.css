@@ -1327,3 +1327,7 @@ a.rounded-full {
     margin-left: 42%;
   }
 }
+
+.b2b-input {
+  border-radius: 0 !important;
+}
