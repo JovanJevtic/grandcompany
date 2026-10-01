@@ -12,7 +12,7 @@ const r2 = (n: number) => Math.round(n * 100) / 100
 export const idx = (i: number) => String(i + 1).padStart(2, '0')
 export const field = 'h-11 w-full rounded-none border border-ink/25 bg-transparent px-3 text-[12px] outline-none transition-colors focus:border-ink'
 
-export type View = 'pregled' | 'katalog' | 'kalkulator' | 'korpa' | 'nalog' | 'kontakt' | 'interno'
+export type View = 'pregled' | 'katalog' | 'korpa' | 'nalog' | 'kontakt' | 'interno'
 
 /** Prelaz na drugi dio portala (adresa #/katalog, radi i dugme "nazad"). */
 export function go(view: View) {

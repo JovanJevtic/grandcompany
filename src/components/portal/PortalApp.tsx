@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { openLogin, useB2B } from '@/lib/b2b'
 import { cartCount, useShop } from '@/lib/cart'
-import Calculator from '@/components/calc/Calculator'
 import Account from './Account'
 import Admin from './Admin'
 import Catalog from './Catalog'
@@ -14,14 +13,13 @@ import { usePortal } from './store'
 import { go, line, type View } from './ui'
 
 // B2B portal Grand Company — kupcima okrenut portal (ne interni BI): jasna hijerarhija
-// Katalog → W111 kalkulator → Korpa → Narudžba, plus nalog (narudžbe, kredit, fakture) i kontakt
+// Katalog → Korpa → Narudžba, plus nalog (narudžbe, kredit, fakture) i kontakt
 // za posebne uslove. Interni dio (tim) je odvojen i sažet. Dio portala je u adresi (#/katalog),
 // pa radi dugme "nazad" i može se poslati link. Podaci su demo (Pantheon ERP).
 
 const VIEWS: { id: View; label: string }[] = [
   { id: 'pregled', label: 'Pregled' },
   { id: 'katalog', label: 'Katalog' },
-  { id: 'kalkulator', label: 'W111 kalkulator' },
   { id: 'korpa', label: 'Korpa' },
   { id: 'nalog', label: 'Moj nalog' },
   { id: 'kontakt', label: 'Kontakt' },
@@ -30,28 +28,6 @@ const VIEWS: { id: View; label: string }[] = [
 const readView = (): View => {
   const v = window.location.hash.replace(/^#\/?/, '') as View
   return [...VIEWS.map((x) => x.id), 'interno'].includes(v) ? v : 'pregled'
-}
-
-function CalculatorView() {
-  return (
-    <div className="pb-[12vh] pt-10">
-      <div className="px-5 md:px-10">
-        <div className={`mb-[6vh] flex flex-wrap items-end justify-between gap-6 border-b-2 border-ink pb-5`}>
-          <div>
-            <p className="label opacity-50">02 · Kalkulator</p>
-            <p className="mt-3 max-w-[52ch] text-[11.5px] leading-[1.65] opacity-70">
-              Unesite površinu zida: ploče, profili, vuna, mase i vijci po Knauf normi W111, sa vašom cijenom i masom tereta. Jednim klikom
-              cijeli set ide u korpu.
-            </p>
-          </div>
-          <button type="button" onClick={() => go('korpa')} className={`border ${line} px-4 py-2.5 text-[11px] transition-colors hover:border-ink`}>
-            Korpa →
-          </button>
-        </div>
-      </div>
-      <Calculator />
-    </div>
-  )
 }
 
 export default function PortalApp() {
@@ -115,7 +91,6 @@ export default function PortalApp() {
 
       {view === 'pregled' && <Overview partner={active} />}
       {view === 'katalog' && <Catalog partner={active} />}
-      {view === 'kalkulator' && <CalculatorView />}
       {view === 'korpa' && <Checkout partner={active} />}
       {view === 'nalog' && <Account partner={active} />}
       {view === 'kontakt' && <Contact partner={active} />}

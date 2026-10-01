@@ -13,13 +13,12 @@ import Cta from '@/components/ui/Cta'
 import { addRequest, creditOf, enterAdmin, ordersOf, usePortal } from './store'
 import { Arrow, Dial, Track, dateOf, field, go, idx, line, type View } from './ui'
 
-// Pregled. Gost: ulaz u portal (kran transport + Pantheon), tok Katalog → Kalkulator → Korpa →
+// Pregled. Gost: ulaz u portal (kran transport + Pantheon), tok Katalog → Korpa →
 // Narudžba, zašto Grand Company, rabatna skala i zahtjev za B2B nalog. Partner: rabat, kredit,
 // aktivna narudžba sa praćenjem i brze radnje.
 
 const FLOW: [View, string, string][] = [
   ['katalog', 'Katalog', 'Artikli sa stanjem iz Pantheona i vašom cijenom'],
-  ['kalkulator', 'W111 kalkulator', 'Površina zida → kompletan spisak materijala'],
   ['korpa', 'Korpa', 'Rabat i kreditni limit u realnom vremenu'],
   ['korpa', 'Narudžba', 'Dostava kamionom sa kranom, valuta 30/60/90'],
 ]
@@ -83,7 +82,7 @@ function Register() {
             <p className="label text-cobalt">Zahtjev je primljen</p>
             <p className="display text-[clamp(28px,3vw,48px)]">{sent}</p>
             <p className="max-w-[44ch] text-[11.5px] leading-[1.65] opacity-70">
-              Komercijalista vas kontaktira u roku od 24 h radnim danima. Do tada možete pregledati katalog i W111 kalkulator.
+              Komercijalista vas kontaktira u roku od 24 h radnim danima. Do tada možete pregledati katalog.
             </p>
             <div className="flex flex-wrap gap-3">
               <Cta onClick={() => go('katalog')}>Katalog</Cta>
@@ -148,7 +147,7 @@ function Guest() {
           </h1>
           <div className="flex flex-wrap items-end justify-between gap-6">
             <p className="max-w-[42ch] text-[12.5px] leading-[1.65]">
-              Katalog sa vašim rabatom, W111 kalkulator materijala, narudžba sa dostavom kamionom sa kranom direktno na sprat i odgođeno
+              Katalog sa vašim rabatom, narudžba sa dostavom kamionom sa kranom direktno na sprat i odgođeno
               plaćanje — sve iz jednog naloga.
             </p>
             <div className="flex flex-wrap gap-3">
@@ -288,7 +287,7 @@ function Partner({ partner }: { partner: FullPartner }) {
           {(
             [
               ['Nova narudžba', 'Katalog', () => go('katalog')],
-              ['Utrošak zida', 'W111', () => go('kalkulator')],
+              ['Isporuka', 'Kran', () => go('kontakt')],
               ['Zadnja narudžba', 'Ponovi', () => { repeat(); go('korpa') }],
               ['Posebni uslovi', 'Kontakt', () => go('kontakt')],
             ] as [string, string, () => void][]

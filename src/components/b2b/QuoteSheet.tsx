@@ -34,7 +34,7 @@ export default function QuoteSheet() {
     return (
       <div className="px-5 py-[20vh] text-center">
         <h1 className="display text-[clamp(36px,4.6vw,72px)]">Predračun</h1>
-        <p className="mx-auto mt-6 max-w-[44ch] text-[12px] opacity-65">Korpa je prazna. Dodajte artikle iz kataloga ili kalkulatora, pa generišite predračun.</p>
+        <p className="mx-auto mt-6 max-w-[44ch] text-[12px] opacity-65">Korpa je prazna. Dodajte artikle iz kataloga, pa generišite predračun.</p>
         <div className="mt-8 flex justify-center">
           <Cta href="/prodavnica">Katalog</Cta>
         </div>

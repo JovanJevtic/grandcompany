@@ -7,7 +7,7 @@ import { STOCK_LABEL, stockLevel } from '@/gc/gc'
 import { openLogin, withDiscount, type FullPartner } from '@/lib/b2b'
 import { addToCart, useShop } from '@/lib/cart'
 import { CATEGORIES, PRODUCTS, defaultQty, money, type CategoryId } from '@/lib/shop'
-import { Arrow, Head, Pill, Stepper, field, go, line } from './ui'
+import { Arrow, Head, Pill, Stepper, field, line } from './ui'
 
 // Katalog za B2B: gusta lista (ne kartice), jer izvođač naručuje po šiframa. Filteri po kategoriji
 // i brendu, pretraga po šifri/nazivu, samo artikli na stanju, sortiranje. Svaki red: stanje iz
@@ -173,12 +173,6 @@ export default function Catalog({ partner }: { partner: FullPartner | null }) {
       </ul>
       {!list.length && <p className="py-16 text-center text-[12px] opacity-60">Nema artikala za ove filtere.</p>}
 
-      <div className="mt-10 flex flex-wrap items-center justify-between gap-4">
-        <p className="text-[11px] opacity-60">Ne znate koliko vam treba? Unesite površinu zida i dobićete kompletan spisak.</p>
-        <button type="button" onClick={() => go('kalkulator')} className="flex items-center gap-3 border border-ink px-5 py-3 text-[11px] transition-colors hover:bg-ink hover:text-bg">
-          W111 kalkulator <Arrow />
-        </button>
-      </div>
     </div>
   )
 }

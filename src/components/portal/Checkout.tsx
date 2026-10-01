@@ -108,13 +108,12 @@ export default function Checkout({ partner }: { partner: FullPartner | null }) {
     return (
       <div className="px-5 pb-[14vh] pt-10 md:px-10">
         <Head no="03 · Korpa" title="Korpa je prazna">
-          Dodajte artikle iz kataloga ili kompletan set iz W111 kalkulatora.
+          Dodajte artikle iz kataloga.
         </Head>
         <div className="mt-8 flex flex-wrap gap-3">
           <Cta solid onClick={() => go('katalog')}>
             Katalog
           </Cta>
-          <Cta onClick={() => go('kalkulator')}>W111 kalkulator</Cta>
         </div>
       </div>
     )

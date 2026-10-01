@@ -17,7 +17,7 @@ import SkySwipe from "@/components/landing/SkySwipe";
 import UsesSplit from "@/components/landing/UsesSplit";
 
 // Početna hibridne B2B + B2C platforme (glavni naglasak B2B). Sadržaj isključivo iz dokumentacije
-// firme (PDF "Kompletna dokumentacija i katalog"). Kalkulator je u prodavnici (/prodavnica#kalkulator).
+// firme (PDF "Kompletna dokumentacija i katalog").
 export default function Home() {
   return (
     <>

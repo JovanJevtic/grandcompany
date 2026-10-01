@@ -1,7 +1,6 @@
 import { Suspense } from 'react'
 import CatalogClient from '@/components/catalog/CatalogClient'
 import BrandStory from '@/components/shop/BrandStory'
-import WallCalculator from '@/components/shop/WallCalculator'
 import Pw from '@/components/ui/Pw'
 
 export const metadata = {
@@ -10,7 +9,7 @@ export const metadata = {
 }
 
 // Prodavnica: naslov u sredini, četiri grupe kao okrugle fotografije, podijeljeni uvod,
-// "Najprodavanije" (mreža sa tankim linijama), kalkulator zida, pa brend i "Sa gradilišta".
+// "Najprodavanije" (mreža sa tankim linijama), pa brend i "Sa gradilišta".
 export default function CataloguePage() {
   return (
     <>
@@ -27,9 +26,6 @@ export default function CataloguePage() {
         <CatalogClient />
       </Suspense>
 
-      <div className="mt-[22vh] border-t border-ink/20">
-        <WallCalculator />
-      </div>
 
       <BrandStory />
       <div aria-hidden className="h-[22vh]" />
