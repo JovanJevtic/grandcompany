@@ -83,7 +83,7 @@ export default async function ArticlePage({ params }: PageProps<'/objave/[slug]'
           {post.tag} · {postDate(post.date)} · {post.read} min čitanja
         </p>
         <TitleReveal className="display mx-auto mt-8 max-w-[16ch] text-[clamp(44px,7.4vw,128px)]"><Pw>{post.title}</Pw></TitleReveal>
-        <p className="mx-auto mt-8 max-w-[42ch] text-[clamp(18px,1.5vw,23px)] italic leading-[1.45] text-ink/70">{post.lead}</p>
+        <p className="mx-auto mt-8 max-w-[42ch] text-[13px] leading-[1.45] text-ink/70">{post.lead}</p>
       </header>
 
       <div className="ed-art mx-5 bg-plate px-[6%] py-[5%] md:mx-10">

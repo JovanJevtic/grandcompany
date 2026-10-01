@@ -81,7 +81,7 @@ export default function ProductCard({ product, view = 'grid', priority, stacked 
         <Link href={href} className="font-pretty text-[clamp(19px,1.45vw,24px)] leading-[1.1]">
           {pw(product.name)}
         </Link>
-        <p className="shrink-0 text-[14px] tabular-nums sm:pt-[2px] sm:text-[15px] transition-colors group-hover:text-signal">{money(product.price)}</p>
+        <p className="shrink-0 text-[14px] tabular-nums sm:pt-[2px] sm:text-[12.5px] transition-colors group-hover:text-signal">{money(product.price)}</p>
       </div>
     </article>
   )

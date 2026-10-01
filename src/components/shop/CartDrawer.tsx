@@ -80,10 +80,10 @@ export default function CartDrawer() {
         }`}
       >
         <div className="flex items-baseline justify-between px-6 pb-6 pt-7 md:px-8">
-          <h2 className="text-[32px] leading-none tracking-[-0.02em]">
-            Korpa <em className="text-[0.6em] text-ink/45 not-italic tabular-nums">({count})</em>
+          <h2 className="flex items-baseline gap-3 leading-none">
+            <span className="font-pretty text-[36px]">Korpa</span> <span className="text-[12.5px] text-ink/45 tabular-nums">({count})</span>
           </h2>
-          <button data-close type="button" onClick={closeCart} className="ulink text-[15px]">
+          <button data-close type="button" onClick={closeCart} className="ulink text-[12.5px]">
             Zatvori
           </button>
         </div>
@@ -91,8 +91,8 @@ export default function CartDrawer() {
         <div data-lenis-prevent className="flex-1 overflow-y-auto overscroll-contain px-6 md:px-8">
           {lines.length === 0 ? (
             <div className="flex h-full flex-col items-center justify-center gap-5 pb-16 text-center">
-              <p className="text-[clamp(28px,3vw,40px)] italic leading-[1.05] tracking-[-0.02em]">Korpa je prazna.</p>
-              <p className="max-w-[30ch] text-[15px] text-ink/60">Dodajte artikle iz prodavnice, pa pošaljite upit za ponudu.</p>
+              <p className="font-pretty text-[clamp(30px,3vw,44px)] leading-[1.05]">Korpa je prazna.</p>
+              <p className="max-w-[30ch] text-[12.5px] text-ink/60">Dodajte artikle iz prodavnice, pa pošaljite upit za ponudu.</p>
               <Cta onClick={toShop} className="mt-4">
                 Prodavnica
               </Cta>
@@ -108,8 +108,8 @@ export default function CartDrawer() {
                   )}
                   <div className="flex min-w-0 flex-1 flex-col justify-between gap-3">
                     <div className="flex items-start justify-between gap-4">
-                      <p className="text-[16px] leading-[1.25]">{l.name}</p>
-                      <p className="shrink-0 text-[15px] tabular-nums">{money(l.price * l.qty)}</p>
+                      <p className="text-[12.5px] leading-[1.25]">{l.name}</p>
+                      <p className="shrink-0 text-[12.5px] tabular-nums">{money(l.price * l.qty)}</p>
                     </div>
                     <div className="flex items-center justify-between gap-3 text-[13px]">
                       <div className="flex items-center rounded-full border border-ink/20">
@@ -145,17 +145,17 @@ export default function CartDrawer() {
         {lines.length > 0 && (
           <div className="px-6 pb-8 pt-6 md:px-8">
             <div className="flex items-baseline justify-between">
-              <p className="text-[15px] text-ink/60">{artikala(count)}</p>
+              <p className="text-[12.5px] text-ink/60">{artikala(count)}</p>
               <p className="text-[28px] tabular-nums tracking-[-0.02em]">{money(cartTotal(cart))}</p>
             </div>
-            <p className="mt-2 text-[13px] italic text-ink/50">
+            <p className="mt-2 text-[13px] text-ink/50">
               Sa PDV-om. Dostavu i plaćanje potvrđujemo ponudom. Demo prodavnica — ništa se ne naplaćuje.
             </p>
             <div className="mt-6 grid gap-2">
               <Cta solid onClick={() => go('ponuda')} className="mx-auto">
                 Upit
               </Cta>
-              <button type="button" onClick={closeCart} className="ulink mx-auto mt-2 text-[15px] text-ink/70">
+              <button type="button" onClick={closeCart} className="ulink mx-auto mt-2 text-[12.5px] text-ink/70">
                 Nastavi kupovinu
               </button>
             </div>

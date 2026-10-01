@@ -109,7 +109,7 @@ export default function Panels() {
             {toast.action && (
               <button
                 type="button"
-                className="shrink-0 rounded-full bg-bg px-4 py-1.5 italic text-ink transition-colors hover:bg-signal hover:text-bg"
+                className="shrink-0 rounded-full bg-bg px-4 py-1.5 text-ink transition-colors hover:bg-signal hover:text-bg"
                 onClick={() => {
                   const target = toast.action!.open
                   if (target === 'cart') openCart()

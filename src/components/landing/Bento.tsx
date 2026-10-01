@@ -64,7 +64,7 @@ export default function Bento() {
             Logistika
           </span>
         </h2>
-        <p className="max-w-[320px] text-[17px] italic leading-[1.45] text-ink/75 md:mb-[1.2vw] md:mr-[2vw]">
+        <p className="max-w-[320px] text-[12.5px] leading-[1.45] text-ink/75 md:mb-[1.2vw] md:mr-[2vw]">
           Vlastiti kamioni sa kranom, viljuškari i utovar istog ili sljedećeg dana za robu na stanju —
         </p>
       </div>
@@ -78,7 +78,7 @@ export default function Bento() {
             <Tag tone="blue">Kamion</Tag>
             <Tag tone="blue">Kran</Tag>
           </span>
-          <span className="mb-8 mt-auto max-w-[260px] pt-16 text-[16px] italic leading-[1.45] opacity-85">
+          <span className="mb-8 mt-auto max-w-[260px] pt-16 text-[12.5px] leading-[1.45] opacity-85">
             Paletu spuštamo na skelu ili etažu, ne na ulicu. Banja Luka i okolina —
           </span>
           <Arrow className="bg-white text-cobalt" />
@@ -91,7 +91,7 @@ export default function Bento() {
           <span className="mt-4 flex flex-wrap gap-1.5">
             <Tag tone="dark">Rabat</Tag>
           </span>
-          <span className="mb-8 mt-auto max-w-[260px] pt-16 text-[16px] italic leading-[1.45] opacity-85">
+          <span className="mb-8 mt-auto max-w-[260px] pt-16 text-[12.5px] leading-[1.45] opacity-85">
             Firme i majstori naručuju po svojim cijenama, na odloženo plaćanje —
           </span>
           <Arrow className="bg-white text-[#1e1e1e]" />

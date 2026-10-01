@@ -42,7 +42,7 @@ export default function Intro() {
         <br />
         <em>svaki</em> sloj
       </Pw></h2>
-      <p data-up className="mx-auto mt-10 max-w-[30ch] px-5 text-lead opacity-80">
+      <p data-up className="mx-auto mt-10 max-w-[46ch] px-5 text-lead opacity-80">
         Knauf sistemi, izolacija i veziva — spušteni kranom na vašu etažu.
       </p>
       <div data-up data-delay="0.1" className="mt-12 flex justify-center">
@@ -63,7 +63,7 @@ export default function Intro() {
             <img src="/editorial/frame-rhythm.webp" alt="" className="h-full w-full object-cover" />
           </div>
         </figure>
-        <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[15px] italic md:mt-8">
+        <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[12.5px] md:mt-8">
           <span className="opacity-70">
           Ploča, profil, vuna — jedan sistem.</span>
         </figcaption>

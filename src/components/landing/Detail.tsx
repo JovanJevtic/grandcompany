@@ -47,7 +47,7 @@ export default function Detail() {
           <div data-curtain data-parallax="10" className="aspect-[2/3] overflow-hidden bg-plate">
             <img src="/editorial/boards-light.webp" alt="Ivica naslaganih gips-kartonskih ploča na suncu" className="h-full w-full object-cover" />
           </div>
-          <figcaption className="mt-5 flex items-center gap-3 text-[14px] italic">
+          <figcaption className="mt-5 flex items-center gap-3 text-[14px]">
             <span className="opacity-60">Gips, vuna, čelik.</span>
           </figcaption>
         </figure>

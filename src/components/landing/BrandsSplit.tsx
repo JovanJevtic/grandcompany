@@ -184,7 +184,7 @@ export default function BrandsSplit() {
             <h3 data-title className="display invisible text-[clamp(40px,4.2vw,76px)]"><Pw>
               {brand}
             </Pw></h3>
-            <p className="max-w-[36ch] text-[clamp(16px,1.2vw,19px)] italic leading-[1.45] opacity-75">{note}</p>
+            <p className="max-w-[36ch] text-[13px] leading-[1.45] opacity-75">{note}</p>
             <p className="text-[14px] opacity-60">{count(brand) ? `${artikala(count(brand))} u katalogu` : 'Na upit'}</p>
           </article>
         ))}

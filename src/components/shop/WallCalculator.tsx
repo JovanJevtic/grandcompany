@@ -1,185 +1,81 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- studijske fotografije artikala iz /public, već u WebP */
+
 import { useMemo, useRef, useState } from 'react'
-import { WALL_SYSTEMS, bySku } from '@/gc/gc'
+import { bySku } from '@/gc/gc'
 import { addToCart, notify } from '@/lib/cart'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import Cta from '@/components/ui/Cta'
-import { calcW111, money, qtyLabel } from '@/lib/shop'
 import Pw from '@/components/ui/Pw'
+import { calcW111, money, shotOf } from '@/lib/shop'
 
-// Kalkulator pregradnog zida po normi W111/W112 (dno prodavnice, #kalkulator): mjere i izbor
-// ploče, profila i mase daju spisak materijala sa cijenom, a tehnički crtež zida (pogled i presjek)
-// se mijenja uživo. "Dodaj sve u korpu" ubacuje cijeli spisak odjednom.
+// Kalkulator pregradnog zida (dno prodavnice, #kalkulator), sveden na ono što kupac zna:
+// dužina, visina, koja ploča i da li ide izolacija. Ostalo je standard (CW 75, jednostruka obloga,
+// Uniflott). Rezultat nije tabela nego mreža pravih fotografija artikala sa količinom — "ovo ćete dobiti".
+// Količine računa calcW111 (norma utroška po m², ista kao ranije).
 
 const PLATES = [
-  { sku: 'KNF-001', label: 'GKB', note: 'standardna' },
-  { sku: 'KNF-002', label: 'GKBI', note: 'vlažni prostori' },
-  { sku: 'KNF-003', label: 'GKF', note: 'vatrootporna' },
-  { sku: 'KNF-004', label: 'Diamant', note: 'tvrda' },
-]
-const STUDS = [
-  { sku: 'PRF-050', label: 'CW 50', mm: 50 },
-  { sku: 'PRF-075', label: 'CW 75', mm: 75 },
-  { sku: 'PRF-100', label: 'CW 100', mm: 100 },
-]
-const FILLERS = [
-  { sku: 'CHM-001', label: 'Uniflott' },
-  { sku: 'CHM-002', label: 'Fugenfüller' },
+  { sku: 'KNF-001', label: 'Standard' },
+  { sku: 'KNF-002', label: 'Kupatilo' },
+  { sku: 'KNF-003', label: 'Vatra' },
+  { sku: 'KNF-004', label: 'Tvrda' },
 ]
 
-const f1 = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 2 })
+// Kratka imena za rezultat (puno ime je u katalogu)
+const SHORT: Record<string, string> = {
+  'KNF-001': 'Ploča GKB',
+  'KNF-002': 'Ploča GKBI',
+  'KNF-003': 'Ploča GKF',
+  'KNF-004': 'Ploča Diamant',
+  'PRF-075': 'Profil CW 75',
+  'PRF-UW75': 'Profil UW 75',
+  'ISO-001': 'Kamena vuna',
+  'CHM-001': 'Masa Uniflott',
+  'ACC-001': 'Vijci TN 25',
+  'ACC-003': 'Bandaž traka',
+}
 
-function Choice<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: { id: T; text: string; hint?: string }[]; onChange: (v: T) => void }) {
+const f1 = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+
+// Mjera: veliki broj i dva kružna dugmeta (−/+), bez klizača.
+function Measure({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
+  const set = (v: number) => onChange(Math.min(max, Math.max(min, Math.round(v * 10) / 10)))
+  const btn = 'grid size-11 place-items-center rounded-full border border-ink/25 text-lg transition-colors hover:border-ink disabled:opacity-30'
   return (
-    <fieldset>
-      <legend className="mb-3 text-[13px] opacity-50">{label}</legend>
-      <div className="flex flex-wrap gap-2">
-        {options.map((o) => {
-          const on = o.id === value
-          return (
-            <button
-              key={o.id}
-              type="button"
-              aria-pressed={on}
-              onClick={() => onChange(o.id)}
-              className={`min-h-11 rounded-full border px-4 py-2 text-left text-[15px] leading-tight transition-colors duration-300 ${
-                on ? 'border-ink bg-ink text-bg' : 'border-ink/20 hover:border-ink'
-              }`}
-            >
-              {o.text}
-              {o.hint && <span className={`ml-2 italic ${on ? 'opacity-70' : 'opacity-50'}`}>{o.hint}</span>}
-            </button>
-          )
-        })}
+    <div className="flex items-center justify-between gap-4 border-b border-ink/15 py-5">
+      <span className="text-[11.5px] opacity-55">{label}</span>
+      <div className="flex items-center gap-4">
+        <button type="button" className={btn} onClick={() => set(value - step)} disabled={value <= min} aria-label={`${label}: manje`}>
+          −
+        </button>
+        <span className="font-pretty w-[4.2ch] text-center text-[34px] leading-none tabular-nums" aria-live="polite">
+          <span className="pw-alt">{f1(value)}</span>
+        </span>
+        <button type="button" className={btn} onClick={() => set(value + step)} disabled={value >= max} aria-label={`${label}: više`}>
+          +
+        </button>
+        <span className="text-[11.5px] opacity-55">m</span>
       </div>
-    </fieldset>
-  )
-}
-
-function Range({ label, value, min, max, step, onChange }: { label: string; value: number; min: number; max: number; step: number; onChange: (v: number) => void }) {
-  return (
-    <label className="block">
-      <span className="mb-2 flex items-baseline justify-between">
-        <span className="text-[13px] opacity-50">{label}</span>
-        <span className="text-[22px] tabular-nums">{f1(value)} m</span>
-      </span>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="range h-6 w-full cursor-pointer"
-      />
-    </label>
-  )
-}
-
-// Pogled na zid: UW gore i dolje, CW na 62,5 cm, ploče po 1,2 m (šavovi isprekidano), vuna.
-function Elevation({ L, H, wool }: { L: number; H: number; wool: boolean }) {
-  const W = 620
-  const HH = 300
-  const s = Math.min((W - 80) / L, (HH - 70) / H)
-  const w = L * s
-  const h = H * s
-  const x0 = (W - w) / 2
-  const y0 = 24
-  const studs: number[] = []
-  for (let x = 0; x <= L + 1e-6; x += 0.625) studs.push(x)
-  if (L - studs[studs.length - 1] > 0.05) studs.push(L)
-  const seams: number[] = []
-  for (let x = 1.2; x < L - 0.05; x += 1.2) seams.push(x)
-  return (
-    <svg viewBox={`0 0 ${W} ${HH}`} className="art h-auto w-full" fill="none" stroke="currentColor" strokeWidth={1.25} strokeLinecap="square" aria-hidden>
-      <rect x={x0} y={y0} width={w} height={h} />
-      {wool &&
-        studs.slice(0, -1).map((x, i) => {
-          const a = x0 + x * s + 4
-          const b = x0 + (studs[i + 1] ?? L) * s - 4
-          if (b - a < 6) return null
-          const pts: string[] = []
-          for (let y = y0 + 10, k = 0; y < y0 + h - 8; y += 9, k++) pts.push(`${k % 2 ? b : a},${y}`)
-          return <polyline key={`w${i}`} data-wool points={pts.join(' ')} opacity={0.3} />
-        })}
-      {studs.map((x, i) => (
-        <rect key={`s${i}`} data-stud x={x0 + x * s - 2} y={y0 + 4} width={4} height={h - 8} fill="var(--plate)" />
-      ))}
-      <path d={`M${x0} ${y0 + 4}H${x0 + w}M${x0} ${y0 + h - 4}H${x0 + w}`} strokeWidth={2.5} />
-      {seams.map((x) => (
-        <line key={`j${x}`} x1={x0 + x * s} y1={y0} x2={x0 + x * s} y2={y0 + h} strokeDasharray="5 5" opacity={0.5} />
-      ))}
-      {/* kote */}
-      <path d={`M${x0} ${y0 + h + 18}H${x0 + w}M${x0} ${y0 + h + 12}v12M${x0 + w} ${y0 + h + 12}v12`} opacity={0.7} />
-      <text x={x0 + w / 2} y={y0 + h + 36} textAnchor="middle" stroke="none" fill="currentColor" fontSize={15} fontStyle="italic">
-        {f1(L)} m
-      </text>
-      <path d={`M${x0 - 18} ${y0}V${y0 + h}M${x0 - 24} ${y0}h12M${x0 - 24} ${y0 + h}h12`} opacity={0.7} />
-      <text x={x0 - 26} y={y0 + h / 2} textAnchor="end" dominantBaseline="middle" stroke="none" fill="currentColor" fontSize={15} fontStyle="italic">
-        {f1(H)} m
-      </text>
-    </svg>
-  )
-}
-
-// Presjek zida (tlocrt): ploče s obje strane, profil, vuna — sa ukupnom debljinom.
-function Section({ layers, stud, wool }: { layers: number; stud: number; wool: boolean }) {
-  const px = 1.6
-  const board = 12.5 * px
-  const core = stud * px
-  const total = core + 2 * layers * board
-  const x0 = 20
-  const y0 = 20
-  const len = 220
-  const rows = [...Array(layers)].map((_, i) => y0 + i * board)
-  const coreY = y0 + layers * board
-  return (
-    <svg viewBox={`0 0 ${len + 40} ${total + 60}`} className="art h-auto w-full" fill="none" stroke="currentColor" strokeWidth={1.25} aria-hidden>
-      {rows.map((y) => (
-        <rect key={`a${y}`} x={x0} y={y} width={len} height={board} fill="var(--plate)" />
-      ))}
-      {wool && <path d={Array.from({ length: 22 }, (_, i) => `${i ? 'L' : 'M'}${x0 + 5 + i * 10} ${i % 2 ? coreY + 4 : coreY + core - 4}`).join('')} opacity={0.35} />}
-      {[0.12, 0.5, 0.88].map((t) => (
-        <path key={t} d={`M${x0 + len * t - 12} ${coreY}h24M${x0 + len * t - 12} ${coreY}v${core}h24M${x0 + len * t - 12} ${coreY + core}h24`} strokeWidth={1.8} />
-      ))}
-      {rows.map((y) => (
-        <rect key={`b${y}`} x={x0} y={coreY + core + (y - y0)} width={len} height={board} fill="var(--plate)" />
-      ))}
-      <path d={`M${x0 + len + 12} ${y0}V${y0 + total}M${x0 + len + 6} ${y0}h12M${x0 + len + 6} ${y0 + total}h12`} opacity={0.7} />
-      <text x={x0 + len / 2} y={y0 + total + 26} textAnchor="middle" stroke="none" fill="currentColor" fontSize={15} fontStyle="italic">
-        {Math.round(stud + layers * 2 * 12.5)} mm
-      </text>
-    </svg>
+    </div>
   )
 }
 
 export default function WallCalculator() {
   const root = useRef<HTMLElement>(null)
-  const [code, setCode] = useState<'W111' | 'W112'>('W111')
   const [L, setL] = useState(4)
   const [H, setH] = useState(2.6)
   const [plate, setPlate] = useState('KNF-001')
-  const [stud, setStud] = useState('PRF-075')
-  const [filler, setFiller] = useState('CHM-001')
   const [wool, setWool] = useState(true)
-  const [tape, setTape] = useState(false)
-
-  const system = WALL_SYSTEMS.find((s) => s.code === code)!
-  const studMm = STUDS.find((s) => s.sku === stud)!.mm
-  const layers = code === 'W112' ? 2 : 1
 
   const { P, items } = useMemo(
-    () =>
-      calcW111({ L, H, cladding: layers === 2 ? 'double' : 'single', plateSku: plate, cwSku: stud, woolSku: wool ? 'ISO-001' : undefined, fillerSku: filler, soundTape: tape }),
-    [L, H, layers, plate, stud, wool, filler, tape],
+    () => calcW111({ L, H, cladding: 'single', plateSku: plate, cwSku: 'PRF-075', woolSku: wool ? 'ISO-001' : undefined, fillerSku: 'CHM-001' }),
+    [L, H, plate, wool],
   )
-  const rows = items.map((it) => {
-    const p = bySku(it.sku)!
-    return { ...it, name: p.name, unit: p.unit, line: p.price * it.qty }
-  })
+  // "3 ploča po 2,5 m²" → "3 ploča": broj komada je ono što kupac razumije
+  const rows = items.map((it) => ({ ...it, count: it.note.split(' po ')[0], line: (bySku(it.sku)?.price ?? 0) * it.qty }))
   const total = rows.reduce((s, r) => s + r.line, 0)
 
   useGSAP(
@@ -193,25 +89,17 @@ export default function WallCalculator() {
     { scope: root },
   )
 
-  // Kad se promijeni mjera ili sistem, profili "niknu" jedan za drugim, a ukupna cijena se odbroji.
+  // Promjena: brojevi u rezultatu kratko "kliknu", ukupna cijena se odbroji.
   useGSAP(
     () => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-      gsap.fromTo('[data-stud]', { scaleY: 0.2, transformOrigin: '50% 100%' }, { scaleY: 1, duration: 0.5, ease: 'power3.out', stagger: 0.015, overwrite: true })
+      gsap.fromTo('[data-count]', { yPercent: 40, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.45, ease: 'power3.out', stagger: 0.03, overwrite: true })
       const out = root.current!.querySelector<HTMLElement>('[data-total]')!
-      const from = Number(out.dataset.value ?? 0)
-      const o = { v: from }
-      gsap.to(o, {
-        v: total,
-        duration: 0.6,
-        ease: 'power2.out',
-        onUpdate: () => {
-          out.textContent = money(o.v)
-        },
-      })
+      const o = { v: Number(out.dataset.value ?? 0) }
+      gsap.to(o, { v: total, duration: 0.6, ease: 'power2.out', onUpdate: () => void (out.textContent = money(o.v)) })
       out.dataset.value = String(total)
     },
-    { dependencies: [L, H, code, plate, stud, wool, filler, tape], scope: root },
+    { dependencies: [L, H, plate, wool], scope: root },
   )
 
   const addAll = () => {
@@ -220,89 +108,74 @@ export default function WallCalculator() {
   }
 
   return (
-    <section ref={root} id="kalkulator" className="scroll-mt-20 py-[18vh]">
-      <div className="gutter text-center">
-        <h2 data-head className="display invisible mx-auto max-w-[16ch] text-[clamp(44px,6vw,108px)]"><Pw>
-          Izmjerite zid. <em>Mi složimo spisak.</em>
-        </Pw></h2>
+    <section ref={root} id="kalkulator" className="scroll-mt-20">
+      <div className="px-5 text-center">
+        <h2 data-head className="display invisible text-[clamp(48px,6vw,108px)]">
+          <Pw>Izmjerite zid</Pw>
+        </h2>
+        <p className="mx-auto mt-6 max-w-[46ch] text-[12.5px] opacity-65">Unesite mjere i ploču — složimo spisak za pregradni zid.</p>
       </div>
 
-      <div className="gutter mx-auto mt-[10vh] grid max-w-[1400px] gap-14 md:grid-cols-12 md:gap-[3vw]">
-        <div className="grid content-start gap-8 md:col-span-4">
-          <Choice
-            label="Sistem"
-            value={code}
-            onChange={setCode}
-            options={[
-              { id: 'W111', text: 'W111', hint: 'jednostruka' },
-              { id: 'W112', text: 'W112', hint: 'dvostruka' },
-            ]}
-          />
-          <Range label="Dužina zida" value={L} min={1} max={12} step={0.1} onChange={setL} />
-          <Range label="Visina zida" value={H} min={2} max={4} step={0.05} onChange={setH} />
-          <Choice label="Ploča" value={plate} onChange={setPlate} options={PLATES.map((p) => ({ id: p.sku, text: p.label }))} />
-          <Choice label="Profil" value={stud} onChange={setStud} options={STUDS.map((s) => ({ id: s.sku, text: s.label }))} />
-          <Choice label="Masa za spojeve" value={filler} onChange={setFiller} options={FILLERS.map((f) => ({ id: f.sku, text: f.label }))} />
-          <div className="flex flex-wrap gap-x-6 gap-y-2">
-            {[
-              { on: wool, set: setWool, text: 'Kamena vuna 50 mm' },
-              { on: tape, set: setTape, text: 'Zvučna traka' },
-            ].map((t) => (
-              <button key={t.text} type="button" aria-pressed={t.on} onClick={() => t.set(!t.on)} className="flex min-h-11 items-center gap-2.5 text-[15px]">
-                <span className={`size-4 rounded-full border transition-colors ${t.on ? 'border-signal bg-signal' : 'border-ink/40'}`} />
-                {t.text}
-              </button>
-            ))}
+      <div className="mt-[10vh] grid border-y border-ink/20 md:grid-cols-[minmax(320px,0.9fr)_1.4fr]">
+        {/* Ulaz */}
+        <div className="flex flex-col px-5 py-10 md:border-r md:border-ink/20 md:px-[3vw] md:py-[4vw]">
+          <Measure label="Dužina" value={L} min={1} max={12} step={0.5} onChange={setL} />
+          <Measure label="Visina" value={H} min={2} max={4} step={0.1} onChange={setH} />
+
+          <p className="mt-8 text-[11.5px] opacity-55">Ploča</p>
+          <div className="mt-4 grid grid-cols-4 gap-2">
+            {PLATES.map((p) => {
+              const on = p.sku === plate
+              return (
+                <button
+                  key={p.sku}
+                  type="button"
+                  aria-pressed={on}
+                  onClick={() => setPlate(p.sku)}
+                  className={`group flex flex-col items-center gap-2 border p-1.5 pb-3 transition-colors duration-300 ${on ? 'border-ink' : 'border-ink/15 hover:border-ink/50'}`}
+                >
+                  <span className="block aspect-square w-full overflow-hidden">
+                    <img src={shotOf(p.sku)} alt="" className="h-full w-full scale-[1.35] object-cover transition-transform duration-500 group-hover:scale-[1.45]" />
+                  </span>
+                  <span className="text-[10.5px]">{p.label}</span>
+                </button>
+              )
+            })}
           </div>
+
+          <button type="button" aria-pressed={wool} onClick={() => setWool(!wool)} className="mt-8 flex min-h-12 items-center justify-between border-y border-ink/15 py-3 text-[11.5px]">
+            <span>Sa izolacijom (kamena vuna)</span>
+            <span className={`relative h-6 w-11 rounded-full transition-colors duration-300 ${wool ? 'bg-ink' : 'bg-ink/20'}`}>
+              <span className={`absolute top-1 size-4 rounded-full bg-bg transition-[left] duration-300 ${wool ? 'left-6' : 'left-1'}`} />
+            </span>
+          </button>
         </div>
 
-        <div className="md:col-span-8">
-          <div className="grid gap-8 bg-plate p-6 md:grid-cols-[1fr_200px] md:p-10">
-            <div>
-              <p className="mb-4 text-[13px] italic opacity-60">Pogled · {f1(P)} m²</p>
-              <Elevation L={L} H={H} wool={wool} />
-            </div>
-            <div className="md:border-l md:border-ink/15 md:pl-8">
-              <p className="mb-4 text-[13px] italic opacity-60">Presjek</p>
-              <div className="mx-auto max-w-[180px] md:max-w-none">
-                <Section layers={layers} stud={studMm} wool={wool} />
+        {/* Rezultat: prave fotografije sa količinom */}
+        <div className="flex flex-col">
+          <div className="grid flex-1 grid-cols-2 sm:grid-cols-4 [&>*]:border-b [&>*]:border-r [&>*]:border-ink/15">
+            {rows.map((r) => (
+              <div key={r.sku} className="flex flex-col items-center px-3 pb-5 pt-3 text-center">
+                <img src={shotOf(r.sku)} alt="" className="aspect-[4/5] w-full max-w-[150px] object-cover" />
+                <span data-count className="font-pretty mt-2 text-[26px] leading-none">
+                  <span className="pw-alt">{r.count.split(' ')[0]}</span>
+                </span>
+                <span className="mt-2 text-[10.5px] leading-[1.4] opacity-70">{SHORT[r.sku] ?? bySku(r.sku)?.name}</span>
               </div>
-              <dl className="mt-5 grid gap-1.5 text-[13px]">
-                <div className="flex justify-between">
-                  <dt className="opacity-50">Zvučna izolacija</dt>
-                  <dd>Rw {system.rw} dB</dd>
-                </div>
-                <div className="flex justify-between">
-                  <dt className="opacity-50">Profil</dt>
-                  <dd>{system.profile}</dd>
-                </div>
-              </dl>
-            </div>
+            ))}
           </div>
-
-          <table className="mt-8 w-full border-collapse text-left">
-            <caption className="sr-only">Spisak materijala</caption>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.sku} className="border-b border-ink/15 align-baseline">
-                  <td className="py-4 pr-3">
-                    <span className="block text-[clamp(15px,1.1vw,18px)] leading-tight">{r.name}</span>
-                    <span className="text-[13px] italic opacity-50">{r.note}</span>
-                  </td>
-                  <td className="hidden py-4 text-right text-[15px] tabular-nums opacity-60 sm:table-cell">{qtyLabel(r.qty, r.unit)}</td>
-                  <td className="w-[7.5rem] py-4 text-right text-[15px] tabular-nums">{money(r.line)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          <div className="mt-10 flex flex-wrap items-end justify-between gap-6">
-            <p>
-              <span className="block text-[13px] opacity-50">Ukupno sa PDV-om</span>
-              <span data-total className="text-[clamp(32px,3vw,52px)] leading-none tabular-nums" data-value={0}>
-                {money(total)}
-              </span>
-            </p>
+          <div className="flex flex-wrap items-center justify-between gap-6 px-5 py-8 md:px-[3vw]">
+            <div>
+              <p className="text-[11.5px] opacity-55">
+                <span className="tabular-nums">{f1(P)} m²</span> zida · ukupno sa PDV-om
+              </p>
+              {/* cifre u Bodoniju (.pw-alt): demo Prettywise ima žig na cifri 4 */}
+              <p className="mt-2 text-[clamp(34px,3.2vw,52px)] leading-none tabular-nums">
+                <span data-total data-value={0} className="pw-alt">
+                  {money(total)}
+                </span>
+              </p>
+            </div>
             <Cta solid onClick={addAll}>
               Dodaj
             </Cta>

@@ -2,12 +2,15 @@
 
 import Link from 'next/link'
 import { useRef } from 'react'
+import UseArt from '@/components/landing/UseArt'
+import { axisShift } from '@/components/landing/iso'
 import Cta from '@/components/ui/Cta'
+import Pw from '@/components/ui/Pw'
 import { COMPANY } from '@/gc/gc'
+import { drawOnScroll } from '@/lib/draw'
 import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ, fitFontSize } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
-import Pw from '@/components/ui/Pw'
 
 const COLS: { title: string; links: [string, string][] }[] = [
   { title: 'Prodavnica', links: [['Katalog', '/prodavnica'], ['Kalkulator zida', '/prodavnica#kalkulator'], ['Objave', '/objave']] },
@@ -15,8 +18,11 @@ const COLS: { title: string; links: [string, string][] }[] = [
   { title: 'Pravno', links: [['Uslovi kupovine', '/uslovi-kupovine'], ['Privatnost', '/politika-privatnosti'], ['Sve politike', '/sve-politike']] },
 ]
 
-// Podnožje: rečenica-poziv, kontakt, tri kratke kolone i veliki wordmark koji izroni slovo po slovo.
-// Podaci firme (JIB, adresa) stoje u jednom sitnom redu na dnu — zakonski dovoljno, vizuelno tiho.
+// Podnožje u tri pojasa, odvojena tankim linijama:
+// 1) poziv (serif naslov, rečenica, CTA) lijevo, a desno pregradni zid koji se SKLAPA dok footer ulazi
+//    u ekran — slojevi (ploča, profili, vuna, ploča) dolaze iz rastavljenog položaja na svoje mjesto;
+// 2) mreža ćelija sa kontaktom i linkovima (sitni sans u verzalu);
+// 3) veliki wordmark koji izroni slovo po slovo + jedan red sa podacima firme.
 export default function Footer() {
   const root = useRef<HTMLElement>(null)
 
@@ -24,6 +30,7 @@ export default function Footer() {
     (_, contextSafe) => {
       const el = root.current!
       const word = el.querySelector<HTMLElement>('[data-word]')!
+      const svg = el.querySelector<SVGSVGElement>('[data-build] svg')!
       let dead = false
       let onResize: (() => void) | null = null
 
@@ -39,8 +46,21 @@ export default function Footer() {
           const { reduce } = ctx.conditions as { reduce: boolean }
           revealChars(el.querySelector('[data-head]')!, reduce, 'top 85%')
           const split = revealChars(word, true)
+          drawOnScroll(svg, reduce, { trigger: svg, start: 'top 90%', duration: 1.4 })
           if (reduce) return
           gsap.fromTo(split.chars, { yPercent: 110 }, { yPercent: 0, duration: 1.4, ease: EASE.quint, stagger: 0.04, scrollTrigger: { trigger: word, start: 'top 98%' } })
+
+          // Sklapanje: svaki sloj kreće iz rastavljenog položaja (dalje što je bliži) i dolazi na 0.
+          const axis = svg.dataset.axis as 'x' | 'y' | 'z'
+          const gap = Number(svg.dataset.gap)
+          gsap.utils.toArray<SVGGElement>('[data-layer]', svg).forEach((layer, k) => {
+            const { x, y } = axisShift(axis, k * gap)
+            gsap.fromTo(
+              layer,
+              { x, y },
+              { x: 0, y: 0, ease: 'none', scrollTrigger: { trigger: svg, start: 'top 95%', end: 'bottom 55%', scrub: 0.8 } },
+            )
+          })
         })
       })
 
@@ -54,44 +74,59 @@ export default function Footer() {
   )
 
   return (
-    <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink pt-[20vh] text-bg">
-      <div className="flex flex-col items-center px-5 text-center">
-        <h2 data-head className="display invisible text-title"><Pw>
-          Gradimo <em>zajedno.</em>
-        </Pw></h2>
-        <p className="mt-8 max-w-[34ch] text-[17px] italic opacity-70">Upit za veći projekat, ponuda za partnere ili samo savjet — javite se.</p>
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-5">
-          <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
-            Pišite
-          </Cta>
-          <a href={COMPANY.phoneMobileHref} className="ulink text-[17px] tabular-nums">
-            {COMPANY.phoneMobile}
-          </a>
+    <footer ref={root} id="kontakt" className="relative z-40 overflow-x-clip bg-ink text-bg [--art-fill:var(--ink)]">
+      {/* 1. Poziv + zid koji se sklapa */}
+      <div className="grid border-b border-bg/15 md:grid-cols-2">
+        <div className="flex flex-col justify-between gap-12 px-5 pb-16 pt-[18vh] md:border-r md:border-bg/15 md:px-10 md:pb-14">
+          <h2 data-head className="display invisible text-[clamp(56px,7vw,128px)]">
+            <Pw>
+              Gradimo
+              <br />
+              zajedno.
+            </Pw>
+          </h2>
+          <div className="flex flex-col gap-8">
+            <p className="max-w-[44ch] text-[12.5px] leading-[1.7] opacity-70">
+              Upit za veći projekat, partnerski račun ili samo savjet o sistemu — javite se.
+            </p>
+            <div className="flex flex-wrap items-center gap-x-10 gap-y-4">
+              <Cta href={`mailto:${COMPANY.emailSales}`} className="[--cta-fill:var(--bg)] [--cta-ink:var(--ink)]">
+                Pišite
+              </Cta>
+              <a href={COMPANY.phoneMobileHref} className="ulink text-[12.5px] tabular-nums">
+                {COMPANY.phoneMobile}
+              </a>
+            </div>
+          </div>
+        </div>
+        <div data-build className="flex items-center justify-center px-8 py-[10vh] md:px-[5vw]">
+          <UseArt use="pregradni-zid" className="w-full max-w-[560px] text-bg/90" title="Pregradni zid: ploča, profili, vuna, ploča" />
         </div>
       </div>
 
-      <div className="mx-auto mt-[18vh] grid w-[calc(100%-40px)] grid-cols-2 gap-x-6 gap-y-12 border-t border-bg/15 pt-12 text-[15px] md:w-[88vw] md:grid-cols-4">
-        <div>
-          <p className="mb-4 flex items-center gap-2.5 italic">
-            <span className="opacity-50">Stovarište</span>
-          </p>
-          <address className="not-italic leading-[1.6]">
+      {/* 2. Kontakt i linkovi: ćelije sa tankim linijama */}
+      <div className="grid grid-cols-2 text-[12px] md:grid-cols-4 [&>*]:border-b [&>*]:border-bg/15 [&>*:nth-child(odd)]:border-r md:[&>*:not(:last-child)]:border-r">
+        <div className="px-5 py-10 md:px-10 md:py-12">
+          <p className="mb-6 opacity-45">Stovarište</p>
+          <address className="not-italic leading-[1.9]">
             {COMPANY.address.split(', ').map((l) => (
               <span key={l} className="block">
                 {l}
               </span>
             ))}
-            <a href={COMPANY.phoneLandlineHref} className="ulink mt-2 inline-block tabular-nums">
+            <a href={COMPANY.phoneLandlineHref} className="ulink tabular-nums">
               {COMPANY.phoneLandline}
+            </a>
+            <br />
+            <a href={`mailto:${COMPANY.emailInfo}`} className="ulink">
+              {COMPANY.emailInfo}
             </a>
           </address>
         </div>
         {COLS.map((c) => (
-          <div key={c.title}>
-            <p className="mb-4 flex items-center gap-2.5 italic">
-              <span className="opacity-50">{c.title}</span>
-            </p>
-            <ul className="flex flex-col gap-1.5">
+          <div key={c.title} className="px-5 py-10 md:px-10 md:py-12">
+            <p className="mb-6 opacity-45">{c.title}</p>
+            <ul className="flex flex-col gap-2.5">
               {c.links.map(([label, href]) => (
                 <li key={href}>
                   <Link href={href} className="ulink">
@@ -104,20 +139,21 @@ export default function Footer() {
         ))}
       </div>
 
-      <div className="mt-[14vh] overflow-x-clip px-5 pb-[1.5vw] text-center">
+      {/* 3. Wordmark + red sa podacima firme */}
+      <div className="mt-[10vh] overflow-x-clip px-5 pb-[1.5vw] text-center">
         <p data-word className="font-pretty inline-block whitespace-nowrap leading-[0.9] tracking-[-0.02em]" aria-label="Grand Company">
           Grand Company
         </p>
       </div>
 
-      <div className="flex flex-col items-center justify-between gap-2 px-5 pb-8 pt-6 text-[12px] opacity-45 md:flex-row md:px-10">
+      <div className="flex flex-col items-center justify-between gap-2 border-t border-bg/15 px-5 py-5 text-[10.5px] opacity-50 md:flex-row md:px-10">
         <p>
           © {COMPANY.founded}–2026 {COMPANY.name} · JIB {COMPANY.jib} ·{' '}
           <Link href="/o-prodavcu" className="ulink">
             Podaci o prodavcu
           </Link>
         </p>
-        <p className="italic">Demo prodavnica — narudžbe se još ne šalju.</p>
+        <p>Demo prodavnica — narudžbe se još ne šalju</p>
       </div>
     </footer>
   )

@@ -30,8 +30,8 @@
   --wm-fs: 10.6vw;
   --story-header: calc(16px + var(--wm-fs) * 0.862);
   /* Stari nazivi fontova (hero, kaolin) pokazuju na novi serif */
-  --font-inter-tight: var(--font-serif);
-  --font-mono-src: var(--font-serif);
+  --font-inter-tight: var(--font-text);
+  --font-mono-src: var(--font-text);
 }
 
 @theme inline {
@@ -44,17 +44,17 @@
   --color-signal: var(--signal);
   --color-cobalt: var(--cobalt);
   --font-grotesk: var(--font-grotesk), "Helvetica Neue", Arial, sans-serif;
-  --font-sans: var(--font-serif), Georgia, serif;
+  --font-sans: var(--font-text), "Helvetica Neue", Arial, sans-serif;
   --font-serif: var(--font-serif), Georgia, serif;
   /* "mono" klase u starim komponentama postaju sitne serif oznake (vidi .font-mono niže) */
-  --font-mono: var(--font-serif), Georgia, serif;
+  --font-mono: var(--font-text), "Helvetica Neue", Arial, sans-serif;
 
   --text-micro: clamp(11px, 0.8vw, 13px);
   --text-micro--line-height: 1.3;
-  --text-small: clamp(14px, 1vw, 17px);
-  --text-small--line-height: 1.45;
-  --text-lead: clamp(20px, 1.9vw, 32px);
-  --text-lead--line-height: 1.2;
+  --text-small: 13px;
+  --text-small--line-height: 1.55;
+  --text-lead: clamp(13px, 1vw, 15px);
+  --text-lead--line-height: 1.6;
   --text-title: clamp(40px, 6vw, 112px);
   --text-title--line-height: 0.95;
   --text-display: clamp(56px, 11vw, 200px);
@@ -73,9 +73,14 @@ html::-webkit-scrollbar {
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-serif), Georgia, serif;
+  /* Tekst: sans u verzalu (Inter). Naslovi (.display, .font-pretty) su serif i normalan kurent. */
+  font-family: var(--font-text), "Helvetica Neue", Arial, sans-serif;
   font-weight: 400;
-  font-feature-settings: "lnum", "kern";
+  font-size: 13px;
+  line-height: 1.55;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  font-feature-settings: "kern", "tnum" 0;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -377,9 +382,9 @@ html:not([data-past-hero]) [data-overlay-header] {
   mask: var(--shape-blade) center / 100% 100% no-repeat;
   background: var(--signal);
   color: #fff;
-  font-family: var(--font-grotesk), Arial, sans-serif;
+  font-family: var(--font-text), Arial, sans-serif;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -449,7 +454,15 @@ html:not([data-past-hero]) [data-overlay-header] {
 .shot {
   position: relative;
   overflow: hidden;
-  background: var(--plate);
+  /* fotografije artikala su na boji stranice (sa sjenom); okvir daje tanka linija */
+  background: var(--bg);
+}
+.shot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid color-mix(in srgb, var(--ink) 16%, transparent);
+  pointer-events: none;
 }
 .shot img {
   transition: transform 1.4s var(--ease-out);
@@ -501,9 +514,9 @@ html:not([data-past-hero]) [data-overlay-header] {
   -webkit-mask: var(--shape-blade) center / 100% 100% no-repeat;
   mask: var(--shape-blade) center / 100% 100% no-repeat;
   color: #fff;
-  font-family: var(--font-grotesk), Arial, sans-serif;
+  font-family: var(--font-text), Arial, sans-serif;
   font-size: 10px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   scale: 0 0.4;
@@ -664,4 +677,34 @@ html.scroll-held body {
 .prose-ed li::marker,
 .article-copy li::marker {
   color: var(--signal);
+}
+
+/* ——— Tipografija: serif samo za naslove, sve ostalo sans u verzalu ——— */
+.display,
+.font-pretty {
+  text-transform: none;
+  letter-spacing: -0.015em;
+}
+/* Kurziv u sans tekstu ne postoji (izgleda jeftino): sve "italic" oznake postaju uspravne. */
+body .italic:not(.display):not(.font-pretty),
+body em:not(.display em):not(.font-pretty em) {
+  font-style: normal;
+}
+input,
+textarea,
+select,
+button {
+  text-transform: uppercase;
+  letter-spacing: 0.035em;
+}
+input::placeholder {
+  text-transform: uppercase;
+}
+
+/* ——— shop v2 (fork) ——— */
+/* Fotografija artikla u ćeliji mreže: ivice se meko utapaju u boju stranice, pa se ne vidi
+   pravougaonik ako nijansa pozadine fotografije malo odstupa. */
+.cell-shot {
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 72%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 72%, transparent 100%);
 }

@@ -25,6 +25,7 @@ import {
 } from '@/lib/shop'
 import { useScrollTo } from '@/lib/useScrollTo'
 import ProductImage from './ProductImage'
+import { pw } from '@/components/ui/Pw'
 
 // Sadržaj bočnih panela: sačuvano, poređenje, pretraga i brzi pregled artikla.
 // Preneseno iz grand-root (panel-views.tsx: SavedView, CompareView, SearchView, ProductView) i obučeno u
@@ -39,8 +40,8 @@ export function PanelLayout({ title, children, footer }: { title: string; childr
   return (
     <div className="flex h-full flex-col text-ink">
       <div className="flex items-center justify-between border-b border-ink/15 px-5 py-5 md:px-8">
-        <h2 className="text-[28px] normal-case leading-none tracking-[-0.02em]">{title}</h2>
-        <button data-close type="button" className="ulink normal-case text-[15px]" onClick={closePanel}>
+        <h2 className="font-pretty text-[32px] leading-none">{pw(title)}</h2>
+        <button data-close type="button" className="ulink normal-case text-[12.5px]" onClick={closePanel}>
           Zatvori
         </button>
       </div>
@@ -55,8 +56,8 @@ export function PanelLayout({ title, children, footer }: { title: string; childr
 function Empty({ title, text, action }: { title: string; text: string; action?: ReactNode }) {
   return (
     <div className="flex flex-col items-start gap-6 pt-6">
-      <p className="text-[32px] italic leading-[1.05]">{title}</p>
-      <p className="max-w-[34ch] text-[15px] text-ink/60">{text}</p>
+      <p className="font-pretty text-[34px] leading-[1.05]">{pw(title)}</p>
+      <p className="max-w-[34ch] text-[12.5px] text-ink/60">{text}</p>
       {action}
     </div>
   )
@@ -264,7 +265,7 @@ export function ProductView({ id }: { id: string }) {
       }
     >
       <ProductImage src={p.image} drawing={p.drawing} alt={p.name} className="aspect-[4/3] w-full border border-ink/15" />
-      <div className="mt-5 flex justify-between gap-3 text-[15px] text-ink/60">
+      <div className="mt-5 flex justify-between gap-3 text-[12.5px] text-ink/60">
         <span>
           {categoryName(p.category)} · {p.sku}
         </span>
@@ -337,7 +338,7 @@ export function SearchView() {
 
       {term.length < 2 ? (
         <div className="mt-10">
-          <p className="text-[15px] text-ink/60">Ili počnite od grupe</p>
+          <p className="text-[12.5px] text-ink/60">Ili počnite od grupe</p>
           <div className="mt-4 flex flex-wrap gap-2">
             {CATEGORIES.map((c) => (
               <button

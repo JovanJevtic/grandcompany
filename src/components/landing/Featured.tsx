@@ -101,7 +101,7 @@ export default function Featured() {
               Najčešće <em>birano</em>
             </Pw>
           </h2>
-          <div role="tablist" aria-label="Grupa artikala" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-[15px]">
+          <div role="tablist" aria-label="Grupa artikala" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-[12.5px]">
             {chips.map((c) => {
               const on = c.id === cat
               return (
@@ -111,7 +111,7 @@ export default function Featured() {
                   role="tab"
                   aria-selected={on}
                   onClick={() => setCat(c.id)}
-                  className={`relative flex min-h-10 items-center transition-opacity duration-300 ${on ? 'italic' : 'opacity-45 hover:opacity-100'}`}
+                  className={`relative flex min-h-10 items-center transition-opacity duration-300 ${on ? '' : 'opacity-45 hover:opacity-100'}`}
                 >
                   <span
                     className={`absolute -left-3.5 size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`}

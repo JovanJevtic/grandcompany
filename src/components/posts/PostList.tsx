@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { POST_TAGS, postDate, type Post } from '@/lib/posts'
 import PostArtDraw from './PostArtDraw'
+import { pw } from '@/components/ui/Pw'
 
 // Filter po temi (tihi tekstualni izbor u sredini) i mreža objava sa crtežom na polju boje papira.
 export default function PostList({ posts }: { posts: Post[] }) {
@@ -24,7 +25,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
 
   return (
     <section className="mt-[18dvh]">
-      <div role="tablist" aria-label="Tema" className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-5 text-[16px]">
+      <div role="tablist" aria-label="Tema" className="flex flex-wrap justify-center gap-x-8 gap-y-3 px-5 text-[12.5px]">
         {tags.map((item) => {
           const on = tag === item
           return (
@@ -53,15 +54,15 @@ export default function PostList({ posts }: { posts: Post[] }) {
               <p className="mt-6 text-[14px] text-ink/50">
                 {post.tag} · {post.read} min
               </p>
-              <h2 className="mt-2 max-w-[22ch] text-[clamp(24px,2vw,32px)] leading-[1.1] tracking-[-0.02em] transition-[font-style] group-hover:italic">
-                {post.title}
+              <h2 className="font-pretty mt-2 max-w-[22ch] text-[clamp(26px,2.2vw,36px)] leading-[1.1] transition-colors duration-500 group-hover:text-signal">
+                {pw(post.title)}
               </h2>
               <p className="sr-only">{postDate(post.date)}</p>
             </Link>
           </article>
         ))}
       </div>
-      {!shown.length && <p className="mt-16 text-center italic text-ink/50">Nema objava za ovu temu.</p>}
+      {!shown.length && <p className="mt-16 text-center text-ink/50">Nema objava za ovu temu.</p>}
     </section>
   )
 }

@@ -66,8 +66,8 @@ export default function Delivery() {
               </span>
             </span>
           </Pw></h2>
-          <p data-foot className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-[15px] md:bottom-14">
-            <span className="flex items-center gap-3 italic">
+          <p data-foot className="absolute inset-x-0 bottom-10 flex flex-col items-center gap-3 text-[12.5px] md:bottom-14">
+            <span className="flex items-center gap-3">
               <span className="opacity-85">Vlastiti kamioni sa kranom, Banja Luka i okolina</span>
             </span>
             <Link href="/dostava" className="ulink">

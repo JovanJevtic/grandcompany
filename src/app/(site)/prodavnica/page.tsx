@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import CatalogClient from '@/components/catalog/CatalogClient'
+import BrandStory from '@/components/shop/BrandStory'
 import WallCalculator from '@/components/shop/WallCalculator'
 import Pw from '@/components/ui/Pw'
 
@@ -8,8 +9,8 @@ export const metadata = {
   description: 'Građevinski materijal: suha gradnja, izolacija, veziva i oprema.',
 }
 
-// Prodavnica: naslov u sredini, četiri grupe kao fotografije, tihi filteri, mreža artikala,
-// a na dnu kalkulator zida.
+// Prodavnica: naslov u sredini, četiri grupe kao okrugle fotografije, podijeljeni uvod,
+// "Najprodavanije" (mreža sa tankim linijama), kalkulator zida, pa brend i "Sa gradilišta".
 export default function CataloguePage() {
   return (
     <>
@@ -17,7 +18,7 @@ export default function CataloguePage() {
         <h1 className="display fade-up text-display"><Pw>
           Kata<em>log</em>
         </Pw></h1>
-        <p className="fade-up mx-auto mt-8 max-w-[34ch] text-[clamp(17px,1.3vw,21px)] leading-snug opacity-70" style={{ animationDelay: '0.12s' }}>
+        <p className="fade-up mx-auto mt-8 max-w-[34ch] text-[13px] leading-snug opacity-70" style={{ animationDelay: '0.12s' }}>
           Materijal za zid, plafon, fasadu i pod — na stanju u Banjoj Luci.
         </p>
       </header>
@@ -26,9 +27,12 @@ export default function CataloguePage() {
         <CatalogClient />
       </Suspense>
 
-      <div className="mt-[16vh] border-t border-ink/15">
+      <div className="mt-[22vh] border-t border-ink/20">
         <WallCalculator />
       </div>
+
+      <BrandStory />
+      <div aria-hidden className="h-[22vh]" />
     </>
   )
 }

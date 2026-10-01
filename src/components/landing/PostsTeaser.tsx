@@ -8,7 +8,7 @@ import { gsap, useGSAP } from '@/lib/gsap'
 import { EASE, MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import { POSTS } from '@/lib/posts'
-import Pw from '@/components/ui/Pw'
+import Pw, { pw } from '@/components/ui/Pw'
 
 // Tri najnovije objave. Kartice zadržavaju linijske crteže (jedino mjesto na sajtu, uz
 // "Po namjeni" i brendove, gdje su ilustracije umjesto fotografija). Na hover se crtež podigne.
@@ -52,12 +52,12 @@ export default function PostsTeaser() {
             <span className="flex aspect-[4/5] items-center justify-center bg-plate px-[12%] [--art-fill:var(--plate)]">
               <PostArtDraw kind={p.art} className="w-full text-ink/80 transition-transform duration-700 ease-[var(--ease-out)] group-hover:-translate-y-3" />
             </span>
-            <span className="mt-5 flex justify-between text-[13px] italic opacity-60">
+            <span className="mt-5 flex justify-between text-[13px] opacity-60">
               <span>{p.tag}</span>
               <span className="tabular-nums not-italic">{date(p.date)}</span>
             </span>
-            <span className="mt-2 block text-[clamp(22px,1.8vw,30px)] leading-[1.1] tracking-[-0.01em]">
-              <span className="ulink">{p.title}</span>
+            <span className="font-pretty mt-2 block text-[clamp(24px,2vw,34px)] leading-[1.1]">
+              <span className="ulink">{pw(p.title)}</span>
             </span>
           </Link>
         ))}

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import PostArtDraw from '@/components/posts/PostArtDraw'
 import PostList from '@/components/posts/PostList'
 import { POSTS, postDate } from '@/lib/posts'
-import Pw from '@/components/ui/Pw'
+import Pw, { pw } from '@/components/ui/Pw'
 
 export const metadata = {
   title: 'Objave | Grand Company',
@@ -20,7 +20,7 @@ export default function PostsPage() {
         <h1 className="display text-[clamp(56px,11vw,190px)]"><Pw>
           Znanje sa <em>gradilišta</em>
         </Pw></h1>
-        <p className="mx-auto mt-12 max-w-[38ch] text-[clamp(17px,1.35vw,21px)] italic text-ink/70">
+        <p className="mx-auto mt-12 max-w-[38ch] text-[13px] text-ink/70">
           Kratki vodiči za izbor, obračun i montažu materijala.
         </p>
       </header>
@@ -35,10 +35,10 @@ export default function PostsPage() {
         </div>
         <div className="max-w-[540px] md:pr-[4vw]">
           <p className="label text-ink/50">Najnovije · {featured.tag}</p>
-          <h2 className="mt-5 text-[clamp(34px,3.6vw,64px)] leading-[1.02] tracking-[-0.03em] transition-[font-style] group-hover:italic">
-            {featured.title}
+          <h2 className="font-pretty mt-5 text-[clamp(36px,3.8vw,68px)] leading-[1.02] transition-colors duration-500 group-hover:text-signal">
+            {pw(featured.title)}
           </h2>
-          <p className="mt-6 max-w-[40ch] text-[17px] leading-[1.5] text-ink/70">{featured.lead}</p>
+          <p className="mt-6 max-w-[40ch] text-[12.5px] leading-[1.5] text-ink/70">{featured.lead}</p>
           <p className="mt-8 flex items-center gap-3 text-[14px] text-ink/55">
             <span className="size-1.5 rounded-full bg-signal" aria-hidden />
             {postDate(featured.date)} · {featured.read} min čitanja
@@ -46,7 +46,7 @@ export default function PostsPage() {
         </div>
       </Link>
 
-      <Suspense fallback={<div className="py-20 text-center italic text-ink/50">Učitavanje…</div>}>
+      <Suspense fallback={<div className="py-20 text-center text-ink/50">Učitavanje…</div>}>
         <PostList posts={rest} />
       </Suspense>
     </div>

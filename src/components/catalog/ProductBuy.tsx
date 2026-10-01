@@ -29,7 +29,7 @@ export default function ProductBuy({ product, zones }: Props) {
           >
             −
           </button>
-          <span className="min-w-[5.5rem] text-center text-[15px] tabular-nums" aria-live="polite">
+          <span className="min-w-[5.5rem] text-center text-[12.5px] tabular-nums" aria-live="polite">
             {qtyLabel(qty, product.unit)}
           </span>
           <button
@@ -44,7 +44,7 @@ export default function ProductBuy({ product, zones }: Props) {
         <Cta solid onClick={() => addToCart(product.id, qty)}>
           Dodaj
         </Cta>
-        <span className="text-[15px] tabular-nums opacity-70" aria-live="polite">
+        <span className="text-[12.5px] tabular-nums opacity-70" aria-live="polite">
           {money(qty * product.price)}
         </span>
       </div>

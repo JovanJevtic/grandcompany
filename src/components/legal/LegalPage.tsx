@@ -4,7 +4,7 @@ import { GROUP_LABEL, type LegalBlock, type LegalDoc, type LegalGroup } from '@/
 import { LEGAL_DOCS } from '@/lib/legal'
 import Cta from '@/components/ui/Cta'
 import { T } from './LegalText'
-import Pw from '@/components/ui/Pw'
+import Pw, { pw } from '@/components/ui/Pw'
 
 // Pravne i servisne stranice: mirna stranica za čitanje. Naslov u sredini, jedna rečenica uvoda,
 // pa jedan centriran stub teksta (~62 znaka u redu). Sadržaj (lijevo, sitno) samo na desktopu i samo
@@ -66,7 +66,7 @@ function Block({ b }: { b: LegalBlock }) {
       )
     case 'note':
       return (
-        <p className="mt-5 text-[0.85em] italic leading-[1.5] text-ink/55">
+        <p className="mt-5 text-[0.85em] leading-[1.5] text-ink/55">
           <T s={b.text} />
         </p>
       )
@@ -83,7 +83,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
         <p className="label text-ink/50">{GROUP_LABEL[doc.group]}</p>
         <h1 className="display mx-auto mt-6 max-w-[14ch] text-[clamp(44px,7vw,120px)] [hyphens:auto]"><Pw>{doc.title}</Pw></h1>
       </header>
-      <p className="mx-auto mt-8 max-w-[46ch] text-center text-[clamp(17px,1.35vw,21px)] italic leading-[1.45] text-ink/75">
+      <p className="mx-auto mt-8 max-w-[46ch] text-center text-[13px] leading-[1.45] text-ink/75">
         <T s={doc.lead} />
       </p>
       {cta && (
@@ -113,7 +113,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
         <div className={`legal-copy ${MEASURE} md:col-start-2`}>
           {doc.sections.map((s) => (
             <section key={s.id} id={s.id} className="scroll-mt-28 pt-12 first:pt-0">
-              <h2 className="text-[clamp(24px,2vw,32px)] leading-[1.15] tracking-[-0.015em]">{s.title}</h2>
+              <h2 className="font-pretty text-[clamp(26px,2.2vw,36px)] leading-[1.15]">{pw(s.title)}</h2>
               {s.blocks.map((b, j) => (
                 <Block key={j} b={b} />
               ))}
@@ -121,7 +121,7 @@ export default function LegalPage({ doc }: { doc: LegalDoc }) {
           ))}
 
           {SITE.legalDraft && doc.group === 'pravno' && (
-            <p className="mt-16 text-[13px] italic text-ink/45">
+            <p className="mt-16 text-[13px] text-ink/45">
               Nacrt: tekst je predložak i treba ga pregledati pravnik prije objave. Istaknute oznake su podaci koje firma
               još treba da dopuni.
             </p>
@@ -151,7 +151,7 @@ export function PoliciesIndex() {
         <h1 className="display text-[clamp(52px,9vw,150px)]"><Pw>
           Sve <em>politike</em>
         </Pw></h1>
-        <p className="mx-auto mt-8 max-w-[40ch] text-[clamp(17px,1.35vw,21px)] italic text-ink/70">
+        <p className="mx-auto mt-8 max-w-[40ch] text-[13px] text-ink/70">
           Dostava, povrat, plaćanje i uslovi — na jednom mjestu.
         </p>
       </header>
@@ -167,8 +167,8 @@ export function PoliciesIndex() {
                     href={`/${d.slug}`}
                     className="group flex items-baseline justify-between gap-6 py-5 transition-[padding] duration-500 ease-[var(--ease-out)] hover:pl-3"
                   >
-                    <span className="text-[clamp(24px,2.6vw,40px)] leading-[1.05] tracking-[-0.02em] transition-[font-style] group-hover:italic">
-                      {d.title}
+                    <span className="font-pretty text-[clamp(26px,2.8vw,44px)] leading-[1.05] transition-colors duration-500 group-hover:text-signal">
+                      {pw(d.title)}
                     </span>
                     <span
                       aria-hidden

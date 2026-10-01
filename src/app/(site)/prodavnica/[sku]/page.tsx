@@ -74,7 +74,7 @@ export default async function ProductPage({ params }: PageProps<'/prodavnica/[sk
             {money(product.price)} <span className="text-[0.6em] opacity-50">/ {product.unit}, sa PDV-om</span>
           </p>
 
-          <p className="fade-up mt-8 max-w-[44ch] text-[clamp(16px,1.15vw,19px)] leading-[1.55] opacity-80" style={{ animationDelay: '0.24s' }}>
+          <p className="fade-up mt-8 max-w-[44ch] text-[13px] leading-[1.55] opacity-80" style={{ animationDelay: '0.24s' }}>
             {product.desc}
           </p>
 
@@ -95,7 +95,7 @@ export default async function ProductPage({ params }: PageProps<'/prodavnica/[sk
             <p className="mt-8 flex flex-wrap gap-x-5 gap-y-1 text-[14px]" data-up>
               <span className="opacity-50">Za radove:</span>
               {uses.map((u) => (
-                <Link key={u.id} href={`/prodavnica?namjena=${u.id}`} className="ulink italic">
+                <Link key={u.id} href={`/prodavnica?namjena=${u.id}`} className="ulink">
                   {u.name}
                 </Link>
               ))}

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Bodoni_Moda, Inter_Tight } from "next/font/google";
+import { Bodoni_Moda, Inter, Inter_Tight } from "next/font/google";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "@/components/SmoothScroll";
@@ -14,6 +14,14 @@ const serif = Bodoni_Moda({
   subsets: ["latin", "latin-ext"],
   style: ["normal", "italic"],
   axes: ["opsz"],
+});
+
+// Tekstni sans: sve osim naslova (opisi, oznake, meni, cijene) — uvijek u verzalu (globals.css).
+// Inter je širok i miran, bez "uskog" karaktera; latin-ext zbog č ć š đ ž.
+const sans = Inter({
+  variable: "--font-text",
+  subsets: ["latin", "latin-ext"],
+  weight: ["400", "500", "600"],
 });
 
 // Debeli grotesk za sitne oznake u verzalu (hero, bento kartice) — kontrast tankom Prettywise-u.
@@ -50,7 +58,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${serif.variable} ${grotesk.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${serif.variable} ${sans.variable} ${grotesk.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
       <body>
         <SmoothScroll>
           {children}

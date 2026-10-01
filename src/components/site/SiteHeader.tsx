@@ -79,7 +79,7 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
             Grand Company
           </Link>
 
-          <nav className="hidden items-center gap-10 text-[15px] md:flex" aria-label="Glavni meni">
+          <nav className="hidden items-center gap-10 text-[12.5px] md:flex" aria-label="Glavni meni">
             {NAV.map(([label, href]) => (
               <Link key={href} href={href} className="relative flex items-center gap-2">
                 <span className={`absolute -left-3.5 size-1.5 rounded-full bg-signal transition-transform duration-500 ${active(href) ? 'scale-100' : 'scale-0'}`} />
@@ -88,9 +88,9 @@ export default function SiteHeader({ variant }: { variant: 'inner' | 'overlay' }
             ))}
           </nav>
 
-          <div className="flex items-center gap-6 justify-self-end text-[15px]">
+          <div className="flex items-center gap-6 justify-self-end text-[12.5px]">
             <button onClick={openCart} className="flex items-center gap-2" aria-label={`Korpa, ${count} artikala`}>
-              <span className="ulink">Korpa</span>
+              <span className="ulink hidden sm:inline">Korpa</span>
               <span
                 className={`grid h-6 min-w-6 place-items-center rounded-full px-1.5 text-[12px] tabular-nums transition-colors ${
                   count ? 'bg-signal text-bg' : 'border border-ink/25'
