@@ -46,7 +46,7 @@ export default function Delivery() {
     <section ref={root} id="isporuka" className="relative z-20 h-[240vh] bg-bg" aria-label="Isporuka kranom">
       <div className="sticky top-0 h-dvh overflow-hidden">
         <div data-frame className="absolute inset-0 overflow-hidden bg-ink will-change-transform" data-cursor="Isporuka">
-          <img src="/editorial/delivery.webp" alt="Kamion sa kranom podiže paletu ploča na sprat zgrade u izgradnji" className="h-full w-full object-cover" />
+          <img decoding="async" src="/editorial/delivery.webp" alt="Kamion sa kranom podiže paletu ploča na sprat zgrade u izgradnji" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-transparent" />
         </div>
 

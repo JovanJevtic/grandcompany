@@ -119,7 +119,7 @@ export default function CatalogClient() {
               className="fade-up group text-center"
             >
               <span className="shot block aspect-square rounded-full !bg-bg ring-1 ring-ink/15 transition-shadow duration-500 group-hover:ring-ink/40">
-                <img src={shotOf(COVER[c.id])} alt="" className="absolute inset-0 h-full w-full object-cover" />
+                <img decoding="async" src={shotOf(COVER[c.id])} alt="" className="absolute inset-0 h-full w-full object-cover" />
               </span>
               <span className="mt-3 inline-flex items-center gap-1.5 text-[11px] leading-tight md:mt-4 md:gap-2 md:text-[12px]">
                 <span className={`size-1.5 rounded-full bg-signal transition-transform duration-500 ${on ? 'scale-100' : 'scale-0'}`} />
@@ -172,7 +172,7 @@ export default function CatalogClient() {
             <article key={p.id} data-cell className="group flex flex-col bg-bg">
               <Link href={`/prodavnica/${p.sku}`} data-cursor="Pogledaj" className="flex flex-1 flex-col items-center px-4 pb-6 pt-8 text-center md:px-6">
                 <span className="relative block aspect-[4/5] w-full max-w-[300px] overflow-hidden">
-                  <img
+                  <img decoding="async"
                     src={p.image}
                     alt={p.name}
                     loading={i < 4 ? 'eager' : 'lazy'}

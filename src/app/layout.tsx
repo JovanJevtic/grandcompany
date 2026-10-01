@@ -71,9 +71,15 @@ export const metadata: Metadata = {
     "GRAND COMPANY d.o.o. iz Banje Luke: veleprodaja i maloprodaja građevinskog materijala, sistemi suhe gradnje i kamena vuna. Pristupačne cijene i stručan savjet.",
 };
 
+const MOTION_FLAG = "if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.setAttribute('data-motion','')"
+
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="bs" className={`${serif.variable} ${sans.variable} ${heavy.variable} ${grotesk.variable} ${condensed.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`}>
+    <html lang="bs" className={`${serif.variable} ${sans.variable} ${heavy.variable} ${grotesk.variable} ${condensed.variable} ${displaySerif.variable} ${prettywise.variable} antialiased`} suppressHydrationWarning>
+      <head>
+        {/* Prije prvog crtanja: elementi koji izranjaju na skrol odmah su sakriveni (ne bljesnu pa nestanu). */}
+        <script dangerouslySetInnerHTML={{ __html: MOTION_FLAG }} />
+      </head>
       <body>
         <SmoothScroll>
           {children}

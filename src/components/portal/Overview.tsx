@@ -170,7 +170,7 @@ function Guest() {
           </div>
         </div>
         <figure data-curtain data-parallax="6" className="relative min-h-[48vh] overflow-hidden bg-ink">
-          <img src="/shop2/brand.webp" alt="Kamion sa kranom istovara paletu gips ploča na sprat" className="absolute inset-0 h-full w-full object-cover" />
+          <img decoding="async" src="/shop2/brand.webp" alt="Kamion sa kranom istovara paletu gips ploča na sprat" className="absolute inset-0 h-full w-full object-cover" />
           <figcaption className="absolute bottom-0 left-0 bg-bg px-4 py-2 text-[11px]">Istovar paleta na etaže — vlastiti kamioni sa kranom</figcaption>
         </figure>
       </section>

@@ -54,7 +54,7 @@ export default function Services() {
           <div data-scale className="absolute inset-0">
             {LAYERS.map((src, i) => (
               // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <img decoding="async"
                 key={src}
                 src={src}
                 alt=""

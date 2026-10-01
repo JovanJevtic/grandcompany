@@ -158,7 +158,7 @@ export default function Checkout({ partner }: { partner: FullPartner | null }) {
                 const src = lines[i]
                 return (
                   <li key={l.sku} className={`grid grid-cols-[52px_1fr_auto] items-center gap-4 border-t ${line} py-4 first:border-t-0`}>
-                    <img src={src?.image ?? shotOf(l.sku)} alt="" className="aspect-square w-full border border-ink/10 bg-white object-cover" />
+                    <img decoding="async" src={src?.image ?? shotOf(l.sku)} alt="" className="aspect-square w-full border border-ink/10 bg-white object-cover" />
                     <div className="min-w-0">
                       <p className="text-[10px] tabular-nums opacity-55">{l.sku}</p>
                       <p className="truncate text-[12px] font-semibold">{l.name}</p>

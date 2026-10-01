@@ -31,7 +31,7 @@ function Tile({ index }: { index: number }) {
           className="relative aspect-[4/5] w-full md:aspect-[3/4]"
           style={{ '--d': `${index * 90}ms` } as CSSProperties}
         >
-          <img
+          <img decoding="async"
             src={c.photo}
             alt=""
             loading="lazy"

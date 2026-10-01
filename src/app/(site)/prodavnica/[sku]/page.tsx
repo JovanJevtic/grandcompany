@@ -52,7 +52,7 @@ export default async function ProductPage({ params }: PageProps<'/prodavnica/[sk
       <section className="grid md:-mt-16 md:grid-cols-2">
         <div className="md:sticky md:top-0 md:h-svh md:self-start">
           <div className="shot h-[min(120vw,80svh)] md:h-full" data-curtain data-float>
-            <img src={product.image} alt={product.name} className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
+            <img decoding="async" src={product.image} alt={product.name} className="absolute inset-0 h-full w-full object-cover" fetchPriority="high" />
           </div>
         </div>
 

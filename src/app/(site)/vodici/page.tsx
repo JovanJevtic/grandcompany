@@ -31,7 +31,7 @@ export default function PostsPage() {
       >
         <div className="relative aspect-[4/3] overflow-hidden bg-plate md:aspect-[16/11]">
           {/* eslint-disable-next-line @next/next/no-img-element -- fotografija iz /public, već u WebP */}
-          <img src={postPhoto(featured.slug)} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.03]" />
+          <img decoding="async" src={postPhoto(featured.slug)} alt="" className="absolute inset-0 h-full w-full object-cover transition-transform duration-1000 ease-[var(--ease-out)] group-hover:scale-[1.03]" />
         </div>
         <div className="max-w-[540px] md:pr-[4vw]">
           <p className="label text-ink/50">Najnovije · {featured.tag}</p>

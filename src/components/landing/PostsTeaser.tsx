@@ -51,7 +51,7 @@ export default function PostsTeaser() {
         {latest.map((p, i) => (
           <Link key={p.slug} href={`/vodici/${p.slug}`} data-post data-cursor="Čitaj" className={`group flex flex-col ${i === 1 ? 'md:mt-[10vh]' : ''}`}>
             <span className="relative block aspect-[4/5] overflow-hidden bg-plate">
-              <img
+              <img decoding="async"
                 src={postPhoto(p.slug)}
                 alt=""
                 loading="lazy"

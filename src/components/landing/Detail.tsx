@@ -42,7 +42,7 @@ export default function Detail() {
     <section ref={root} id="stovariste" className="relative z-20 bg-bg py-[16vh]" aria-label="Stovarište i radno vrijeme">
       <div className="mx-auto grid w-[calc(100%-40px)] max-w-[1400px] gap-10 md:grid-cols-[1.25fr_1fr] md:gap-[5vw]">
         <figure data-curtain data-parallax="6" className="relative aspect-[16/10] overflow-hidden bg-plate">
-          <img src="/photos/stovariste-vazduh.jpg" alt="Stovarište Grand Company iz vazduha" className="absolute inset-0 h-full w-full object-cover" />
+          <img decoding="async" src="/photos/stovariste-vazduh.jpg" alt="Stovarište Grand Company iz vazduha" className="absolute inset-0 h-full w-full object-cover" />
         </figure>
 
         <div className="flex flex-col justify-center">

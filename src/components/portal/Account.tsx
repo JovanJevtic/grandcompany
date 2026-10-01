@@ -76,7 +76,7 @@ function Orders({ partner }: { partner: FullPartner }) {
                 const l = resolveLine(sku)
                 return (
                   <li key={sku} className={`flex w-[156px] items-center gap-2 border ${line} p-1.5 pr-2`}>
-                    <img src={l?.image ?? shotOf(sku)} alt="" className="size-10 shrink-0 object-cover" />
+                    <img decoding="async" src={l?.image ?? shotOf(sku)} alt="" className="size-10 shrink-0 object-cover" />
                     <span className="text-[9.5px] leading-[1.3]">
                       <span className="block font-semibold">{sku}</span>
                       <span className="opacity-60">

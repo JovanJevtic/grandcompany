@@ -48,10 +48,10 @@ export default function BrandStory() {
       <div className="grid border-y border-ink/20 md:grid-cols-2">
         <div data-collage className="relative aspect-square overflow-hidden md:border-r md:border-ink/20">
           <figure data-parallax="6" className="absolute inset-0 overflow-hidden">
-            <img src="/shop2/brand.webp" alt="Gleterica na svježe izglađenoj masi" className="h-full w-full object-cover" />
+            <img decoding="async" src="/shop2/brand.webp" alt="Gleterica na svježe izglađenoj masi" className="h-full w-full object-cover" />
           </figure>
           <figure data-inset className="absolute left-[30%] top-[24%] w-[38%] border-[6px] border-white shadow-[0_24px_50px_-24px_rgba(27,36,54,.5)]">
-            <img src="/shop2/brand-inset.webp" alt="Spoj ploča prekriven bandaž trakom i masom" className="aspect-[3/4] w-full object-cover" />
+            <img decoding="async" src="/shop2/brand-inset.webp" alt="Spoj ploča prekriven bandaž trakom i masom" className="aspect-[3/4] w-full object-cover" />
           </figure>
         </div>
 
@@ -79,7 +79,7 @@ export default function BrandStory() {
             t ? (
               <figure key={i} className="bg-bg p-4 md:p-5">
                 <div data-curtain className="aspect-[4/5] overflow-hidden">
-                  <img src={t.src} alt={t.alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1.4s] ease-[var(--ease-out)] hover:scale-105" />
+                  <img decoding="async" src={t.src} alt={t.alt} loading="lazy" className="h-full w-full object-cover transition-transform duration-[1.4s] ease-[var(--ease-out)] hover:scale-105" />
                 </div>
               </figure>
             ) : (

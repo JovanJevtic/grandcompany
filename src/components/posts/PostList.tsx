@@ -50,7 +50,7 @@ export default function PostList({ posts }: { posts: Post[] }) {
           <article key={post.slug} className="group">
             <Link href={`/vodici/${post.slug}`} className="block" data-cursor="Čitaj">
               <div className="relative aspect-[4/3] overflow-hidden bg-plate">
-                <img
+                <img decoding="async"
                   src={postPhoto(post.slug)}
                   alt=""
                   loading="lazy"

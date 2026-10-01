@@ -55,14 +55,14 @@ export default function Intro() {
 
       <div data-collage className="relative mx-auto mt-[16vh] w-[calc(100%-40px)] md:w-[78vw]">
         <figure data-curtain data-parallax="8" className="relative aspect-[3/2] overflow-hidden bg-plate" data-cursor="Katalog">
-          <img src="/editorial/materials-still.webp" alt="Ploče, profili i kamena vuna u praznoj betonskoj sobi" className="absolute inset-0 h-full w-full object-cover" />
+          <img decoding="async" src="/editorial/materials-still.webp" alt="Ploče, profili i kamena vuna u praznoj betonskoj sobi" className="absolute inset-0 h-full w-full object-cover" />
         </figure>
         <figure
           data-small
           className="absolute -bottom-[10%] -left-[2%] hidden aspect-[2/3] w-[22%] overflow-hidden bg-plate shadow-[0_30px_60px_-30px_rgba(27,36,54,.45)] md:block"
         >
           <div data-curtain className="h-full w-full">
-            <img src="/editorial/frame-rhythm.webp" alt="" className="h-full w-full object-cover" />
+            <img decoding="async" src="/editorial/frame-rhythm.webp" alt="" className="h-full w-full object-cover" />
           </div>
         </figure>
         <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[12.5px] md:mt-8">

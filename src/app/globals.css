@@ -1690,3 +1690,13 @@ html:not([data-intro-done]) .nav--home .nav__bar {
     border-color 0.35s,
     color 0.35s;
 }
+
+/* Početna stanja elemenata koji izranjaju na skrol (media.ts): postavljena u CSS-u, pa se na
+   učitavanju ne vide prije animacije (nema "bljesak → nestane → izroni"). GSAP ih preuzme. */
+html[data-motion] [data-up] {
+  visibility: hidden;
+  opacity: 0;
+}
+html[data-motion] [data-curtain] {
+  clip-path: inset(100% 0% 0% 0%);
+}

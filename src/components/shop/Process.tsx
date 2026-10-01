@@ -36,7 +36,7 @@ export default function Process() {
       <div className="mt-[10dvh] grid gap-8 border-t-2 border-current pt-8 md:grid-cols-12 md:gap-[1.5vw]">
         <figure className="min-w-0 md:col-span-5">
           <div className="relative aspect-[4/3] w-full overflow-hidden bg-bg/10">
-            <img src="/photos/kran-utovar.jpg" alt="Kamion Grand Company sa kranom pri utovaru paleta" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+            <img decoding="async" src="/photos/kran-utovar.jpg" alt="Kamion Grand Company sa kranom pri utovaru paleta" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
           </div>
           <figcaption className="mt-2 text-micro uppercase opacity-60">Naš kamion sa kranom, stovarište Banja Luka</figcaption>
         </figure>

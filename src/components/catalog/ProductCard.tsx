@@ -21,7 +21,7 @@ export default function ProductCard({ product, view = 'grid', priority, stacked 
     return (
       <article data-flip-id={product.id} className="group grid grid-cols-[88px_1fr_auto] items-center gap-5 border-t border-ink/15 py-4">
         <Link href={href} className="shot block aspect-[4/5]" data-cursor="Pogledaj">
-          <img src={product.image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+          <img decoding="async" src={product.image} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
         </Link>
         <div>
           <p className="label opacity-50">{categoryName(product.category)}</p>
@@ -50,7 +50,7 @@ export default function ProductCard({ product, view = 'grid', priority, stacked 
     <article data-flip-id={product.id} className="group flex flex-col">
       <div className="relative">
         <Link href={href} className="shot block aspect-[4/5]" data-cursor="Pogledaj" data-float>
-          <img
+          <img decoding="async"
             src={product.image}
             alt={product.name}
             loading={priority ? 'eager' : 'lazy'}

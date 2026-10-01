@@ -67,7 +67,7 @@ export default function Materials() {
           <figure>
             <div className="relative aspect-[16/10] w-full overflow-hidden bg-ink/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={m.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
+              <img decoding="async" src={m.photo} alt="" className="absolute inset-0 h-full w-full object-cover" />
             </div>
             <figcaption className="mt-2 text-micro uppercase text-ink/60">{m.name} · primjer ugradnje</figcaption>
           </figure>

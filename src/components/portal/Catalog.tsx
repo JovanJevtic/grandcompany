@@ -123,7 +123,7 @@ export default function Catalog({ partner }: { partner: FullPartner | null }) {
           return (
             <li key={p.sku} className={`border-b ${line}`}>
               <div className="grid grid-cols-[64px_1fr] items-center gap-x-4 gap-y-4 py-4 lg:grid-cols-[72px_1.8fr_1fr_1fr_auto_120px] lg:gap-5">
-                <img src={p.image} alt="" className="aspect-square w-full border border-ink/10 bg-white object-cover" loading="lazy" />
+                <img decoding="async" src={p.image} alt="" className="aspect-square w-full border border-ink/10 bg-white object-cover" loading="lazy" />
                 <button type="button" onClick={() => setOpen(expanded ? null : p.sku)} className="min-w-0 text-left" aria-expanded={expanded}>
                   <span className="text-[10px] tabular-nums opacity-55">
                     {p.sku} · {p.brand}

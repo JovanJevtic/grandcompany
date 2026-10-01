@@ -63,7 +63,7 @@ function Media({ photo, className = '' }: { photo: Photo; className?: string }) 
     >
       <div data-scale className="absolute inset-0">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
+        <img decoding="async"
           data-par
           src={photo.src}
           alt={photo.alt}

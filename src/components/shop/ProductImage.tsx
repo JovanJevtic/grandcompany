@@ -14,7 +14,7 @@ export default function ProductImage({
 }) {
   return (
     <div className={`relative overflow-hidden ${drawing ? 'bg-well' : 'bg-ink/10'} ${className}`}>
-      <img
+      <img decoding="async"
         src={src}
         alt={alt}
         loading="lazy"
