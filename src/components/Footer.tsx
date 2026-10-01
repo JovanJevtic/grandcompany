@@ -17,6 +17,7 @@ const COLS: { title: string; items: Item[] }[] = [
     title: 'Navigacija',
     items: [
       { label: 'Prodavnica', href: '/prodavnica' },
+      { label: 'Kalkulator W111', href: '/kalkulator' },
       { label: 'Isporuka', href: '/dostava' },
       { label: 'Vodiči', href: '/vodici' },
       { label: 'B2B portal', href: '/portal' },

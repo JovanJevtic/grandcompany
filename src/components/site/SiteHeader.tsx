@@ -21,6 +21,7 @@ import LogoMark from './LogoMark'
 
 const LINKS = [
   ['Prodavnica', '/prodavnica'],
+  ['Kalkulator', '/kalkulator'],
   ['Isporuka', '/dostava'],
   ['Vodiči', '/vodici'],
 ] as const
