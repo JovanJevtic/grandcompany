@@ -1,4 +1,4 @@
-// Crteži za građevinski kalkulator (pogled spreda / odozdo, u razmjeri). Okvir 1000×470.
+// Crteži za građevinski kalkulator (pogled spreda / odozdo, u razmjeri). Okvir 1000×470 (ili 1000×vh).
 // Razmjera prati unesene mjere (uz minimum), pa crtež uvijek popuni kadar, a vidi se odnos stranica.
 
 const VW = 1000
@@ -27,9 +27,10 @@ function Dims({ x0, y0, w, h }: { x0: number; y0: number; w: number; h: number }
 }
 
 // ——— W111: zid sa presjekom (desna trećina pokazuje CW profile i vunu) ———
-export function WallVisual({ L, H, plate, wool, double }: { L: number; H: number; plate: string; wool: boolean; double: boolean }) {
+export function WallVisual({ L, H, plate, wool, double, vh = 470 }: { L: number; H: number; plate: string; wool: boolean; double: boolean; vh?: number }) {
+  const VH = vh // viši okvir (kalkulator) = veći crtež
   const { color, ink } = PLATE_COLORS[plate] ?? PLATE_COLORS['KNF-001']
-  const scale = Math.min((VW - 2 * PAD) / Math.max(L, 5), (VH - 2 * PAD) / Math.max(H, 3))
+  const scale = Math.min((VW - 2 * PAD) / Math.max(L, 2), (VH - 2 * PAD) / Math.max(H, 2))
   const w = L * scale
   const h = H * scale
   const x0 = (VW - w) / 2
@@ -78,9 +79,10 @@ export function WallVisual({ L, H, plate, wool, double }: { L: number; H: number
 }
 
 // ——— D112: plafon gledan odozdo — ploče, a u desnoj trećini mreža CD profila sa ovjesima ———
-export function CeilingVisual({ L, W, plate }: { L: number; W: number; plate: string }) {
+export function CeilingVisual({ L, W, plate, vh = 470 }: { L: number; W: number; plate: string; vh?: number }) {
+  const VH = vh
   const { color, ink } = PLATE_COLORS[plate] ?? PLATE_COLORS['KNF-001']
-  const scale = Math.min((VW - 2 * PAD) / Math.max(L, 5), (VH - 2 * PAD) / Math.max(W, 3))
+  const scale = Math.min((VW - 2 * PAD) / Math.max(L, 2), (VH - 2 * PAD) / Math.max(W, 2))
   const w = L * scale
   const h = W * scale
   const x0 = (VW - w) / 2
@@ -130,9 +132,10 @@ export function CeilingVisual({ L, W, plate }: { L: number; W: number; plate: st
 }
 
 // ——— DEMIT: fasada sa pločama stiropora (1000 × 500 mm, smaknute) i slojem armiranja desno ———
-export function FacadeVisual({ L, H, eps }: { L: number; H: number; eps: string }) {
+export function FacadeVisual({ L, H, eps, vh = 470 }: { L: number; H: number; eps: string; vh?: number }) {
+  const VH = vh
   const board = eps === 'ISO-006' ? { color: '#8e9297', ink: '#6c7076' } : { color: '#f4f2ee', ink: '#c9c4bb' }
-  const scale = Math.min((VW - 2 * PAD) / Math.max(L, 6), (VH - 2 * PAD) / Math.max(H, 3))
+  const scale = Math.min((VW - 2 * PAD) / Math.max(L, 2), (VH - 2 * PAD) / Math.max(H, 2))
   const w = L * scale
   const h = H * scale
   const x0 = (VW - w) / 2

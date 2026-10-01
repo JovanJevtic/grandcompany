@@ -1,238 +1,263 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- fotografije artikala iz /public, već u WebP */
+
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { gsap, useGSAP } from '@/lib/gsap'
-import { MQ } from '@/lib/motion'
-import { revealChars } from '@/lib/reveal'
-import { calcD112, calcDemit, calcW111 } from '@/lib/shop'
-import Bom, { useBomRows } from './Bom'
-import Logistics from './Logistics'
-import { CeilingVisual, FacadeVisual, WallVisual } from './visuals'
+import { bySku } from '@/gc/gc'
+import { addToCart, notify } from '@/lib/cart'
+import { gsap } from '@/lib/gsap'
+import { recommendCrane, tons } from '@/lib/logistics'
+import { calcD112, calcDemit, calcW111, money, qtyLabel } from '@/lib/shop'
+import { useBomRows } from './Bom'
+import { CeilingVisual, FacadeVisual, PLATE_COLORS, WallVisual } from './visuals'
 
-// Građevinski kalkulator (dno prodavnice, #kalkulator): tri sistema u tabovima —
-// W111 pregradni zid, D112 spušteni plafon, DEMIT fasada. Svaki tab: nekoliko jasnih kontrola,
-// crtež u razmjeri koji prati unos, spisak materijala sa cijenama (B2B rabat ako je partner
-// prijavljen), masa tereta i "Dodaj sve u korpu". Ispod: logistika i kran transport.
+// Kalkulator materijala (dno prodavnice, #kalkulator) — raspored kao na MT Ponos referenci:
+// dvije kartice preko fotografije. Lijevo (tamna) kratko objašnjenje i crtež u razmjeri koji
+// prati unos — ploča mijenja boju po tipu (GKB, GKBI, GKF, Diamant). Desno (svijetla) jedan
+// tok odozgo nadolje: sistem → mjere (ili površina) → opcije → rezerva → rezultat → u korpu.
 
-type Tab = 'w111' | 'd112' | 'demit'
-const TABS: { id: Tab; label: string; sub: string }[] = [
-  { id: 'w111', label: 'W111', sub: 'Pregradni zid' },
-  { id: 'd112', label: 'D112', sub: 'Spušteni plafon' },
-  { id: 'demit', label: 'DEMIT', sub: 'Fasada' },
+type Sys = 'w111' | 'd112' | 'demit'
+const SYSTEMS: { id: Sys; label: string; dims: [string, string] }[] = [
+  { id: 'w111', label: 'Knauf W111 · pregradni zid', dims: ['Dužina zida', 'Visina zida'] },
+  { id: 'd112', label: 'Knauf D112 · spušteni plafon', dims: ['Dužina prostorije', 'Širina prostorije'] },
+  { id: 'demit', label: 'DEMIT · kontaktna fasada', dims: ['Dužina fasade', 'Visina fasade'] },
 ]
+const DEFAULTS: Record<Sys, [number, number]> = { w111: [4, 2.6], d112: [5, 4], demit: [10, 6] }
 const PLATES = [
-  { id: 'KNF-001', label: 'GKB' },
-  { id: 'KNF-002', label: 'GKBI' },
-  { id: 'KNF-003', label: 'GKF' },
-  { id: 'KNF-004', label: 'Diamant' },
+  { id: 'KNF-001', label: 'GKB · standardna' },
+  { id: 'KNF-002', label: 'GKBI · vlagootporna' },
+  { id: 'KNF-003', label: 'GKF · vatrootporna' },
+  { id: 'KNF-004', label: 'Diamant · tvrda' },
+]
+const PROFILES = [
+  { id: 'PRF-050', label: 'CW 50' },
+  { id: 'PRF-075', label: 'CW 75' },
+  { id: 'PRF-100', label: 'CW 100' },
+]
+const EPS = [
+  { id: 'ISO-004', label: 'EPS 70 · bijeli' },
+  { id: 'ISO-006', label: 'Neopor · grafitni' },
 ]
 
-const f1 = (n: number) => n.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+const fmt = (n: number, d = 2) => n.toLocaleString('de-DE', { minimumFractionDigits: d, maximumFractionDigits: d })
+// Unos prihvata i zarez i tačku; prazno ili nevažeće = null.
+const parse = (s: string) => {
+  const n = parseFloat(s.replace(',', '.'))
+  return Number.isFinite(n) && n > 0 ? n : null
+}
 
-// Animirana vrijednost za crtež: mjera "klizi" do nove vrijednosti umjesto da skoči.
-function useTween(target: Record<string, number>) {
+// Mjera na crtežu "klizi" do nove vrijednosti umjesto da skoči.
+function useTween(target: { a: number; b: number }) {
   const [shown, setShown] = useState(target)
   const ref = useRef({ ...target })
-  const key = JSON.stringify(target)
   useEffect(() => {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const t = gsap.to(ref.current, { ...target, duration: reduce ? 0 : 0.6, ease: 'power3.out', onUpdate: () => setShown({ ...ref.current }) })
+    const t = gsap.to(ref.current, { a: target.a, b: target.b, duration: reduce ? 0 : 0.6, ease: 'power3.out', onUpdate: () => setShown({ ...ref.current }) })
     return () => {
       t.kill()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- key je serijalizovan target
-  }, [key])
+  }, [target.a, target.b])
   return shown
 }
 
-function Step({ label, value, min, max, step, unit = 'm', onChange }: { label: string; value: number; min: number; max: number; step: number; unit?: string; onChange: (v: number) => void }) {
-  const set = (v: number) => onChange(Math.min(max, Math.max(min, Math.round(v * 10) / 10)))
-  const btn = 'grid size-9 shrink-0 place-items-center rounded-none border border-ink/25 text-lg transition-colors hover:border-ink disabled:opacity-30'
+function Field({ label, value, onChange, placeholder, unit }: { label: string; value: string; onChange: (v: string) => void; placeholder: string; unit: string }) {
   return (
-    <div className="flex items-center justify-between gap-3 border-b border-ink/12 py-4">
-      <span className="text-[10.5px] opacity-60">{label}</span>
-      <div className="flex items-center gap-2">
-        <button type="button" className={btn} onClick={() => set(value - step)} disabled={value <= min} aria-label={`${label}: manje`}>
-          −
-        </button>
-        <span className="num w-[4.6ch] text-center text-[22px] leading-none" aria-live="polite">
-          {f1(value)}
-        </span>
-        <button type="button" className={btn} onClick={() => set(value + step)} disabled={value >= max} aria-label={`${label}: više`}>
-          +
-        </button>
-        <span className="w-6 text-[10.5px] opacity-55">{unit}</span>
-      </div>
-    </div>
+    <label className="calc2-field">
+      <span className="calc2-label">
+        {label} ({unit})
+      </span>
+      <input inputMode="decimal" value={value} placeholder={placeholder} onChange={(e) => onChange(e.target.value)} className="calc2-input" />
+    </label>
   )
 }
 
-function Choice<T extends string>({ label, value, options, onChange }: { label: string; value: T; options: { id: T; label: string }[]; onChange: (v: T) => void }) {
+function Select({ label, value, options, onChange }: { label: string; value: string; options: { id: string; label: string }[]; onChange: (v: string) => void }) {
   return (
-    <div className="flex flex-col gap-2 border-b border-ink/12 py-4">
-      <span className="text-[10.5px] opacity-60">{label}</span>
-      <div className="calc-seg" role="radiogroup" aria-label={label}>
-        {options.map((o) => (
-          <button key={o.id} type="button" role="radio" aria-checked={o.id === value} onClick={() => onChange(o.id)} className="calc-seg__opt">
-            {o.label}
-          </button>
-        ))}
-      </div>
-    </div>
+    <label className="calc2-field">
+      <span className="calc2-label">{label}</span>
+      <span className="calc2-select">
+        <select value={value} onChange={(e) => onChange(e.target.value)}>
+          {options.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </span>
+    </label>
+  )
+}
+
+function Check({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {
+  return (
+    <label className="calc2-check">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+      <span>
+        <span className="block">{label}</span>
+        {hint && <span className="calc2-hint">{hint}</span>}
+      </span>
+    </label>
   )
 }
 
 export default function Calculator() {
-  const root = useRef<HTMLElement>(null)
-  const [tab, setTab] = useState<Tab>('w111')
-
-  // W111
-  const [wL, setWL] = useState(4)
-  const [wH, setWH] = useState(2.6)
-  const [wPlate, setWPlate] = useState('KNF-001')
-  const [cw, setCw] = useState('PRF-075')
-  const [cladding, setCladding] = useState<'single' | 'double'>('single')
-  const [wool, setWool] = useState<'da' | 'ne'>('da')
-  // D112
-  const [cL, setCL] = useState(5)
-  const [cW, setCW] = useState(4)
-  const [cPlate, setCPlate] = useState('KNF-001')
-  // DEMIT
-  const [fL, setFL] = useState(10)
-  const [fH, setFH] = useState(6)
+  const [sys, setSys] = useState<Sys>('w111')
+  const [a, setA] = useState(String(DEFAULTS.w111[0]).replace('.', ','))
+  const [b, setB] = useState(String(DEFAULTS.w111[1]).replace('.', ','))
+  const [area, setArea] = useState('')
+  const [plate, setPlate] = useState('KNF-001')
+  const [profile, setProfile] = useState('PRF-075')
+  const [double, setDouble] = useState(false)
+  const [wool, setWool] = useState(true)
   const [eps, setEps] = useState('ISO-004')
+  const [reserve, setReserve] = useState(true)
+  const [open, setOpen] = useState(false)
+
+  const def = SYSTEMS.find((s) => s.id === sys)!
+  const pickSys = (id: Sys) => {
+    setSys(id)
+    setA(String(DEFAULTS[id][0]).replace('.', ','))
+    setB(String(DEFAULTS[id][1]).replace('.', ','))
+    setArea('')
+  }
+
+  // Mjere: druga mjera (visina / širina) + ili dužina, ili površina direktno (tada dužina = P / druga).
+  const second = parse(b) ?? DEFAULTS[sys][1]
+  const directArea = parse(area)
+  const first = directArea ? directArea / second : (parse(a) ?? DEFAULTS[sys][0])
+  // Rezerva za sječenje i otpad: dodaje se na dužinu (norme već uključuju ~5%).
+  const k = reserve ? 1.1 : 1
 
   const result = useMemo(() => {
-    if (tab === 'w111')
-      return calcW111({ L: wL, H: wH, cladding, plateSku: wPlate, cwSku: cw, woolSku: wool === 'da' ? 'ISO-001' : undefined, fillerSku: 'CHM-001' })
-    if (tab === 'd112') return calcD112({ L: cL, W: cW, plateSku: cPlate })
-    return calcDemit({ A: fL * fH, epsSku: eps })
-  }, [tab, wL, wH, cladding, wPlate, cw, wool, cL, cW, cPlate, fL, fH, eps])
+    if (sys === 'w111')
+      return calcW111({ L: first * k, H: second, cladding: double ? 'double' : 'single', plateSku: plate, cwSku: profile, woolSku: wool ? 'ISO-001' : undefined, fillerSku: 'CHM-001' })
+    if (sys === 'd112') return calcD112({ L: first * k, W: second, plateSku: plate })
+    return calcDemit({ A: first * second * k, epsSku: eps })
+  }, [sys, first, second, k, double, plate, profile, wool, eps])
 
-  const { kg, total } = useBomRows(result.items)
-  const wallShown = useTween({ L: wL, H: wH })
-  const ceilShown = useTween({ L: cL, W: cW })
-  const facShown = useTween({ L: fL, H: fH })
-  const active = TABS.find((t) => t.id === tab)!
+  const { rows, total, retail, kg, discount } = useBomRows(result.items)
+  const shown = useTween({ a: first, b: second })
+  const net = first * second
+  const thumb = bySku(sys === 'demit' ? eps : plate)
 
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia()
-      mm.add(MQ, (ctx) => {
-        const { reduce } = ctx.conditions as { reduce: boolean }
-        revealChars(root.current!.querySelector('[data-head]')!, reduce, 'top 80%')
-      })
-    },
-    { scope: root },
-  )
+  const addAll = () => {
+    rows.forEach((r) => addToCart(r.sku, r.qty))
+    notify(`${def.label}: spisak je u korpi`, { label: 'Korpa', open: 'cart' })
+  }
 
   return (
-    <section ref={root} id="kalkulator" className="scroll-mt-24">
-      <div className="px-5 text-center">
-        <h2 data-head className="display invisible text-[clamp(36px,5vw,84px)]">
-          Građevinski kalkulator
-        </h2>
-        <p className="mx-auto mt-5 max-w-[56ch] text-[12px] leading-[1.6] opacity-65">
-          Unesite mjere — sajt izračuna utrošak materijala po normi, sa cijenom i masom tereta.
-        </p>
-        <div className="calc-tabs mx-auto mt-8" role="tablist" aria-label="Sistem">
-          {TABS.map((t) => (
-            <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className="calc-tabs__opt">
-              <span className="font-pretty text-[13px]">{t.label}</span>
-              <span className="text-[10px] opacity-70">{t.sub}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+    <section id="kalkulator" className="calc2 scroll-mt-24">
+      <img src="/editorial/boards-light.webp" alt="" aria-hidden className="calc2-bg" />
 
-      <div className="mx-auto mt-[6vh] grid max-w-[1320px] border-y border-ink/15 px-0 md:mx-8 md:grid-cols-[minmax(300px,0.8fr)_1.6fr] md:border-x lg:mx-auto">
-        {/* Kontrole */}
-        <div className="min-w-0 px-5 py-6 md:border-r md:border-ink/15 md:px-7">
-          <p className="mb-2 text-[10.5px] opacity-55">
-            {active.label} · {active.sub}
-          </p>
-          {tab === 'w111' && (
-            <>
-              <Step label="Dužina zida" value={wL} min={1} max={20} step={0.5} onChange={setWL} />
-              <Step label="Visina zida" value={wH} min={2} max={5} step={0.1} onChange={setWH} />
-              <Choice label="Ploča" value={wPlate} onChange={setWPlate} options={PLATES} />
-              <Choice
-                label="CW profil"
-                value={cw}
-                onChange={setCw}
-                options={[
-                  { id: 'PRF-050', label: 'CW 50' },
-                  { id: 'PRF-075', label: 'CW 75' },
-                  { id: 'PRF-100', label: 'CW 100' },
-                ]}
-              />
-              <Choice
-                label="Obloga"
-                value={cladding}
-                onChange={setCladding}
-                options={[
-                  { id: 'single', label: 'Jednostruka' },
-                  { id: 'double', label: 'Dvostruka' },
-                ]}
-              />
-              <Choice
-                label="Kamena vuna 50 mm"
-                value={wool}
-                onChange={setWool}
-                options={[
-                  { id: 'da', label: 'Da' },
-                  { id: 'ne', label: 'Ne' },
-                ]}
-              />
-            </>
-          )}
-          {tab === 'd112' && (
-            <>
-              <Step label="Dužina prostorije" value={cL} min={1} max={20} step={0.5} onChange={setCL} />
-              <Step label="Širina prostorije" value={cW} min={1} max={20} step={0.5} onChange={setCW} />
-              <Choice label="Ploča" value={cPlate} onChange={setCPlate} options={PLATES} />
-              <p className="pt-4 text-[10.5px] leading-[1.6] opacity-55">Orijentaciono, po približnoj normi Knauf D112.</p>
-            </>
-          )}
-          {tab === 'demit' && (
-            <>
-              <Step label="Dužina fasade" value={fL} min={2} max={60} step={1} onChange={setFL} />
-              <Step label="Visina fasade" value={fH} min={2} max={20} step={0.5} onChange={setFH} />
-              <Choice
-                label="Stiropor"
-                value={eps}
-                onChange={setEps}
-                options={[
-                  { id: 'ISO-004', label: 'EPS 70 bijeli' },
-                  { id: 'ISO-006', label: 'Grafitni Neopor' },
-                ]}
-              />
-              <p className="pt-4 text-[10.5px] leading-[1.6] opacity-55">
-                Orijentaciono: stiropor, Ceresit CT 83 (lijepljenje) i CT 85 (armiranje). Mrežica, tiplovi i završni sloj nisu u
-                katalogu — dogovaraju se uz ponudu.
-              </p>
-            </>
-          )}
-        </div>
-
-        {/* Crtež + spisak */}
-        <div className="flex min-w-0 flex-col">
-          <div className="border-b border-ink/15 bg-bg">
-            {tab === 'w111' && <WallVisual L={wallShown.L} H={wallShown.H} plate={wPlate} wool={wool === 'da'} double={cladding === 'double'} />}
-            {tab === 'd112' && <CeilingVisual L={ceilShown.L} W={ceilShown.W} plate={cPlate} />}
-            {tab === 'demit' && <FacadeVisual L={facShown.L} H={facShown.H} eps={eps} />}
+      <div className="calc2-grid">
+        {/* Lijevo: objašnjenje + crtež u razmjeri */}
+        <div className="calc2-card calc2-card--dark">
+          <div className="text-center">
+            <p className="calc2-label !text-bg/60">Kalkulator materijala</p>
+            <h2 className="calc2-title">Unesite mjere i odmah vidite koliko materijala vam treba</h2>
           </div>
-          <div className="px-5 py-6 md:px-7">
-            <p className="mb-4 text-[10.5px] opacity-55">
-              Površina <span className="tabular-nums">{f1(result.P)} m²</span>
-            </p>
-            <Bom items={result.items} label={`${active.label} ${active.sub}`} />
+
+          <div className="calc2-visual flex flex-1 items-center" style={{ '--ink': '#f4f1ec' } as React.CSSProperties}>
+            {sys === 'w111' && <WallVisual L={shown.a} H={shown.b} plate={plate} wool={wool} double={double} vh={820} />}
+            {sys === 'd112' && <CeilingVisual L={shown.a} W={shown.b} plate={plate} vh={820} />}
+            {sys === 'demit' && <FacadeVisual L={shown.a} H={shown.b} eps={eps} vh={820} />}
+          </div>
+
+          <div className="calc2-legend">
+            <span className="tabular-nums">
+              {fmt(first, 1)} × {fmt(second, 1)} m = {fmt(net)} m²
+            </span>
+            {sys !== 'demit' && (
+              <span className="flex items-center gap-2">
+                <i className="calc2-swatch" style={{ background: (PLATE_COLORS[plate] ?? PLATE_COLORS['KNF-001']).color }} />
+                {PLATES.find((p) => p.id === plate)?.label}
+              </span>
+            )}
           </div>
         </div>
-      </div>
 
-      <div className="mx-auto mt-8 max-w-[1320px] px-0 md:mx-8 lg:mx-auto">
-        <Logistics kg={kg} goodsTotal={total} />
+        {/* Desno: jedan tok unosa i rezultat */}
+        <div className="calc2-card calc2-card--light">
+          <div className="flex items-end gap-4">
+            <div className="min-w-0 flex-1">
+              <Select label="Odaberite sistem" value={sys} onChange={(v) => pickSys(v as Sys)} options={SYSTEMS} />
+            </div>
+            {thumb?.image && <img src={thumb.image} alt="" className="calc2-thumb" />}
+          </div>
+
+          <p className="calc2-sub">Mjere</p>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label={def.dims[0]} unit="m" value={a} onChange={(v) => { setA(v); setArea('') }} placeholder={`npr. ${DEFAULTS[sys][0]}`} />
+            <Field label={def.dims[1]} unit="m" value={b} onChange={setB} placeholder={`npr. ${DEFAULTS[sys][1]}`} />
+          </div>
+          <Field label="Ili unesite površinu direktno" unit="m²" value={area} onChange={setArea} placeholder="npr. 45" />
+
+          <div className="mt-2 grid grid-cols-2 gap-4">
+            {sys !== 'demit' && <Select label="Ploča" value={plate} onChange={setPlate} options={PLATES} />}
+            {sys === 'w111' && <Select label="Profil" value={profile} onChange={setProfile} options={PROFILES} />}
+            {sys === 'demit' && <Select label="Stiropor" value={eps} onChange={setEps} options={EPS} />}
+          </div>
+
+          <div className="mt-5 flex flex-col gap-3">
+            {sys === 'w111' && <Check checked={double} onChange={setDouble} label="Dvostruka obloga" hint="Dva sloja ploča sa svake strane — bolja zvučna i protivpožarna zaštita" />}
+            {sys === 'w111' && <Check checked={wool} onChange={setWool} label="Kamena vuna u zidu" hint="Toplotna i zvučna izolacija između profila" />}
+            <Check checked={reserve} onChange={setReserve} label="+ Dodaj 10% rezerve" hint="Preporučujemo zbog sječenja i otpada pri ugradnji" />
+          </div>
+
+          <dl className="calc2-results">
+            <div>
+              <dt>Površina</dt>
+              <dd>
+                {fmt(net)} <small>m²</small>
+              </dd>
+            </div>
+            <div>
+              <dt>Artikala</dt>
+              <dd>{rows.length}</dd>
+            </div>
+            <div>
+              <dt>Masa tereta</dt>
+              <dd>
+                {tons(kg)} <small>t</small>
+              </dd>
+            </div>
+            <div>
+              <dt>Ukupno sa PDV-om</dt>
+              <dd>
+                {money(total)}
+                {discount > 0 && <small className="ml-2 line-through opacity-60">{money(retail)}</small>}
+              </dd>
+            </div>
+          </dl>
+          {recommendCrane(kg) && <p className="calc2-hint mt-2">Preporuka: dostava kamionom sa kranom.</p>}
+
+          <button type="button" className="calc2-toggle" onClick={() => setOpen((v) => !v)} aria-expanded={open}>
+            {open ? 'Sakrij spisak materijala' : 'Prikaži spisak materijala'}
+            <span aria-hidden>{open ? '−' : '+'}</span>
+          </button>
+          {open && (
+            <ul className="calc2-list">
+              {rows.map((r) => (
+                <li key={r.sku}>
+                  <span className="min-w-0">
+                    <span className="block truncate">{r.name}</span>
+                    <span className="calc2-hint">{r.note}</span>
+                  </span>
+                  <span className="shrink-0 text-right tabular-nums">
+                    {qtyLabel(r.qty, r.unit)}
+                    <span className="calc2-hint block">{money(r.price)}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          <button type="button" onClick={addAll} className="calc2-cta">
+            <span>Dodaj sve u korpu · {money(total)}</span>
+            <span aria-hidden>→</span>
+          </button>
+          <p className="calc2-hint mt-3">Orijentaciono, po normi proizvođača. Za veće projekte pošaljite nacrt — vratimo tačnu specifikaciju.</p>
+        </div>
       </div>
     </section>
   )
