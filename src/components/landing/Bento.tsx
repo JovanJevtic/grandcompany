@@ -102,7 +102,7 @@ export default function Bento() {
         {/* Fotografija + svijetli panel: Pantheon ERP zalihe */}
         <Link href="/prodavnica" data-bento className="group flex min-h-[340px] flex-col overflow-hidden bg-[#d9d9d9] text-ink md:min-h-[460px]" data-cursor="Katalog">
           <div data-parallax="6" className="relative h-[260px] overflow-hidden bg-[#111] md:h-[54%]">
-            <img decoding="async" src="/editorial/bento-mono.webp" alt="Pocinčani profili na regalima skladišta" className="absolute inset-0 h-full w-full object-cover" />
+            <img decoding="async" loading="lazy" src="/editorial/bento-mono.webp" alt="Pocinčani profili na regalima skladišta" className="absolute inset-0 h-full w-full object-cover" />
             <span className="label absolute left-7 top-7 text-white">Stovarište</span>
             <span className="absolute right-6 top-6 flex gap-1.5 text-white max-md:left-7 max-md:right-auto max-md:top-14">
               <Tag tone="photo">Zalihe</Tag>

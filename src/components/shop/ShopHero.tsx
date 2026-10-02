@@ -19,10 +19,10 @@ export default function ShopHero({ onAll }: { onAll: () => void }) {
       <div className="flex min-h-[82vh] flex-col justify-between gap-14 px-5 py-8 md:border-r md:border-ink/20 md:px-[3vw] md:py-[3vw]">
         <div className="flex gap-2.5">
           <figure data-curtain className="aspect-square w-[min(34vw,190px)] overflow-hidden">
-            <img decoding="async" src="/shop2/detail-a.webp" alt="Rez naslaganih gips-kartonskih ploča" className="h-full w-full object-cover" />
+            <img decoding="async" loading="lazy" src="/shop2/detail-a.webp" alt="Rez naslaganih gips-kartonskih ploča" className="h-full w-full object-cover" />
           </figure>
           <figure data-curtain className="aspect-square w-[min(34vw,190px)] overflow-hidden">
-            <img decoding="async" src="/shop2/detail-b.webp" alt="Crni samourezni vijci na plavoj podlozi" className="h-full w-full object-cover" />
+            <img decoding="async" loading="lazy" src="/shop2/detail-b.webp" alt="Crni samourezni vijci na plavoj podlozi" className="h-full w-full object-cover" />
           </figure>
         </div>
 
@@ -39,7 +39,7 @@ export default function ShopHero({ onAll }: { onAll: () => void }) {
       </div>
 
       <figure data-curtain data-parallax="7" className="relative min-h-[60vh] overflow-hidden md:min-h-0" data-cursor="Katalog" onClick={onAll}>
-        <img decoding="async"
+        <img decoding="async" loading="lazy"
           src="/shop2/hero.webp"
           alt="Pocinčani profili složeni kao skulptura na terakota podlozi"
           className="absolute inset-0 h-full w-full object-cover"

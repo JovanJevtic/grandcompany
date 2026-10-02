@@ -19,17 +19,19 @@ const serif = Bodoni_Moda({
 
 // Tekstni sans: sve osim naslova (opisi, oznake, meni, cijene) — uvijek u verzalu (globals.css).
 // Inter je širok i miran, bez "uskog" karaktera; latin-ext zbog č ć š đ ž.
+// Varijabilan: JEDAN fajl umjesto tri statične težine — manje prenosa i parse-a.
 const sans = Inter({
   variable: "--font-text",
   subsets: ["latin", "latin-ext"],
-  weight: ["400", "500", "600"],
+  weight: "variable",
 });
 
 // Naslovi: debeli geometrijski sans (korporativni stil), uvijek verzal. Prettywise ostaje samo za logotip.
+// Varijabilan: 700/800/900 iz jedne ose wght, umjesto tri odvojena fajla.
 const heavy = Montserrat({
   variable: "--font-heavy",
   subsets: ["latin", "latin-ext"],
-  weight: ["700", "800", "900"],
+  weight: "variable",
 });
 
 // Navbar: zbijeni masni verzal (ćelije trake, preklopnik, Kupuj).
@@ -40,10 +42,11 @@ const condensed = Barlow_Condensed({
 });
 
 // Debeli grotesk za sitne oznake u verzalu (hero, bento kartice) — kontrast tankom Prettywise-u.
+// Varijabilan (wght osa).
 const grotesk = Inter_Tight({
   variable: "--font-grotesk",
   subsets: ["latin", "latin-ext"],
-  weight: ["500", "700", "800"],
+  weight: "variable",
 });
 
 // Display serif (italic) za kratke rečenice preko scene. Bodoni Moda je OFL —

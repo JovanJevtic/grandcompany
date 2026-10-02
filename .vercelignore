@@ -1,2 +1,5 @@
 .playwright-mcp
 *.log
+# Izvorne PNG verzije generisanih fotografija (180 MB) — sajt koristi samo gotove WebP
+# u /public/editorial, /public/shop, /public/shop2...; izvornici idu samo u repo, ne u deploy.
+public/gen
