@@ -103,6 +103,7 @@ const PRINT_FRAG = /* glsl */ `
   uniform float paperOnly; // 1 = površina je čist papir (tlo), bez tačaka i bez obrisa
   uniform float inside;    // 1 = objekat iz sobe (enterijer)
   uniform float navy;      // 1 = tabla sa logom: ravan ton (bez sjenčenja), mastilo tamno plavo
+  uniform float flatInk;   // 1 = puno mastilo bez rastera (kontrateg, kabina)
   varying vec3 vInst;
   varying float vDepth;
   varying vec3 vWorld;
@@ -150,6 +151,7 @@ const PRINT_FRAG = /* glsl */ `
     float lo = lineOnly;
     if (someDots > .5 && fract(sin(dot(floor(vInst * 2.0), vec3(12.99, 78.23, 37.71))) * 43758.55) > .5) lo = 0.0;
     tone *= (1.0 - lo) * (1.0 - paperOnly);
+    if (flatInk > .5) tone = 1.0;
     // Linijski objekti (kran) pišu pokrivenost .95 umjesto 1, da ih završni shader prepozna.
     // Pokrivenost nosi i oznake: .95 = linijski objekat, .92 = linijski objekat u zgradi sa sobom,
     // .85 = soba, .76 = tabla sa logom, ostalo edgeW. Geometrijske linije (LINE_FRAG): .975 / .89.
@@ -474,7 +476,7 @@ export function createCraneRenderer(renderer, world) {
     const defines = {};
     if (src.map) defines.PRINT_MAP = '';
     pm = new THREE.ShaderMaterial({
-      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, paperOnly: { value: src.userData.paper ? 1 : 0 }, inside: { value: inside ? 1 : 0 }, navy: { value: src.userData.navy ? 1 : 0 }, map: { value: src.map || null } },
+      uniforms: { baseTone: { value: toneOf(src) }, opacity: { value: 1 }, lightDir, fog, shadeK, radial: { value: new THREE.Vector4(...(src.userData.radial || [0, 0, 0, 0])) }, edgeW: { value: src.userData.edgeW ?? 1 }, lineOnly: { value: line ? 1 : 0 }, someDots: { value: line && src.userData.printDots ? 1 : 0 }, paperOnly: { value: src.userData.paper ? 1 : 0 }, inside: { value: inside ? 1 : 0 }, navy: { value: src.userData.navy ? 1 : 0 }, flatInk: { value: src.userData.flat ? 1 : 0 }, map: { value: src.map || null } },
       defines,
       side: src.side,
       vertexShader: PRINT_VERT,
