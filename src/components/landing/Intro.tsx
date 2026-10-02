@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element -- editorijalne fotografije iz /public, već u WebP */
 
 import { useRef } from 'react'
+import Link from 'next/link'
 import Cta from '@/components/ui/Cta'
 import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { useMediaMotion } from '@/lib/media'
@@ -87,17 +88,18 @@ export default function Intro() {
           <h2 data-head className="display invisible max-w-[18ch] text-[clamp(32px,4.8vw,92px)]">
             <Pw>Građevinski materijal za profesionalce</Pw>
           </h2>
-          <p data-up data-delay="0.1" className="max-w-[52ch] text-[15px] leading-[1.7] opacity-75 md:pb-3">
-            Snabdijevamo građevinske firme i izvođače: materijal sa stovarišta u Banjoj Luci, vaša cijena i dostava
-            vlastitim kamionima sa kranom — direktno na gradilište. Suha gradnja i Knauf sistemi su naša specijalizacija.
-          </p>
-        </div>
-
-        <div data-up data-delay="0.2" className="mt-8 flex flex-wrap gap-3">
-          <Cta href="/portal" solid>
-            B2B portal
-          </Cta>
-          <Cta href="/prodavnica">Maloprodaja</Cta>
+          <div className="md:pb-3">
+            <p data-up data-delay="0.1" className="max-w-[52ch] text-[15px] leading-[1.7] opacity-75">
+              Snabdijevamo građevinske firme i izvođače: materijal sa stovarišta u Banjoj Luci, vaša cijena i dostava
+              vlastitim kamionima sa kranom — direktno na gradilište. Suha gradnja i Knauf sistemi su naša specijalizacija.
+            </p>
+            <div data-up data-delay="0.2" className="mt-7 flex flex-wrap gap-3">
+              <Cta href="/portal" solid>
+                B2B portal
+              </Cta>
+              <Cta href="/prodavnica">Maloprodaja</Cta>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -110,21 +112,18 @@ export default function Intro() {
           <div data-viewport className="hs-viewport w-full">
             <div data-track className="flex w-max items-start gap-[6vw] px-5 md:gap-[2.2vw] md:px-[6vw]">
               {SCENES.map((s, i) => (
-                <figure
-                  key={s.src}
-                  data-curtain
-                  className="m-0 shrink-0 snap-start"
-                  style={{ marginTop: i % 2 ? '8vh' : 0 }}
-                >
-                  <div className="relative h-[48vh] aspect-[2/3] overflow-hidden bg-plate md:h-[60vh]">
-                    <img
-                      decoding="async"
-                      loading="lazy"
-                      src={s.src}
-                      alt={`${s.label} — ${s.note}`}
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
-                  </div>
+                <figure key={s.src} className="m-0 shrink-0 snap-start" style={{ marginTop: i % 2 ? '8vh' : 0 }}>
+                  <Link href="/prodavnica" data-cursor-plate="Katalog" className="group block">
+                    <div data-curtain className="relative h-[48vh] aspect-[2/3] overflow-hidden bg-plate md:h-[60vh]">
+                      <img
+                        decoding="async"
+                        loading="lazy"
+                        src={s.src}
+                        alt={`${s.label} — ${s.note}`}
+                        className="absolute inset-0 h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out)] group-hover:scale-[1.03]"
+                      />
+                    </div>
+                  </Link>
                   <figcaption className="mt-3 text-[11px] tracking-[0.06em] text-ink/55">
                     <span className="font-medium text-ink/80">{String(i + 1).padStart(2, '0')}</span> · {s.label}
                   </figcaption>

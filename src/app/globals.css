@@ -524,6 +524,26 @@ html:not([data-past-hero]) [data-overlay-header] {
 .cursor[data-big] .cursor-tag {
   scale: 1;
 }
+/* Velika kobalt ploča sa riječju (npr. KATALOG preko trake kadrova): kvadrat, kao i sve pločice
+   na sajtu (ivice su namjerno oštre), sa strelicom kao na CTA dugmadima. */
+.cursor[data-cursor-plate] .cursor-tag {
+  left: -62px;
+  top: -62px;
+  width: 124px;
+  height: 124px;
+  background: var(--cobalt);
+  color: #fff;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  padding-left: 0.2em;
+  row-gap: 5px;
+}
+.cursor[data-cursor-plate] .cursor-tag::after {
+  content: '→';
+  font-size: 14px;
+  letter-spacing: 0;
+  padding-left: 0;
+}
 @media (pointer: coarse), (hover: none) {
   .cursor {
     display: none;

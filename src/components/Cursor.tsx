@@ -30,13 +30,17 @@ export default function Cursor() {
       xTo(e.clientX)
       yTo(e.clientY)
       // <html> nosi data-cursor (sakriva sistemski kursor), zato se on preskače.
-      const target = (e.target as Element | null)?.closest?.('[data-cursor]:not(html)')
+      const target = (e.target as Element | null)?.closest?.('[data-cursor]:not(html), [data-cursor-plate]')
       // Preko tamnih i plavih površina (footer, tamne kartice, plave sekcije) kursor postaje bijel.
       const dark = (e.target as Element | null)?.closest?.('footer, .bg-ink, .bg-char, .bg-navy, .bg-cobalt, [data-step-band="navy"]')
       el.toggleAttribute('data-on-dark', !!dark)
-      const text = target?.getAttribute('data-cursor')
+      // `data-cursor-plate="Riječ"` je velika plava ploča (npr. KATALOG preko kadrova); `data-cursor`
+      // je uobičajeno "sječivo" sa riječju.
+      const plate = target?.getAttribute('data-cursor-plate')
+      const text = plate || target?.getAttribute('data-cursor')
       if (text) label.current!.textContent = text
       el.toggleAttribute('data-big', !!text)
+      el.toggleAttribute('data-cursor-plate', !!plate)
     }
     const onLeave = () => gsap.to(el, { autoAlpha: 0, duration: 0.3 })
     const onEnter = () => gsap.to(el, { autoAlpha: 1, duration: 0.3 })
