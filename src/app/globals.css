@@ -1854,16 +1854,63 @@ html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-c
   letter-spacing: 0.08em;
   opacity: 0.55;
 }
-.asort-group + .asort-group {
-  margin-top: 36px;
+/* Kategorije kao accordion: natpis + "+" desno, horizontalne linije, proizvodi u dropdownu. */
+.asort-acc {
+  margin-top: 28px;
 }
-.asort-group__title {
-  padding-bottom: 10px;
+.asort-acc__group {
+  border-top: 1.5px solid var(--ink);
+}
+.asort-acc__group:last-child {
   border-bottom: 1.5px solid var(--ink);
+}
+.asort-acc__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  padding-block: 18px;
+  text-align: left;
+  cursor: pointer;
+}
+.asort-acc__name {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
   font-family: var(--font-heavy), sans-serif;
   font-size: clamp(16px, 1.4vw, 20px);
   font-weight: 800;
   letter-spacing: 0.01em;
+}
+.asort-acc__plus {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: 999px;
+  color: var(--ink);
+  transition: transform 0.5s var(--ease-out), background-color 0.3s, color 0.3s, border-color 0.3s;
+}
+.asort-acc__plus svg {
+  width: 13px;
+  height: 13px;
+}
+.asort-acc__row:hover .asort-acc__plus {
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.asort-acc__plus.is-open {
+  transform: rotate(45deg);
+  background: var(--ink);
+  color: var(--bg);
+  border-color: var(--ink);
+}
+.asort-acc__body {
+  padding-bottom: 12px;
 }
 .asort-item {
   display: grid;

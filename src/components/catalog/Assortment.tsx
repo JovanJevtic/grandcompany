@@ -39,6 +39,11 @@ export default function Assortment() {
   const [sort, setSort] = useState<Sort>('preporuceno')
   const [inStock, setInStock] = useState(false)
   const [added, setAdded] = useState<string | null>(null)
+  // Accordion (dropdown): bez filtera se vide samo natpisi kategorija (+ pritisne se i otvori).
+  // Kad su aktivni filteri/pretraga, grupe s rezultatima su automatski otvorene — sve se računa
+  // u renderu (bez efekata): ručnoZatvoreno važi samo dok je filter aktivan, ručnoOtvoreno bez njega.
+  const [manualOpen, setManualOpen] = useState<Set<string>>(new Set())
+  const [closed, setClosed] = useState<Set<string>>(new Set())
 
   const list = useMemo(() => {
     const words = norm(q).split(/\s+/).filter(Boolean)
@@ -61,6 +66,36 @@ export default function Assortment() {
     sort === 'preporuceno'
       ? CATEGORIES.map((c) => ({ id: c.id, name: c.name, items: list.filter((p) => p.category === c.id) })).filter((g) => g.items.length)
       : [{ id: 'sve', name: '', items: list }]
+
+  const isFiltered = q.trim() !== '' || cat !== 'sve' || brand !== 'sve' || inStock || sort !== 'preporuceno'
+
+  const isOpen = (id: string) => (isFiltered ? !closed.has(id) : manualOpen.has(id))
+
+  const toggleOpen = (id: string) => {
+    if (isOpen(id)) {
+      setManualOpen((prev) => {
+        const n = new Set(prev)
+        n.delete(id)
+        return n
+      })
+      setClosed((prev) => {
+        const n = new Set(prev)
+        n.add(id)
+        return n
+      })
+    } else {
+      setClosed((prev) => {
+        const n = new Set(prev)
+        n.delete(id)
+        return n
+      })
+      setManualOpen((prev) => {
+        const n = new Set(prev)
+        n.add(id)
+        return n
+      })
+    }
+  }
 
   const add = (id: string, qty: number) => {
     addToCart(id, qty)
@@ -143,48 +178,71 @@ export default function Assortment() {
         {list.length === PRODUCTS.length ? `Prikazano svih ${list.length}` : `${list.length} od ${PRODUCTS.length} artikala`}
       </p>
 
-      {/* Lista */}
-      {groups.map((g) => (
-        <div key={g.id} className="asort-group">
-          {g.name && (
-            <h3 className="asort-group__title">
-              {g.name} <span className="tabular-nums opacity-45">{g.items.length}</span>
-            </h3>
-          )}
-          <ul className="asort-list">
-            {g.items.map((p) => {
-              const lvl = stockLevel(p)
-              return (
-                <li key={p.id} className="asort-item">
-                  <Link href={`/prodavnica/${p.sku}`} className="asort-thumb" aria-hidden tabIndex={-1}>
-                    <img decoding="async" loading="lazy" src={p.image} alt="" />
-                  </Link>
-                  <div className="asort-main">
-                    <span className="asort-sku">
-                      {p.sku} · {p.brand}
-                    </span>
-                    <Link href={`/prodavnica/${p.sku}`} className="asort-name">
-                      {p.name}
-                    </Link>
-                    <span className="asort-spec">{p.spec}</span>
-                  </div>
-                  <span className="asort-stock">
-                    <i className={DOT[lvl]} />
-                    {STOCK_LABEL[lvl]}
-                    <span className="opacity-50">{qtyLabel(p.stock, p.unit)}</span>
-                  </span>
-                  <span className="asort-price tabular-nums">
-                    <Price value={p.price} unit={p.unit} />
-                  </span>
-                  <button type="button" className="asort-add" onClick={() => add(p.id, defaultQty(p))} aria-label={`Dodaj u korpu: ${p.name}`}>
-                    {added === p.id ? 'Dodato ✓' : 'Dodaj'}
-                  </button>
-                </li>
-              )
-            })}
-          </ul>
-        </div>
-      ))}
+      {/* Lista: natpisi kategorija odvojeni horizontalnim linijama, sa "+" desno;
+          proizvodi se otvaraju klikom (dropdown). Kod aktivnih filtera grupe s rezultatima
+          su automatski otvorene, pa se traženi artikli vide. */}
+      <ul className="asort-acc">
+        {groups.map((g) => {
+          const open = isOpen(g.id)
+          const label = g.name || 'Svi artikli'
+          return (
+            <li key={g.id} className="asort-acc__group">
+              <button
+                type="button"
+                onClick={() => toggleOpen(g.id)}
+                aria-expanded={open}
+                aria-controls={`acc-${g.id}`}
+                className="asort-acc__row"
+              >
+                <span className="asort-acc__name">
+                  {label} <span className="tabular-nums opacity-45">{g.items.length}</span>
+                </span>
+                <span className={`asort-acc__plus ${open ? 'is-open' : ''}`} aria-hidden>
+                  <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth={1.5}>
+                    <path d="M8 1v14M1 8h14" />
+                  </svg>
+                </span>
+              </button>
+              {open && (
+                <div id={`acc-${g.id}`} className="asort-acc__body">
+                  <ul className="asort-list">
+                    {g.items.map((p) => {
+                      const lvl = stockLevel(p)
+                      return (
+                        <li key={p.id} className="asort-item">
+                          <Link href={`/prodavnica/${p.sku}`} className="asort-thumb" aria-hidden tabIndex={-1}>
+                            <img decoding="async" loading="lazy" src={p.image} alt="" />
+                          </Link>
+                          <div className="asort-main">
+                            <span className="asort-sku">
+                              {p.sku} · {p.brand}
+                            </span>
+                            <Link href={`/prodavnica/${p.sku}`} className="asort-name">
+                              {p.name}
+                            </Link>
+                            <span className="asort-spec">{p.spec}</span>
+                          </div>
+                          <span className="asort-stock">
+                            <i className={DOT[lvl]} />
+                            {STOCK_LABEL[lvl]}
+                            <span className="opacity-50">{qtyLabel(p.stock, p.unit)}</span>
+                          </span>
+                          <span className="asort-price tabular-nums">
+                            <Price value={p.price} unit={p.unit} />
+                          </span>
+                          <button type="button" className="asort-add" onClick={() => add(p.id, defaultQty(p))} aria-label={`Dodaj u korpu: ${p.name}`}>
+                            {added === p.id ? 'Dodato ✓' : 'Dodaj'}
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                </div>
+              )}
+            </li>
+          )
+        })}
+      </ul>
 
       {!list.length && (
         <div className="py-20 text-center">
