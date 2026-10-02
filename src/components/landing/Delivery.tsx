@@ -48,7 +48,7 @@ export default function Delivery() {
           sljedeće trake padaju direktno na nju — bez krem trake između. */}
       <div className="sticky top-0 h-dvh overflow-hidden">
         <div data-frame className="absolute inset-0 overflow-hidden bg-ink will-change-transform" data-cursor="Isporuka">
-          <img decoding="async" loading="lazy" src="/editorial/yard-trucks.webp" alt="Kamioni sa kranom utovaruju palete u dvorištu stovarišta" className="h-full w-full object-cover" />
+          <img decoding="async" loading="lazy" src="/editorial/delivery.webp" alt="Kamion sa kranom podiže paletu ploča na sprat zgrade u izgradnji" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-ink/55 via-ink/10 to-transparent" />
         </div>
 
