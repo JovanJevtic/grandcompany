@@ -585,11 +585,16 @@ export function createCraneScene() {
   const CAMERA_KEYS=[
     // p      pozicija                 pogled
     [0,         [-1.34,25.4,8.2],      [-1.34,25.4,0]],   // tabla sa logom na protivtegu, izbliza
-    [.07,       [3,17,48],             [-4,19,0]],        // cijeli kran, strijela lijevo
-    [.13,       [10,17.5,47],          [-2,18,0]],
-    [.22,       [22,18,40],            [2,14.5,0]],       // kran prolazi ispred nas, zgrada raste
-    [.34,       [30,18,34],            [6,12.6,0]],       // teret iznad krova
-    [.44,       [29,17.5,29],          [8.2,11.2,0]],     // spuštanje na krov (srednji plan)
+    // ——— Posle logotipa: kamera „pleše" oko krana (široko → worm's-eye → bird's-eye → makro) ———
+    [.05,       [6,13,44],             [-5,17,0]],        // široki niski kadar — cijeli kran i zgrada
+    [.11,       [1,11,30],             [-6,20,0]],        // bliže, kran se uspravlja u kadar
+    [.15,       [-2,1.6,8],            [-7,24,0]],        // WORM'S-EYE: uz stub, gledamo gore u glavu
+    [.22,       [4,27.5,12],           [0,26,0]],         // uspon uz stub — glava i kontrateg izbliza
+    [.29,       [0,38,20],             [-4,25,0]],        // BIRD'S-EYE: odozgo na glavu, strijelu i kolica
+    [.35,       [9,17,9.5],            [9,14.4,1.5]],     // MAKRO: kuka i kavez sa teretom
+    [.40,       [16,9,10],             [9,6,0]],          // krupno: spratovi zgrade i složaj materijala
+    // ——— Nastavlja postojeća priča (spuštanje, otkačinjanje, fasada, soba, nebo) ———
+    [.44,       [29,17.5,29],          [8.2,11.2,0]],     // spuštanje tereta na krov (srednji plan)
     [.52,       [26,18.5,25],          [8.6,12.6,0]],     // kuka se otkači i ode gore
     [.60,       [20,13,19],            [8.8,8.4,0]],      // niz fasadu
     [.68,       [15.2,7.6,12.2],       [8.6,6.0,0]],      // ka balkonu sprata ENTRY
