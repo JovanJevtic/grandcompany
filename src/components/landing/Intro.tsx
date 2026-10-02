@@ -4,16 +4,27 @@
 
 import { useRef } from 'react'
 import Cta from '@/components/ui/Cta'
-import { gsap, useGSAP } from '@/lib/gsap'
+import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { useMediaMotion } from '@/lib/media'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
 import Pw from '@/components/ui/Pw'
 
-// Prvi ekran poslije herosa: ko smo (B2B veleprodaja, Knauf distributer), dva ulaza — B2B portal
-// i maloprodaja — i kolaž od dvije fotografije.
-// Velika slika se otvara odozdo i klizi sporije od stranice, mala portretna preko nje brže —
-// razlika u brzini daje dubinu. id="radovi" je okidač za odlazak velikog wordmarka (SiteChrome).
+// Prvi ekran poslije herosa: ko smo (B2B veleprodaja, Knauf sistematika). Tekst je uz lijevu
+// ivicu (naslov, opis, ulazi — sve u istoj liniji), a ispod njega vodoravna traka krupnih,
+// mirnih kadrova: kran, ploče, profili, vuna, bandaža. Skrol vozi traku udesno (na mobilnom
+// i uz reduced-motion je običan swipe). id="radovi" je okidač za odlazak velikog wordmarka.
+const SCENES = [
+  { src: '/editorial/pro/01-kuka.webp', label: 'Kuka i svežanj ploča', note: 'Istovar na gradilištu' },
+  { src: '/editorial/pro/02-paleta.webp', label: 'Složaj ploča na paleti', note: 'Suho skladištenje' },
+  { src: '/editorial/pro/03-stub.webp', label: 'Stub krana odozdo', note: 'Vlastita logistika' },
+  { src: '/editorial/pro/04-bandaza.webp', label: 'Bandaža i glet', note: 'Suha gradnja' },
+  { src: '/editorial/pro/05-profili.webp', label: 'Pocinkovani profili', note: 'Knauf sistemi' },
+  { src: '/editorial/pro/06-vuna.webp', label: 'Kamena vuna', note: 'Toplotna i zvučna izolacija' },
+  { src: '/editorial/pro/07-kontrateg.webp', label: 'Kontrateg i pod', note: 'Naš toranjski kran' },
+  { src: '/editorial/pro/08-vijci.webp', label: 'Vijci za suhu gradnju', note: 'Sitni materijal' },
+]
+
 export default function Intro() {
   const root = useRef<HTMLElement>(null)
   useMediaMotion(root)
@@ -24,50 +35,104 @@ export default function Intro() {
       mm.add(MQ, (ctx) => {
         const { reduce } = ctx.conditions as { reduce: boolean }
         revealChars(root.current!.querySelector('[data-head]')!, reduce, 'top 80%')
-        if (reduce) return
-        const el = root.current!
-        gsap.fromTo(
-          el.querySelector('[data-small]'),
-          { yPercent: 30 },
-          { yPercent: -40, ease: 'none', scrollTrigger: { trigger: el.querySelector('[data-collage]'), start: 'top bottom', end: 'bottom top', scrub: true } },
-        )
+      })
+    },
+    { scope: root },
+  )
+
+  // Traka kadrova: sekcija se zalijepi (CSS sticky u višem omotaču) i skrol, umjesto na sljedeću
+  // sekciju, vodi traku vodoravno. Sticky drži browser — bez GSAP pina, pa nema skoka.
+  useGSAP(
+    () => {
+      const el = root.current!
+      const wrap = el.querySelector<HTMLElement>('[data-pinwrap]')!
+      const viewport = el.querySelector<HTMLElement>('[data-viewport]')!
+      const track = el.querySelector<HTMLElement>('[data-track]')!
+
+      const mm = gsap.matchMedia()
+      mm.add({ desktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)' }, () => {
+        const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth)
+        // Omotač je visok koliko traje vožnja: ekran + dužina trake. Mjeri se prije svakog
+        // osvježavanja ScrollTriggera, da start/end budu izmjereni na tačnoj visini.
+        const setHeight = () => {
+          wrap.style.height = `${window.innerHeight + distance()}px`
+        }
+        setHeight()
+        ScrollTrigger.addEventListener('refreshInit', setHeight)
+        const tween = gsap.to(track, {
+          x: () => -distance(),
+          ease: 'none',
+          scrollTrigger: { trigger: wrap, start: 'top top', end: () => `+=${distance()}`, scrub: 0.7, invalidateOnRefresh: true },
+        })
+        return () => {
+          ScrollTrigger.removeEventListener('refreshInit', setHeight)
+          wrap.style.height = ''
+          tween.scrollTrigger?.kill()
+          tween.kill()
+          gsap.set(track, { clearProps: 'transform' })
+        }
       })
     },
     { scope: root },
   )
 
   return (
-    <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[18vh] pt-[24vh] text-center">
-      <p data-up className="label mb-8 opacity-60">Veleprodaja građevinskog materijala · Banja Luka</p>
-      <h2 data-head className="display invisible mx-auto max-w-[14ch] px-5 text-[clamp(40px,7.4vw,128px)]">
-        <Pw>Građevinski materijal za profesionalce</Pw>
-      </h2>
-      <p data-up className="mx-auto mt-10 max-w-[56ch] px-5 text-lead opacity-80">
-        Snabdijevamo građevinske firme i izvođače: materijal sa stovarišta u Banjoj Luci, vaša cijena i dostava
-        vlastitim kamionima sa kranom — direktno na gradilište. Suha gradnja i Knauf sistemi su naša specijalizacija.
-      </p>
-      <div data-up data-delay="0.1" className="mt-12 flex flex-wrap justify-center gap-3">
-        <Cta href="/portal" solid>
-          B2B portal
-        </Cta>
-        <Cta href="/prodavnica">Maloprodaja</Cta>
+    <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[8vh] pt-[24vh]">
+      <div className="gutter">
+        <p data-up className="label opacity-60">
+          Veleprodaja građevinskog materijala · Banja Luka
+        </p>
+
+        <div className="mt-7 grid gap-x-[5vw] gap-y-7 md:grid-cols-[minmax(0,1.05fr)_minmax(0,48ch)] md:items-end">
+          <h2 data-head className="display invisible max-w-[18ch] text-[clamp(32px,4.8vw,92px)]">
+            <Pw>Građevinski materijal za profesionalce</Pw>
+          </h2>
+          <p data-up data-delay="0.1" className="max-w-[52ch] text-[15px] leading-[1.7] opacity-75 md:pb-3">
+            Snabdijevamo građevinske firme i izvođače: materijal sa stovarišta u Banjoj Luci, vaša cijena i dostava
+            vlastitim kamionima sa kranom — direktno na gradilište. Suha gradnja i Knauf sistemi su naša specijalizacija.
+          </p>
+        </div>
+
+        <div data-up data-delay="0.2" className="mt-8 flex flex-wrap gap-3">
+          <Cta href="/portal" solid>
+            B2B portal
+          </Cta>
+          <Cta href="/prodavnica">Maloprodaja</Cta>
+        </div>
       </div>
 
-      <div data-collage className="relative mx-auto mt-[16vh] w-[calc(100%-40px)] md:w-[78vw]">
-        <figure data-curtain data-parallax="8" className="relative aspect-[3/2] overflow-hidden bg-plate" data-cursor="Katalog">
-          <img decoding="async" loading="lazy" src="/editorial/materials-still.webp" alt="Ploče, profili i kamena vuna u praznoj betonskoj sobi" className="absolute inset-0 h-full w-full object-cover" />
-        </figure>
-        <figure
-          data-small
-          className="absolute -bottom-[10%] -left-[2%] hidden aspect-[2/3] w-[22%] overflow-hidden bg-plate shadow-[0_30px_60px_-30px_rgba(27,36,54,.45)] md:block"
+      {/* Traka kadrova: sticky sekcija, skrol je vozi udesno. */}
+      <div data-pinwrap className="relative mt-[12vh] bg-bg">
+        <section
+          aria-label="Sa gradilišta i iz stovarišta"
+          className="relative overflow-hidden bg-bg md:sticky md:top-0 md:flex md:h-dvh md:items-center"
         >
-          <div data-curtain className="h-full w-full">
-            <img decoding="async" loading="lazy" src="/editorial/frame-rhythm.webp" alt="" className="h-full w-full object-cover" />
+          <div data-viewport className="hs-viewport w-full">
+            <div data-track className="flex w-max items-start gap-[6vw] px-5 md:gap-[2.2vw] md:px-[6vw]">
+              {SCENES.map((s, i) => (
+                <figure
+                  key={s.src}
+                  data-curtain
+                  className="m-0 shrink-0 snap-start"
+                  style={{ marginTop: i % 2 ? '8vh' : 0 }}
+                >
+                  <div className="relative h-[48vh] aspect-[2/3] overflow-hidden bg-plate md:h-[60vh]">
+                    <img
+                      decoding="async"
+                      loading="lazy"
+                      src={s.src}
+                      alt={`${s.label} — ${s.note}`}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  </div>
+                  <figcaption className="mt-3 text-[11px] tracking-[0.06em] text-ink/55">
+                    <span className="font-medium text-ink/80">{String(i + 1).padStart(2, '0')}</span> · {s.label}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
           </div>
-        </figure>
-        <figcaption data-up className="mt-6 flex items-center justify-end gap-3 text-[12.5px] md:mt-8">
-          <span className="opacity-70">Od materijala do gradilišta — iz jednog skladišta.</span>
-        </figcaption>
+        </section>
       </div>
     </section>
   )
