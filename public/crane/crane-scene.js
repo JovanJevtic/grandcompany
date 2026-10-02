@@ -1,5 +1,5 @@
 import * as THREE from '../vendor/three.module.min.js';
-import {craneTowerKit, MAST_TOP, trolleyY, BUNDLE_TOP} from './crane-tower.js?v=3';
+import {craneTowerKit, MAST_TOP, trolleyY, BUNDLE_TOP} from './crane-tower.js?v=4';
 import {applyConstructionSurfaces} from './crane-surfaces.js?v=18';
 import {RoundedBoxGeometry} from '../vendor/three-addons/geometries/RoundedBoxGeometry.js';
 import {createDeliveryEffects} from './crane-effects.js?v=7';
@@ -208,8 +208,10 @@ export function createCraneScene() {
   const architecture=architectureKit({box,rod,group,batch,m});
   const tower=craneTowerKit({box,rod,profile,group,batch,m});
   const crane=group(scene,-7,0,0);
-  // Štampa: kran se crta samo linijama (obrisi), bez tačaka i punog mastila — vidi crane-print.
-  crane.userData.printLine=true;
+  // Štampa: kran je puna boja (pune plohe + "izbijene" linije), kao na referencama; zgrade i
+  // skela ostaju linijski crtež. `printCrane` je oznaka za završni shader: kran se na početku
+  // priče (dok je kamera na tabli) ne vidi, pa se "razvije" dok se kamera odmiče — kao i prije.
+  crane.userData.printCrane=true;
   tower.base(crane);
   tower.mast(crane);
   batch(crane);
@@ -252,8 +254,9 @@ export function createCraneScene() {
   batch(trolley);
   // Teret, kuka i sajle više nisu djeca strijele: teret ostaje na krovu kad se kuka otkači,
   // a kuka nastavlja sa kranom. Njihov položaj u svijetu računa update() (vidi rigPose).
+  // I oni su puna boja — svežanj je svijetla tačkasta ploha, trake i kuka puno mastilo.
   const load=group(scene,0,0,0);
-  load.userData.printLine=true;
+  load.userData.printCrane=true;
   load.scale.setScalar(LOAD_SCALE);
   function pallet(g,x,y,z,blocks=true,variant=0) {
     for(const px of [-.65,0,.65])box(g,m.darkWood,x+px,y+.12,z,.17,.24,1.3);
@@ -281,13 +284,13 @@ export function createCraneScene() {
   }
   // Kuka (kolotur + ušica) visi sa kolica; dok nosi teret, sjedi tačno iznad kaveza.
   const hook=group(scene,0,0,0);
-  hook.userData.printLine=true;
+  hook.userData.printCrane=true;
   hook.scale.setScalar(LOAD_SCALE);
   tower.hookBlock(hook);
   batch(hook);
   // Sajle: svaka je grupa sa jediničnim štapom unutra (0..1), pa animacija ide preko grupe.
-  // Linijski crtež se crta po lokalnom prostoru grupe — tako i linije prate kuku i teret.
-  const cable=(r)=>{const g=group(scene);g.userData.printLine=true;rod(g,m.steel,[0,0,0],[0,1,0],r);return g;};
+  // Pune šipke prate kuku i teret u svijetu.
+  const cable=(r)=>{const g=group(scene);g.userData.printCrane=true;rod(g,m.steel,[0,0,0],[0,1,0],r);return g;};
   const hoists=[[-.14,-.14],[-.14,.14],[.14,-.14],[.14,.14]].map(([dx,dz])=>{
     const g=cable(.03);g.userData.dx=dx;g.userData.dz=dz;return g;
   });

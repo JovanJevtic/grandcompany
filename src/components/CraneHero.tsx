@@ -48,8 +48,8 @@ export default function CraneHero() {
   // Three.js (najveći fajl, ~680 KB) i scena se skidaju odmah sa HTML-om, a ne tek kad React
   // pokrene efekat ispod. URL-ovi moraju biti isti kao u importima (uključujući ?v=).
   preloadModule('/vendor/three.module.min.js')
-  preloadModule('/crane/crane-scene.js?v=55')
-  preloadModule('/crane/crane-print.js?v=27')
+  preloadModule('/crane/crane-scene.js?v=56')
+  preloadModule('/crane/crane-print.js?v=28')
 
   useEffect(() => {
     const script = document.createElement('script')
