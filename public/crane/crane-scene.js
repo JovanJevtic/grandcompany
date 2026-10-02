@@ -487,12 +487,13 @@ export function createCraneScene() {
 
   // ——— Putanja kamere kroz cijelu priču (sirovi progres 0..1) ———
   // Jedna glatka kriva (Catmull-Rom) kroz ključeve, bez skokova i bez "plesa" oko krana:
-  //   .00-.27  kamera kreće odozdo, uz sam stub (worm's-eye), brzo se penje dok se kran okreće,
+  //   .00-.275 kamera kreće odozdo, uz sam stub (worm's-eye), brzo se penje dok se kran okreće,
   //            pa na nivou glave skreće ka kontrategu i dolazi na tablu sa logom (kraj krana);
-  //   .27-.43  u krupnom planu putuje horizontalno pored mašinskog poda i kabine, duž strijele,
+  //   .275-.43 u krupnom planu putuje horizontalno pored mašinskog poda i kabine, duž strijele,
   //            do kolica, pa pogled spusti na kuku i teret;
-  //   .43-.57  blagi odzum dok se teret spušta na krov, pa kuka ide gore (otkačinjanje);
-  //   .57-.76  spust niz fasadu do balkona i ulaz u kupatilo; .76-1 izlaz kroz prozor u nebo.
+  //   .43-.65  podigne se i odmah odmakne na TOP VIEW: ceo kran se vidi odozgo dok teret sleće
+  //            na krov i kuka se otkači (kadar miruje, samo teret ide dole);
+  //   .65-.81  spust niz fasadu do balkona; .81-1 ulaz u kupatilo i izlaz kroz prozor u nebo.
   // Kamera ne ulazi u ekstremni krupni plan i ne vraća se: jedan smjer, jedan pogled.
   const EYE=ENTRY_Y+1.5;
   const CAMERA_KEYS=[
@@ -510,16 +511,22 @@ export function createCraneScene() {
     [.355,      [-5.6,25.4,8.4],       [-4.5,26.3,0]],    // horizontalno pored mašinskog poda i kabine
     [.395,      [1,24.7,8.6],          [5.5,26.5,0]],     // duž strijele ka kolicima
     [.43,       [4.4,23.4,8.4],        [8.6,16.4,0]],     // kuka i teret u centru, sajle idu uvis
-    [.475,      [2.8,22.6,11.4],       [8.6,14.6,0]],     // blagi odzum — teret se spušta
-    [.52,       [0,21.8,15.8],         [8.8,12.4,0]],     // teret sleće na krov
-    [.57,       [-.4,20.6,18.2],       [8.8,12.8,0]],     // kuka se otkači i ide gore
-    [.63,       [3.6,15.6,16.2],       [8.8,9.6,0]],      // niz fasadu
-    [.70,       [7.6,9.4,13.2],        [8.7,6.9,0]],      // ka balkonu sprata ENTRY
-    [.76,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
-    [.82,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
-    [.87,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
-    [.91,       [10.3,EYE,0],          [14.5,EYE,0]],     // pred prozorom
-    [.96,       [13.8,EYE+.05,0],      [18,EYE+.45,0]],   // kroz prozor
+    [.465,      [1.5,26,11],           [8,17,0]],         // otpočinje odmicanje — teret još visi
+    [.50,       [-3,31,15],            [6.5,19,0]],       // diže se
+    [.535,      [-8.5,38,21],          [4.5,21,0]],       // širi se kadar
+    [.565,      [-13,43.5,28],         [3,22.5,0]],       // ceo kran ulazi u kadar
+    [.59,       [-16,46.5,32.5],       [2,23.5,0]],       // TOP VIEW: ceo kran odozgo, teret kreće dole
+    [.63,       [-15.5,45.5,31.5],     [2.5,21.5,0]],     // teret putuje ka krovu (kadar miruje)
+    [.67,       [-14,42,29.5],         [3.5,19.5,0]],     // teret sleće
+    [.71,       [-10.5,35.5,25.5],     [6,16.5,0]],       // kuka se otkači — počinje spust
+    [.75,       [-5,28,21],            [7.5,13,0]],       // niz fasadu
+    [.79,       [1,19,17],             [8.5,9.5,0]],      // bliži se zgradi
+    [.82,       [5.5,12.5,14.5],       [8.6,7.8,0]],      // ka balkonu sprata ENTRY
+    [.85,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
+    [.89,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
+    [.92,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
+    [.95,       [10.3,EYE,0],          [14.5,EYE,0]],     // pred prozorom
+    [.975,      [13.8,EYE+.05,0],      [18,EYE+.45,0]],   // kroz prozor
     [1,         [17.0,EYE+.3,0],       [22,EYE+3.4,0]],   // napolju — ostaje samo nebo
   ];
   const cameraCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[1])),false,'centripetal');
@@ -592,8 +599,9 @@ export function createCraneScene() {
   }
   // ——— Kran: okretanje, teret, kuka ———
   // Trenuci priče u sirovom progresu skrola. Okretanje ide uz uspon kamere (kran se okreće dok
-  // se penjemo), spuštanje tereta počinje tačno kad kamera spusti pogled na kuku i teret (.44).
-  const T={swing0:.04,swing1:.165,drop0:.44,drop1:.53,release0:.53,release1:.575,lift0:.55,lift1:.65,away0:.58,away1:.72};
+  // se penjemo); spuštanje tereta počinje tek kad je kamera na TOP VIEW-u (.59), tako da se
+  // cijeli kran vidi prije nego teret krene dole.
+  const T={swing0:.04,swing1:.165,drop0:.59,drop1:.67,release0:.67,release1:.71,lift0:.69,lift1:.78,away0:.72,away1:.84};
   const MAST_X=-7;
   // Gornja tačka sajli: kolica se voze po donjim tetivama strijele, pa im visina prati x.
   const trolleyTop=(x)=>MAST_TOP+trolleyY(x)-.42;
@@ -624,7 +632,7 @@ export function createCraneScene() {
     const th=slewAt(p);
     slew.rotation.y=th;
     // Kolica idu ka kraju strijele dok se kamera penje; posle otkačinjanja se vraćaju.
-    const tx=13+3*smooth(.09,.32,p)-3*smooth(.58,.70,p);
+    const tx=13+3*smooth(.09,.32,p)-3*smooth(.70,.82,p);
     trolley.position.x=tx;
     trolley.position.y=trolleyY(tx);
     // Teret na sajli malo kasni za strijelom dok se kran okreće (inercija), a smiri se pri spuštanju.
@@ -673,11 +681,14 @@ export function createCraneScene() {
     // odmakne od tačke pogleda da kran i zgrada stanu u širinu; u sobi je normalna.
     const path=cameraPath(p);
     target.copy(path.look);
-    const pull=mix(Math.max(1,.92/aspect),1,smooth(.70,.79,p));
+    // Uzak (uspravan) ekran: pogled se pomjeri ka sredini krana, da kontrateg ne ispadne iz kadra.
+    const narrow=clamp((1-aspect)/.47);
+    if(narrow>0)target.x-=3.5*narrow*(1-smooth(.82,.90,p));
+    const pull=mix(Math.max(1,.92/aspect),1,smooth(.82,.90,p));
     camera.position.copy(path.position).sub(target).multiplyScalar(pull).add(target);
     focus.copy(target);
     // U sobi je objektiv širi (naročito na uskom ekranu), da kupatilo stane u kadar.
-    const inside=smooth(.74,.8,p)*(1-smooth(.94,.99,p));
+    const inside=smooth(.81,.87,p)*(1-smooth(.96,.99,p));
     camera.fov=37+(aspect<1?24:9)*inside;
     camera.aspect=aspect;camera.lookAt(target);camera.updateProjectionMatrix();
     return {chapter:p<.17?0:p<.36?1:p<.58?2:p<.925?3:4};
