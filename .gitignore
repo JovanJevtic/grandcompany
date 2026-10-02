@@ -47,3 +47,7 @@ next-env.d.ts
 
 # originalni PNG-ovi iz Codex generatora (sajt koristi WebP iz public/shop i public/editorial)
 /public/gen/
+
+# Privremeni screenshotovi iz root-a (ne u repo)
+/*.png
+/*.webp
