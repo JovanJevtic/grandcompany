@@ -9,7 +9,6 @@ import { gsap, ScrollTrigger, useGSAP } from '@/lib/gsap'
 import { useMediaMotion } from '@/lib/media'
 import { MQ } from '@/lib/motion'
 import { revealChars } from '@/lib/reveal'
-import Pw from '@/components/ui/Pw'
 
 // Prvi ekran poslije herosa: ko smo (B2B veleprodaja, Knauf sistematika). Tekst je uz lijevu
 // ivicu (naslov, opis, ulazi — sve u istoj liniji), a ispod njega vodoravna traka krupnih,
@@ -80,16 +79,20 @@ export default function Intro() {
   return (
     <section ref={root} id="radovi" className="relative z-20 bg-bg pb-[8vh] pt-[24vh]">
       <div className="gutter">
-        <p data-up className="label opacity-60">
-          Veleprodaja građevinskog materijala · Banja Luka
-        </p>
+        {/* Naslov u istom jeziku kao "Sistemi suhe gradnje" — riječi u stepenastim redovima —
+            ali je cijeli blok centriran na stranici. */}
+        <h2
+          data-head
+          className="display invisible mx-auto w-fit text-center text-[clamp(36px,5.6vw,108px)] leading-[0.9] tracking-[-0.03em]"
+        >
+          <span className="block text-left">Građevinski</span>
+          <span className="block text-right">materijal</span>
+          <span className="block text-left">za profesionalce</span>
+        </h2>
 
-        <div className="mt-7 grid gap-x-[5vw] gap-y-7 md:grid-cols-[minmax(0,1.05fr)_minmax(0,48ch)] md:items-end">
-          <h2 data-head className="display invisible max-w-[18ch] text-[clamp(32px,4.8vw,92px)]">
-            <Pw>Građevinski materijal za profesionalce</Pw>
-          </h2>
-          <div className="md:pb-3">
-            <p data-up data-delay="0.1" className="max-w-[52ch] text-[15px] leading-[1.7] opacity-75">
+        <div data-up data-delay="0.1" className="mt-12 flex justify-end">
+          <div className="max-w-[52ch]">
+            <p className="text-[15px] leading-[1.7] opacity-75">
               Snabdijevamo građevinske firme i izvođače: materijal sa stovarišta u Banjoj Luci, vaša cijena i dostava
               vlastitim kamionima sa kranom — direktno na gradilište. Suha gradnja i Knauf sistemi su naša specijalizacija.
             </p>

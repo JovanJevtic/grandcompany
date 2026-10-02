@@ -487,47 +487,46 @@ export function createCraneScene() {
 
   // ——— Putanja kamere kroz cijelu priču (sirovi progres 0..1) ———
   // Jedna glatka kriva (Catmull-Rom) kroz ključeve, bez skokova i bez "plesa" oko krana:
-  //   .00-.275 kamera kreće odozdo, uz sam stub (worm's-eye), brzo se penje dok se kran okreće,
+  //   .00-.235 kamera kreće odozdo, uz sam stub (worm's-eye), brzo se penje dok se kran okreće,
   //            pa na nivou glave skreće ka kontrategu i dolazi na tablu sa logom (kraj krana);
-  //   .275-.43 u krupnom planu putuje horizontalno pored mašinskog poda i kabine, duž strijele,
+  //   .235-.365 u krupnom planu putuje horizontalno pored mašinskog poda i kabine, duž strijele,
   //            do kolica, pa pogled spusti na kuku i teret;
-  //   .43-.65  podigne se i odmah odmakne na TOP VIEW: ceo kran se vidi odozgo dok teret sleće
-  //            na krov i kuka se otkači (kadar miruje, samo teret ide dole);
-  //   .65-.81  spust niz fasadu do balkona; .81-1 ulaz u kupatilo i izlaz kroz prozor u nebo.
+  //   .365-.61  blago se odmakne (najdalje: kuka, sajle, krov i gornji dio krana u istom kadru)
+  //            i tu miruje dok teret sleće na krov i kuka se otkači;
+  //   .61-.80  spust niz fasadu do balkona; .80-1 ulaz u kupatilo i izlaz kroz prozor u nebo.
   // Kamera ne ulazi u ekstremni krupni plan i ne vraća se: jedan smjer, jedan pogled.
   const EYE=ENTRY_Y+1.5;
   const CAMERA_KEYS=[
     // p      pozicija                 pogled
     [0,         [-2.8,2.2,9.6],        [-7.2,20.5,0]],    // baza: odozdo uz stub, kran se ne vidi cijeli
-    [.035,      [-3.1,2.9,9.4],        [-7.3,21.5,0]],    // polazak — lagano
-    [.07,       [-3.6,5.2,9.0],        [-7.4,23.2,0]],    // ubrzava uz stub
-    [.10,       [-4.4,8.4,8.3],        [-7,24.5,0]],      // uspon, stub se uspravlja u kadar
-    [.14,       [-5.6,13.6,7.8],       [-7.4,25.6,0]],    // brzi uspon (najveća brzina puta)
-    [.18,       [-7.6,18.8,7.2],       [-7.8,26.2,0]],    // tik uz stub, glava ulazi u kadar
-    [.215,      [-10.4,22.8,6.9],      [-9.6,26,0]],      // na nivou glave — skreće ka kontrategu
-    [.245,      [-11.9,24.6,6.5],      [-11.4,25.6,.2]],  // prilazi tabli
-    [.275,      [-12.25,25.15,6.3],    [-12.25,25.1,.2]], // TABLA SA LOGOM (kraj krana, izbliza)
-    [.315,      [-10.4,25.3,7.7],      [-9.5,26.2,0]],    // kreće dalje — pogled duž krana
-    [.355,      [-5.6,25.4,8.4],       [-4.5,26.3,0]],    // horizontalno pored mašinskog poda i kabine
-    [.395,      [1,24.7,8.6],          [5.5,26.5,0]],     // duž strijele ka kolicima
-    [.43,       [4.4,23.4,8.4],        [8.6,16.4,0]],     // kuka i teret u centru, sajle idu uvis
-    [.465,      [1.5,26,11],           [8,17,0]],         // otpočinje odmicanje — teret još visi
-    [.50,       [-3,31,15],            [6.5,19,0]],       // diže se
-    [.535,      [-8.5,38,21],          [4.5,21,0]],       // širi se kadar
-    [.565,      [-13,43.5,28],         [3,22.5,0]],       // ceo kran ulazi u kadar
-    [.59,       [-16,46.5,32.5],       [2,23.5,0]],       // TOP VIEW: ceo kran odozgo, teret kreće dole
-    [.63,       [-15.5,45.5,31.5],     [2.5,21.5,0]],     // teret putuje ka krovu (kadar miruje)
-    [.67,       [-14,42,29.5],         [3.5,19.5,0]],     // teret sleće
-    [.71,       [-10.5,35.5,25.5],     [6,16.5,0]],       // kuka se otkači — počinje spust
-    [.75,       [-5,28,21],            [7.5,13,0]],       // niz fasadu
-    [.79,       [1,19,17],             [8.5,9.5,0]],      // bliži se zgradi
-    [.82,       [5.5,12.5,14.5],       [8.6,7.8,0]],      // ka balkonu sprata ENTRY
-    [.85,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
-    [.89,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
-    [.92,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
-    [.95,       [10.3,EYE,0],          [14.5,EYE,0]],     // pred prozorom
-    [.975,      [13.8,EYE+.05,0],      [18,EYE+.45,0]],   // kroz prozor
-    [1,         [17.0,EYE+.3,0],       [22,EYE+3.4,0]],   // napolju — ostaje samo nebo
+    [.028,      [-3.1,2.9,9.4],        [-7.3,21.5,0]],    // polazak — lagano
+    [.058,      [-3.6,5.2,9.0],        [-7.4,23.2,0]],    // ubrzava uz stub
+    [.085,      [-4.4,8.4,8.3],        [-7,24.5,0]],      // uspon, stub se uspravlja u kadar
+    [.12,       [-5.6,13.6,7.8],       [-7.4,25.6,0]],    // brzi uspon (najveća brzina puta)
+    [.155,      [-7.6,18.8,7.2],       [-7.8,26.2,0]],    // tik uz stub, glava ulazi u kadar
+    [.185,      [-10.4,22.8,6.9],      [-9.6,26,0]],      // na nivou glave — skreće ka kontrategu
+    [.21,       [-11.9,24.6,6.5],      [-11.4,25.6,.2]],  // prilazi tabli
+    [.235,      [-12.25,25.15,6.3],    [-12.25,25.1,.2]], // TABLA SA LOGOM (kraj krana, izbliza)
+    [.27,       [-10.4,25.3,7.7],      [-9.5,26.2,0]],    // kreće dalje — pogled duž krana
+    [.30,       [-5.6,25.4,8.4],       [-4.5,26.3,0]],    // horizontalno pored mašinskog poda i kabine
+    [.335,      [1,24.7,8.6],          [5.5,26.5,0]],     // duž strijele ka kolicima
+    [.365,      [4.4,23.4,8.4],        [8.6,16.4,0]],     // kuka i teret u centru, sajle idu uvis
+    [.395,      [2.2,25,11],           [8,16.5,0]],       // otpočinje odmicanje — teret još visi
+    [.425,      [-.8,28,15.5],         [7,17.5,0]],       // širi se kadar
+    [.46,       [-2.2,31,20],          [5,19,0]],         // NAJDALJE: kuka, sajle, krov i vrh krana u kadru
+    [.52,       [-2.4,30.6,20],        [5,17,0]],         // teret putuje dole (kadar miruje)
+    [.575,      [-2.5,29.8,20.5],      [5,14.5,0]],       // teret sleće na krov
+    [.61,       [-3,29,21],            [5.6,14,0]],       // kuka se otkači i ide gore
+    [.655,      [-1,25.5,19],          [7.5,12.5,0]],     // počinje spust
+    [.70,       [1.5,20.5,17],         [8.2,10.4,0]],     // niz fasadu
+    [.745,      [4.6,15,15],           [8.5,8.6,0]],      // ka zgradi
+    [.775,      [6.6,11.6,13.5],       [8.5,7.4,0]],      // ka balkonu sprata ENTRY
+    [.80,       [8.1,EYE+.1,11.5],     [8.1,EYE-.1,0]],   // ispred balkonskih vrata
+    [.85,       [8.1,EYE,2.0],         [8.9,EYE-.25,-3]], // kroz vrata — umivaonik i ogledalo
+    [.89,       [8.9,EYE,.3],          [11.8,EYE-.15,-2.2]], // okret ka prozoru
+    [.93,       [10.3,EYE,0],          [14.5,EYE,0]],     // pred prozorom
+    [.955,      [12.4,EYE+.05,0],      [18,EYE+.45,0]],   // kroz prozor
+    [1,         [17.0,EYE+.4,0],       [22,EYE+3.4,0]],   // napolju — ostaje samo nebo
   ];
   const cameraCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[1])),false,'centripetal');
   const lookCurve=new THREE.CatmullRomCurve3(CAMERA_KEYS.map(k=>new THREE.Vector3(...k[2])),false,'centripetal');
@@ -599,9 +598,9 @@ export function createCraneScene() {
   }
   // ——— Kran: okretanje, teret, kuka ———
   // Trenuci priče u sirovom progresu skrola. Okretanje ide uz uspon kamere (kran se okreće dok
-  // se penjemo); spuštanje tereta počinje tek kad je kamera na TOP VIEW-u (.59), tako da se
-  // cijeli kran vidi prije nego teret krene dole.
-  const T={swing0:.04,swing1:.165,drop0:.59,drop1:.67,release0:.67,release1:.71,lift0:.69,lift1:.78,away0:.72,away1:.84};
+  // se penjemo); spuštanje tereta počinje kad je kadar najširi (.43) — tada se vidi kuka, sajle,
+  // krov i vrh krana, pa teret putuje dole u mirnom kadru.
+  const T={swing0:.035,swing1:.145,drop0:.46,drop1:.575,release0:.575,release1:.615,lift0:.595,lift1:.70,away0:.62,away1:.80};
   const MAST_X=-7;
   // Gornja tačka sajli: kolica se voze po donjim tetivama strijele, pa im visina prati x.
   const trolleyTop=(x)=>MAST_TOP+trolleyY(x)-.42;
@@ -632,7 +631,7 @@ export function createCraneScene() {
     const th=slewAt(p);
     slew.rotation.y=th;
     // Kolica idu ka kraju strijele dok se kamera penje; posle otkačinjanja se vraćaju.
-    const tx=13+3*smooth(.09,.32,p)-3*smooth(.70,.82,p);
+    const tx=13+3*smooth(.08,.28,p)-3*smooth(.66,.78,p);
     trolley.position.x=tx;
     trolley.position.y=trolleyY(tx);
     // Teret na sajli malo kasni za strijelom dok se kran okreće (inercija), a smiri se pri spuštanju.
@@ -684,11 +683,11 @@ export function createCraneScene() {
     // Uzak (uspravan) ekran: pogled se pomjeri ka sredini krana, da kontrateg ne ispadne iz kadra.
     const narrow=clamp((1-aspect)/.47);
     if(narrow>0)target.x-=3.5*narrow*(1-smooth(.82,.90,p));
-    const pull=mix(Math.max(1,.92/aspect),1,smooth(.82,.90,p));
+    const pull=mix(Math.max(1,.92/aspect),1,smooth(.76,.84,p));
     camera.position.copy(path.position).sub(target).multiplyScalar(pull).add(target);
     focus.copy(target);
     // U sobi je objektiv širi (naročito na uskom ekranu), da kupatilo stane u kadar.
-    const inside=smooth(.81,.87,p)*(1-smooth(.96,.99,p));
+    const inside=smooth(.77,.83,p)*(1-smooth(.95,.985,p));
     camera.fov=37+(aspect<1?24:9)*inside;
     camera.aspect=aspect;camera.lookAt(target);camera.updateProjectionMatrix();
     return {chapter:p<.17?0:p<.36?1:p<.58?2:p<.925?3:4};

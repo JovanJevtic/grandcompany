@@ -20,8 +20,8 @@ import * as THREE from '../vendor/three.module.min.js';
 // city: 0 = pozadina je samo nebo u oblacima, 1 = grad sa neboderima (tek kad se izađe kroz prozor).
 export const STAGES = [
   { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 4.4, angle: 45, bg: .2, floor: 0, city: 0 },  // uspon uz kran, tabla sa logom, vožnja do kuke
-  { at: .30, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .24, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): spuštanje na krov, otkačinjanje, fasada
-  { at: .81, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
+  { at: .26, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .24, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): vožnja do kuke, spuštanje na krov, otkačinjanje, fasada
+  { at: .76, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
   // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
   // grad se nazire samo kroz gustinu tačaka. Preko nje se ispisuje rečenica, svijetla i centrirana.
   { at: .925, paper: '#2448e0', ink: '#13289c', cell: 6.0, angle: 30, bg: .55, floor: .2, city: 1 },
@@ -635,9 +635,9 @@ export function createCraneRenderer(renderer, world) {
       uniforms.bgShift.value.set(mouse.x * -.012, mouse.y * .01 + .05 - p * .07);
       uniforms.bgScale.value = .86 - .08 * Math.min(1, p / .5);
       // U sobi nema sunca: sjenčenje je mekše, pa enterijer ostane svijetao i čitljiv.
-      const inside = Math.min(1, Math.max(0, (p - .77) / .1));
-      // Kamera je u sobi (vidi crane-scene: širi objektiv od .81–.87): kroz prozor se vidi plavi grad.
-      uniforms.room.value = p > .87 ? 1 : 0; // tek kad kamera prođe kroz balkonska vrata (.85 ispred, .89 unutra)
+      const inside = Math.min(1, Math.max(0, (p - .73) / .1));
+      // Kamera je u sobi (vidi crane-scene: širi objektiv od .77–.83): kroz prozor se vidi plavi grad.
+      uniforms.room.value = p > .83 ? 1 : 0; // tek kad kamera prođe kroz balkonska vrata (.80 ispred, .85 unutra)
       // Uvodni kadar je sada baza krana (kamera gleda uvis), pa se kran vidi od prvog trenutka:
       // "razvijanje" iz tačaka (lineFade) je isključeno i drži se na 1.
       uniforms.lineFade.value = 1;
