@@ -2059,6 +2059,13 @@ html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-c
   display: grid;
   border: 1.5px solid var(--ink);
 }
+/* Lijevo: kontrola (površina + izbor materijala), desno: presjek koji to prati.
+   U istom okviru — na mobitelu jedno iznad drugog, na desktopu jedan do drugog. */
+.w111-mix {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
 .w111-area,
 .w111-options {
   padding: clamp(22px, 3vw, 44px);
@@ -2070,13 +2077,20 @@ html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-c
   gap: 18px;
   border-bottom: 1.5px solid var(--ink);
 }
+.w111-drawing {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: clamp(22px, 3vw, 32px);
+  border-top: 1.5px solid var(--ink);
+}
 @media (min-width: 960px) {
   .w111-input {
-    grid-template-columns: 1.15fr 1fr;
+    grid-template-columns: 1.05fr 1fr;
   }
-  .w111-area {
-    border-bottom: 0;
-    border-right: 1.5px solid var(--ink);
+  .w111-drawing {
+    border-top: 0;
+    border-left: 1.5px solid var(--ink);
   }
 }
 .w111-area__row {
@@ -2090,7 +2104,7 @@ html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-c
   flex: 1;
   background: transparent;
   border-bottom: 1.5px solid var(--ink);
-  font-size: clamp(64px, 9vw, 150px);
+  font-size: clamp(44px, 5.5vw, 84px);
   line-height: 1;
   text-align: right;
   outline: none;
@@ -2100,7 +2114,7 @@ html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-c
   border-bottom-color: var(--cobalt);
 }
 .w111-area__unit {
-  font-size: clamp(28px, 3.2vw, 52px);
+  font-size: clamp(20px, 2.6vw, 36px);
   line-height: 1;
 }
 .w111-options {
@@ -2196,32 +2210,29 @@ html:not([data-hydrated]) :is([data-client-state], .nav__mode-desk, .nav__cart-c
 .w111-toggle input:checked {
   background: var(--ink) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M5 10.5l3 3 7-7' fill='none' stroke='%23f4f1ec' stroke-width='2.2'/%3E%3C/svg%3E") center/14px no-repeat;
 }
-.w111-visual {
-  margin-top: clamp(48px, 9vh, 110px);
-}
-.w111-visual__head {
+.w111-drawing__head {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
+  gap: 12px;
   padding-bottom: 14px;
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 18%, transparent);
 }
-.w111-visual__dims {
+.w111-drawing__dims {
   display: flex;
-  gap: clamp(20px, 3vw, 48px);
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  gap: clamp(16px, 2.4vw, 32px);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
 }
-.w111-visual__dims b {
-  margin-right: 6px;
-  font-size: clamp(30px, 3.4vw, 56px);
+.w111-drawing__dims b {
+  margin-right: 4px;
+  font-size: clamp(18px, 1.9vw, 28px);
   line-height: 1;
   letter-spacing: -0.01em;
 }
-.w111-visual svg {
-  margin-block: clamp(20px, 4vh, 48px);
+.w111-drawing__svg svg {
+  margin-block: clamp(16px, 3vh, 32px);
 }
 .w111-svg-label {
   font-size: 13px;

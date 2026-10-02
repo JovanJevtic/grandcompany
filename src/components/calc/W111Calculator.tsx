@@ -113,105 +113,110 @@ export default function W111Calculator() {
 
   return (
     <div className="w111">
-      {/* ——— Unos ——— */}
-      <section className="w111-input" aria-label="Unos">
-        <div className="w111-area">
-          <label htmlFor="w111-area" className="w111-label">
-            01 · Površina zida
-          </label>
-          <div className="w111-area__row">
-            <button type="button" className="btn-square" onClick={() => step(-1)} aria-label="Manje">
-              −
-            </button>
-            <input
-              id="w111-area"
-              inputMode="decimal"
-              value={raw}
-              onChange={(e) => setRaw(e.target.value)}
-              onBlur={() => !area && setRaw('1')}
-              className="w111-area__input display"
-              aria-describedby="w111-area-hint"
-            />
-            <span className="w111-area__unit display">m²</span>
-            <button type="button" className="btn-square" onClick={() => step(1)} aria-label="Više">
-              +
-            </button>
-          </div>
-          <p id="w111-area-hint" className="w111-hint">
-            Dužina × visina zida, bez otvora za vrata. Npr. zid 4 × 2,6 m = 10,4 m².
-          </p>
-        </div>
-
-        <div className="w111-options">
-          <div>
-            <p className="w111-label">02 · Obloga</p>
-            <div className="w111-seg" role="radiogroup" aria-label="Obloga">
-              {(
-                [
-                  ['single', 'Jednostruka', '1 ploča sa svake strane · 100 mm'],
-                  ['double', 'Dvostruka', '2 ploče sa svake strane · 125 mm'],
-                ] as const
-              ).map(([id, name, sub]) => (
-                <button key={id} type="button" role="radio" aria-checked={cladding === id} onClick={() => setCladding(id)}>
-                  <span className="block">{name}</span>
-                  <span className="w111-seg__sub">{sub}</span>
-                </button>
-              ))}
+      {/* ——— Unos + presjek u istom kadru: dio gdje se mijenja artikal (lijevo) i
+              ilustracija koja to prati (desno) leže jedan pored drugog, na mobitelu
+              jedan iznad drugog, u istom okviru — bez velikog praznog prostora. ——— */}
+      <section className="w111-input" aria-label="Kalkulator — unos i presjek zida">
+        <div className="w111-mix">
+          <div className="w111-area">
+            <label htmlFor="w111-area" className="w111-label">
+              01 · Površina zida
+            </label>
+            <div className="w111-area__row">
+              <button type="button" className="btn-square" onClick={() => step(-1)} aria-label="Manje">
+                −
+              </button>
+              <input
+                id="w111-area"
+                inputMode="decimal"
+                value={raw}
+                onChange={(e) => setRaw(e.target.value)}
+                onBlur={() => !area && setRaw('1')}
+                className="w111-area__input display"
+                aria-describedby="w111-area-hint"
+              />
+              <span className="w111-area__unit display">m²</span>
+              <button type="button" className="btn-square" onClick={() => step(1)} aria-label="Više">
+                +
+              </button>
             </div>
+            <p id="w111-area-hint" className="w111-hint">
+              Dužina × visina zida, bez otvora za vrata. Npr. zid 4 × 2,6 m = 10,4 m².
+            </p>
           </div>
 
-          <div>
-            <p className="w111-label">03 · Ploča</p>
-            <div className="w111-plates" role="radiogroup" aria-label="Ploča">
-              {PLATES.map((p) => (
-                <button key={p.sku} type="button" role="radio" aria-checked={plate === p.sku} onClick={() => setPlate(p.sku)}>
-                  <i style={{ background: p.color }} />
-                  <span>
-                    <span className="block">{p.code}</span>
-                    <span className="w111-seg__sub">{p.note}</span>
-                  </span>
-                </button>
-              ))}
+          <div className="w111-options">
+            <div>
+              <p className="w111-label">02 · Obloga</p>
+              <div className="w111-seg" role="radiogroup" aria-label="Obloga">
+                {(
+                  [
+                    ['single', 'Jednostruka', '1 ploča sa svake strane · 100 mm'],
+                    ['double', 'Dvostruka', '2 ploče sa svake strane · 125 mm'],
+                  ] as const
+                ).map(([id, name, sub]) => (
+                  <button key={id} type="button" role="radio" aria-checked={cladding === id} onClick={() => setCladding(id)}>
+                    <span className="block">{name}</span>
+                    <span className="w111-seg__sub">{sub}</span>
+                  </button>
+                ))}
+              </div>
             </div>
+
+            <div>
+              <p className="w111-label">03 · Ploča</p>
+              <div className="w111-plates" role="radiogroup" aria-label="Ploča">
+                {PLATES.map((p) => (
+                  <button key={p.sku} type="button" role="radio" aria-checked={plate === p.sku} onClick={() => setPlate(p.sku)}>
+                    <i style={{ background: p.color }} />
+                    <span>
+                      <span className="block">{p.code}</span>
+                      <span className="w111-seg__sub">{p.note}</span>
+                    </span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <label className="w111-toggle">
+              <input type="checkbox" checked={wool} onChange={(e) => setWool(e.target.checked)} />
+              <span>
+                <span className="block">04 · Kamena vuna u zidu</span>
+                <span className="w111-seg__sub">Toplotna i zvučna izolacija između profila</span>
+              </span>
+            </label>
           </div>
-
-          <label className="w111-toggle">
-            <input type="checkbox" checked={wool} onChange={(e) => setWool(e.target.checked)} />
-            <span>
-              <span className="block">04 · Kamena vuna u zidu</span>
-              <span className="w111-seg__sub">Toplotna i zvučna izolacija između profila</span>
-            </span>
-          </label>
         </div>
-      </section>
 
-      {/* ——— Presjek ——— */}
-      <section className="w111-visual" aria-label="Presjek zida">
-        <div className="w111-visual__head">
-          <p className="w111-label">Presjek · pogled odozgo</p>
-          <p className="w111-visual__dims tabular-nums">
-            <span>
-              <b className="display">{wallThickness(cladding)}</b> mm debljina
-            </span>
-            <span>
-              <b className="display">{nf(area || 0)}</b> m² zida
-            </span>
-          </p>
-        </div>
-        <Section cladding={cladding} color={plateDef.color} wool={wool} />
-        <ul className="w111-legend">
-          <li>
-            <i style={{ background: plateDef.color }} /> {plateDef.code} 12,5 mm × {cladding === 'double' ? 2 : 1} sa svake strane
-          </li>
-          <li>
-            <i className="w111-legend__stud" /> CW 75 na 625 mm, UW 75 pod i plafon
-          </li>
-          {wool && (
+        <div className="w111-drawing">
+          <div className="w111-drawing__head">
+            <p className="w111-label">Presjek · pogled odozgo</p>
+            <p className="w111-drawing__dims tabular-nums">
+              <span>
+                <b className="display">{wallThickness(cladding)}</b> mm
+              </span>
+              <span>
+                <b className="display">{nf(area || 0)}</b> m²
+              </span>
+            </p>
+          </div>
+          <div className="w111-drawing__svg">
+            <Section cladding={cladding} color={plateDef.color} wool={wool} />
+          </div>
+          <ul className="w111-legend">
             <li>
-              <i className="w111-legend__wool" /> Kamena vuna 50 mm
+              <i style={{ background: plateDef.color }} /> {plateDef.code} 12,5 mm × {cladding === 'double' ? 2 : 1} sa svake strane
             </li>
-          )}
-        </ul>
+            <li>
+              <i className="w111-legend__stud" /> CW 75 na 625 mm, UW 75 pod i plafon
+            </li>
+            {wool && (
+              <li>
+                <i className="w111-legend__wool" /> Kamena vuna 50 mm
+              </li>
+            )}
+          </ul>
+        </div>
       </section>
 
       {/* ——— Spisak materijala ——— */}
