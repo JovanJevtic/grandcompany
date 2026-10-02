@@ -1,8 +1,9 @@
 'use client'
 
+/* eslint-disable @next/next/no-img-element -- znak uvoda je jedan mali WebP, ide odmah sa HTML-om */
+
 import { useEffect, useRef } from 'react'
 import { useLenis } from 'lenis/react'
-import GcMonogram from './GcMonogram'
 
 // Uvodni splash (uzor: leome-and-partners.com): četiri kvadratića se skupe u 2x2 blok,
 // raziđu se u čoškove okvira, pa iz dna izranja monogram; na kraju se zavjesa podigne.
@@ -115,7 +116,8 @@ export default function Splash() {
 
         <div className="splash-mark-mask">
           <div data-mark className="splash-mark">
-            <GcMonogram className="block h-auto w-full" />
+            {/* Znak brenda u svijetloj verziji (za tamnu podlogu uvoda). */}
+            <img src="/brand/mark-light.webp" alt="" decoding="async" className="block h-auto w-full" />
           </div>
         </div>
       </div>

@@ -41,12 +41,12 @@
   transform: translate(var(--x0), var(--y0));
 }
 
-/* Maska drži monogram skrivenim dok ne izroni iz dna. */
+/* Maska drži znak skrivenim dok ne izroni iz dna. */
 .splash-mark-mask {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: calc(var(--splash-frame) * 0.47);
+  width: calc(var(--splash-frame) * 0.6);
   transform: translate(-50%, -50%);
   overflow: hidden;
 }
