@@ -525,24 +525,18 @@ html:not([data-past-hero]) [data-overlay-header] {
   scale: 1;
 }
 /* Velika kobalt ploča sa riječju (npr. KATALOG preko trake kadrova): kvadrat, kao i sve pločice
-   na sajtu (ivice su namjerno oštre), sa strelicom kao na CTA dugmadima. */
+   na sajtu (ivice su namjerno oštre); riječ stoji centrirana, bez strelice. */
 .cursor[data-cursor-plate] .cursor-tag {
-  left: -62px;
-  top: -62px;
-  width: 124px;
-  height: 124px;
+  left: -52px;
+  top: -52px;
+  width: 104px;
+  height: 104px;
   background: var(--cobalt);
   color: #fff;
   font-size: 11px;
   letter-spacing: 0.2em;
+  /* nadoknada zadnjeg razmaka slova, da riječ stoji optički u sredini */
   padding-left: 0.2em;
-  row-gap: 5px;
-}
-.cursor[data-cursor-plate] .cursor-tag::after {
-  content: '→';
-  font-size: 14px;
-  letter-spacing: 0;
-  padding-left: 0;
 }
 @media (pointer: coarse), (hover: none) {
   .cursor {
@@ -846,8 +840,9 @@ html[data-past-hero] .nav--home .nav__bar {
   color: var(--ink);
 }
 .nav__mark {
-  width: 30px;
-  height: auto;
+  /* Znak je uzan i uspravan (izometrijsko "G"): visina se poklapa sa visinom riječi. */
+  height: 23px;
+  width: auto;
   transition: opacity 0.6s var(--ease-out) 0.15s, transform 0.6s var(--ease-out) 0.15s;
 }
 .nav__word {
@@ -1019,7 +1014,7 @@ html.menu-open .nav--home {
     margin-left: -10px;
   }
   .nav__mark {
-    width: 24px;
+    height: 19px;
   }
   .nav__word {
     font-size: 17px;
@@ -1398,7 +1393,7 @@ html.menu-open .nav--home {
   gap: 10px;
 }
 .nav__mark {
-  width: 32px;
+  height: 25px;
 }
 .nav__word {
   font-size: 20px;
@@ -1511,7 +1506,7 @@ html.menu-open .nav--home {
     font-size: 18px;
   }
   .nav__mark {
-    width: 28px;
+    height: 22px;
   }
   .nav__buy {
     min-width: 0;
@@ -1534,7 +1529,7 @@ html.menu-open .nav--home {
     padding-left: 0;
   }
   .nav__mark {
-    width: 26px;
+    height: 20px;
   }
   .nav__word {
     font-size: 17px;
