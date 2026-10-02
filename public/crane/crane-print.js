@@ -454,9 +454,10 @@ const POST_FRAG = /* glsl */ `
     // Puni kran ne treba prisilno mastilo: njegov ton je 1, pa dotInk pokrije cijelu plohu.
     amount = max(amount, geoLine * fill * (1.0 - outside) * lineFade);
     if (navyF > .5) amount = smoothstep(.45, .55, objTone);
-    // istrošena štampa: sitne mrlje papira u mastilu i poneka mrlja mastila na papiru
+    // istrošena štampa: sitne mrlje papira — ali samo u rasteru (tačke, svijetli tonovi i nebo).
+    // Pune plohe mastila (kran, kontrateg, tabla, okna) ostaju čiste, bez bijelih zrna.
     float fleck = smoothstep(.84, .9, grain * vnoise(frag / (5.0 * dpr) + 7.0) * 1.7);
-    amount *= 1.0 - fleck * .3 * (1.0 - geoLine) * (1.0 - navyF);
+    amount *= 1.0 - fleck * .3 * (1.0 - geoLine) * (1.0 - navyF) * (1.0 - solid);
     vec3 col = mix(paper, ink, clamp(amount, 0.0, 1.0));
     gl_FragColor = vec4(col, 1.0);
   }
