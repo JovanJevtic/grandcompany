@@ -19,9 +19,9 @@ import * as THREE from '../vendor/three.module.min.js';
 // bg: koliko se vidi pozadina (0..1); at: progres kad prelaz u ovo poglavlje počinje;
 // city: 0 = pozadina je samo nebo u oblacima, 1 = grad sa neboderima (tek kad se izađe kroz prozor).
 export const STAGES = [
-  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 4.4, angle: 45, bg: .2, floor: 0, city: 0 },  // kran se okreće
-  { at: .17, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .24, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): zgrada niče, spuštanje na krov, kuka se otkači
-  { at: .58, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
+  { at: 0, paper: '#e4e8f0', ink: '#1e40d6', cell: 4.4, angle: 45, bg: .2, floor: 0, city: 0 },  // uspon uz kran, tabla sa logom, vožnja do kuke
+  { at: .30, paper: '#1e40d6', ink: '#e9eefb', cell: 5.2, angle: 18, bg: .24, floor: 0, city: 0 }, // plavi blok (negativ, nacrt): spuštanje na krov, otkačinjanje, fasada
+  { at: .72, paper: '#f4f1ec', ink: '#1e40d6', cell: 5.0, angle: 45, bg: .42, floor: 0, city: 0 },   // enterijer — topao papir
   // Napolju: puna kobalt pozadina, i dalje u tačkama (tamnija plava; `floor` = najmanja tačka svuda),
   // grad se nazire samo kroz gustinu tačaka. Preko nje se ispisuje rečenica, svijetla i centrirana.
   { at: .925, paper: '#2448e0', ink: '#13289c', cell: 6.0, angle: 30, bg: .55, floor: .2, city: 1 },
@@ -401,10 +401,7 @@ const POST_FRAG = /* glsl */ `
       sampleG(vUv + offs[i] * px, n, d, a, tn);
       float c = step(.1, a);
       float nGeo = max(step(.965, a) * step(a, .985), step(.875, a) * step(a, .905));
-      // "Razlivanje" pune masti ~1px oko objekta. Ako je susjed kran koji se još "razvija"
-      // (lineFade 0), mast se ne razliva — inače bi na početku ostao samo obris krana.
-      float nCrane = step(.985, a) * step(a, .996);
-      solidN = max(solidN, c * smoothstep(.78, .86, tn) * (1.0 - nGeo) * mix(1.0, lineFade, nCrane));
+      solidN = max(solidN, c * smoothstep(.78, .86, tn) * (1.0 - nGeo));
       // obris prema papiru samo za objekte sa punom težinom ivice (tlo je nema)
       // obris prema linijskim objektima (zgrada) i punom kranu gasi se zajedno sa njima (lineFade)
       float lineN = max(max(step(.875, a) * step(a, .985), step(.875, a0) * step(a0, .985)), max(step(.985, a) * step(a, .996), step(.985, a0) * step(a0, .996)));
@@ -637,12 +634,12 @@ export function createCraneRenderer(renderer, world) {
       uniforms.bgShift.value.set(mouse.x * -.012, mouse.y * .01 + .05 - p * .07);
       uniforms.bgScale.value = .86 - .08 * Math.min(1, p / .5);
       // U sobi nema sunca: sjenčenje je mekše, pa enterijer ostane svijetao i čitljiv.
-      const inside = Math.min(1, Math.max(0, (p - .62) / .1));
+      const inside = Math.min(1, Math.max(0, (p - .68) / .1));
       // Kamera je u sobi (vidi crane-scene: širi objektiv od .74–.8): kroz prozor se vidi plavi grad.
       uniforms.room.value = p > .805 ? 1 : 0; // tek kad kamera prođe kroz balkonska vrata (.76 ispred, .82 unutra)
-      // Kran se pojavljuje dok se kamera odmiče od table (vidi CAMERA_KEYS: .0 → .07).
-      const lf = Math.min(1, Math.max(0, (p - .012) / .04));
-      uniforms.lineFade.value = lf * lf * (3 - 2 * lf);
+      // Uvodni kadar je sada baza krana (kamera gleda uvis), pa se kran vidi od prvog trenutka:
+      // "razvijanje" iz tačaka (lineFade) je isključeno i drži se na 1.
+      uniforms.lineFade.value = 1;
       shadeK.value = .78 - .45 * inside * inside * (3 - 2 * inside);
     },
     onBackground(fn) { onBg = fn; if (pending === 0) fn(); },

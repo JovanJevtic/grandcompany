@@ -5,9 +5,9 @@
 // gornja ivica scene, pa se visina offseta mjeri iz njega, a ne iz headera.
 // Dodat je i dispose() da se scena ugasi ako se stranica montira ponovo.
 import * as THREE from '../vendor/three.module.min.js';
-import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=28';
+import {createCraneRenderer, STAGES, stageAt} from './crane-print.js?v=29';
 import {craneQuality} from './crane-quality.js?v=20';
-import {createCraneScene, clamp, smooth} from './crane-scene.js?v=56';
+import {createCraneScene, clamp, smooth} from './crane-scene.js?v=57';
 
 const cover=document.querySelector('.construction-story');
 const viewport=cover?.querySelector('.crane-viewport');
@@ -219,8 +219,9 @@ async function init() {
     govern(gapMs,gapMs>0&&gapMs<60);
     const dt=Math.min(.1,(now-lastTime)/1000||1/60);lastTime=now;
     mouse.x+=(mouseTarget.x-mouse.x)*(1-Math.exp(-4*dt));mouse.y+=(mouseTarget.y-mouse.y)*(1-Math.exp(-4*dt));
-    // Lenis već ublažava skrol; ovdje samo mali dodatni filter, da scena ne kasni za točkićem.
-    progress=Math.abs(targetProgress-progress)<.00015?targetProgress:progress+(targetProgress-progress)*(1-Math.exp(-22*dt));
+    // Lenis već ublažava skrol; ovdje je mekši filter nego prije (18/s), da kamera ne trza
+    // za točkićem — duža putanja se čita mirnije.
+    progress=Math.abs(targetProgress-progress)<.00015?targetProgress:progress+(targetProgress-progress)*(1-Math.exp(-18*dt));
     const state=world.update(progress,width/frameHeight);
     pipeline.setStyle(progress,mouse,window.innerWidth<768);
     // Boja wordmarka prati poglavlje ispod njega (na plavom bloku je svijetao).
