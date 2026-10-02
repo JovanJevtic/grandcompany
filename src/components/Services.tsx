@@ -6,7 +6,7 @@ import { MQ } from '@/lib/motion'
 import { revealChars, revealLines, revealMedia } from '@/lib/reveal'
 
 // Naše fotografije se smjenjuju dok se skrola, jedna po usluzi: prodavnica, kran, stovarište, tabla.
-const LAYERS = ['/photos/prodavnica.jpg', '/photos/kran-utovar.jpg', '/photos/stovariste-pregled.jpg', '/photos/tabla.jpg']
+const LAYERS = ['/photos/prodavnica.webp', '/photos/kran-utovar.webp', '/photos/stovariste-pregled.webp', '/photos/tabla.webp']
 
 export default function Services() {
   const root = useRef<HTMLElement>(null)

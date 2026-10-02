@@ -68,10 +68,10 @@ export const CRANE_RECOMMEND_OVER_KG: number = raw.CRANE_RECOMMEND_OVER_KG
 // Material or work shots only — posed stock photos of workers are banned by
 // the design system (design/DESIGN-SYSTEM.md, "Fotografija").
 const CATEGORY_PHOTO: Record<CategoryId, string> = {
-  'suha-gradnja': '/photos/drywall-wall.jpg',
-  izolacija: '/photos/facade.jpg',
-  veziva: '/photos/pallets-bags.jpg',
-  oprema: '/photos/drywall-frame.jpg',
+  'suha-gradnja': '/photos/drywall-wall.webp',
+  izolacija: '/photos/facade.webp',
+  veziva: '/photos/pallets-bags.webp',
+  oprema: '/photos/drywall-frame.webp',
 }
 
 export const CATEGORIES: Category[] = raw.CATEGORIES.map((c) => ({
@@ -113,12 +113,12 @@ export const PRODUCTS: Product[] = raw.PRODUCTS.map((p) => ({
   pack: (p as { pack?: { size: number; name: string } }).pack,
   image: PHOTOS[p.sku] ?? `/products/${p.sku}.svg`,
   drawing: !PHOTOS[p.sku],
-  photo: PHOTOS[p.sku] ?? (STOCK_BY_SKU[p.sku] ? `/stock/${STOCK_BY_SKU[p.sku]}.jpg` : `/products/${p.sku}.svg`),
+  photo: PHOTOS[p.sku] ?? (STOCK_BY_SKU[p.sku] ? `/stock/${STOCK_BY_SKU[p.sku]}.webp` : `/products/${p.sku}.svg`),
   illustrative: !PHOTOS[p.sku],
 }))
 
-/** Stock photography for sections (Pexels, free licence) — names map to /stock/<name>.jpg */
-export const STOCK = (name: string) => `/stock/${name}.jpg`
+/** Stock photography for sections (Pexels, free licence) — names map to /stock/<name>.webp */
+export const STOCK = (name: string) => `/stock/${name}.webp`
 
 export const PARTNERS = raw.PARTNERS as unknown as Partner[]
 export const PARTNER_TIERS = raw.PARTNER_TIERS as PartnerTier[]
@@ -130,13 +130,13 @@ export const BRAND_NOTES = raw.BRAND_NOTES as [string, string][]
 
 /** Our own photographs of the yard, fleet and shop (never stock) */
 export const PHOTOS_GC = {
-  yardAerial: '/photos/stovariste-vazduh.jpg',
-  yard: '/photos/stovariste-pregled.jpg',
-  yardGate: '/photos/stovariste-ulaz.jpg',
-  crane: '/photos/kran-utovar.jpg',
-  forklift: '/photos/palete-viljuskar.jpg',
-  shop: '/photos/prodavnica.jpg',
-  sign: '/photos/tabla.jpg',
+  yardAerial: '/photos/stovariste-vazduh.webp',
+  yard: '/photos/stovariste-pregled.webp',
+  yardGate: '/photos/stovariste-ulaz.webp',
+  crane: '/photos/kran-utovar.webp',
+  forklift: '/photos/palete-viljuskar.webp',
+  shop: '/photos/prodavnica.webp',
+  sign: '/photos/tabla.webp',
 } as const
 
 export const bySku = (sku: string) => PRODUCTS.find((p) => p.sku === sku)

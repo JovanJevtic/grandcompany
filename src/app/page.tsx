@@ -13,6 +13,7 @@ import Intro from "@/components/landing/Intro";
 import StepBand from "@/components/ui/StepBand";
 import Partners from "@/components/landing/Partners";
 import PostsTeaser from "@/components/landing/PostsTeaser";
+import Yard from "@/components/landing/Yard";
 import SkySwipe from "@/components/landing/SkySwipe";
 import UsesSplit from "@/components/landing/UsesSplit";
 
@@ -44,6 +45,8 @@ export default function Home() {
         <StepBand tone="navy" profile="valley" steps={11} aria-label="Vodiči" className="!z-[45]">
           <PostsTeaser />
         </StepBand>
+        {/* Usputna sekcija pred podnožje: stovarište (foto → plava ilustracija na hover). */}
+        <Yard />
         <Footer />
       </main>
       <CartDrawer />

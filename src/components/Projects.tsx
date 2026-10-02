@@ -18,18 +18,18 @@ type Item = { category: string; side: Photo; blocks: Block[] }
 const ITEMS: Item[] = [
   {
     category: 'Stovarište',
-    side: { src: '/photos/tabla.jpg', alt: 'Tabla Grand Company na ulazu' },
+    side: { src: '/photos/tabla.webp', alt: 'Tabla Grand Company na ulazu' },
     blocks: [
       {
         kind: 'wide',
-        photos: [{ src: '/photos/stovariste-pregled.jpg', alt: 'Stovarište sa paletama materijala' }],
+        photos: [{ src: '/photos/stovariste-pregled.webp', alt: 'Stovarište sa paletama materijala' }],
         text: 'Stovarište u Banjoj Luci. Ploče, profili, izolacija i veziva stoje na paletama, spremni za utovar.',
       },
       {
         kind: 'pair',
         photos: [
-          { src: '/photos/stovariste-ulaz.jpg', alt: 'Ulaz na stovarište' },
-          { src: '/photos/palete-viljuskar.jpg', alt: 'Viljuškar utovaruje palete' },
+          { src: '/photos/stovariste-ulaz.webp', alt: 'Ulaz na stovarište' },
+          { src: '/photos/palete-viljuskar.webp', alt: 'Viljuškar utovaruje palete' },
         ],
         text: 'Stanje na sajtu čitamo iz Pantheona, istog sistema iz kojeg radi prodaja. Viljuškar utovara palete direktno na kamion.',
       },
@@ -37,16 +37,16 @@ const ITEMS: Item[] = [
   },
   {
     category: 'Vozni park',
-    side: { src: '/photos/stovariste-vazduh.jpg', alt: 'Stovarište iz vazduha' },
+    side: { src: '/photos/stovariste-vazduh.webp', alt: 'Stovarište iz vazduha' },
     blocks: [
       {
         kind: 'tall',
-        photos: [{ src: '/photos/kran-utovar.jpg', alt: 'Kamion sa kranom pri utovaru' }],
+        photos: [{ src: '/photos/kran-utovar.webp', alt: 'Kamion sa kranom pri utovaru' }],
         text: 'Vlastiti kamioni sa kranom spuštaju paletu na etažu ili skelu, ne na ulicu.',
       },
       {
         kind: 'wide',
-        photos: [{ src: '/photos/prodavnica.jpg', alt: 'Prodavnica Grand Company' }],
+        photos: [{ src: '/photos/prodavnica.webp', alt: 'Prodavnica Grand Company' }],
         text: 'Prodavnica za manje količine i lično preuzimanje. CE deklaracija i protivpožarni atest idu uz otpremnicu.',
       },
     ],

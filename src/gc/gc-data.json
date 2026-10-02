@@ -1,8 +1,8 @@
 {
  "PRODUCT_PHOTOS": {
-  "ACC-003": "/products/ACC-003.jpg",
-  "ISO-003": "/products/ISO-003.jpg",
-  "ISO-004": "/products/ISO-004.jpg"
+  "ACC-003": "/products/ACC-003.webp",
+  "ISO-003": "/products/ISO-003.webp",
+  "ISO-004": "/products/ISO-004.webp"
  },
  "COMPANY": {
   "name": "Grand Company d.o.o. Banja Luka",
@@ -25,12 +25,12 @@
    "id": "suha-gradnja",
    "label": "Suha gradnja",
    "lead": "Gips-kartonske ploče i pocinčani profili",
-   "image": "img/interior.jpg",
+   "image": "img/interior.webp",
    "gallery": [
-    "img/interior.jpg",
-    "img/hall.jpg"
+    "img/interior.webp",
+    "img/hall.webp"
    ],
-   "app": "img/app/drywall-frame.jpg",
+   "app": "img/app/drywall-frame.webp",
    "color": "#4F6D8F",
    "usage": "Knauf sistemi suhe gradnje za pregradne zidove, obloge i spuštene plafone. Ploče se razlikuju po boji kartona: bijela je standardna, zelena vlagootporna, crvena vatrootporna, a plava ojačana Diamant ploča. Profili se biraju prema debljini zida i sistemu."
   },
@@ -38,10 +38,10 @@
    "id": "izolacija",
    "label": "Izolacija i fasade",
    "lead": "Kamena i staklena vuna, stiropor i stirodur",
-   "image": "img/facade.jpg",
+   "image": "img/facade.webp",
    "gallery": [
-    "img/facade.jpg",
-    "img/office.jpg"
+    "img/facade.webp",
+    "img/office.webp"
    ],
    "color": "#B7862C",
    "usage": "Toplotna i zvučna izolacija za pregradne zidove, potkrovlja, podove i kontaktne fasade. Kamena vuna je negoriva i dobro prigušuje zvuk, staklena vuna u rolni je lakša za kose krovove, a grafitni stiropor daje istu izolaciju sa tanjom pločom."
@@ -50,12 +50,12 @@
    "id": "veziva",
    "label": "Veziva i ljepila",
    "lead": "Mase za spojeve, ljepila, glet i cement",
-   "image": "img/concrete-curves.jpg",
+   "image": "img/concrete-curves.webp",
    "gallery": [
-    "img/concrete-curves.jpg",
-    "img/site-aerial.jpg"
+    "img/concrete-curves.webp",
+    "img/site-aerial.webp"
    ],
-   "app": "img/app/jointing.jpg",
+   "app": "img/app/jointing.webp",
    "color": "#4E7A55",
    "usage": "Gipsane mase za fugovanje, ljepila za fasadne sisteme i keramiku, glet mase i cement. Vreće čuvajte na paleti, na suhom i zaštićene od vlage, i koristite ih unutar roka trajanja otisnutog na pakovanju."
   },
@@ -63,12 +63,12 @@
    "id": "oprema",
    "label": "Vijci i oprema",
    "lead": "Samourezni vijci, trake i ovjesi",
-   "image": "img/steel-frame.jpg",
+   "image": "img/steel-frame.webp",
    "gallery": [
-    "img/steel-frame.jpg",
-    "img/cranes.jpg"
+    "img/steel-frame.webp",
+    "img/cranes.webp"
    ],
-   "app": "img/app/taping.jpg",
+   "app": "img/app/taping.webp",
    "color": "#A8432F",
    "usage": "Pribor za montažu sistema suhe gradnje: vijci za jednostruku i dvostruku oblogu, trake za ojačanje spojeva, akustične trake ispod vodećih profila i direktni ovjesi za plafone."
   }
