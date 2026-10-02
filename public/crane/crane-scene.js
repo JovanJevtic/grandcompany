@@ -229,13 +229,15 @@ export function createCraneScene() {
     const paint=(mark)=>{
       const g=c.getContext('2d');g.fillStyle='#ffffff';g.fillRect(0,0,1024,1024);
       if(mark){
-        const w=520,h=w*216/281,t=document.createElement('canvas');t.width=w;t.height=h;const tc=t.getContext('2d');
+        // Znak je izometrijsko "G" (odnos strana ~310:345); crta se dovoljno veliko da se
+        // vidi i na najmanjem kadru, a tekst ide ispod njega.
+        const w=430,h=w*345.38/310.29,t=document.createElement('canvas');t.width=w;t.height=h;const tc=t.getContext('2d');
         tc.drawImage(mark,0,0,w,h);tc.globalCompositeOperation='source-in';tc.fillStyle='#1b2436';tc.fillRect(0,0,w,h);
-        g.drawImage(t,(1024-w)/2,170);
+        g.drawImage(t,(1024-w)/2,150);
       }
       const fam=getComputedStyle(document.documentElement).getPropertyValue('--font-heavy').trim()||'sans-serif';
-      g.fillStyle='#1b2436';g.textAlign='center';g.textBaseline='alphabetic';g.font=`900 118px ${fam}`;
-      g.fillText('GRAND',512,700);g.fillText('COMPANY',512,830);
+      g.fillStyle='#1b2436';g.textAlign='center';g.textBaseline='alphabetic';g.font=`900 112px ${fam}`;
+      g.fillText('GRAND',512,700);g.fillText('COMPANY',512,824);
       tex.needsUpdate=true;
     };
     paint(null);
